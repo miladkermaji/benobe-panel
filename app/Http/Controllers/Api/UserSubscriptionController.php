@@ -72,6 +72,9 @@ class UserSubscriptionController extends Controller
     {
         $request->validate([
             'plan_id' => 'required|exists:user_membership_plans,id',
+        ], [
+            'plan_id.required' => 'انتخاب طرح اشتراک الزامی است.',
+            'plan_id.exists' => 'طرح اشتراک انتخاب‌شده معتبر نیست.',
         ]);
 
         $user = Auth::user();
@@ -111,8 +114,7 @@ class UserSubscriptionController extends Controller
             $meta['doctor_id'] = $user->id;
         } elseif ($user instanceof \App\Models\Secretary) {
             $meta['secretary_id'] = $user->id;
-        }
-        elseif ($user instanceof \App\Models\Admin\Manager) {
+        } elseif ($user instanceof \App\Models\Admin\Manager) {
             $meta['manager_id'] = $user->id;
         } else {
             $meta['user_id'] = $user->id;
@@ -194,7 +196,7 @@ class UserSubscriptionController extends Controller
         // اگر تراکنش pending بود، verify را اجرا کن
         $verifiedTransaction = app(\Modules\Payment\Services\PaymentService::class)->verify();
         if (!$verifiedTransaction || $verifiedTransaction->status !== 'paid') {
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'تراکنش یافت نشد یا موفقیت آمیز نبود.',
@@ -227,7 +229,7 @@ class UserSubscriptionController extends Controller
                 $subscribable = \App\Models\Doctor::find($meta['doctor_id']);
             } elseif (isset($meta['secretary_id'])) {
                 $subscribable = \App\Models\Secretary::find($meta['secretary_id']);
-            }elseif (isset($meta['manager_id'])) {
+            } elseif (isset($meta['manager_id'])) {
                 $subscribable = \App\Models\Admin\Manager::find($meta['manager_id']);
             }
             if (!$subscribable) {
@@ -238,7 +240,7 @@ class UserSubscriptionController extends Controller
                 ], 404, ['Content-Type' => 'application/json']);
             }
 
-           
+
 
             try {
                 $subscription = UserSubscription::create([
@@ -261,7 +263,7 @@ class UserSubscriptionController extends Controller
                     'plan' => $planModel,
                 ], 200, ['Content-Type' => 'application/json']);
             } catch (\Exception $e) {
-               
+
                 return response()->json([
                     'success' => false,
                     'message' => 'خطا در ثبت اشتراک. لطفا با پشتیبانی تماس بگیرید.',
@@ -270,7 +272,7 @@ class UserSubscriptionController extends Controller
             }
 
         } catch (\Exception $e) {
-           
+
             return response()->json([
                 'success' => false,
                 'message' => 'خطا در فعال‌سازی اشتراک. لطفا با پشتیبانی تماس بگیرید.',
