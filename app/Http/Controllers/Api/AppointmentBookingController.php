@@ -26,6 +26,9 @@ use App\Models\DoctorCounselingWorkSchedule;
 use Modules\Payment\Services\PaymentService;
 use Modules\Payment\App\Http\Models\Transaction;
 use Illuminate\Support\Facades\Auth;
+use Modules\SendOtp\App\Http\Services\MessageService;
+use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use App\Jobs\SendSmsNotificationJob;
 
 class AppointmentBookingController extends Controller
 {
@@ -700,6 +703,45 @@ class AppointmentBookingController extends Controller
                         ]);
 
                         $doctorId = $appointment->doctor_id;
+
+                        // ارسال پیامک پس از پرداخت موفق (مطابق Livewire AppointmentsList)
+                        try {
+                            $userMobile = null;
+                            $userName = null;
+                            if (method_exists($appointment, 'patientable') && $appointment->patientable) {
+                                $userMobile = $appointment->patientable->mobile;
+                                $userName = $appointment->patientable->first_name . ' ' . $appointment->patientable->last_name;
+                            } elseif (isset($appointment->mobile)) {
+                                $userMobile = $appointment->mobile;
+                                $userName = $appointment->first_name . ' ' . $appointment->last_name;
+                            }
+                            if ($userMobile) {
+                                $templateId = 100282;
+                                $params = [
+                                    $appointment->tracking_code
+                                ];
+                                $message = "به نوبه : نوبت شما ثبت شد جزئیات:\nhttps://emr-benobe.ir/profile/user?section=appointments\nکدرهگیری : {$appointment->tracking_code}";
+                                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                                if ($gatewayName === 'pishgamrayan') {
+                                    SendSmsNotificationJob::dispatch(
+                                        $message,
+                                        [$userMobile],
+                                        $templateId,
+                                        $params
+                                    )->delay(now()->addSeconds(5));
+                                } else {
+                                    SendSmsNotificationJob::dispatch(
+                                        $message,
+                                        [$userMobile],
+                                        null,
+                                        $params
+                                    )->delay(now()->addSeconds(5));
+                                }
+                            }
+                        } catch (\Exception $ex) {
+                            Log::error('SMS Send Error (AppointmentBookingController@paymentResult): ' . $ex->getMessage());
+                        }
                     }
                 }
 
