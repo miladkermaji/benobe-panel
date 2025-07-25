@@ -380,8 +380,26 @@ class AppointmentBookingController extends Controller
                 $clinicId = $mainClinic ? $mainClinic->id : null;
 
                 // بررسی در دسترس بودن نوبت
+                $config = null;
+                if ($serviceType === 'in_person') {
+                    $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+                        ->where('clinic_id', $clinicId)
+                        ->first();
+                } else {
+                    $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
+                        ->where('clinic_id', $clinicId)
+                        ->first();
+                }
+
                 $isSlotAvailable = $this->checkSlotAvailability($doctor, $appointmentDate, $appointmentTime, $serviceType, $clinicId);
                 if (!$isSlotAvailable) {
+                    if ($config && !$config->auto_scheduling) {
+                        return response()->json([
+                            'status' => 'error',
+                            'message' => 'امکان رزرو آنلاین برای این پزشک فعال نیست. لطفاً برای دریافت نوبت با مطب تماس بگیرید یا پزشک دیگری را انتخاب کنید.',
+                            'data' => null,
+                        ], 400);
+                    }
                     return response()->json([
                         'status' => 'error',
                         'message' => 'این نوبت دیگر در دسترس نیست.',
