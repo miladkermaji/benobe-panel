@@ -81,8 +81,8 @@ class RegisterDoctorMedicalCenterController extends Controller
             'title' => 'required|string|max:255',
             'type' => 'required|string|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
             'siam_code' => 'nullable|string',
-            'province_id' => 'required|integer',
-            'city_id' => 'required|integer',
+            'province_id' => 'required|integer|exists:zone,id',
+            'city_id' => 'required|integer|exists:zone,id',
             'address' => 'nullable|string',
             'description' => 'nullable|string',
         ], $messages);
