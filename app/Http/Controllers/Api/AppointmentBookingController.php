@@ -579,27 +579,36 @@ class AppointmentBookingController extends Controller
         return $days[$dayOfWeek] ?? $dayOfWeek;
     }
 
+
+    // ... existing code ...
     /**
      * نمایش نتیجه پرداخت و به‌روزرسانی وضعیت نوبت
      *
-     * @OA\Get(
+     * @OA\Post(
      *   path="/appointments/payment/result",
      *   summary="نمایش نتیجه پرداخت و به‌روزرسانی وضعیت نوبت",
      *   description="این متد نتیجه پرداخت را بر اساس transaction_id یا Authority بررسی می‌کند.",
      *   tags={"Appointments"},
-     *   @OA\Parameter(
-     *     name="transaction_id",
-     *     in="query",
-     *     required=false,
-     *     description="شناسه تراکنش پرداخت (Transaction ID)",
-     *     @OA\Schema(type="string")
-     *   ),
-     *   @OA\Parameter(
-     *     name="Authority",
-     *     in="query",
-     *     required=false,
-     *     description="کد Authority برگشتی از درگاه پرداخت",
-     *     @OA\Schema(type="string")
+     *   @OA\RequestBody(
+     *     required=true,
+     *     @OA\MediaType(
+     *       mediaType="application/json",
+     *       @OA\Schema(
+     *         type="object",
+     *         @OA\Property(
+     *           property="transaction_id",
+     *           type="string",
+     *           description="شناسه تراکنش پرداخت (Transaction ID)",
+     *           example="123456"
+     *         ),
+     *         @OA\Property(
+     *           property="Authority",
+     *           type="string",
+     *           description="کد Authority برگشتی از درگاه پرداخت",
+     *           example="A0000000000000000000000000000000000000"
+     *         )
+     *       )
+     *     )
      *   ),
      *   @OA\Response(response=200, description="پرداخت موفق یا ناموفق"),
      *   @OA\Response(response=400, description="پارامتر ارسال نشده یا خطای اعتبارسنجی"),
@@ -610,12 +619,16 @@ class AppointmentBookingController extends Controller
     public function paymentResult(Request $request)
     {
         try {
-            // چک کردن وجود transaction_id
-            $transactionId = $request->input('transaction_id') ?? $request->input('Authority');
+            // اعتبارسنجی ورودی‌ها
+            $validated = $request->validate([
+                'transaction_id' => 'nullable|string',
+                'Authority' => 'nullable|string',
+            ]);
+            $transactionId = $validated['transaction_id'] ?? $validated['Authority'] ?? null;
             if (!$transactionId) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'پارامتر transaction_id یا Authority در درخواست وجود ندارد.',
+                    'message' => 'پارامتر transaction_id یا Authority در ورودی الزامی است. لطفاً یکی از این دو را ارسال کنید.',
                     'data'    => null,
                 ], 400);
             }
