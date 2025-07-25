@@ -674,6 +674,9 @@ textarea.form-control {
         align-items: stretch;
         gap: 0.5rem;
     }
+    .dropdown-menu.show{
+        margin-bottom: 67px !important;
+    }
     .selectDate_datepicker__xkZeS,
     .my-btn-primary,
     .my-form-control {

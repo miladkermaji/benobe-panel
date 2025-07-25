@@ -511,10 +511,11 @@
     <!-- Bottom Navigation for Mobile -->
     <style>
       @media (max-width: 425px) {
-        .mobile-bottom-nav__label{
+        .mobile-bottom-nav__label {
           font-size: 9px !important;
         }
       }
+
       @media (max-width: 768px) {
 
         .sidebar__nav,
@@ -559,6 +560,7 @@
           .mobile-bottom-nav__label {
             font-size: 10px;
           }
+
           .mobile-bottom-nav__item svg {
             width: 22px;
             height: 22px;
@@ -648,10 +650,12 @@
             opacity: 0;
             transform: translateX(-50%) translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateX(-50%) translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
@@ -671,10 +675,12 @@
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -694,10 +700,12 @@
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
@@ -1026,8 +1034,15 @@
     }
 
     @keyframes overlayFadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .mobile-submenu-header {

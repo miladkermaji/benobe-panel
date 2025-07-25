@@ -1185,6 +1185,9 @@ svg {
         height: auto;
         min-height: 70px;
     }
+    body{
+        margin-bottom: 70px !important;
+    }
     
     .header__right {
         flex: 0 1 auto;
