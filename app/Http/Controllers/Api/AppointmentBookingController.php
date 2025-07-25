@@ -25,6 +25,7 @@ use App\Models\DoctorCounselingHoliday;
 use App\Models\DoctorCounselingWorkSchedule;
 use Modules\Payment\Services\PaymentService;
 use Modules\Payment\App\Http\Models\Transaction;
+use Illuminate\Support\Facades\Auth;
 
 class AppointmentBookingController extends Controller
 {
@@ -58,6 +59,24 @@ class AppointmentBookingController extends Controller
             $appointmentDate = $request->input('appointment_date');
             $appointmentTime = $request->input('appointment_time');
             $serviceType     = $request->input('service_type');
+
+            // گرفتن کاربر لاگین‌شده و تعیین guard (اصلاح شده برای JWT guards)
+            $authenticatedUser = null;
+            $patientableType = null;
+            if (Auth::guard('manager-api')->check()) {
+                $authenticatedUser = Auth::guard('manager-api')->user();
+                $patientableType = get_class($authenticatedUser);
+            } elseif (Auth::guard('secretary-api')->check()) {
+                $authenticatedUser = Auth::guard('secretary-api')->user();
+                $patientableType = get_class($authenticatedUser);
+            } elseif (Auth::guard('doctor-api')->check()) {
+                $authenticatedUser = Auth::guard('doctor-api')->user();
+                $patientableType = get_class($authenticatedUser);
+            } elseif (Auth::guard('api')->check()) {
+                $authenticatedUser = Auth::guard('api')->user();
+                $patientableType = get_class($authenticatedUser);
+            }
+            $patientableId = $authenticatedUser ? $authenticatedUser->id : null;
 
             // پیدا کردن پزشک
             $doctor = Doctor::where('id', $doctorId)
@@ -130,6 +149,8 @@ class AppointmentBookingController extends Controller
                     'status' => 'scheduled',
                     'payment_status' => 'pending',
                     'appointment_type' => $serviceType,
+                    'patientable_id' => $patientableId,
+                    'patientable_type' => $patientableType,
                 ]);
                 $reservedAt = $appointment->reserved_at ? $appointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
             }
