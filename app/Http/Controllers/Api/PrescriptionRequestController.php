@@ -548,4 +548,25 @@ class PrescriptionRequestController extends Controller
             'data' => $subUsers,
         ]);
     }
+
+    // تنظیمات درخواست نسخه برای دکتر لاگین شده
+    public function prescriptionSettings(Request $request)
+    {
+        $doctorId = $request->input('doctor_id');
+        if (!$doctorId) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'doctor_id الزامی است',
+                'data' => null,
+            ], 400);
+        }
+        $settings = PrescriptionRequest::where('doctor_id', $doctorId)->first();
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'request_enabled' => $settings ? (bool) $settings->request_enabled : false,
+                'enabled_types' => $settings ? $settings->enabled_types : [],
+            ],
+        ]);
+    }
 }

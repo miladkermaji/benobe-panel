@@ -89,6 +89,7 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
     Route::prefix('prescriptions')->group(function () {
         Route::get('/my', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'myPrescriptions'])->name('api.prescriptions.my');
         Route::post('/request', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'requestPrescription'])->name('api.prescriptions.request');
+        Route::get('/settings', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'prescriptionSettings'])->name('api.prescriptions.settings');
     });
 
     // ثبت‌نام پزشک و مرکز درمانی
