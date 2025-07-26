@@ -6,20 +6,20 @@
           <!-- Toggle Section -->
           <div class="text-center mb-4 p-4 bg-light rounded-3">
             <div
-              class="d-flex justify-content-center align-items-center  p-3 gap-2 bg-white rounded-3 shadow-sm flex-wrap"
+              class="d-flex justify-content-center align-items-center p-3 gap-2 bg-white rounded-3 shadow-sm flex-wrap"
               style="min-height: 60px;">
               <span class="fw-bold fs-5 text-dark mb-0">درخواست نسخه</span>
-              <div class="form-check form-switch m-0" style="display: flex; align-items: center;">
+              <div class="form-check form-switch m-0 position-relative" style="display: flex; align-items: center;">
                 <input class="form-check-input" type="checkbox" id="requestEnabledSwitch"
                   wire:model.live="request_enabled">
                 <label class="form-check-label" for="requestEnabledSwitch"></label>
+                <span class="position-absolute fw-bold text-white"
+                  style="top: 50%; transform: translateY(-50%); z-index: 2; pointer-events: none; font-size: 0.7rem; {{ $request_enabled ? 'left: 17px;' : 'right: 8px;' }}">
+                  {{ $request_enabled ? 'فعال' : 'غیرفعال' }}
+                </span>
               </div>
-              <span class="fw-bold fs-6 mb-0 {{ $request_enabled ? 'text-success' : 'text-muted' }}">
-                {{ $request_enabled ? 'فعال' : 'غیرفعال' }}
-              </span>
             </div>
           </div>
-
           <!-- Types Section - Only show when enabled -->
           @if ($request_enabled)
             <div class="types-section">
@@ -55,10 +55,6 @@
       </div>
     </div>
   </div>
-
-
-
-
   <script>
     document.addEventListener('livewire:init', function() {
       Livewire.on('show-alert', (event) => {

@@ -30,7 +30,6 @@
     --radius-nav: 1rem; /* کاهش برای موبایل */
     --radius-circle: 9999px;
 }
-
 /* استایل‌های عمومی */
 body {
     background-color: var(--background-light);
@@ -42,7 +41,6 @@ body {
     width: 100vw;
     overflow-x: hidden;
 }
-
 /* کارت‌ها */
 .card {
     background: var(--background-card);
@@ -52,12 +50,10 @@ body {
     overflow: hidden;
     margin: 0;
 }
-
 .card:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 18px var(--shadow);
 }
-
 /* هدر کارت */
 .card-header {
     background: var(--gradient-primary);
@@ -69,12 +65,10 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
-
 /* بدنه کارت */
 .card-body {
     padding: 1rem;
 }
-
 /* دکمه‌ها */
 .my-btn-primary {
     background: var(--gradient-primary);
@@ -89,7 +83,6 @@ body {
     align-items: center;
     gap: 0.375rem;
 }
-
 .my-btn-primary:hover {
     background: linear-gradient(
         90deg,
@@ -98,7 +91,6 @@ body {
     );
     transform: translateY(-2px);
 }
-
 .btn-outline-light {
     border: 1px solid rgba(255, 255, 255, 0.9);
     color: #ffffff;
@@ -107,12 +99,10 @@ body {
     font-size: 11px;
     transition: background 0.2s ease, transform 0.2s ease;
 }
-
 .btn-outline-light:hover {
     background: rgba(255, 255, 255, 0.2);
     transform: translateY(-2px);
 }
-
 .btn-gradient-success {
     background: linear-gradient(
         90deg,
@@ -126,7 +116,6 @@ body {
     font-size: 12px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
-
 .btn-gradient-success:hover {
     background: linear-gradient(
         90deg,
@@ -147,17 +136,14 @@ body {
     font-size: 12px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
-
 .btn-gradient-danger:hover:not(:disabled) {
     background: linear-gradient(90deg, #ef4444 0%, var(--text-original) 100%);
     transform: translateY(-2px);
 }
-
 .btn-gradient-danger:disabled {
     background: rgba(200, 200, 200, 0.5);
     cursor: not-allowed;
 }
-
 /* ورودی‌ها */
 .form-control,
 .form-select {
@@ -170,14 +156,12 @@ body {
     height: 38px;
     font-size: 13px;
 }
-
 .form-control:focus,
 .form-select:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.25);
     background: var(--background-card);
 }
-
 .form-label {
     position: absolute;
     top: -17px;
@@ -186,7 +170,6 @@ body {
     font-size: 11px;
     transition: all 0.2s ease;
 }
-
 /* استایل Select2 */
 .select2-container--default .select2-selection--single {
     border: 1px solid var(--border-neutral);
@@ -195,7 +178,6 @@ body {
     background: var(--background-card);
     padding: 0.375rem;
 }
-
 .select2-container--default
     .select2-selection--single
     .select2-selection__rendered {
@@ -203,35 +185,29 @@ body {
     color: var(--text-primary);
     font-size: 13px;
 }
-
 .select2-container--default
     .select2-selection--single
     .select2-selection__arrow {
     height: 38px;
     right: 8px;
 }
-
 .select2-container--default .select2-selection--single:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.25);
 }
-
 .select2-container--default .select2-dropdown {
     border: 1px solid var(--border-neutral);
     border-radius: var(--radius-button);
     background: var(--background-card);
 }
-
 .select2-container--default .select2-results__option {
     padding: 6px 10px;
     color: var(--text-primary);
 }
-
 .select2-container--default .select2-results__option--highlighted {
     background: var(--background-footer);
     color: var(--text-primary);
 }
-
 /* هدر شیشه‌ای */
 .glass-header {
     background: var(--gradient-header);
@@ -244,7 +220,6 @@ body {
     gap: 0.5rem;
     flex-wrap: nowrap;
 }
-
 /* جدول */
 .table {
     width: 100% !important;
@@ -256,12 +231,10 @@ body {
     box-shadow: 0 3px 10px var(--shadow);
     margin: 0;
 }
-
 .table thead {
     background: var(--gradient-primary);
     color: #ffffff;
 }
-
 .table th,
 .table td {
     padding: 0.75rem;
@@ -269,23 +242,19 @@ body {
     vertical-align: middle;
     border-bottom: 1px solid var(--border-neutral);
 }
-
 .table th {
     font-weight: 600;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
-
 .table td {
     font-size: 12px;
     color: var(--text-primary);
 }
-
 .table-hover tbody tr:hover {
     background-color: var(--background-footer);
 }
-
 .table-responsive {
     width: 100%;
     max-width: 100%;
@@ -293,7 +262,6 @@ body {
     -webkit-overflow-scrolling: touch;
     border-radius: var(--radius-button);
 }
-
 /* آیکون جستجو */
 .search-icon {
     position: absolute;
@@ -302,12 +270,10 @@ body {
     transform: translateY(-50%);
     color: var(--text-secondary);
 }
-
 /* انیمیشن */
 .custom-animate-bounce {
     animation: bounce 1.2s infinite;
 }
-
 @keyframes bounce {
     0%,
     100% {
@@ -317,7 +283,6 @@ body {
         transform: translateY(-5px);
     }
 }
-
 /* تنظیمات ریسپانسیو */
 @media (max-width: 991px) {
     .container-fluid {
@@ -332,36 +297,29 @@ body {
         padding: 0.5rem;
         gap: 0.5rem;
     }
-
     .glass-header h1 {
         font-size: 1.1rem;
         flex-grow: 1;
         text-align: right;
     }
-
     .input-group {
         max-width: 100%;
         flex-grow: 1;
     }
-
     .buttons-container {
         flex-direction: row;
         gap: 0.5rem;
         justify-content: flex-end;
     }
-
     .card {
         border-radius: 0.5rem;
     }
-
     .card-header {
         padding: 0.5rem;
     }
-
     .card-body {
         padding: 0.75rem;
     }
-
     .form-control,
     .form-select,
     .select2-container--default .select2-selection--single {
@@ -369,48 +327,39 @@ body {
         font-size: 12px;
         padding: 0.375rem 0.75rem;
     }
-
     .select2-container--default
         .select2-selection--single
         .select2-selection__rendered {
         line-height: 26px;
     }
-
     .form-label {
         font-size: 10px;
         top: -14px;
     }
-
     .my-btn-primary,
     .btn-gradient-success,
     .btn-gradient-danger {
         padding: 0.25rem 0.75rem;
         font-size: 11px;
     }
-
     .btn-outline-light {
         padding: 0.2rem 0.5rem;
         font-size: 10px;
     }
-
     .table th,
     .table td {
         padding: 0.5rem;
         font-size: 11px;
     }
-
     .table th {
         font-size: 12px;
     }
-
     .notes-cards {
         display: block;
     }
-
     .table-responsive {
         display: none;
     }
-
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
@@ -418,7 +367,6 @@ body {
         margin-bottom: 1rem;
         overflow: hidden;
     }
-
     .note-card .card-header {
         background: var(--gradient-primary);
         color: #ffffff;
@@ -428,11 +376,9 @@ body {
         align-items: center;
         gap: 0.5rem;
     }
-
     .note-card .card-body {
         padding: 1rem;
     }
-
     .note-card .card-item {
         display: flex;
         justify-content: space-between;
@@ -440,20 +386,16 @@ body {
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--border-neutral);
     }
-
     .note-card .card-item:last-child {
         border-bottom: none;
     }
-
     .note-card .card-item .label {
         color: var(--text-secondary);
         font-size: 0.875rem;
     }
-
     .note-card .card-item .value {
         font-weight: 500;
     }
-
     .note-card .card-actions {
         display: flex;
         gap: 0.5rem;
@@ -461,7 +403,6 @@ body {
         padding-top: 1rem;
         border-top: 1px solid var(--border-neutral);
     }
-
     .note-card .card-actions button {
         flex: 1;
         padding: 0.5rem;
@@ -474,49 +415,40 @@ body {
         gap: 0.5rem;
         transition: all 0.2s ease;
     }
-
     .note-card .card-actions .edit-btn {
         background: var(--primary-light);
         color: #ffffff;
     }
-
     .note-card .card-actions .delete-btn {
         background: var(--text-original);
         color: #ffffff;
     }
-
     .note-card .card-actions button:hover {
         transform: translateY(-2px);
         box-shadow: 0 2px 4px var(--shadow);
     }
 }
-
 @media (max-width: 767px) {
     body {
         font-size: 14px;
     }
-
     .container-fluid {
         padding: 0 0.25rem;
         margin: 0;
     }
-
     .card {
         border-radius: 0.375rem;
         margin: 0;
     }
-
     .card-body {
         padding: 0.5rem;
     }
-
     .card-header {
         padding: 0.5rem;
         flex-direction: row;
         flex-wrap: nowrap;
         gap: 0.25rem;
     }
-
     .glass-header {
         padding: 0.5rem;
         flex-direction: row;
@@ -524,25 +456,21 @@ body {
         justify-content: space-between;
         align-items: center;
     }
-
     .glass-header h1 {
         font-size: 1rem;
         text-align: right;
         flex-grow: 1;
     }
-
     .input-group {
         max-width: 50%;
         flex-grow: 1;
     }
-
     .buttons-container {
         flex-direction: row;
         gap: 0.25rem;
         justify-content: flex-end;
         flex-wrap: nowrap;
     }
-
     .form-control,
     .form-select,
     .select2-container--default .select2-selection--single {
@@ -550,83 +478,67 @@ body {
         font-size: 11px;
         padding: 0.25rem 0.5rem;
     }
-
     .select2-container--default
         .select2-selection--single
         .select2-selection__rendered {
         line-height: 24px;
     }
-
     .select2-container--default
         .select2-selection--single
         .select2-selection__arrow {
         height: 34px;
         right: 6px;
     }
-
     .form-label {
         font-size: 9px;
         top: -12px;
         right: 6px;
     }
-
     .my-btn-primary,
     .btn-gradient-success,
     .btn-gradient-danger {
         padding: 0.2rem 0.5rem;
         font-size: 10px;
     }
-
     .btn-outline-light {
         padding: 0.15rem 0.4rem;
         font-size: 9px;
     }
-
     .table th,
     .table td {
         padding: 0.4rem;
         font-size: 10px;
     }
-
     .table th {
         font-size: 11px;
     }
-
     .container-fluid .row.g-3 {
         margin: 0;
     }
-
     .container-fluid .row.g-3 > div {
         padding: 0.25rem;
     }
-
     .note-card .card-header {
         padding: 0.5rem;
     }
-
     .note-card .card-body {
         padding: 0.75rem;
     }
-
     .note-card .card-item {
         padding: 0.375rem 0;
     }
-
     .note-card .card-item .label {
         font-size: 0.8125rem;
     }
-
     .note-card .card-actions {
         margin-top: 0.75rem;
         padding-top: 0.75rem;
     }
-
     .note-card .card-actions button {
         padding: 0.375rem;
         font-size: 0.8125rem;
     }
 }
-
 @media (max-width: 575px) {
     body {
         font-size: 13px;
@@ -635,39 +547,30 @@ body {
         padding-left: 0.1rem !important;
         padding-right: 0.1rem !important;
     }
-
     .container-fluid {
         padding: 0 0.2rem;
     }
-
     .card {
         border-radius: 0.25rem;
     }
-
     .card-body {
         padding: 0.4rem;
     }
-
     .card-header {
         padding: 0.4rem;
     }
-
     .glass-header {
         padding: 0.4rem;
     }
-
     .glass-header h1 {
         font-size: 0.9rem;
     }
-
     .input-group {
         max-width: 100%;
     }
-
     .buttons-container {
         gap: 0.2rem;
     }
-
     .form-control,
     .form-select,
     .select2-container--default .select2-selection--single {
@@ -675,86 +578,69 @@ body {
         font-size: 10px;
         padding: 0.2rem 0.4rem;
     }
-
     .select2-container--default
         .select2-selection--single
         .select2-selection__rendered {
         line-height: 22px;
     }
-
     .form-label {
         font-size: 8px;
         top: -10px;
     }
-
     .my-btn-primary,
     .btn-gradient-success,
     .btn-gradient-danger {
         padding: 0.15rem 0.4rem;
         font-size: 9px;
     }
-
     .btn-outline-light {
         padding: 0.1rem 0.3rem;
         font-size: 8px;
     }
-
     .table th,
     .table td {
         padding: 0.3rem;
         font-size: 9px;
     }
-
     .note-card {
         border-radius: 0.5rem;
     }
-
     .note-card .card-header {
         padding: 0.375rem;
     }
-
     .note-card .card-body {
         padding: 0.5rem;
     }
-
     .note-card .card-item {
         padding: 0.25rem 0;
     }
-
     .note-card .card-item .label {
         font-size: 0.75rem;
     }
-
     .note-card .card-actions {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
     }
-
     .note-card .card-actions button {
         padding: 0.25rem;
         font-size: 0.75rem;
     }
 }
-
 /* مخفی کردن گزینه‌های پنل */
 .myPanelOption {
     display: none !important;
 }
-
 /* استایل کارت‌های موبایل برای یادداشت‌ها */
 .notes-cards {
     display: none;
 }
-
 @media (max-width: 991px) {
     .notes-cards {
         display: block;
     }
-
     .table-responsive {
         display: none;
     }
-
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
@@ -762,7 +648,6 @@ body {
         margin-bottom: 1rem;
         overflow: hidden;
     }
-
     .note-card .card-header {
         background: var(--gradient-primary);
         color: #ffffff;
@@ -772,11 +657,9 @@ body {
         align-items: center;
         gap: 0.5rem;
     }
-
     .note-card .card-body {
         padding: 1rem;
     }
-
     .note-card .card-item {
         display: flex;
         justify-content: space-between;
@@ -784,20 +667,16 @@ body {
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--border-neutral);
     }
-
     .note-card .card-item:last-child {
         border-bottom: none;
     }
-
     .note-card .card-item .label {
         color: var(--text-secondary);
         font-size: 0.875rem;
     }
-
     .note-card .card-item .value {
         font-weight: 500;
     }
-
     .note-card .card-actions {
         display: flex;
         gap: 0.5rem;
@@ -805,7 +684,6 @@ body {
         padding-top: 1rem;
         border-top: 1px solid var(--border-neutral);
     }
-
     .note-card .card-actions button {
         flex: 1;
         padding: 0.5rem;
@@ -818,94 +696,75 @@ body {
         gap: 0.5rem;
         transition: all 0.2s ease;
     }
-
     .note-card .card-actions .edit-btn {
         background: var(--primary-light);
         color: #ffffff;
     }
-
     .note-card .card-actions .delete-btn {
         background: var(--text-original);
         color: #ffffff;
     }
-
     .note-card .card-actions button:hover {
         transform: translateY(-2px);
         box-shadow: 0 2px 4px var(--shadow);
     }
 }
-
 @media (max-width: 767px) {
     .note-card .card-header {
         padding: 0.5rem;
     }
-
     .note-card .card-body {
         padding: 0.75rem;
     }
-
     .note-card .card-item {
         padding: 0.375rem 0;
     }
-
     .note-card .card-item .label {
         font-size: 0.8125rem;
     }
-
     .note-card .card-actions {
         margin-top: 0.75rem;
         padding-top: 0.75rem;
     }
-
     .note-card .card-actions button {
         padding: 0.375rem;
         font-size: 0.8125rem;
     }
 }
-
 @media (max-width: 575px) {
     .note-card {
         border-radius: 0.5rem;
     }
-
     .note-card .card-header {
         padding: 0.375rem;
     }
-
     .note-card .card-body {
         padding: 0.5rem;
     }
-
     .note-card .card-item {
         padding: 0.25rem 0;
     }
-
     .note-card .card-item .label {
         font-size: 0.75rem;
     }
-
     .note-card .card-actions {
         margin-top: 0.5rem;
         padding-top: 0.5rem;
     }
-
     .note-card .card-actions button {
         padding: 0.25rem;
         font-size: 0.75rem;
     }
 }
-
 /* Mobile Card Styles */
 @media (max-width: 991px) {
     .table-responsive {
         display: none;
     }
-
     .notes-cards {
         display: block !important;
         padding: 1rem;
     }
-
     .note-card {
         background: #fff;
         border-radius: 0.5rem;
@@ -913,16 +772,13 @@ body {
         margin-bottom: 1rem;
         overflow: hidden;
     }
-
     .note-card-header {
         padding: 1rem;
         border-bottom: 1px solid #f3f4f6;
     }
-
     .note-card-body {
         padding: 1rem;
     }
-
     .note-card-item {
         display: flex;
         flex-direction: row;
@@ -933,18 +789,15 @@ body {
         padding: 0.5rem 0;
         border-bottom: 1px solid var(--border-neutral);
     }
-
     .note-card-item:last-child {
         margin-bottom: 0;
         border-bottom: none;
     }
-
     .note-card-label {
         color: var(--text-secondary);
         font-size: 0.875rem;
         min-width: 80px;
     }
-
     .note-card-value {
         color: var(--text-primary);
         font-size: 0.9375rem;
@@ -952,44 +805,35 @@ body {
         flex: 1;
     }
 }
-
 @media (max-width: 767px) {
     .notes-cards {
         padding: 0.75rem;
     }
-
     .note-card {
         margin-bottom: 0.75rem;
     }
-
     .note-card-header,
     .note-card-body {
         padding: 0.75rem;
     }
-
     .note-card-item {
         margin-bottom: 0.5rem;
     }
 }
-
 @media (max-width: 575px) {
     .notes-cards {
         padding: 0.5rem;
     }
-
     .note-card {
         margin-bottom: 0.5rem;
     }
-
     .note-card-header,
     .note-card-body {
         padding: 0.5rem;
     }
-
     .note-card-label {
         font-size: 0.8125rem;
     }
-
     .note-card-value {
         font-size: 0.875rem;
     }
@@ -997,45 +841,36 @@ body {
 .table {
     margin-bottom: 0;
 }
-
 .table th {
     background-color: var(--background-light);
     font-weight: 600;
     white-space: nowrap;
 }
-
 .table td {
     vertical-align: middle;
 }
-
 .badge {
     font-weight: 500;
     padding: 0.35em 0.65em;
 }
-
 .bg-primary-subtle {
     background-color: rgba(37, 99, 235, 0.1);
 }
-
 .text-primary {
     color: var(--primary) !important;
 }
-
 .group-actions {
     background-color: var(--background-light);
     border-bottom: 1px solid var(--border-neutral);
 }
-
 .form-select-sm {
     height: 32px;
     font-size: 0.875rem;
 }
-
 .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
 }
-
 /* Mobile Card Styles */
 .note-card {
     background: var(--background-card);
@@ -1043,7 +878,6 @@ body {
     box-shadow: 0 2px 8px var(--shadow);
     overflow: hidden;
 }
-
 .note-card-header {
     background: var(--gradient-primary);
     color: #ffffff;
@@ -1053,11 +887,9 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
-
 .note-card-body {
     padding: 1rem;
 }
-
 .note-card-item {
     display: flex;
     justify-content: space-between;
@@ -1065,29 +897,24 @@ body {
     padding: 0.5rem 0;
     border-bottom: 1px solid var(--border-neutral);
 }
-
 .note-card-item:last-child {
     border-bottom: none;
 }
-
 .note-card-label {
     color: var(--text-secondary);
     font-size: 0.875rem;
     min-width: 80px;
 }
-
 .note-card-value {
     color: var(--text-primary);
     font-size: 0.9375rem;
     text-align: left;
     flex: 1;
 }
-
 .search-container {
     position: relative;
     transition: all 0.3s ease;
 }
-
 .search-input {
     height: 36px;
     font-size: 0.875rem;
@@ -1096,109 +923,87 @@ body {
     background-color: rgba(255, 255, 255, 0.95);
     transition: all 0.3s ease;
 }
-
 .search-input:focus {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
     background-color: #ffffff;
 }
-
 .search-icon {
     opacity: 0.6;
     transition: opacity 0.3s ease;
 }
-
 .search-input:focus + .search-icon {
     opacity: 1;
 }
-
 .btn-gradient-success {
     border-radius: 6px !important;
     transition: all 0.3s ease;
 }
-
 .btn-gradient-success:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 @media (min-width: 768px) {
     .glass-header .search-container {
         max-width: 300px;
     }
-
     .glass-header .btn-gradient-success {
         width: auto;
     }
-
     .glass-header .d-flex {
         justify-content: space-between !important;
     }
 }
-
 @media (max-width: 768px) {
     .glass-header {
         padding: 1rem;
     }
-
     .glass-header .d-flex {
         gap: 1rem;
     }
-
     .search-container {
         width: 100%;
     }
-
     .search-input {
         height: 38px;
         font-size: 0.875rem;
     }
-
     .btn-gradient-success {
         width: 100%;
         justify-content: center;
     }
-
     .glass-header h1 {
         font-size: 1.1rem;
         text-align: right;
         width: 100%;
         margin-bottom: 0.5rem;
     }
-
     .glass-header .d-flex.flex-column {
         width: 100%;
     }
-
     .glass-header .d-flex.flex-column > div {
         width: 100%;
     }
 }
-
 @media (max-width: 576px) {
     .glass-header {
         padding: 0.75rem;
     }
-
     .btn-gradient-success-576 {
         height: 36px;
     }
-
     .glass-header h1 {
         font-size: 1rem;
         text-align: right;
         margin-bottom: 0.75rem;
     }
-
     .search-input {
         height: 36px;
         font-size: 0.8125rem;
     }
-
     .glass-header .d-flex.gap-2 {
         flex-direction: column;
         width: 100%;
     }
-
     .glass-header .d-flex.gap-2 > * {
         width: 100%;
     }
@@ -1208,17 +1013,14 @@ body {
         opacity: 0;
         transform: scale(0.8);
     }
-
     100% {
         opacity: 1;
         transform: scale(1);
     }
 }
-
 body {
     background-color: #f6f8fa !important;
 }
-
 .prescription-card {
     border: none;
     border-radius: 1.1rem;
@@ -1227,15 +1029,12 @@ body {
     background: #fff;
     transition: box-shadow 0.2s, border-radius 0.2s;
 }
-
 .prescription-card:hover {
     box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
 }
-
 .search-filter-bar {
     width: 100%;
 }
-
 @media (max-width: 991px) {
     .search-filter-bar {
         flex-direction: row !important;
@@ -1244,37 +1043,30 @@ body {
         justify-content: stretch !important;
         margin-bottom: 0.5rem;
     }
-
     .search-container {
         width: 100%;
         min-width: 0;
     }
 }
-
 .search-icon {
     font-size: 1.1rem;
     color: #b0b0b0;
 }
-
 .prescription-card-header {
     background: var(--gradient-primary);
     color: #fff;
     border-radius: 0.75rem 0.75rem 0 0;
 }
-
 .chevron-icon {
     font-size: 1.3rem;
     transition: transform 0.2s;
 }
-
 .prescription-card .collapse:not(.show) + .chevron-icon {
     transform: rotate(0deg);
 }
-
 .prescription-card .collapse.show + .chevron-icon {
     transform: rotate(180deg);
 }
-
 .prescription-card-header-mobile {
     background: linear-gradient(90deg, #4f9acd 0%, #2e86c1 100%) !important;
     color: #fff !important;
@@ -1286,18 +1078,15 @@ body {
     justify-content: space-between;
     transition: background 0.3s;
 }
-
 .prescription-card-header-mobile .fw-bold {
     color: #fff !important;
     font-size: 1.08rem;
     font-weight: 700;
 }
-
 .prescription-card-header-mobile .text-white-50 {
     color: rgba(255, 255, 255, 0.8) !important;
     font-size: 0.97em;
 }
-
 .chevron-icon {
     font-size: 1.5rem;
     color: #fff;
@@ -1307,33 +1096,27 @@ body {
     align-items: center;
     transition: transform 0.3s;
 }
-
 .prescription-card-header-mobile[aria-expanded="true"] .chevron-icon {
     transform: rotate(180deg);
 }
-
 .collapse.collapse-animated {
     transition: height 0.35s cubic-bezier(0.4, 2, 0.6, 1),
         opacity 0.35s cubic-bezier(0.4, 2, 0.6, 1);
 }
-
 @media (max-width: 991px) {
     .search-filter-bar .d-flex {
         flex-direction: row-reverse !important;
     }
-
     .filter-select-mobile {
         order: 2;
         margin-right: auto;
         margin-left: 0;
     }
-
     .search-container {
         order: 1;
         margin-left: 0.5rem;
     }
 }
-
 .note-card-item {
     display: flex;
     justify-content: space-between;
@@ -1344,30 +1127,25 @@ body {
     min-height: 20px;
     background: none;
 }
-
 .row.gx-2 {
     margin-left: 0;
     margin-right: 0;
     margin-bottom: 0.18rem;
 }
-
 .col-6.note-card-item {
     padding-left: 0.4rem;
     padding-right: 0.4rem;
     justify-content: space-between;
 }
-
 .row.gx-2 .col-6.note-card-item:last-child {
     justify-content: flex-end;
     text-align: left;
 }
-
 .row.gx-2 .col-6.note-card-item:last-child .note-card-label,
 .row.gx-2 .col-6.note-card-item:last-child .note-card-value {
     justify-content: flex-end;
     text-align: left;
 }
-
 .note-card-label,
 .note-card-value {
     display: flex;
@@ -1376,7 +1154,6 @@ body {
     word-break: break-word;
     flex-wrap: wrap;
 }
-
 @media (max-width: 400px) {
     .note-card-label,
     .note-card-value {
@@ -1386,7 +1163,6 @@ body {
         white-space: normal;
     }
 }
-
 .note-card-label {
     color: #7b8a99;
     font-size: 0.93em;
@@ -1394,7 +1170,6 @@ body {
     margin-left: 0.18rem;
     font-weight: 500;
 }
-
 .note-card-value {
     color: #222;
     font-size: 1.01em;
@@ -1402,16 +1177,13 @@ body {
     flex: 1;
     font-weight: 600;
 }
-
 .note-card-item:last-child {
     border-bottom: none;
 }
-
 .note-card-item .badge {
     font-size: 0.85em;
     margin-left: 0.15rem;
 }
-
 .accordion-content {
     max-height: 0;
     overflow: hidden;
@@ -1419,86 +1191,126 @@ body {
         opacity 0.35s cubic-bezier(0.4, 2, 0.6, 1);
     opacity: 0;
 }
-
 .accordion-content.show {
     max-height: 1000px;
     opacity: 1;
 }
-
 .chevron-icon svg {
     transition: transform 0.3s;
 }
-
 .chevron-icon.open svg {
     transform: rotate(180deg);
 }
 .tracking-modal-animate {
     animation: trackingModalFadeInScale 0.35s cubic-bezier(0.4, 2, 0.6, 1) both;
 }
-
-
-
-    /* Toggle Switch Styling */
-    .form-switch .form-check-input {
-      width: 3rem;
-      height: 1.5rem;
-      background-color: #6c757d;
-      border-color: #6c757d;
-      background-image: none;
-      position: relative;
-      appearance: none;
-      -webkit-appearance: none;
-    }
-
-    .form-switch .form-check-input:checked {
-      background-color: #28a745;
-      border-color: #28a745;
-      background-image: none;
-    }
-
-    .form-switch .form-check-input:focus {
-      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-
-    /* Toggle Circle */
-    .form-switch .form-check-input::before {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 2px;
-      width: 1rem;
-      height: 1rem;
-      background-color: white;
-      border-radius: 50%;
-      transition: all 0.3s ease;
-    }
-
-    .form-switch .form-check-input:checked::before {
-      transform: translateX(1.5rem);
-    }
-
-    /* Checkbox Styling */
-    .form-check-input {
-      width: 1.25rem;
-      height: 1.25rem;
-    }
-
-    .form-check-input:checked {
-      background-color: #28a745;
-      border-color: #28a745;
-    }
-
-    .form-check-input:focus {
-      box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-    }
-
-    /* Hover effect for checkbox containers */
-    .form-check.border:hover {
-      border-color: #28a745 !important;
-      background-color: #f8f9fa;
-    }
-
-    /* Selected state */
-    .form-check-input:checked+.form-check-label {
-      color: #28a745 !important;
-    }
+/* Toggle Switch Styling */
+.form-switch .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+    background-color: #6c757d;
+    border-color: #6c757d;
+    background-image: none;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.form-switch .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+    background-image: none;
+}
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+/* Toggle Circle */
+.form-switch .form-check-input::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 1rem;
+    height: 1rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+.form-switch .form-check-input:checked::before {
+    transform: translateX(1.5rem);
+}
+/* Checkbox Styling */
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+/* Hover effect for checkbox containers */
+.form-check.border:hover {
+    border-color: #28a745 !important;
+    background-color: #f8f9fa;
+}
+/* Selected state */
+.form-check-input:checked + .form-check-label {
+    color: #28a745 !important;
+}
+/* Bigger Toggle Switch */
+.form-switch .form-check-input {
+    width: 5rem;
+    height: 2.5rem;
+    background-color: #6c757d;
+    border-color: #6c757d;
+    background-image: none;
+    position: relative;
+    appearance: none;
+    -webkit-appearance: none;
+}
+.form-switch .form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+    background-image: none;
+}
+.form-switch .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+/* Toggle Circle */
+.form-switch .form-check-input::before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 1.75rem;
+    height: 1.75rem;
+    background-color: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+.form-switch .form-check-input:checked::before {
+    transform: translateX(2.5rem);
+}
+/* Checkbox Styling */
+.form-check-input {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+/* Hover effect for checkbox containers */
+.form-check.border:hover {
+    border-color: #28a745 !important;
+    background-color: #f8f9fa;
+}
+/* Selected state */
+.form-check-input:checked + .form-check-label {
+    color: #28a745 !important;
+}
