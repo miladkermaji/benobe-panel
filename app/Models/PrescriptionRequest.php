@@ -20,11 +20,15 @@ class PrescriptionRequest extends Model
         'clinic_id',
         'transaction_id',
         'referral_code',
+        'request_enabled',
+        'enabled_types',
     ];
 
     protected $casts = [
         'tracking_code' => 'integer',
         'price' => 'integer',
+        'request_enabled' => 'boolean',
+        'enabled_types' => 'array',
     ];
 
     public function requestable()

@@ -11,4 +11,9 @@ class DoctorPrescriptionController extends Controller
     {
         return view('dr.panel.doctor-prescriptions.index');
     }
+
+    public function settings()
+    {
+        return view('dr.panel.doctor-prescriptions.settings');
+    }
 }

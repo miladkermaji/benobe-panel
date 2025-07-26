@@ -102,6 +102,10 @@
               <li class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
                 <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
               </li>
+              <li
+                class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
+                <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
+              </li>
             </ul>
           </li>
         @endif

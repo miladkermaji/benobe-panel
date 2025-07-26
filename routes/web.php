@@ -25,6 +25,7 @@ use App\Http\Controllers\Dr\Panel\Profile\DrProfileController;
 use App\Http\Controllers\Dr\Panel\Profile\LoginLogsController;
 use App\Http\Controllers\Admin\Panel\Setting\SettingController;
 use App\Http\Controllers\Admin\Panel\UserSubscriptionController;
+use App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController;
 use App\Http\Controllers\Admin\Panel\UserAppointmentFeeController;
 use App\Http\Controllers\Admin\Panel\UserMembershipPlanController;
 use App\Http\Controllers\Dr\Panel\Tickets\TicketResponseController;
@@ -69,7 +70,6 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
-use App\Http\Controllers\Dr\Panel\DoctorFaqs\DoctorFaqController;
 
 //manager login routes
 /* login manager routes */
@@ -106,9 +106,9 @@ Route::prefix('admin')
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'create'])->name('create');
             Route::get('/{id}', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'show'])->name('show');
-            
 
-Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
+
+            Route::get('/tickets', [\App\Http\Controllers\Admin\Panel\Tickets\TicketController::class, 'index'])->name('tickets.index');
 
 
         });
@@ -879,6 +879,7 @@ Route::post('/dr/panel/profile/subusers/quick-create-user', [\App\Http\Controlle
 Route::middleware(['doctor'])->prefix('dr/panel')->group(function () {
     // ... existing code ...
     Route::get('my-prescriptions', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'index'])->name('dr.panel.my-prescriptions');
+    Route::get('my-prescriptions/settings', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'settings'])->name('dr.panel.my-prescriptions.settings');
 });
 
 Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(function () {
