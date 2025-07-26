@@ -273,7 +273,18 @@ class DoctorServiceList extends Component
             $this->dispatch('show-alert', type: 'warning', message: 'هیچ خدمتی انتخاب نشده است.');
             return;
         }
-        DoctorService::whereIn('id', $this->selectedDoctorServices)->delete();
+
+        // فیلتر کردن مقادیر برای اطمینان از اینکه فقط اعداد صحیح هستند
+        $validIds = array_filter($this->selectedDoctorServices, function ($id) {
+            return is_numeric($id) && is_int((int)$id);
+        });
+
+        if (empty($validIds)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ شناسه معتبری برای حذف یافت نشد.');
+            return;
+        }
+
+        DoctorService::whereIn('id', $validIds)->delete();
         $this->selectedDoctorServices = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'خدمات انتخاب‌شده با موفقیت حذف شدند!');
@@ -310,7 +321,17 @@ class DoctorServiceList extends Component
 
     private function updateStatus($status)
     {
-        DoctorService::whereIn('id', $this->selectedDoctorServices)
+        // فیلتر کردن مقادیر برای اطمینان از اینکه فقط اعداد صحیح هستند
+        $validIds = array_filter($this->selectedDoctorServices, function ($id) {
+            return is_numeric($id) && is_int((int)$id);
+        });
+
+        if (empty($validIds)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ شناسه معتبری برای به‌روزرسانی یافت نشد.');
+            return;
+        }
+
+        DoctorService::whereIn('id', $validIds)
             ->update(['status' => $status]);
 
         $this->selectedDoctorServices = [];
