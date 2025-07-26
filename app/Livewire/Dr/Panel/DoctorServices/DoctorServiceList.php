@@ -62,7 +62,6 @@ class DoctorServiceList extends Component
         if ($this->selectedClinicId !== 'default') {
             $clinic = Clinic::where('id', $this->selectedClinicId)->where('doctor_id', $doctorId)->first();
             if (!$clinic) {
-                Log::warning('کلینیک انتخاب‌شده معتبر نیست: ' . $this->selectedClinicId);
                 $this->selectedClinicId = 'default';
             }
         }
@@ -80,7 +79,6 @@ class DoctorServiceList extends Component
         if (!$hasServices) {
             $freeInsurance = Insurance::where('id', 72)->first();
             if (!$freeInsurance) {
-                Log::warning('بیمه آزاد با ID 72 یافت نشد.');
                 return;
             }
             $visitService = Service::where('name', 'ویزیت')->first();
@@ -90,7 +88,6 @@ class DoctorServiceList extends Component
                     'description' => 'ویزیت عمومی پزشک',
                     'status' => true,
                 ]);
-                Log::info('خدمت ویزیت در جدول Service ایجاد شد.');
             }
             DoctorService::create([
                 'doctor_id' => $doctorId,
@@ -105,9 +102,8 @@ class DoctorServiceList extends Component
                 'status' => 1,
                 'parent_id' => null,
             ]);
-            Log::info('خدمت ویزیت پیش‌فرض برای پزشک با ID ' . $doctorId . ' ایجاد شد.');
         } else {
-            Log::info('ویزیت پیش‌فرض ایجاد نشد چون حداقل یک خدمت برای پزشک با ID ' . $doctorId . ' وجود دارد.');
+           
         }
     }
 
@@ -121,12 +117,10 @@ class DoctorServiceList extends Component
     public function clinicSelected($clinicId = 'default')
     {
         $this->selectedClinicId = $clinicId;
-        Log::info('clinicSelected called with clinicId: ' . $this->selectedClinicId);
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
             $clinic = Clinic::where('id', $this->selectedClinicId)->where('doctor_id', $doctorId)->first();
             if (!$clinic) {
-                Log::warning('کلینیک انتخاب‌شده معتبر نیست: ' . $this->selectedClinicId);
                 $this->selectedClinicId = 'default';
             }
         }
@@ -167,9 +161,7 @@ class DoctorServiceList extends Component
         ->where('status', true);
 
         $paginated = $query->paginate($this->perPage);
-        Log::info('Selected Clinic ID: ' . $this->selectedClinicId);
-        Log::info('Doctor ID: ' . $doctorId);
-        Log::info('Query Results: ', $paginated->toArray());
+  
 
         $paginated->getCollection()->each(function ($service) {
             $service->isOpen = in_array($service->id, $this->openServices);
@@ -342,7 +334,6 @@ class DoctorServiceList extends Component
     public function render()
     {
         $services = $this->readyToLoad ? $this->getDoctorServicesQuery() : null;
-        Log::info('Render called, readyToLoad: ' . ($this->readyToLoad ? 'true' : 'false'));
         return view('livewire.dr.panel.doctor-services.doctor-service-list', ['services' => $services]);
     }
 }
