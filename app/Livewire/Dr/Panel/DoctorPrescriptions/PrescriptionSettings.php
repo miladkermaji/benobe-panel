@@ -46,6 +46,8 @@ class PrescriptionSettings extends Component
         if (!$settings) {
             $settings = new PrescriptionRequest();
             $settings->doctor_id = $doctor->id;
+            $settings->requestable_type = 'App\Models\Doctor';
+            $settings->requestable_id = $doctor->id;
         }
         $settings->request_enabled = $this->request_enabled ? 1 : 0;
         $settings->enabled_types = $this->enabled_types;
