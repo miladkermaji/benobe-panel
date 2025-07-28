@@ -88,7 +88,8 @@ class HeaderComponent extends Component
     protected function loadMedicalCenters($doctor)
     {
         if ($doctor) {
-            $this->medicalCenters = $doctor->medicalCenters()->select('id', 'name', 'is_active', 'province_id', 'city_id')->with(['province', 'city'])->get();
+            // فعلاً خالی - بعداً با داده‌های واقعی پر می‌شود
+            $this->medicalCenters = collect();
         }
     }
 
@@ -105,7 +106,7 @@ class HeaderComponent extends Component
             }
 
             // اگر مرکز درمانی انتخاب‌شده‌ای ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
-            $activeMedicalCenters = $this->medicalCenters->where('is_active', true);
+            $activeMedicalCenters = collect($this->medicalCenters)->where('is_active', true);
 
             if ($activeMedicalCenters->count() > 0) {
                 // اولین مرکز درمانی فعال را انتخاب کن

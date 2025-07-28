@@ -43,7 +43,7 @@ class MedicalCenter extends Model
 
     public function doctors()
     {
-        return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
+        return $this->belongsToMany(Doctor::class, 'doctor_medical_center', 'medical_center_id', 'doctor_id');
     }
 
     public function doctor()

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dr\Panel;
 
 use Carbon\Carbon;
-use App\Models\Clinic;
 use App\Models\Secretary;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
@@ -61,7 +60,7 @@ class DrPanelController extends Controller
             ->where('payment_status', 'paid')
             ->where('status', 'attended')
             ->sum('final_price');
-        $selectedClinicId = $this->getSelectedClinicId();
+        $selectedMedicalCenterId = $this->getSelectedMedicalCenterId();
         return view('dr.panel.index', compact(
             'totalPatientsToday',
             'visitedPatients',
@@ -69,7 +68,7 @@ class DrPanelController extends Controller
             'weeklyIncome',
             'monthlyIncome',
             'totalIncome',
-            'selectedClinicId',
+            'selectedMedicalCenterId',
         ));
     }
 

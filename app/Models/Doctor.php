@@ -389,7 +389,7 @@ class Doctor extends Authenticatable implements JWTSubject
 
     public function medicalCenters()
     {
-        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center');
+        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center', 'doctor_id', 'medical_center_id');
     }
     public function permissions()
     {

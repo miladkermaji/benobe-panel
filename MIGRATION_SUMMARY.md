@@ -1,153 +1,120 @@
-# خلاصه تغییرات Migration - تبدیل Clinics به Medical Centers
+# خلاصه تغییرات Migration و Model برای تبدیل clinics به medical_centers
 
-## هدف
-تبدیل جدول `clinics` به جدول `medical_centers` با اضافه کردن فیلد `prescription_tariff` و تغییر تمام روابط مرتبط.
+## تغییرات انجام شده:
 
-## تغییرات انجام شده
+### 1. Migration های جدید ایجاد شده:
+- `2025_07_28_000001_add_prescription_tariff_to_medical_centers_table.php` - اضافه کردن فیلد prescription_tariff
+- `2025_07_28_000002_update_appointments_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در appointments
+- `2025_07_28_000003_update_prescription_requests_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در prescription_requests
+- `2025_07_28_000004_update_doctor_notes_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در doctor_notes
+- `2025_07_28_000005_update_vacations_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در vacations
+- `2025_07_28_000006_update_order_visits_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در order_visits
+- `2025_07_28_000007_update_counseling_appointments_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در counseling_appointments
+- `2025_07_28_000008_update_best_doctors_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در best_doctors
+- `2025_07_28_000009_update_clinic_deposit_settings_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در clinic_deposit_settings
+- `2025_07_28_000010_update_doctor_selected_clinics_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در doctor_selected_clinics
+- `2025_07_28_000011_update_doctor_clinic_table_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در doctor_clinic
+- `2025_07_28_000012_rename_doctor_clinic_to_doctor_medical_center.php` - تغییر نام جدول doctor_clinic به doctor_medical_center
+- `2025_07_28_000013_rename_clinic_deposit_settings_to_medical_center_deposit_settings.php` - تغییر نام جدول clinic_deposit_settings به medical_center_deposit_settings
+- `2025_07_28_000014_rename_doctor_selected_clinics_to_doctor_selected_medical_centers.php` - تغییر نام جدول doctor_selected_clinics به doctor_selected_medical_centers
+- `2025_07_28_000015_drop_clinics_table_and_related_tables.php` - حذف جداول clinics و clinic_galleries
+- `2025_07_28_000016_update_manual_appointment_settings_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در manual_appointment_settings
+- `2025_07_28_000017_update_manual_appointments_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در manual_appointments
+- `2025_07_28_000018_update_consultations_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در consultations
+- `2025_07_28_000019_update_doctor_appointment_configs_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در doctor_appointment_configs
+- `2025_07_28_000020_update_doctor_counseling_configs_clinic_to_medical_center.php` - تغییر clinic_id به medical_center_id در doctor_counseling_configs
 
-### 1. اضافه کردن فیلد prescription_tariff به جدول medical_centers
-- **فایل**: `2025_07_28_000001_add_prescription_tariff_to_medical_centers_table.php`
-- **تغییر**: اضافه کردن فیلد `prescription_tariff` به جدول `medical_centers`
+### 2. Migration های جدید برای بازسازی جداول:
+- `2025_07_28_000021_create_doctor_appointment_configs_table.php` - بازسازی جدول doctor_appointment_configs
+- `2025_07_28_000022_create_doctor_counseling_configs_table.php` - بازسازی جدول doctor_counseling_configs
+- `2025_07_28_000023_create_manual_appointment_settings_table.php` - بازسازی جدول manual_appointment_settings
+- `2025_07_28_000024_create_manual_appointments_table.php` - بازسازی جدول manual_appointments
+- `2025_07_28_000025_create_consultations_table.php` - بازسازی جدول consultations
+- `2025_07_28_000026_create_order_visits_table.php` - بازسازی جدول order_visits
 
-### 2. تغییر کلیدهای خارجی از clinics به medical_centers
+### 3. Migration های قدیمی به‌روزرسانی شده:
+تمام migration های قدیمی که به جدول clinics اشاره می‌کردند، به‌روزرسانی شدند تا به medical_centers اشاره کنند.
 
-#### جداول اصلی:
-- **appointments**: `clinic_id` → `medical_center_id`
-- **prescription_requests**: `clinic_id` → `medical_center_id`
-- **doctor_notes**: `clinic_id` → `medical_center_id`
-- **vacations**: `clinic_id` → `medical_center_id`
-- **order_visits**: `clinic_id` → `medical_center_id`
-- **counseling_appointments**: `clinic_id` → `medical_center_id`
-- **best_doctors**: `clinic_id` → `medical_center_id`
-- **clinic_deposit_settings**: `clinic_id` → `medical_center_id`
-- **doctor_selected_clinics**: `clinic_id` → `medical_center_id`
-- **doctor_clinic**: `clinic_id` → `medical_center_id`
-- **manual_appointment_settings**: `clinic_id` → `medical_center_id`
-- **manual_appointments**: `clinic_id` → `medical_center_id`
-- **consultations**: `clinic_id` → `medical_center_id`
-- **doctor_appointment_configs**: `clinic_id` → `medical_center_id`
-- **doctor_counseling_configs**: `clinic_id` → `medical_center_id`
+### 4. Model های به‌روزرسانی شده:
+- **MedicalCenter** - اضافه کردن فیلد prescription_tariff و روابط جدید
+- **Doctor** - حذف روابط clinics و به‌روزرسانی روابط
+- **Appointment** - تغییر رابطه clinic به medicalCenter
+- **PrescriptionRequest** - تغییر رابطه clinic به medicalCenter
+- **DoctorNote** - تغییر رابطه clinic به medicalCenter
+- **Vacation** - تغییر رابطه clinic به medicalCenter
+- **BestDoctor** - تغییر رابطه clinic به medicalCenter
+- **CounselingAppointment** - تغییر رابطه clinic به medicalCenter
+- **Consultation** - تغییر رابطه clinic به medicalCenter
+- **ManualAppointment** - تغییر رابطه clinic به medicalCenter
+- **ManualAppointmentSetting** - تغییر رابطه clinic به medicalCenter
+- **DoctorAppointmentConfig** - تغییر رابطه clinic به medicalCenter
+- **DoctorCounselingConfig** - تغییر رابطه clinic به medicalCenter
+- **Secretary** - تغییر رابطه clinic به medicalCenter
+- **DoctorHoliday** - تغییر رابطه clinic به medicalCenter
+- **DoctorService** - تغییر رابطه clinic به medicalCenter
+- **Insurance** - تغییر رابطه clinic به medicalCenter
+- **DoctorWalletTransaction** - تغییر رابطه clinic به medicalCenter
+- **UserBlocking** - تغییر رابطه clinic به medicalCenter
+- **SecretaryPermission** - تغییر رابطه clinic به medicalCenter
+- **CounselingDailySchedule** - تغییر رابطه clinic به medicalCenter
+- **DoctorCounselingHoliday** - تغییر رابطه clinic به medicalCenter
+- **SpecialDailySchedule** - تغییر رابطه clinic به medicalCenter
+- **CounselingHoliday** - تغییر رابطه clinic به medicalCenter
+- **DoctorCounselingWorkSchedule** - تغییر رابطه clinic به medicalCenter
 
-#### جداول اضافی:
-- **secretaries**: `clinic_id` → `medical_center_id`
-- **doctor_holidays**: `clinic_id` → `medical_center_id`
-- **doctor_counseling_work_schedules**: `clinic_id` → `medical_center_id`
-- **secretary_permissions**: `clinic_id` → `medical_center_id`
-- **user_blockings**: `clinic_id` → `medical_center_id`
-- **special_daily_schedules**: `clinic_id` → `medical_center_id`
-- **counseling_daily_schedules**: `clinic_id` → `medical_center_id`
-- **counseling_holidays**: `clinic_id` → `medical_center_id`
-- **doctor_counseling_holidays**: `clinic_id` → `medical_center_id`
-- **doctor_work_schedules**: `clinic_id` → `medical_center_id`
-- **insurances**: `clinic_id` → `medical_center_id`
-- **doctor_wallet_transactions**: `clinic_id` → `medical_center_id`
+### 5. Model های جدید ایجاد شده:
+- **MedicalCenterDepositSetting** - مدل جدید برای جدول medical_center_deposit_settings
+- **OrderVisit** - مدل جدید برای جدول order_visits
+- **DoctorSelectedMedicalCenter** - مدل جدید برای جدول doctor_selected_medical_centers
 
-### 3. تغییر نام جداول
-- **doctor_clinic** → **doctor_medical_center**
-- **clinic_deposit_settings** → **medical_center_deposit_settings**
-- **doctor_selected_clinics** → **doctor_selected_medical_centers**
+### 6. Model های حذف شده:
+- **Clinic** - حذف کامل
+- **ClinicDepositSetting** - حذف کامل
+- **ClinicGallery** - حذف کامل
+- **DoctorSelectedClinic** - حذف کامل
 
-### 4. حذف جداول قدیمی
-- جدول `clinics` و تمام جداول مرتبط با آن
-- جدول `clinic_galleries`
+### 7. Trait ها و Controller های به‌روزرسانی شده:
+- **HasSelectedClinic** - تغییر متدها برای استفاده از medical_center
+- **DrPanelController** - تغییر متد getSelectedClinicId به getSelectedMedicalCenterId
+- **HeaderComponent** - تغییر کامل برای استفاده از medical_center
+- **HeaderComponent View** - تغییر کامل برای استفاده از medical_center
 
-### 5. به‌روزرسانی مدل‌ها
+### 8. فایل‌های حذف شده:
+- `database/migrations/2024_09_19_062139_create_clinics_table.php`
+- `database/migrations/2025_07_21_000002_add_prescription_fee_to_clinics_table.php`
+- `app/Models/Clinic.php`
+- `app/Models/ClinicDepositSetting.php`
+- `app/Models/ClinicGallery.php`
+- `app/Models/DoctorSelectedClinic.php`
 
-#### مدل‌های به‌روزرسانی شده:
-- **MedicalCenter**: اضافه کردن فیلد `prescription_tariff` و روابط جدید
-- **Appointment**: تغییر رابطه `clinic` به `medicalCenter`
-- **PrescriptionRequest**: تغییر رابطه `clinic` به `medicalCenter`
-- **DoctorSelectedMedicalCenter**: تغییر نام و روابط
-- **DoctorNote**: تغییر رابطه `clinic` به `medicalCenter`
-- **Vacation**: تغییر رابطه `clinic` به `medicalCenter`
-- **BestDoctor**: تغییر رابطه `clinic` به `medicalCenter`
-- **MedicalCenterDepositSetting**: مدل جدید
-- **OrderVisit**: مدل جدید
-- **CounselingAppointment**: تغییر رابطه `clinic` به `medicalCenter`
-- **Consultation**: تغییر رابطه `clinic` به `medicalCenter`
-- **ManualAppointment**: تغییر رابطه `clinic` به `medicalCenter`
-- **ManualAppointmentSetting**: تغییر رابطه `clinic` به `medicalCenter`
-- **DoctorAppointmentConfig**: تغییر رابطه `clinic` به `medicalCenter`
-- **DoctorCounselingConfig**: تغییر رابطه `clinic` به `medicalCenter`
-- **Doctor**: تغییر روابط `selectedClinic` به `selectedMedicalCenter` و حذف متدهای مربوط به clinic
+## مراحل بعدی:
 
-#### مدل‌های حذف شده:
-- **Clinic**: حذف کامل
-- **ClinicDepositSetting**: حذف کامل
-- **ClinicGallery**: حذف کامل
+### 1. قبل از اجرای Migration ها:
+- **Backup از دیتابیس** تهیه کنید
+- **Migration های موجود** را rollback کنید (در صورت نیاز)
+- **داده‌های موجود** در جدول clinics را به medical_centers منتقل کنید
 
-### 6. Migration های جدید ایجاد شده
-- `2025_07_28_000021_create_doctor_appointment_configs_table.php`
-- `2025_07_28_000022_create_doctor_counseling_configs_table.php`
-- `2025_07_28_000023_create_manual_appointment_settings_table.php`
-- `2025_07_28_000024_create_manual_appointments_table.php`
-- `2025_07_28_000025_create_consultations_table.php`
-- `2025_07_28_000026_create_order_visits_table.php`
-
-### 7. Migration های حذف شده
-- `2024_09_19_062139_create_clinics_table.php`
-- `2025_07_21_000002_add_prescription_fee_to_clinics_table.php`
-- `2025_03_20_100000_create_doctor_clinic_table.php`
-- `2025_06_16_082822_create_doctor_selected_clinics_table.php`
-- `2025_01_26_113551_create_clinic_deposit_settings_table.php`
-- `2025_01_11_181906_create_doctor_appointment_configs_table.php`
-- `2025_01_28_085320_create_doctor_counseling_configs_table.php`
-- `2025_01_19_143416_create_manual_appointment_settings_table.php`
-- `2025_03_02_130303_create_order_visits_table.php`
-
-### 8. Migration های قدیمی به‌روزرسانی شده
-تمام migration های قدیمی که به جدول `clinics` اشاره می‌کردند، به‌روزرسانی شدند تا به جدول `medical_centers` اشاره کنند.
-
-## نحوه اجرا
-
-### مرحله 1: اجرای migration ها
+### 2. اجرای Migration ها:
 ```bash
 php artisan migrate
 ```
 
-### مرحله 2: بررسی خطاها
-```bash
-php artisan migrate:status
-```
+### 3. بررسی و تست:
+- **Controller ها** که از Clinic استفاده می‌کنند را بررسی کنید
+- **View ها** که clinic data نمایش می‌دهند را بررسی کنید
+- **Livewire Components** که با clinic کار می‌کنند را بررسی کنید
+- **Route ها** که به clinic resources اشاره می‌کنند را بررسی کنید
 
-### مرحله 3: تست عملکرد
-- بررسی عملکرد API ها
-- بررسی عملکرد پنل ادمین
-- بررسی عملکرد پنل پزشک
+### 4. تست جامع:
+- **نوبت‌دهی** در مراکز درمانی
+- **مشاوره آنلاین**
+- **مدیریت مراکز درمانی**
+- **گزارش‌گیری**
+- **پروفایل پزشک**
 
-## نکات مهم
-
-1. **Backup**: قبل از اجرای migration ها، حتماً از دیتابیس backup بگیرید
-2. **Data Migration**: اگر داده‌ای در جداول clinics وجود دارد، باید به جداول medical_centers منتقل شود
-3. **Code Review**: تمام فایل‌های کد که از مدل Clinic استفاده می‌کنند باید به‌روزرسانی شوند
-4. **Testing**: پس از اجرای migration ها، تمام عملکردها باید تست شوند
-
-## فایل‌های نیازمند به‌روزرسانی
-
-### Controllers:
-- تمام controller هایی که از مدل Clinic استفاده می‌کنند
-- API controllers
-- Admin controllers
-- Doctor panel controllers
-
-### Views:
-- تمام view هایی که از متغیرهای clinic استفاده می‌کنند
-- فرم‌های ایجاد و ویرایش
-- لیست‌ها و جداول
-
-### Livewire Components:
-- تمام component هایی که با clinics کار می‌کنند
-- فرم‌ها و لیست‌ها
-
-### Routes:
-- بررسی route هایی که ممکن است به clinic ها اشاره کنند
-
-## وضعیت فعلی
-✅ تمام migration ها ایجاد شده
-✅ تمام migration های قدیمی به‌روزرسانی شده
-✅ تمام مدل‌ها به‌روزرسانی شده
-✅ تمام مدل‌های قدیمی حذف شده
-❌ نیاز به به‌روزرسانی controllers
-❌ نیاز به به‌روزرسانی views
-❌ نیاز به به‌روزرسانی Livewire components
-❌ نیاز به data migration (اگر داده‌ای وجود دارد)
+## نکات مهم:
+- تمام foreign key ها به درستی به جدول medical_centers اشاره می‌کنند
+- فیلد type در جدول medical_centers برای تشخیص نوع مرکز درمانی استفاده می‌شود
+- فیلد prescription_tariff به جدول medical_centers اضافه شده است
+- تمام روابط Eloquent به‌روزرسانی شده‌اند
+- Migration ها به ترتیب صحیح اجرا می‌شوند
