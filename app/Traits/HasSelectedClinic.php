@@ -2,46 +2,45 @@
 
 namespace App\Traits;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\DoctorSelectedClinic;
+use App\Models\DoctorSelectedMedicalCenter;
 use Illuminate\Support\Facades\Auth;
 
 trait HasSelectedClinic
 {
     /**
-     * Get the selected clinic for the current user
+     * Get the selected medical center for the current user
      *
-     * @return Clinic|null
+     * @return MedicalCenter|null
      */
-    public function getSelectedClinic()
+    public function getSelectedMedicalCenter()
     {
         $doctor = $this->getDoctor();
         if (!$doctor) {
             return null;
         }
 
-        $selectedClinic = $doctor->selectedClinic;
-        if (!$selectedClinic || is_null($selectedClinic->clinic_id)) {
-            return null; // مشاوره آنلاین یا عدم انتخاب کلینیک
+        $selectedMedicalCenter = $doctor->selectedMedicalCenter;
+        if (!$selectedMedicalCenter || is_null($selectedMedicalCenter->medical_center_id)) {
+            return null; // مشاوره آنلاین یا عدم انتخاب مرکز درمانی
         }
 
-        return $selectedClinic->clinic; // کلینیک انتخاب‌شده
+        return $selectedMedicalCenter->medicalCenter; // مرکز درمانی انتخاب‌شده
     }
 
     /**
-     * Get the selected clinic ID for the current user
+     * Get the selected medical center ID for the current user
      *
      * @return int|null
      */
-    public function getSelectedClinicId()
+    public function getSelectedMedicalCenterId()
     {
         $doctor = $this->getDoctor();
         if (!$doctor) {
             return null;
         }
 
-        return $doctor->selectedClinic?->clinic_id; // ID کلینیک انتخاب‌شده یا null برای مشاوره آنلاین
+        return $doctor->selectedMedicalCenter?->medical_center_id; // ID مرکز درمانی انتخاب‌شده یا null برای مشاوره آنلاین
     }
 
     /**
