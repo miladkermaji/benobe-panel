@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Admin\Panel\Dashboard;
 
 use App\Models\User;
-use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Secretary;
 use App\Models\Appointment;
@@ -59,7 +58,7 @@ class AdminDashboardController extends Controller
                 ->where('payment_status', 'paid')
                 ->sum('final_price'),
             'new_doctors' => Doctor::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
-            'new_clinics' => Clinic::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count()
+            'new_medical_centers' => \App\Models\MedicalCenter::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count()
         ];
 
         // آمار ماهانه
@@ -73,7 +72,7 @@ class AdminDashboardController extends Controller
                 ->where('payment_status', 'paid')
                 ->sum('final_price'),
             'new_doctors' => Doctor::whereMonth('created_at', now()->month)->count(),
-            'new_clinics' => Clinic::whereMonth('created_at', now()->month)->count()
+            'new_medical_centers' => \App\Models\MedicalCenter::whereMonth('created_at', now()->month)->count()
         ];
 
         return view('admin.panel.dashboard.index', [
@@ -81,7 +80,7 @@ class AdminDashboardController extends Controller
             'totalPatients' => User::where('user_type', 0)->whereNull('deleted_at')->count(),
             'totalSecretaries' => Secretary::whereNull('deleted_at')->count(),
             'totalManagers' => Manager::whereNull('deleted_at')->count(),
-            'totalClinics' => Clinic::count(),
+            'totalMedicalCenters' => \App\Models\MedicalCenter::count(),
             'totalAppointments' => Appointment::whereNull('deleted_at')->count(),
             'weeklyStats' => $weeklyStats,
             'monthlyStats' => $monthlyStats,
@@ -132,21 +131,21 @@ class AdminDashboardController extends Controller
                 ->pluck('count', 'week')
                 ->toArray(),
 
-            // نمودار ۷: مقایسه کلینیک‌ها
-            'clinicComparison' => Appointment::selectRaw('
-                    clinics.name as clinic_name,
+            // نمودار ۷: مقایسه مراکز درمانی
+            'medicalCenterComparison' => Appointment::selectRaw('
+                    medical_centers.name as medical_center_name,
                     COUNT(CASE WHEN appointments.status = "attended" THEN 1 END) as attended,
                     COUNT(CASE WHEN appointments.status = "cancelled" THEN 1 END) as cancelled,
                     COUNT(CASE WHEN appointments.status = "missed" THEN 1 END) as missed
                 ')
-                ->join('clinics', 'appointments.clinic_id', '=', 'clinics.id')
+                ->join('medical_centers', 'appointments.medical_center_id', '=', 'medical_centers.id')
                 ->whereNull('appointments.deleted_at')
-                ->groupBy('clinics.id', 'clinics.name')
+                ->groupBy('medical_centers.id', 'medical_centers.name')
                 ->orderBy(DB::raw('COUNT(appointments.id)'), 'desc')
                 ->limit(5)
                 ->get()
                 ->mapWithKeys(function ($item) {
-                    return [$item->clinic_name => [
+                    return [$item->medical_center_name => [
                         'حاضر شده' => $item->attended,
                         'لغو شده' => $item->cancelled,
                         'غایب' => $item->missed
@@ -287,7 +286,7 @@ class AdminDashboardController extends Controller
                 ->toArray(),
 
             // برچسب‌های کلینیک
-            'clinicActivityLabels' => Clinic::pluck('name')->toArray()
+            'clinicActivityLabels' => \App\Models\MedicalCenter::pluck('name')->toArray()
         ]);
     }
 }

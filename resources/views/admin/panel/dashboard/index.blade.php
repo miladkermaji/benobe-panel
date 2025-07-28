@@ -49,11 +49,11 @@
       </div>
       <div class="stat-card cursor-pointer">
         <div class="stat-icon">
-          <img src="{{ asset('admin-assets/icons/clinic.svg') }}" alt="تعداد کلینیک‌ها">
+          <img src="{{ asset('admin-assets/icons/clinic.svg') }}" alt="تعداد مراکز درمانی">
         </div>
         <div class="stat-info">
-          <div class="stat-label">تعداد کلینیک‌ها</div>
-          <div class="stat-value">{{ $totalClinics }} کلینیک</div>
+          <div class="stat-label">تعداد مراکز درمانی</div>
+          <div class="stat-value">{{ $totalMedicalCenters }} مرکز درمانی</div>
         </div>
       </div>
       <div class="stat-card cursor-pointer">
@@ -130,9 +130,9 @@
     <div class="col-md-4">
       <div class="chart-card">
         <div class="card-body">
-          <h5 class="card-title">مقایسه کلینیک‌ها</h5>
+          <h5 class="card-title">مقایسه مراکز درمانی</h5>
           <div class="chart-container">
-            <canvas id="clinicComparisonChart"></canvas>
+            <canvas id="medicalCenterComparisonChart"></canvas>
           </div>
         </div>
       </div>
@@ -236,7 +236,7 @@
     appointmentsByDayOfWeek: @json($appointmentsByDayOfWeek),
     doctorSpecialties: @json($doctorSpecialties),
     appointmentsTrend: @json($appointmentsTrend),
-    clinicComparison: @json($clinicComparison),
+    medicalCenterComparison: @json($medicalCenterComparison),
     paymentStatus: @json($paymentStatus),
     visitorStats: @json($visitorStats),
     monthlyRevenue: @json($monthlyRevenue),
