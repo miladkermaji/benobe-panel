@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id(); // شناسه منحصر به فرد
 
             $table->unsignedBigInteger('doctor_id'); // شناسه پزشک
-            $table->unsignedBigInteger('clinic_id')->nullable(); // شناسه کلینیک
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // شناسه مرکز درمانی
 
             $table->boolean('auto_scheduling')->default(true);
             // آیا نوبت‌دهی به صورت خودکار انجام شود؟
@@ -27,7 +27,6 @@ return new class extends Migration {
 
             $table->boolean('holiday_availability')->default(false);
             // آیا در تعطیلات امکان نوبت‌دهی وجود دارد؟
-
 
             $table->integer('appointment_duration')->default(15);
             // مدت زمان هر نوبت (دقیقه)
@@ -47,13 +46,13 @@ return new class extends Migration {
                 ->on('doctors')
                 ->onDelete('cascade'); // حذف تنظیمات در صورت حذف پزشک
 
-            $table->foreign('clinic_id')
+            $table->foreign('medical_center_id')
                 ->references('id')
-                ->on('clinics')
-                ->onDelete('cascade'); // حذف تنظیمات در صورت حذف کلینیک
+                ->on('medical_centers')
+                ->onDelete('cascade'); // حذف تنظیمات در صورت حذف مرکز درمانی
 
-            // محدودیت یکتایی - فقط یک رکورد برای هر پزشک و کلینیک
-            $table->unique(['doctor_id', 'clinic_id']);
+            // محدودیت یکتایی - فقط یک رکورد برای هر پزشک و مرکز درمانی
+            $table->unique(['doctor_id', 'medical_center_id']);
         });
     }
 

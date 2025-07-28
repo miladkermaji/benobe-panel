@@ -27,7 +27,7 @@ return new class () extends Migration {
 
             // تعریف کلیدهای خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('cascade');
             $table->foreign('parent_id')->references('id')->on('doctor_services')->onDelete('cascade');
         });
     }

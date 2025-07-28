@@ -24,7 +24,7 @@ return new class () extends Migration {
 
             // کلید خارجی برای ارتباط با جدول پزشکان
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('cascade');
         });
     }
 

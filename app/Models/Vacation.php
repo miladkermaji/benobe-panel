@@ -1,32 +1,34 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vacation extends Model
 {
-    use HasFactory;
-
-    // جدول مرتبط با مدل
-    protected $table = 'vacations';
-
-    // مشخص کردن فیلدهای قابل پر کردن
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'date',
         'start_time',
         'end_time',
         'is_full_day',
     ];
 
-    /**
-     * ارتباط با مدل دکتر (یک مرخصی متعلق به یک دکتر است).
-     */
+    protected $casts = [
+        'date' => 'date',
+        'start_time' => 'datetime:H:i:s',
+        'end_time' => 'datetime:H:i:s',
+        'is_full_day' => 'boolean',
+    ];
+
     public function doctor()
     {
-        return $this->belongsTo(Doctor::class, 'doctor_id');
+        return $this->belongsTo(Doctor::class);
     }
 
+    public function medicalCenter()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+    }
 }

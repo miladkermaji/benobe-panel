@@ -49,7 +49,7 @@ return new class () extends Migration {
                 ->onDelete('cascade'); // حذف رکوردهای مرتبط در صورت حذف پزشک
             $table->foreign('clinic_id')
                 ->references('id')
-                ->on('clinics')
+                ->on('medical_centers')
                 ->onDelete('cascade');
             // محدودیت یکتایی برای جلوگیری از تکرار رکوردها
             $table->unique(['doctor_id', 'day', 'clinic_id']);

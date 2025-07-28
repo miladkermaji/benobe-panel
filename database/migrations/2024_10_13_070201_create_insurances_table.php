@@ -12,7 +12,7 @@ return new class () extends Migration {
         // ایجاد جدول insurances
         Schema::create('insurances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('clinic_id')->nullable()->constrained('clinics')->nullOnDelete();
+            $table->foreignId('clinic_id')->nullable()->constrained('medical_centers')->nullOnDelete();
             $table->string('name');
             $table->tinyInteger('calculation_method')->default(0);
             $table->unsignedInteger('appointment_price')->nullable();

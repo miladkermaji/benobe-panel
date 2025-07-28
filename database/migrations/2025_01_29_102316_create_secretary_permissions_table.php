@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('doctor_id')->constrained('doctors')->onDelete('cascade');
             $table->foreignId('secretary_id')->constrained('secretaries')->onDelete('cascade');
-            $table->foreignId('clinic_id')->nullable()->constrained('clinics')->onDelete('cascade');
+            $table->foreignId('clinic_id')->nullable()->constrained('medical_centers')->onDelete('cascade');
 
             $table->json('permissions')->nullable(); // ذخیره دسترسی‌ها به‌صورت JSON
             $table->boolean('has_access')->default(true); // دسترسی فعال یا غیرفعال

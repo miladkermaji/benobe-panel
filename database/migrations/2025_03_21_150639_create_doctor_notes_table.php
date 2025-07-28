@@ -22,9 +22,8 @@ return new class () extends Migration {
                 ->references('id')
                 ->on('doctors')
                 ->onDelete('cascade');
-            $table->foreign('clinic_id')
-                ->references('id')
-                ->on('clinics')
+            $table->foreign('clinic_id')->references('id')
+                ->on('medical_centers')
                 ->onDelete('cascade');
             $table->unique(['doctor_id', 'clinic_id', 'appointment_type']);
         });

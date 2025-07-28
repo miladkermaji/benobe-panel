@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -47,7 +47,7 @@ return new class extends Migration {
                 ->onDelete('cascade'); // حذف رکوردهای مرتبط در صورت حذف پزشک
             $table->foreign('clinic_id')
                 ->references('id')
-                ->on('clinics')
+                ->on('medical_centers')
                 ->onDelete('cascade');
             // محدودیت یکتایی برای جلوگیری از تکرار رکوردها
             $table->unique(['doctor_id', 'day','clinic_id']);

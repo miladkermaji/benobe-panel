@@ -15,7 +15,7 @@ class Appointment extends Model
     use HasFactory;
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'pattern_id',
         'insurance_id',
         'appointment_type',
@@ -52,10 +52,11 @@ class Appointment extends Model
         return $this->belongsTo(Specialty::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
+
     public function patientable()
     {
         return $this->morphTo();
@@ -74,15 +75,11 @@ class Appointment extends Model
     // Accessor برای وضعیت پرداخت (اگر وجود داشته باشه)
     public function getPaymentStatusLabelAttribute()
     {
-        switch ($this->payment_status) {
-            case 'paid':
-                return 'پرداخت شده';
-            case 'unpaid':
-                return 'پرداخت نشده';
-            case 'pending':
-                return 'در انتظار پرداخت';
-            default:
-                return 'نامشخص';
-        }
+        return match($this->payment_status) {
+            'pending' => 'در انتظار پرداخت',
+            'paid' => 'پرداخت شده',
+            'unpaid' => 'پرداخت نشده',
+            default => 'نامشخص'
+        };
     }
 }

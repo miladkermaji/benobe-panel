@@ -11,13 +11,11 @@ class MedicalCenter extends Model
     use SoftDeletes;
     use Sluggable;
 
-
-
     protected $fillable = [
         'name', 'title', 'address', 'secretary_phone', 'phone_number', 'postal_code',
         'siam_code',
         'province_id', 'city_id', 'is_main_center', 'start_time', 'end_time',
-        'description', 'latitude', 'longitude', 'consultation_fee', 'payment_methods',
+        'description', 'latitude', 'longitude', 'consultation_fee', 'prescription_tariff', 'payment_methods',
         'is_active', 'working_days', 'avatar', 'documents', 'phone_numbers',
         'location_confirmed', 'type', 'galleries', 'specialty_ids', 'insurance_ids',
         'service_ids', 'Center_tariff_type', 'Daycare_centers', 'slug', 'average_rating',
@@ -36,6 +34,7 @@ class MedicalCenter extends Model
         'insurance_ids' => 'array',
         'service_ids' => 'array',
         'consultation_fee' => 'decimal:2',
+        'prescription_tariff' => 'decimal:2',
         'latitude' => 'decimal:7',
         'longitude' => 'decimal:7',
         'average_rating' => 'decimal:1',
@@ -46,10 +45,12 @@ class MedicalCenter extends Model
     {
         return $this->belongsToMany(Doctor::class, 'doctor_medical_center');
     }
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class, 'id');
     }
+
     public function sluggable(): array
     {
         return [
@@ -58,6 +59,7 @@ class MedicalCenter extends Model
             ],
         ];
     }
+
     public function province()
     {
         return $this->belongsTo(Zone::class, 'province_id');
@@ -115,5 +117,51 @@ class MedicalCenter extends Model
             return $query->orderBy('reviews_count', $sortDirection);
         }
         return $query;
+    }
+
+    // روابط جدید برای جایگزینی clinics
+    public function appointments()
+    {
+        return $this->hasMany(Appointment::class, 'medical_center_id');
+    }
+
+    public function prescriptionRequests()
+    {
+        return $this->hasMany(PrescriptionRequest::class, 'medical_center_id');
+    }
+
+    public function doctorNotes()
+    {
+        return $this->hasMany(DoctorNote::class, 'medical_center_id');
+    }
+
+    public function vacations()
+    {
+        return $this->hasMany(Vacation::class, 'medical_center_id');
+    }
+
+    public function orderVisits()
+    {
+        return $this->hasMany(OrderVisit::class, 'medical_center_id');
+    }
+
+    public function counselingAppointments()
+    {
+        return $this->hasMany(CounselingAppointment::class, 'medical_center_id');
+    }
+
+    public function bestDoctors()
+    {
+        return $this->hasMany(BestDoctor::class, 'medical_center_id');
+    }
+
+    public function depositSettings()
+    {
+        return $this->hasMany(MedicalCenterDepositSetting::class, 'medical_center_id');
+    }
+
+    public function selectedByDoctors()
+    {
+        return $this->hasMany(DoctorSelectedMedicalCenter::class, 'medical_center_id');
     }
 }

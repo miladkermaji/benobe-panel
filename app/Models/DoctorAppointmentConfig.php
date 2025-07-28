@@ -1,15 +1,14 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Clinic;
-use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Model;
 
 class DoctorAppointmentConfig extends Model
 {
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'appointment_duration',
         'collaboration_with_other_sites',
         'auto_scheduling',
@@ -28,13 +27,14 @@ class DoctorAppointmentConfig extends Model
     {
         return intval($value) ?: 30;
     }
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

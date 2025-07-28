@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Clinic;
 use App\Models\Insurance;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,7 +19,7 @@ class Consultation extends Model
     protected $fillable = [
         'doctor_id',
         'patient_id',
-        'clinic_id',
+        'medical_center_id',
         'insurance_id',
         'duration',
         'consultation_type',
@@ -70,10 +70,10 @@ class Consultation extends Model
         return $this->belongsTo(User::class);
     }
 
-    // ارتباط با کلینیک
-    public function clinic()
+    // ارتباط با مرکز درمانی
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     // ارتباط با بیمه

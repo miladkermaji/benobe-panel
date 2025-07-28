@@ -30,8 +30,8 @@ class DoctorCounselingWorkSchedule extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
     }
 }

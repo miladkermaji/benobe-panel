@@ -53,7 +53,7 @@ return new class () extends Migration {
             $table->foreign('insurance_id')->references('id')->on('insurances')->onDelete('set null');
             $table->foreign('clinic_id')
                 ->references('id')
-                ->on('clinics')
+                ->on('medical_centers')
                 ->onDelete('set null');
 
             $table->index(['doctor_id', 'appointment_date'], 'idx_doctor_date');

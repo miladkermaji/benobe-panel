@@ -17,7 +17,7 @@ class PrescriptionRequest extends Model
         'prescription_insurance_id',
         'price',
         'payment_status',
-        'clinic_id',
+        'medical_center_id',
         'transaction_id',
         'referral_code',
         'request_enabled',
@@ -59,9 +59,9 @@ class PrescriptionRequest extends Model
         return $insurance ? $insurance->pivot->referral_code : null;
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     public function transaction()

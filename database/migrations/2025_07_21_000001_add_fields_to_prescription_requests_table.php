@@ -33,7 +33,7 @@ return new class () extends Migration {
             }
             if (!Schema::hasColumn('prescription_requests', 'clinic_id')) {
                 $table->unsignedBigInteger('clinic_id')->nullable()->after('price');
-                $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('set null');
+                $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('set null');
             }
             if (!Schema::hasColumn('prescription_requests', 'transaction_id')) {
                 $table->unsignedBigInteger('transaction_id')->nullable()->after('clinic_id');
