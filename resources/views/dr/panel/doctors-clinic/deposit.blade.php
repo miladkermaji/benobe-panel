@@ -7,7 +7,7 @@
 @endsection
 
 @section('site-header')
-  {{ 'پنل مدیریت | مدیریت بیعانه' }}
+  {{ 'پنل پزشک | مدیریت بیعانه' }}
 @endsection
 
 @section('content')
