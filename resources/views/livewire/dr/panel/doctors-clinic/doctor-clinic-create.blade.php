@@ -29,15 +29,30 @@
                 <label for="clinic-name" class="form-label">نام مطب</label>
               </div>
               <div class="col-md-6 col-sm-12 position-relative mt-4">
+                <input wire:model.defer="title" type="text" class="form-control" id="clinic-title"
+                  placeholder="عنوان مطب">
+                <label for="clinic-title" class="form-label">عنوان مطب (اختیاری)</label>
+              </div>
+              <div class="col-md-6 col-sm-12 position-relative mt-4">
                 <input wire:model.defer="phone_numbers.0" type="text" class="form-control" id="clinic-phone"
                   placeholder="شماره موبایل" required>
                 <label for="clinic-phone" class="form-label">شماره موبایل</label>
               </div>
               <div class="col-md-6 col-sm-12 position-relative mt-4">
-                <input wire:model.defer="prescription_fee" type="number" min="0" step="0.01"
-                  class="form-control" id="clinic-prescription-fee" placeholder="تعرفه نسخه (تومان)">
-                <label for="clinic-prescription-fee" class="form-label">تعرفه نسخه (تومان)</label>
-                @error('prescription_fee')
+                <input wire:model.defer="secretary_phone" type="text" class="form-control"
+                  id="clinic-secretary-phone" placeholder="شماره منشی">
+                <label for="clinic-secretary-phone" class="form-label">شماره منشی (اختیاری)</label>
+              </div>
+              <div class="col-md-6 col-sm-12 position-relative mt-4">
+                <input wire:model.defer="phone_number" type="text" class="form-control" id="clinic-phone-number"
+                  placeholder="شماره تلفن">
+                <label for="clinic-phone-number" class="form-label">شماره تلفن (اختیاری)</label>
+              </div>
+              <div class="col-md-6 col-sm-12 position-relative mt-4">
+                <input wire:model.defer="prescription_tariff" type="number" min="0" step="0.01"
+                  class="form-control" id="clinic-prescription-tariff" placeholder="تعرفه نسخه (تومان)">
+                <label for="clinic-prescription-tariff" class="form-label">تعرفه نسخه (تومان)</label>
+                @error('prescription_tariff')
                   <span class="text-danger">{{ $message }}</span>
                 @enderror
               </div>

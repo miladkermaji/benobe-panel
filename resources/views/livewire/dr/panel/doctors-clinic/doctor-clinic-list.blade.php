@@ -92,7 +92,7 @@
                       <td>{{ $item->address ?? '---' }}</td>
                       <td>{{ $item->description ?? '---' }}</td>
                       <td>
-                        {{ $item->prescription_fee !== null ? number_format($item->prescription_fee) . ' تومان' : '---' }}
+                        {{ $item->prescription_tariff !== null ? number_format($item->prescription_tariff) . ' تومان' : '---' }}
                       </td>
                       <td class="text-center">
                         <span class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }}">
@@ -196,7 +196,7 @@
                     <div class="note-card-item">
                       <span class="note-card-label">تعرفه نسخه:</span>
                       <span
-                        class="note-card-value">{{ $item->prescription_fee !== null ? number_format($item->prescription_fee) . ' تومان' : '---' }}</span>
+                        class="note-card-value">{{ $item->prescription_tariff !== null ? number_format($item->prescription_tariff) . ' تومان' : '---' }}</span>
                     </div>
                     <div class="note-card-item">
                       <span class="note-card-label">وضعیت:</span>
