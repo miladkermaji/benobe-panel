@@ -453,20 +453,22 @@
 
     // اسکریپت برای بستن Dropdown بعد از هر wire:click و اطمینان از عملکرد صحیح آن در Livewire
     function rebindDropdownEvents() {
-      document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(function(btn) {
-        btn.onclick = function() {
-          setTimeout(function() {
-            var dropdown = btn.closest('.dropdown');
-            if (dropdown) {
-              var toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
-              if (toggle) {
-                var instance = bootstrap.Dropdown.getOrCreateInstance(toggle);
-                instance.hide();
+      if (typeof bootstrap !== 'undefined') {
+        document.querySelectorAll('.dropdown-menu .dropdown-item').forEach(function(btn) {
+          btn.onclick = function() {
+            setTimeout(function() {
+              var dropdown = btn.closest('.dropdown');
+              if (dropdown) {
+                var toggle = dropdown.querySelector('[data-bs-toggle="dropdown"]');
+                if (toggle) {
+                  var instance = bootstrap.Dropdown.getOrCreateInstance(toggle);
+                  instance.hide();
+                }
               }
-            }
-          }, 200);
-        }
-      });
+            }, 200);
+          }
+        });
+      }
     }
     document.addEventListener('DOMContentLoaded', rebindDropdownEvents);
     document.addEventListener('livewire:navigated', rebindDropdownEvents);

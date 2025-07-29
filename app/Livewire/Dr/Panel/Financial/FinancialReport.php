@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Dr\Panel\Financial;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\Component;
 use App\Models\Insurance;
 use App\Models\Appointment;
@@ -395,9 +395,9 @@ class FinancialReport extends Component
 
         if ($this->clinicId) {
             if ($modelType === 'Transaction') {
-                $query->whereJsonContains('meta->clinic_id', (int) $this->clinicId);
+                $query->whereJsonContains('meta->medical_center_id', (int) $this->clinicId);
             } else {
-                $query->where('clinic_id', $this->clinicId);
+                $query->where('medical_center_id', $this->clinicId);
             }
         }
 
@@ -545,7 +545,7 @@ class FinancialReport extends Component
                 'amount' => $item->amount,
                 'status' => $item->status,
                 'description' => $meta['description'] ?? 'بدون توضیح',
-                'clinic_id' => $meta['clinic_id'] ?? null,
+                'medical_center_id' => $meta['medical_center_id'] ?? null,
                 'payment_method' => $meta['payment_method'] ?? null,
                 'insurance_id' => $meta['insurance_id'] ?? null,
                 'transaction_type' => $meta['type'] ?? 'unknown',
@@ -560,7 +560,7 @@ class FinancialReport extends Component
                 'amount' => $item->amount,
                 'status' => $item->status,
                 'description' => $item->description ?? 'بدون توضیح',
-                'clinic_id' => $item->clinic_id,
+                'medical_center_id' => $item->medical_center_id,
                 'payment_method' => null,
                 'insurance_id' => null,
                 'transaction_type' => $item->type,
@@ -575,7 +575,7 @@ class FinancialReport extends Component
                 'amount' => $item->final_price,
                 'status' => $item->payment_status,
                 'description' => $item->description ?? 'بدون توضیح',
-                'clinic_id' => $item->clinic_id,
+                'medical_center_id' => $item->medical_center_id,
                 'payment_method' => $item->payment_method,
                 'insurance_id' => $item->insurance_id,
                 'transaction_type' => $item->appointment_type,
@@ -590,7 +590,7 @@ class FinancialReport extends Component
                 'amount' => $item->final_price,
                 'status' => $item->status,
                 'description' => $item->description ?? 'بدون توضیح',
-                'clinic_id' => $item->clinic_id,
+                'medical_center_id' => $item->medical_center_id,
                 'payment_method' => $item->payment_method,
                 'insurance_id' => null,
                 'transaction_type' => $item->payment_method ?? 'manual',
@@ -605,7 +605,7 @@ class FinancialReport extends Component
                 'amount' => $item->final_price,
                 'status' => $item->payment_status,
                 'description' => $item->description ?? 'بدون توضیح',
-                'clinic_id' => $item->clinic_id,
+                'medical_center_id' => $item->medical_center_id,
                 'payment_method' => null,
                 'insurance_id' => $item->insurance_id,
                 'transaction_type' => $item->appointment_type,
@@ -714,7 +714,9 @@ class FinancialReport extends Component
         $todayEnd = Carbon::today()->endOfDay();
         $todayAmount = $this->readyToLoad ? $this->getTotalAmount($todayStart, $todayEnd) : 0;
 
-        $clinics = Clinic::where('doctor_id', $doctorId)->get();
+        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->get();
 
         // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
         $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
