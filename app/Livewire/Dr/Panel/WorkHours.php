@@ -220,7 +220,7 @@ class Workhours extends Component
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
             return request()->route('medicalCenter') ?? 'default';
         }
-        return $this->getSelectedClinicId() ?? 'default';
+        return $this->getSelectedMedicalCenterId() ?? 'default';
     }
     public function autoSaveCalendarDays()
     {
@@ -1983,7 +1983,7 @@ class Workhours extends Component
     {
         $this->isEmergencyModalOpen = $isOpen;
     }
-    public function updatedSelectedClinicId()
+    public function updatedSelectedMedicalCenterId()
     {
         $this->activeMedicalCenterId = $this->selectedMedicalCenterId;
         $this->reset(['workSchedules', 'isWorking', 'slots']);
@@ -2640,5 +2640,23 @@ class Workhours extends Component
         $this->copySourceDay = $day;
         $this->copySourceIndex = $index;
         Log::info('openCopyScheduleModal called', ['copySourceDay' => $day, 'copySourceIndex' => $index]);
+    }
+    public function setSelectedMedicalCenterId($medicalCenterId)
+    {
+        try {
+            // تنظیم medicalCenterId و activeMedicalCenterId
+            $this->selectedMedicalCenterId = $medicalCenterId;
+            $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
+            // ذخیره medicalCenterId در سشن
+            session(['selectedMedicalCenterId' => $medicalCenterId]);
+            // بازنشانی پراپرتی‌ها
+            $this->reset(['workSchedules', 'isWorking', 'slots']);
+            // بارگذاری مجدد داده‌ها
+            $this->mount();
+            // ارسال رویداد رفرش
+            $this->dispatch('refresh-clinic-data');
+        } catch (\Exception $e) {
+            $this->showErrorMessage('خطا در تنظیم مرکز درمانی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
+        }
     }
 }

@@ -949,15 +949,15 @@ class ScheduleSettingController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-            $selectedClinicId = $request->input('selectedClinicId');
+            $selectedMedicalCenterId = $request->input('selectedClinicId');
 
             // دریافت تنظیمات تقویم
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
-                ->where(function ($query) use ($selectedClinicId) {
-                    if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                ->where(function ($query) use ($selectedMedicalCenterId) {
+                    if ($selectedMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $selectedMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -967,11 +967,11 @@ class ScheduleSettingController extends Controller
             // دریافت روزهای کاری
             $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
-                ->where(function ($query) use ($selectedClinicId) {
-                    if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                ->where(function ($query) use ($selectedMedicalCenterId) {
+                    if ($selectedMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $selectedMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->pluck('day')
@@ -984,10 +984,10 @@ class ScheduleSettingController extends Controller
                 ->where('status', 'scheduled')
                 ->whereNull('deleted_at');
 
-            if ($selectedClinicId === 'default') {
-                $appointmentsQuery->whereNull('clinic_id');
-            } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
-                $appointmentsQuery->where('clinic_id', $selectedClinicId);
+            if ($selectedMedicalCenterId === 'default') {
+                $appointmentsQuery->whereNull('medical_center_id');
+            } elseif ($selectedMedicalCenterId && $selectedMedicalCenterId !== 'default') {
+                $appointmentsQuery->where('medical_center_id', $selectedMedicalCenterId);
             }
 
             // اگر در صفحه نوبت دستی هستیم فقط نوبت‌های manual را بشمار
@@ -1009,11 +1009,11 @@ class ScheduleSettingController extends Controller
             // دریافت تنظیمات نوبت‌دهی
             $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
-                ->where(function ($query) use ($selectedClinicId) {
-                    if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                ->where(function ($query) use ($selectedMedicalCenterId) {
+                    if ($selectedMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $selectedMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->select('day', 'appointment_settings')
@@ -1339,7 +1339,7 @@ class ScheduleSettingController extends Controller
             }
 
             // بررسی کلینیک
-            if ($selectedClinicId !== 'default' && !Clinic::where('id', $selectedClinicId)->exists()) {
+            if ($selectedClinicId !== 'default' && !\App\Models\MedicalCenter::where('id', $selectedClinicId)->exists()) {
                 return response()->json(['status' => false, 'message' => 'کلینیک نامعتبر است.'], 400);
             }
 
