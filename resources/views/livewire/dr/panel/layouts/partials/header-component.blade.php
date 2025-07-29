@@ -77,9 +77,10 @@
                     </div>
                     @foreach ($medicalCenters as $medicalCenter)
                       <div
-                        class="d-flex justify-content-between align-items-center option-card {{ $selectedMedicalCenterId == $medicalCenter->id ? 'card-active' : '' }} {{ !$medicalCenter->is_active ? 'inactive-clinic' : '' }}"
-                        wire:click="selectMedicalCenter({{ $medicalCenter->id }})" data-id="{{ $medicalCenter->id }}"
-                        data-active="{{ $medicalCenter->is_active ? '1' : '0' }}">
+                        class="d-flex justify-content-between align-items-center option-card {{ $selectedMedicalCenterId == ($medicalCenter->id ?? null) ? 'card-active' : '' }} {{ !($medicalCenter->is_active ?? false) ? 'inactive-clinic' : '' }}"
+                        wire:click="selectMedicalCenter({{ $medicalCenter->id ?? '' }})"
+                        data-id="{{ $medicalCenter->id ?? '' }}"
+                        data-active="{{ $medicalCenter->is_active ?? false ? '1' : '0' }}">
                         <div class="d-flex align-items-center p-3 position-relative">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -88,20 +89,20 @@
                               fill="#3F3F79"></path>
                           </svg>
                           <div class="d-flex flex-column mx-3">
-                            <span class="fw-bold d-block fs-15">{{ $medicalCenter->name }}</span>
+                            <span class="fw-bold d-block fs-15">{{ $medicalCenter->name ?? '' }}</span>
                             <span class="fw-bold d-block fs-13">{{ $medicalCenter->province->name ?? '' }}،
                               {{ $medicalCenter->city->name ?? '' }}</span>
                           </div>
-                          @if (!$medicalCenter->is_active)
+                          @if (!($medicalCenter->is_active ?? false))
                             <div class="inactive-dot"
                               title="این مرکز درمانی هنوز فعال نشده است برای فعالسازی روی دکمه فعالسازی کلیک کنید">
                             </div>
                           @endif
                         </div>
                         <div class="mx-2">
-                          @if (!$medicalCenter->is_active)
+                          @if (!($medicalCenter->is_active ?? false))
                             <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
-                              onclick="window.location.href='{{ route('activation-doctor-clinic', $medicalCenter) }}'">فعال‌سازی
+                              onclick="window.location.href='{{ route('activation-doctor-clinic', $medicalCenter->id ?? '') }}'">فعال‌سازی
                             </button>
                           @endif
                         </div>

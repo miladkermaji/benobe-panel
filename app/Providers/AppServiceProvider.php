@@ -32,11 +32,6 @@ class AppServiceProvider extends ServiceProvider
             $view->with('medicalCenters', $medicalCenters);
         });
 
-        View::composer('livewire.dr.panel.layouts.partials.header-component', function ($view) {
-            $medicalCenters = collect(); // فعلاً خالی
-            $view->with('medicalCenters', $medicalCenters);
-        });
-
         Appointment::observe(AppointmentObserver::class);
 
         DoctorService::observe(DoctorServiceObserver::class);

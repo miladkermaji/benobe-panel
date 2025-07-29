@@ -4,8 +4,9 @@ namespace App\Livewire\Dr\Panel\Layouts\Partials;
 
 use Livewire\Component;
 use App\Models\DoctorWallet;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\NotificationRecipient;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -16,27 +17,25 @@ class HeaderComponent extends Component
     public $unreadCount = 0;
     public $selectedMedicalCenterId = null;
     public $selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
-    public $medicalCenters = [];
+    public $medicalCenters;
 
     public function mount()
     {
         $this->notifications = new Collection();
+        $this->medicalCenters = new Collection(); // Initialize medicalCenters
 
         if (Auth::guard('doctor')->check()) {
             $doctor = Auth::guard('doctor')->user();
             $doctorId = $doctor->id;
             $doctorMobile = $doctor->mobile;
 
-
             // بارگذاری مراکز درمانی
             $this->loadMedicalCenters($doctor);
-
             // تنظیم مرکز درمانی انتخاب‌شده
             $this->setSelectedMedicalCenterFromDatabase($doctor);
 
             $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
                 ->sum('balance');
-
 
             // لود اعلان‌ها برای پزشک
             $doctorNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Doctor')
@@ -89,10 +88,9 @@ class HeaderComponent extends Component
     protected function loadMedicalCenters($doctor)
     {
         if ($doctor) {
-            // بارگذاری مراکز درمانی از جدول medical_centers با تایپ policlinic
             $this->medicalCenters = $doctor->medicalCenters()
-                ->where('type', 'policlinic')
-                ->where('is_active', true)
+                ->select('medical_centers.*')
+                ->where('medical_centers.type', 'policlinic')
                 ->with(['province', 'city'])
                 ->get();
         }
@@ -102,18 +100,15 @@ class HeaderComponent extends Component
     {
         if ($doctor) {
             // اگر دکتر مرکز درمانی انتخاب‌شده‌ای دارد، از آن استفاده کن
-            if ($doctor->selectedMedicalCenter) {
+            if ($doctor->selectedMedicalCenter && $doctor->selectedMedicalCenter->medical_center_id) {
                 $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
-                $this->selectedMedicalCenterName = $this->selectedMedicalCenterId
-                    ? $doctor->selectedMedicalCenter->medicalCenter->name
-                    : 'مشاوره آنلاین به نوبه';
+                $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
                 return;
             }
 
             // اگر مرکز درمانی انتخاب‌شده‌ای ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
             $activeMedicalCenters = $doctor->medicalCenters()
-                ->where('type', 'policlinic')
-                ->where('is_active', true)
+                ->where('medical_centers.type', 'policlinic')
                 ->get();
 
             if ($activeMedicalCenters->count() > 0) {
@@ -143,7 +138,7 @@ class HeaderComponent extends Component
 
         if ($doctor) {
             // اعتبارسنجی مرکز درمانی - فقط کلینیک‌ها
-            if ($medicalCenterId && !$doctor->medicalCenters()->where('id', $medicalCenterId)->where('type', 'policlinic')->exists()) {
+            if ($medicalCenterId && !$doctor->medicalCenters()->where('medical_centers.id', $medicalCenterId)->where('medical_centers.type', 'policlinic')->exists()) {
                 $this->addError('medical_center', 'مرکز درمانی انتخاب‌شده معتبر نیست.');
                 return;
             }
@@ -154,7 +149,7 @@ class HeaderComponent extends Component
             // به‌روزرسانی مقادیر
             $this->selectedMedicalCenterId = $medicalCenterId;
             $this->selectedMedicalCenterName = $medicalCenterId
-                ? $doctor->medicalCenters()->where('type', 'policlinic')->find($medicalCenterId)->name
+                ? $doctor->medicalCenters()->where('medical_centers.type', 'policlinic')->find($medicalCenterId)->name
                 : 'مشاوره آنلاین به نوبه';
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             DoctorSeeder::class,
             InsulinSeeder::class,
             PrescriptionInsuranceSeeder::class,
+            MedicalCenterSeeder::class,
         ]);
     }
 }
