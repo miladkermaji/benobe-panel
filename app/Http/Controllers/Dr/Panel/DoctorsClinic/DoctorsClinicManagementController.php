@@ -78,15 +78,15 @@ class DoctorsClinicManagementController extends Controller
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
         $medicalCenter = MedicalCenter::create([
-            'name'          => $request->name,
-            'phone_numbers' => json_encode($request->phone_numbers),
-            'address'       => $request->address,
-            'province_id'   => $request->province_id,
-            'city_id'       => $request->city_id,
-            'postal_code'   => $request->postal_code,
-            'description'   => $request->description,
-            'type'          => 'clinic',
-            'is_active'     => true,
+            'name' => $request->name,
+            'phone_numbers' => $request->phone_numbers,
+            'province_id' => $request->province_id,
+            'city_id' => $request->city_id,
+            'postal_code' => $request->postal_code,
+            'address' => $request->address,
+            'description' => $request->description,
+            'type' => 'policlinic',
+            'is_active' => true,
         ]);
 
         // Attach the doctor to the medical center
@@ -179,9 +179,7 @@ class DoctorsClinicManagementController extends Controller
 
             $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
                 $query->where('doctor_id', $doctorId);
-            })
-            ->where('type', 'clinic')
-            ->get();
+            })->where('type', 'policlinic')->get();
             $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);

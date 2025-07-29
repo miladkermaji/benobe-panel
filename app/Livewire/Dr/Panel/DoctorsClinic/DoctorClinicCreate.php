@@ -80,14 +80,14 @@ class DoctorClinicCreate extends Component
 
         $medicalCenter = MedicalCenter::create([
             'name' => $this->name,
-            'phone_numbers' => json_encode($this->phone_numbers),
+            'phone_numbers' => $this->phone_numbers,
             'province_id' => $this->province_id,
             'city_id' => $this->city_id,
             'postal_code' => $this->postal_code,
             'address' => $this->address,
             'description' => $this->description,
             'prescription_fee' => $this->prescription_fee,
-            'type' => 'clinic',
+            'type' => 'policlinic',
             'is_active' => true,
         ]);
 

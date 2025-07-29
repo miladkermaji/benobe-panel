@@ -37,6 +37,7 @@ class HeaderComponent extends Component
             $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
                 ->sum('balance');
 
+
             // لود اعلان‌ها برای پزشک
             $doctorNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Doctor')
                 ->where('recipient_id', $doctorId)
@@ -88,8 +89,12 @@ class HeaderComponent extends Component
     protected function loadMedicalCenters($doctor)
     {
         if ($doctor) {
-            // فعلاً خالی - بعداً با داده‌های واقعی پر می‌شود
-            $this->medicalCenters = collect();
+            // بارگذاری مراکز درمانی از جدول medical_centers با تایپ policlinic
+            $this->medicalCenters = $doctor->medicalCenters()
+                ->where('type', 'policlinic')
+                ->where('is_active', true)
+                ->with(['province', 'city'])
+                ->get();
         }
     }
 
@@ -106,7 +111,10 @@ class HeaderComponent extends Component
             }
 
             // اگر مرکز درمانی انتخاب‌شده‌ای ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
-            $activeMedicalCenters = collect($this->medicalCenters)->where('is_active', true);
+            $activeMedicalCenters = $doctor->medicalCenters()
+                ->where('type', 'policlinic')
+                ->where('is_active', true)
+                ->get();
 
             if ($activeMedicalCenters->count() > 0) {
                 // اولین مرکز درمانی فعال را انتخاب کن
@@ -134,8 +142,8 @@ class HeaderComponent extends Component
             : Auth::guard('secretary')->user()->doctor;
 
         if ($doctor) {
-            // اعتبارسنجی مرکز درمانی
-            if ($medicalCenterId && !$doctor->medicalCenters()->where('id', $medicalCenterId)->exists()) {
+            // اعتبارسنجی مرکز درمانی - فقط کلینیک‌ها
+            if ($medicalCenterId && !$doctor->medicalCenters()->where('id', $medicalCenterId)->where('type', 'policlinic')->exists()) {
                 $this->addError('medical_center', 'مرکز درمانی انتخاب‌شده معتبر نیست.');
                 return;
             }
@@ -146,7 +154,7 @@ class HeaderComponent extends Component
             // به‌روزرسانی مقادیر
             $this->selectedMedicalCenterId = $medicalCenterId;
             $this->selectedMedicalCenterName = $medicalCenterId
-                ? $doctor->medicalCenters()->find($medicalCenterId)->name
+                ? $doctor->medicalCenters()->where('type', 'policlinic')->find($medicalCenterId)->name
                 : 'مشاوره آنلاین به نوبه';
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها

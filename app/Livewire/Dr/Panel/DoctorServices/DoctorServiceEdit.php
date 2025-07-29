@@ -290,9 +290,7 @@ class DoctorServiceEdit extends Component
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
-        })
-        ->where('type', 'clinic')
-        ->get();
+        })->where('type', 'policlinic')->get();
         $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->with(['service', 'insurance', 'clinic'])
             ->get();

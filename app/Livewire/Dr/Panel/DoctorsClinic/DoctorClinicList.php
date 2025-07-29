@@ -136,20 +136,15 @@ class DoctorClinicList extends Component
         }
     }
 
-    private function getClinicsQuery()
+    protected function getClinicsQuery()
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId = Auth::guard('doctor')->check() 
+            ? Auth::guard('doctor')->user()->id 
+            : Auth::guard('secretary')->user()->doctor_id;
+
         return MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
-        })
-        ->where('type', 'clinic')
-        ->where(function ($query) {
-            $query->where('name', 'like', '%' . $this->search . '%')
-                ->orWhere('address', 'like', '%' . $this->search . '%')
-                ->orWhere('description', 'like', '%' . $this->search . '%');
-        })
-        ->with(['province', 'city'])
-        ->orderByDesc('id');
+        })->where('type', 'policlinic');
     }
 
     public function render()

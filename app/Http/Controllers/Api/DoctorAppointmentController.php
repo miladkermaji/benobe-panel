@@ -56,11 +56,7 @@ class DoctorAppointmentController extends Controller
 
             $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
                 $query->where('doctor_id', $doctorId);
-            })
-            ->where('type', 'clinic')
-            ->where('is_active', true)
-            ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
-            ->get();
+            })->where('type', 'policlinic')->where('is_active', true)->select('id', 'name')->get();
 
             $selectedClinic = null;
             if ($selectedClinicId) {
