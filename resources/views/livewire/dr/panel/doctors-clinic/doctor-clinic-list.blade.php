@@ -95,11 +95,9 @@
                         {{ $item->prescription_fee !== null ? number_format($item->prescription_fee) . ' تومان' : '---' }}
                       </td>
                       <td class="text-center">
-                        <div class="form-check form-switch d-flex justify-content-center">
-                          <input class="form-check-input" type="checkbox" role="switch"
-                            wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
-                            style="width: 3em; height: 1.5em; margin-top: 0;">
-                        </div>
+                        <span class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }}">
+                          {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
+                        </span>
                       </td>
                       <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
@@ -113,8 +111,8 @@
                           </a>
                           <button wire:click="confirmDelete({{ $item->id }})"
                             class="btn btn-sm btn-gradient-danger px-2 py-1">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                              stroke="currentColor" stroke-width="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                              stroke-width="2">
                               <path
                                 d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                             </svg>
@@ -202,11 +200,9 @@
                     </div>
                     <div class="note-card-item">
                       <span class="note-card-label">وضعیت:</span>
-                      <div class="form-check form-switch d-inline-block">
-                        <input class="form-check-input" type="checkbox" role="switch"
-                          wire:click="toggleStatus({{ $item->id }})" {{ $item->is_active ? 'checked' : '' }}
-                          style="width: 3em; height: 1.5em; margin-top: 0;">
-                      </div>
+                      <span class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }}">
+                        {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
+                      </span>
                     </div>
                   </div>
                 </div>
