@@ -82,7 +82,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6 shadow-sm">
         <div class="modal-header">
-          <h5 class="modal-title fw-bold" id="sendSmsModalLabel">ارسال پیام جدید</h5>
+          <h5 class="modal-title fw-bold text-dark" id="sendSmsModalLabel">ارسال پیام جدید</h5>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">&times;</span>
           </button>
