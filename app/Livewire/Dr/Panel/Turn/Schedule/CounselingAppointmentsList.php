@@ -152,7 +152,7 @@ class CounselingAppointmentsList extends Component
         $this->calendarMonth = Jalalian::now()->getMonth();
         $doctor = $this->getAuthenticatedDoctor();
         $this->selectedClinicId =
-$this->getSelectedClinicId();
+$this->getSelectedMedicalCenterId();
 
         if ($doctor) {
             $this->loadClinics();

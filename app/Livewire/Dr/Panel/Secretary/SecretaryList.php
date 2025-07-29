@@ -37,7 +37,7 @@ class SecretaryList extends Component
 
     public function mount()
     {
-        $this->clinic_id = $this->getSelectedClinicId();
+        $this->clinic_id = $this->getSelectedMedicalCenterId();
     }
 
     public function loadSecretaries()

@@ -37,7 +37,7 @@ class SecretaryCreate extends Component
         if ($this->province_id) {
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
-        $this->clinic_id = $this->getSelectedClinicId();
+        $this->clinic_id = $this->getSelectedMedicalCenterId();
     }
 
     public function updatedProvinceId($value)

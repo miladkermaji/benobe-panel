@@ -14,7 +14,7 @@ class SecretaryPermissionController extends Controller
     public function index(Request $request)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedClinicId();
+        $clinicId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form');
@@ -45,7 +45,7 @@ class SecretaryPermissionController extends Controller
     public function update(Request $request, $secretaryId)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedClinicId();
+        $clinicId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
             return response()->json([

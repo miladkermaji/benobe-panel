@@ -1782,4 +1782,3 @@ class SpecialDaysAppointment extends Component
         }
     }
 }
-

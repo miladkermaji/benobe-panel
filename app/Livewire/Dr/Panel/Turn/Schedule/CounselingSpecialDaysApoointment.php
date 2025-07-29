@@ -19,8 +19,7 @@ use App\Models\DoctorCounselingWorkSchedule;
 
 class CounselingSpecialDaysApoointment extends Component
 {
-    
-use HasSelectedClinic;
+    use HasSelectedClinic;
 
     public $time;
     public $editingSettingIndex = null;
@@ -84,8 +83,8 @@ use HasSelectedClinic;
 
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
-        $this->selectedClinicId = 
-$this->getSelectedClinicId();
+        $this->selectedClinicId =
+$this->getSelectedMedicalCenterId();
 
         $this->loadCalendarData();
     }

@@ -17,8 +17,6 @@ use Illuminate\Support\Facades\Validator;
 
 class ManualNobatController extends Controller
 {
-    
-
     /**
      * Display a listing of the resource.
      */
@@ -26,7 +24,8 @@ class ManualNobatController extends Controller
     {
 
         try {
-            $selectedClinicId = $this->getSelectedClinicId();;
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
+            ;
 
             $appointments = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
@@ -65,7 +64,7 @@ class ManualNobatController extends Controller
     public function showSettings(Request $request)
     {
         $doctorId         = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $selectedClinicId = $this->getSelectedClinicId();
+        $selectedClinicId = $this->getSelectedMedicalCenterId();
 
         // جستجوی تنظیمات با در نظر گرفتن کلینیک
         $settings = ManualAppointmentSetting::where('doctor_id', $doctorId)
@@ -112,7 +111,7 @@ class ManualNobatController extends Controller
         try {
             // گرفتن آیدی پزشک یا منشی
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // ذخیره یا به‌روزرسانی تنظیمات نوبت‌دهی دستی
             $settings = ManualAppointmentSetting::updateOrCreate(
@@ -212,7 +211,7 @@ class ManualNobatController extends Controller
         try {
             $data = $validator->validated();
             $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
-            $data['clinic_id'] = $this->getSelectedClinicId() === 'default' ? null : $this->getSelectedClinicId();
+            $data['clinic_id'] = $this->getSelectedMedicalCenterId() === 'default' ? null : $this->getSelectedMedicalCenterId();
 
             if (ManualAppointment::where('user_id', $data['user_id'])
                 ->where('appointment_date', $data['appointment_date'])
@@ -311,7 +310,8 @@ class ManualNobatController extends Controller
     public function edit($id, Request $request)
     {
         try {
-            $selectedClinicId = $this->getSelectedClinicId();;
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
+            ;
 
             $appointment = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
@@ -398,7 +398,8 @@ class ManualNobatController extends Controller
     public function destroy($id, Request $request)
     {
         try {
-            $selectedClinicId = $this->getSelectedClinicId();;
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
+            ;
 
             // جستجوی نوبت بر اساس کلینیک
             $appointment = ManualAppointment::when(
@@ -420,8 +421,8 @@ class ManualNobatController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
-    
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
+
             $insurances = DoctorService::where('doctor_services.doctor_id', $doctorId)
                 ->where('doctor_services.status', true)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
@@ -434,9 +435,9 @@ class ManualNobatController extends Controller
                 ->join('insurances', 'doctor_services.insurance_id', '=', 'insurances.id')
                 ->select('insurances.id', 'insurances.name')
                 ->get();
-    
+
             Log::info('Insurances fetched successfully', ['insurances' => $insurances]);
-    
+
             return response()->json([
                 'success' => true,
                 'data' => $insurances,
@@ -454,7 +455,7 @@ class ManualNobatController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             $services = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $insuranceId)
@@ -500,7 +501,7 @@ class ManualNobatController extends Controller
             'discount_percentage.max' => 'درصد تخفیف نمی‌تواند بیشتر از ۱۰۰ باشد.',
             'discount_amount.min' => 'مبلغ تخفیف نمی‌تواند منفی باشد.',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -508,20 +509,20 @@ class ManualNobatController extends Controller
                 'errors' => $validator->errors()->all(),
             ], 422);
         }
-    
+
         try {
             $isFree = $request->input('is_free', false);
             $serviceIds = $request->input('service_ids', []);
             $discountPercentage = $request->input('discount_percentage', 0);
             $discountAmount = $request->input('discount_amount', 0);
-    
+
             Log::info('Calculating final price', [
                 'service_ids' => $serviceIds,
                 'is_free' => $isFree,
                 'discount_percentage' => $discountPercentage,
                 'discount_amount' => $discountAmount,
             ]);
-    
+
             if ($isFree) {
                 return response()->json([
                     'success' => true,
@@ -532,11 +533,11 @@ class ManualNobatController extends Controller
                     ],
                 ]);
             }
-    
+
             $basePrice = DoctorService::whereIn('id', $serviceIds)
                 ->where('status', true)
                 ->sum('price');
-    
+
             if (empty($serviceIds) || $basePrice == 0) {
                 return response()->json([
                     'success' => true,
@@ -547,7 +548,7 @@ class ManualNobatController extends Controller
                     ],
                 ]);
             }
-    
+
             if ($discountPercentage > 0) {
                 $discountAmount = round(($basePrice * $discountPercentage) / 100, 2);
             } elseif ($discountAmount > 0) {
@@ -556,16 +557,16 @@ class ManualNobatController extends Controller
                 $discountPercentage = 0;
                 $discountAmount = 0;
             }
-    
+
             $finalPrice = round(max(0, $basePrice - $discountAmount), 0);
-    
+
             Log::info('Final price calculated', [
                 'base_price' => $basePrice,
                 'final_price' => $finalPrice,
                 'discount_percentage' => $discountPercentage,
                 'discount_amount' => $discountAmount,
             ]);
-    
+
             return response()->json([
                 'success' => true,
                 'data' => [
@@ -615,7 +616,7 @@ class ManualNobatController extends Controller
             'final_price.gt' => 'قیمت نهایی باید بیشتر از صفر باشد، مگر اینکه ویزیت رایگان باشد.',
             'final_price.gte' => 'قیمت نهایی نمی‌تواند منفی باشد.',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -623,19 +624,19 @@ class ManualNobatController extends Controller
                 'errors' => $validator->errors()->all(),
             ], 422);
         }
-    
+
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
-    
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
+
             Log::info('Attempting to find appointment', [
                 'appointment_id' => $id,
                 'doctor_id' => $doctorId,
                 'selectedClinicId' => $selectedClinicId,
             ]);
-    
+
             $appointment = ManualAppointment::find($id);
-    
+
             if (!$appointment) {
                 Log::warning('Appointment not found', ['appointment_id' => $id]);
                 return response()->json([
@@ -643,7 +644,7 @@ class ManualNobatController extends Controller
                     'message' => 'نوبت یافت نشد!',
                 ], 404);
             }
-    
+
             if ($appointment->doctor_id != $doctorId) {
                 Log::warning('Doctor ID mismatch', [
                     'appointment_doctor_id' => $appointment->doctor_id,
@@ -654,7 +655,7 @@ class ManualNobatController extends Controller
                     'message' => 'دسترسی غیرمجاز: این نوبت متعلق به پزشک دیگری است!',
                 ], 403);
             }
-    
+
             if ($selectedClinicId !== 'default' && $appointment->clinic_id != $selectedClinicId) {
                 Log::warning('Clinic ID mismatch', [
                     'appointment_clinic_id' => $appointment->clinic_id,
@@ -665,7 +666,7 @@ class ManualNobatController extends Controller
                     'message' => 'کلینیک انتخاب‌شده با نوبت مطابقت ندارد!',
                 ], 422);
             }
-    
+
             if ($selectedClinicId === 'default' && !is_null($appointment->clinic_id)) {
                 Log::warning('Clinic ID expected to be null', [
                     'appointment_clinic_id' => $appointment->clinic_id,
@@ -675,16 +676,16 @@ class ManualNobatController extends Controller
                     'message' => 'کلینیک انتخاب‌شده با نوبت مطابقت ندارد!',
                 ], 422);
             }
-    
+
             $data = $validator->validated();
-    
+
             Log::info('End visit data', [
                 'appointment_id' => $id,
                 'data' => $data,
                 'doctor_id' => $doctorId,
                 'selectedClinicId' => $selectedClinicId,
             ]);
-    
+
             $appointment->update([
                 'insurance_id' => $data['insurance_id'],
                 'final_price' => $data['final_price'],
@@ -693,10 +694,10 @@ class ManualNobatController extends Controller
                 'payment_method' => $data['is_free'] ? null : $data['payment_method'],
                 'description' => $data['description'],
             ]);
-    
+
             $cacheKey = "appointments_doctor_{$doctorId}_clinic_{$selectedClinicId}";
             Cache::forget($cacheKey);
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'ویزیت با موفقیت ثبت شد!',

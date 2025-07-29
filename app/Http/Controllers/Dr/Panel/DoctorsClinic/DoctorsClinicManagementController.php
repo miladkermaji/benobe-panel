@@ -169,7 +169,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             $clinics = Clinic::where('doctor_id', $doctorId)->get();
             $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
@@ -190,7 +190,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -293,7 +293,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -382,7 +382,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             $deposit = ClinicDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
