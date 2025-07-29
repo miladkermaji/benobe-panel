@@ -2,28 +2,34 @@
 
 namespace App\Http\Controllers\Api;
 
-use Carbon\Carbon;
-use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\DoctorNote;
+use App\Models\Clinic;
+use App\Models\MedicalCenter;
+use App\Models\CounselingAppointment;
+use App\Models\DoctorCounselingConfig;
+use App\Models\DoctorCounselingWorkSchedule;
+use App\Models\DoctorAppointmentConfig;
+use App\Models\DoctorWorkSchedule;
 use App\Models\Appointment;
+use App\Models\Insurance;
+use App\Models\Service;
+use App\Models\Zone;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
+use App\Models\DoctorNote;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorHolidays;
-use App\Models\DoctorWorkSchedule;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
 use App\Models\SpecialDailySchedule;
-use App\Models\CounselingAppointment;
 use App\Models\SpecialDailySchedules;
-use App\Models\DoctorCounselingConfig;
 use App\Models\CounselingDailySchedule;
 use App\Models\DoctorCounselingHoliday;
 use App\Models\CounselingDailySchedules;
 use App\Models\DoctorCounselingHolidays;
-use App\Models\DoctorCounselingWorkSchedule;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class DoctorAppointmentController extends Controller
 {
@@ -48,10 +54,13 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-            $clinics = Clinic::where('doctor_id', $doctorId)
-                ->where('is_active', true)
-                ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
-                ->get();
+            $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+                $query->where('doctor_id', $doctorId);
+            })
+            ->where('type', 'clinic')
+            ->where('is_active', true)
+            ->select('id', 'name', 'province_id', 'city_id', 'address', 'phone_number', 'is_main_clinic')
+            ->get();
 
             $selectedClinic = null;
             if ($selectedClinicId) {
@@ -109,7 +118,7 @@ class DoctorAppointmentController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-          
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور. لطفاً دوباره تلاش کنید.',
@@ -285,7 +294,7 @@ class DoctorAppointmentController extends Controller
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
                 if (in_array($checkDateString, $holidayDates)) {
-                  
+
                     continue;
                 }
             }
@@ -312,7 +321,7 @@ class DoctorAppointmentController extends Controller
                     $endTime = Carbon::parse($checkDateString . ' ' . $workHours[0]['end'], 'Asia/Tehran');
                     $totalMinutes = $startTime->diffInMinutes($endTime);
                     $duration = floor($totalMinutes / $maxAppointments);
-                   
+
                 }
             } else {
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
@@ -356,7 +365,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-          
+
 
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
@@ -369,15 +378,15 @@ class DoctorAppointmentController extends Controller
                     $time = $appointment->appointment_time;
                     if (preg_match('/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/', $time)) {
                         $correctedTime = Carbon::parse($time, 'Asia/Tehran')->format('H:i:s');
-                       
+
                         $time = $correctedTime;
                     } elseif (!preg_match('/\d{2}:\d{2}:\d{2}/', $time)) {
-                        
+
                         continue;
                     }
                     $bookedTimes[] = $time;
                 } catch (\Exception $e) {
-                    
+
                 }
             }
 
@@ -386,7 +395,7 @@ class DoctorAppointmentController extends Controller
 
             foreach ($workHours as $workHour) {
                 if (!isset($workHour['start']) || !isset($workHour['end'])) {
-                   
+
                     continue;
                 }
 
@@ -397,9 +406,9 @@ class DoctorAppointmentController extends Controller
                 if (isset($workHour['max_appointments']) && $workHour['max_appointments'] > 0) {
                     $totalMinutes = $startTime->diffInMinutes($endTime);
                     $duration = floor($totalMinutes / $workHour['max_appointments']);
-                   
+
                 } else {
-                   
+
                     continue;
                 }
 
@@ -419,10 +428,10 @@ class DoctorAppointmentController extends Controller
                                     break;
                                 }
                             } else {
-                                
+
                             }
                         } catch (\Exception $e) {
-                           
+
                         }
                     }
 
@@ -539,7 +548,7 @@ class DoctorAppointmentController extends Controller
             if ($holidays && $holidays->holiday_dates) {
                 $holidayDates = is_string($holidays->holiday_dates) ? json_decode($holidays->holiday_dates, true) : $holidays->holiday_dates;
                 if (in_array($checkDateString, $holidayDates)) {
-                   
+
                     continue;
                 }
             }
@@ -588,7 +597,7 @@ class DoctorAppointmentController extends Controller
             }
 
             if (empty($workHours)) {
-               
+
                 continue;
             }
 
@@ -602,7 +611,7 @@ class DoctorAppointmentController extends Controller
                 }
             }
 
-           
+
 
             $dayAppointments = $bookedAppointments->filter(function ($appointment) use ($checkDate) {
                 return Carbon::parse($appointment->appointment_date)->isSameDay($checkDate);
@@ -613,7 +622,7 @@ class DoctorAppointmentController extends Controller
 
             foreach ($workHours as $workHour) {
                 if (!isset($workHour['start']) || !isset($workHour['end'])) {
-                    
+
                     continue;
                 }
 
@@ -626,7 +635,7 @@ class DoctorAppointmentController extends Controller
                     $duration = floor($totalMinutes / $workHour['max_appointments']);
                 }
 
-                
+
 
                 $currentTime = $startTime->copy();
                 while ($currentTime->lessThan($endTime)) {
@@ -643,10 +652,10 @@ class DoctorAppointmentController extends Controller
                                     break;
                                 }
                             } else {
-                                
+
                             }
                         } catch (\Exception $e) {
-                           
+
                         }
                     }
 
@@ -663,7 +672,7 @@ class DoctorAppointmentController extends Controller
                             $apptEnd = $apptStart->copy()->addMinutes($duration);
                             return $currentTime->lt($apptEnd) && $currentTime->gte($apptStart);
                         } catch (\Exception $e) {
-                         
+
                             return false;
                         }
                     });

@@ -4,11 +4,12 @@ namespace App\Livewire\Dr\Panel\DoctorServices;
 
 use App\Models\Clinic;
 use App\Models\Service;
-use Livewire\Component;
 use App\Models\Insurance;
 use App\Models\DoctorService;
+use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Models\MedicalCenter;
 
 class DoctorServiceEdit extends Component
 {
@@ -286,7 +287,12 @@ class DoctorServiceEdit extends Component
     {
         $services = Service::where('status', true)->get();
         $insurances = Insurance::all();
-        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->get();
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })
+        ->where('type', 'clinic')
+        ->get();
         $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->with(['service', 'insurance', 'clinic'])
             ->get();

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 
 use App\Models\Zone;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use App\Models\ClinicDepositSetting;
 use Illuminate\Support\Facades\Auth;
@@ -75,8 +75,9 @@ class DoctorsClinicManagementController extends Controller
             'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
-        Clinic::create([
-            'doctor_id'     => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        $medicalCenter = MedicalCenter::create([
             'name'          => $request->name,
             'phone_numbers' => json_encode($request->phone_numbers),
             'address'       => $request->address,
@@ -84,7 +85,12 @@ class DoctorsClinicManagementController extends Controller
             'city_id'       => $request->city_id,
             'postal_code'   => $request->postal_code,
             'description'   => $request->description,
+            'type'          => 'clinic',
+            'is_active'     => true,
         ]);
+
+        // Attach the doctor to the medical center
+        $medicalCenter->doctors()->attach($doctorId);
 
         return response()->json(['message' => 'مطب با موفقیت اضافه شد']);
     }
@@ -117,7 +123,7 @@ class DoctorsClinicManagementController extends Controller
             'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         $clinic->update([
             'name'          => $request->name,
             'phone_numbers' => json_encode($request->phone_numbers),
@@ -133,7 +139,7 @@ class DoctorsClinicManagementController extends Controller
 
     public function edit($id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         return view('dr.panel.doctors-clinic.edit', compact('clinic'));
     }
 
@@ -145,7 +151,7 @@ class DoctorsClinicManagementController extends Controller
 
     public function destroy($id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         $clinic->delete();
 
         return response()->json(['message' => 'مطب با موفقیت حذف شد']);
@@ -171,7 +177,11 @@ class DoctorsClinicManagementController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
-            $clinics = Clinic::where('doctor_id', $doctorId)->get();
+            $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+                $query->where('doctor_id', $doctorId);
+            })
+            ->where('type', 'clinic')
+            ->get();
             $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
@@ -225,7 +235,9 @@ class DoctorsClinicManagementController extends Controller
             $validated = $request->validate($rules, $messages);
 
             $clinicId = $selectedClinicId === 'default' ? null : $selectedClinicId;
-            if ($clinicId && !Clinic::where('id', $clinicId)->where('doctor_id', $doctorId)->exists()) {
+            if ($clinicId && !MedicalCenter::where('id', $clinicId)->whereHas('doctors', function ($query) use ($doctorId) {
+                $query->where('doctor_id', $doctorId);
+            })->exists()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'مطب انتخاب‌شده معتبر نیست یا متعلق به شما نیست.'

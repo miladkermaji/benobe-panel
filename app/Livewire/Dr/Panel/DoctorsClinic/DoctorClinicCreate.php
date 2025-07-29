@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Dr\Panel\DoctorsClinic;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Zone;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -76,8 +76,9 @@ class DoctorClinicCreate extends Component
             return;
         }
 
-        Clinic::create([
-            'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        $medicalCenter = MedicalCenter::create([
             'name' => $this->name,
             'phone_numbers' => json_encode($this->phone_numbers),
             'province_id' => $this->province_id,
@@ -86,7 +87,12 @@ class DoctorClinicCreate extends Component
             'address' => $this->address,
             'description' => $this->description,
             'prescription_fee' => $this->prescription_fee,
+            'type' => 'clinic',
+            'is_active' => true,
         ]);
+
+        // Attach the doctor to the medical center
+        $medicalCenter->doctors()->attach($doctorId);
 
         $this->dispatch('show-alert', type: 'success', message: 'مطب با موفقیت ایجاد شد!');
         return redirect()->route('dr-clinic-management');
