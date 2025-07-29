@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 use App\Models\Zone;
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
-use App\Models\ClinicDepositSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
 use App\Traits\HasSelectedClinic;
 use App\Helpers\PersianNumber;
+use App\Models\MedicalCenterDepositSetting;
 
 class DoctorsClinicManagementController extends Controller
 {
@@ -180,7 +180,7 @@ class DoctorsClinicManagementController extends Controller
             $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
                 $query->where('doctor_id', $doctorId);
             })->where('type', 'policlinic')->get();
-            $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
+            $deposits = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 }, function ($query) {
@@ -243,7 +243,7 @@ class DoctorsClinicManagementController extends Controller
             }
 
             // بررسی وجود بیعانه قبلی
-            $existingDeposit = ClinicDepositSetting::where('doctor_id', $doctorId)
+            $existingDeposit = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($clinicId) {
                     if ($clinicId) {
                         $query->where('clinic_id', $clinicId);
@@ -271,7 +271,7 @@ class DoctorsClinicManagementController extends Controller
                 ], 422);
             }
 
-            $deposit = ClinicDepositSetting::create([
+            $deposit = MedicalCenterDepositSetting::create([
                 'clinic_id' => $clinicId,
                 'doctor_id' => $doctorId,
                 'deposit_amount' => $depositAmount,
@@ -337,7 +337,7 @@ class DoctorsClinicManagementController extends Controller
 
             $validated = $request->validate($rules, $messages);
 
-            $deposit = ClinicDepositSetting::where('id', $id)
+            $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
@@ -394,7 +394,7 @@ class DoctorsClinicManagementController extends Controller
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
-            $deposit = ClinicDepositSetting::where('id', $id)
+            $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
