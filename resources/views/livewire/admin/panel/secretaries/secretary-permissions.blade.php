@@ -20,7 +20,7 @@
         <div class="table-responsive text-nowrap d-none d-md-block">
           <table class="table w-100 m-0">
             <tbody>
-        @forelse ($doctors as $doctor)
+              @forelse ($doctors as $doctor)
             <tbody x-data="{ open: false }">
               <tr style="background: #f5f7fa; border-top: 2px solid #b3c2d1; cursor:pointer;" @click="open = !open">
                 <td class="py-2 px-3 fw-bold text-primary" style="font-size: 1.05rem;">
@@ -57,22 +57,25 @@
                             <path d="M9 5v4l3 2" />
                           </svg>
                           {{ $secretary->first_name . ' ' . $secretary->last_name }} ({{ $secretary->mobile }})
-                    </span>
-                    @if ($secretary->clinic)
-                      <span
+                        </span>
+                        @if ($secretary->clinic)
+                          <span
                             class="badge-comment bg-gradient-primary  font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">{{ $secretary->clinic->name }}</span>
-                    @else
-                      <span
-                        class="badge-comment bg-gradient-info text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">ویزیت
-                        آنلاین</span>
-                    @endif
-                  </div>
+                        @else
+                          <span
+                            class="badge-comment bg-gradient-info text-white font-medium px-3 py-1 rounded-full shadow-sm hover:shadow-md transition-all duration-300">ویزیت
+                            آنلاین</span>
+                        @endif
+                      </div>
                       <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @php
-                          $permission = $secretary->permissions->firstWhere('clinic_id', $secretary->clinic_id);
+                          $permission = $secretary->permissions->firstWhere(
+                              'medical_center_id',
+                              $secretary->medical_center_id,
+                          );
                           $savedPermissions = $permission ? $permission->permissions ?? [] : [];
                           $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
-                          $clinicId = $secretary->clinic_id;
+                          $clinicId = $secretary->medical_center_id;
                         @endphp
                         @foreach ($permissionsConfig as $permissionKey => $permissionData)
                           <div
@@ -183,10 +186,13 @@
                     </div>
                     <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       @php
-                        $permission = $secretary->permissions->firstWhere('clinic_id', $secretary->clinic_id);
+                        $permission = $secretary->permissions->firstWhere(
+                            'medical_center_id',
+                            $secretary->medical_center_id,
+                        );
                         $savedPermissions = $permission ? $permission->permissions ?? [] : [];
                         $savedPermissions = is_array($savedPermissions) ? $savedPermissions : [];
-                        $clinicId = $secretary->clinic_id;
+                        $clinicId = $secretary->medical_center_id;
                       @endphp
                       @foreach ($permissionsConfig as $permissionKey => $permissionData)
                         <div class="permission-item p-3 shadow-md bg-background-card transition-all duration-300 mb-2">
@@ -232,19 +238,19 @@
                   </div>
                 @endforelse
               </div>
-          </div>
-        @empty
-          <div class="text-center py-6">
-            <div class="d-flex flex-column align-items-center justify-content-center">
+            </div>
+          @empty
+            <div class="text-center py-6">
+              <div class="d-flex flex-column align-items-center justify-content-center">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
                   stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
                 <p class="text-text-secondary font-medium m-0">دکتری مطابق جستجو یافت نشد.</p>
               </div>
             </div>
           @endforelse
-          </div>
+        </div>
       </div>
     </div>
   </div>

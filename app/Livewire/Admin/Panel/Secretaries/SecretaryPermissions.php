@@ -49,9 +49,9 @@ class SecretaryPermissions extends Component
             ->where('secretary_id', $secretaryId)
             ->where(function ($query) use ($clinicId) {
                 if ($clinicId !== null && $clinicId !== 'null') {
-                    $query->where('clinic_id', $clinicId);
+                    $query->where('medical_center_id', $clinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })->first();
 
@@ -64,7 +64,7 @@ class SecretaryPermissions extends Component
             SecretaryPermission::create([
                 'doctor_id' => $doctorId,
                 'secretary_id' => $secretaryId,
-                'clinic_id' => $clinicId === 'null' ? null : $clinicId,
+                'medical_center_id' => $clinicId === 'null' ? null : $clinicId,
                 'permissions' => $permissions,
                 'has_access' => !empty($permissions),
             ]);
