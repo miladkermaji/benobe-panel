@@ -233,7 +233,7 @@ class Workhours extends Component
     private function resolveMedicalCenterId(): string
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            return request()->route('medicalCenter') ?? 'default';
+            return request()->route('clinic') ?? 'default';
         }
         return $this->getSelectedMedicalCenterId() ?? 'default';
     }
@@ -318,23 +318,23 @@ class Workhours extends Component
     public function handleMedicalCenterSelected($data)
     {
         $medicalCenterId = $data['medicalCenterId'] ?? null;
-        
+
         // بروزرسانی selectedMedicalCenterId
         $this->selectedMedicalCenterId = $medicalCenterId;
         $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
-        
+
         // ذخیره در سشن
         session(['selectedMedicalCenterId' => $medicalCenterId]);
-        
+
         // بازنشانی پراپرتی‌ها
         $this->reset(['workSchedules', 'isWorking', 'slots']);
-        
+
         // بارگذاری مجدد داده‌ها
         $this->mount();
-        
+
         // ارسال رویداد رفرش
         $this->dispatch('refresh-clinic-data');
-        
+
         // نمایش پیام به کاربر
         $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات ساعات کاری در حال بروزرسانی...');
     }
@@ -1124,7 +1124,7 @@ class Workhours extends Component
     public function refreshWorkSchedules()
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $currentMedicalCenterId = request()->route('clinic') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
             $medicalCenterId = $this->activeMedicalCenterId;

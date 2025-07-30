@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\ClinicDepositSettings;
 use Livewire\Component;
 use App\Models\ClinicDepositSetting;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
@@ -22,7 +22,7 @@ class ClinicDepositSettingsEdit extends Component
         $this->form = $this->clinicDepositSetting->toArray();
         $this->form['no_deposit'] = $this->form['deposit_amount'] == 0;
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::where('doctor_id', $this->form['doctor_id'])->get();
+        $this->clinics = MedicalCenter::where('doctor_id', $this->form['doctor_id'])->get();
 
         // Dispatch initial clinics data
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {
@@ -32,7 +32,7 @@ class ClinicDepositSettingsEdit extends Component
 
     public function updatedFormDoctorId($value)
     {
-        $this->clinics = Clinic::where('doctor_id', $value)->get();
+        $this->clinics = MedicalCenter::where('doctor_id', $value)->get();
         $this->form['clinic_id'] = '';
 
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {
@@ -54,7 +54,7 @@ class ClinicDepositSettingsEdit extends Component
         try {
             $validator = Validator::make($this->form, [
                 'doctor_id' => 'required|exists:doctors,id',
-                'clinic_id' => 'nullable|exists:clinics,id',
+                'clinic_id' => 'nullable|exists:medical_centers,id',
                 'deposit_amount' => 'required|numeric|min:0',
                 'no_deposit' => 'boolean',
                 'notes' => 'nullable|string|max:500',
