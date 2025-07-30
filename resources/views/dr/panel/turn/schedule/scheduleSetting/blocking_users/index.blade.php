@@ -390,19 +390,20 @@
           selectedUsers = [];
           $('#selectAll').prop('checked', false);
           toggleGroupActions();
-          if (response.blockedUsers.length === 0) {
+
+          if (!response.blockedUsers || response.blockedUsers.length === 0) {
             tableBody.append(
               '<tr><td colspan="9" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
             );
             cardsContainer.append(
               '<div class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></div>'
             );
-            return;
+          } else {
+            response.blockedUsers.forEach((user, index) => {
+              appendBlockedUser(user, index + 1);
+              appendBlockedUserCard(user, index + 1);
+            });
           }
-          response.blockedUsers.forEach((user, index) => {
-            appendBlockedUser(user, index + 1);
-            appendBlockedUserCard(user, index + 1);
-          });
         },
         error: function() {
           toastr.error("خطا در بارگذاری لیست کاربران!");
@@ -439,8 +440,10 @@
         success: function(response) {
           if (response.success) {
             toastr.success(response.message);
-            appendBlockedUser(response.blocking_user, $('#blockedUsersTable tbody tr').length + 1);
-            appendBlockedUserCard(response.blocking_user, $('.notes-cards .note-card').length + 1);
+            // به جای appendBlockedUser، کل لیست را دوباره لود کنیم
+            loadBlockedUsers();
+            // پاک کردن فیلد جستجو
+            $('#searchInput').val('');
             form[0].reset();
             $('#addUserModal').modal('hide');
           }
@@ -486,8 +489,8 @@
                         <div class="form-check form-switch d-flex justify-content-center">
                             <input class="form-check-input" type="checkbox" role="switch"
                                 data-id="${user.id}" 
-                                data-status="${user.status}" 
-                                ${user.status == 1 ? 'checked' : ''}
+                                data-status="${parseInt(user.status)}" 
+                                ${parseInt(user.status) == 1 ? 'checked' : ''}
                                 onchange="toggleStatus(this)"
                                 style="width: 3em; height: 1.5em; margin-top: 0;">
                         </div>
@@ -551,8 +554,8 @@
                             <div class="form-check form-switch d-inline-block">
                                 <input class="form-check-input" type="checkbox" role="switch" 
                                     data-id="${user.id}" 
-                                    data-status="${user.status}" 
-                                    ${user.status == '1' ? 'checked' : ''} 
+                                    data-status="${parseInt(user.status)}" 
+                                    ${parseInt(user.status) == 1 ? 'checked' : ''} 
                                     onchange="toggleStatus(this)"
                                     style="width: 3em; height: 1.5em; margin-top: 0;">
                             </div>
@@ -574,24 +577,30 @@
         success: function(response) {
           const tableBody = $('#blockedUsersTable tbody');
           const cardsContainer = $('.notes-cards');
+
+          // پاک کردن محتوای قبلی
           tableBody.empty();
           cardsContainer.empty();
           selectedUsers = [];
           $('#selectAll').prop('checked', false);
           toggleGroupActions();
-          if (response.blockedUsers.length === 0) {
+
+          // بررسی وجود کاربران
+          if (!response.blockedUsers || response.blockedUsers.length === 0) {
+            // نمایش پیام "هیچ کاربری یافت نشد"
             tableBody.append(
-              '<tr><td colspan="9" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
+              '<tr><td colspan="9" class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></td></tr>'
             );
             cardsContainer.append(
               '<div class="text-center py-4"><div class="d-flex justify-content-center align-items-center flex-column"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2"><path d="M5 12h14M12 5l7 7-7 7" /></svg><p class="text-muted fw-medium">هیچ کاربر مسدودی یافت نشد.</p></div></div>'
             );
-            return;
+          } else {
+            // نمایش کاربران
+            response.blockedUsers.forEach((user, index) => {
+              appendBlockedUser(user, index + 1);
+              appendBlockedUserCard(user, index + 1);
+            });
           }
-          response.blockedUsers.forEach((user, index) => {
-            appendBlockedUser(user, index + 1);
-            appendBlockedUserCard(user, index + 1);
-          });
         },
         error: function() {
           toastr.error("خطا در بارگذاری لیست کاربران!");
@@ -641,10 +650,8 @@
             success: function(response) {
               if (response.success) {
                 toastr.success(response.message);
-                row.remove();
-                card.remove();
-                selectedUsers = selectedUsers.filter(id => id != userId);
-                toggleGroupActions();
+                // به جای حذف دستی، کل لیست را دوباره لود کنیم
+                loadBlockedUsers();
               } else {
                 toastr.error(response.message);
               }
@@ -664,14 +671,6 @@
       const newStatus = currentStatus === 1 ? 0 : 1;
       const statusText = newStatus === 1 ? 'مسدود' : 'آزاد';
 
-      // اضافه کردن console.log برای دیباگ
-      console.log('Toggle Status Debug:', {
-        userId,
-        currentStatus,
-        newStatus,
-        element: $(element).data()
-      });
-
       Swal.fire({
         title: 'تغییر وضعیت',
         text: `آیا می‌خواهید وضعیت این کاربر را به "${statusText}" تغییر دهید؟`,
@@ -690,32 +689,31 @@
             status: newStatus,
           };
 
-          // اضافه کردن console.log برای دیباگ
-          console.log('Request Data:', requestData);
-
           $.ajax({
             url: "{{ route('doctor-blocking-users.update-status') }}",
             method: "PATCH",
             data: requestData,
             success: function(response) {
-              console.log('Success Response:', response);
               if (response.success) {
-                $(element)
-                  .prop('checked', newStatus === 1)
-                  .data('status', newStatus);
+                // به‌روزرسانی وضعیت در تمام المان‌های مربوطه
+                $(`[data-id="${userId}"] .form-check-input`).each(function() {
+                  $(this).prop('checked', newStatus === 1).data('status', newStatus);
+                });
                 toastr.success(response.message);
               } else {
                 toastr.error(response.message || 'خطا در تغییر وضعیت');
+                // برگرداندن به وضعیت قبلی
                 $(element).prop('checked', currentStatus === 1);
               }
             },
             error: function(xhr) {
-              console.error('Error Response:', xhr.responseJSON);
               toastr.error(xhr.responseJSON?.message || 'خطا در تغییر وضعیت!');
+              // برگرداندن به وضعیت قبلی
               $(element).prop('checked', currentStatus === 1);
             }
           });
         } else {
+          // برگرداندن به وضعیت قبلی
           $(element).prop('checked', currentStatus === 1);
         }
       });
@@ -778,6 +776,11 @@
     $(document).ready(function() {
       loadBlockedUsers();
       $('[data-toggle="tooltip"]').tooltip();
+
+      // گوش دادن به تغییر کلینیک
+      $(document).on('clinicChanged', function() {
+        loadBlockedUsers();
+      });
     });
   </script>
 @endsection
