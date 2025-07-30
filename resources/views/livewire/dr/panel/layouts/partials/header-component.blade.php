@@ -252,6 +252,7 @@
           function handleDropdownClick(e) {
             e.preventDefault();
             e.stopPropagation();
+            e.stopImmediatePropagation();
 
             // تغییر وضعیت aria-expanded
             const isExpanded = this.getAttribute('aria-expanded') === 'true';
@@ -301,16 +302,24 @@
 
           // بستن دراپ‌داون با کلیک خارج از آن
           document.removeEventListener('click', handleOutsideClick);
-          document.addEventListener('click', handleOutsideClick);
+
+          // اضافه کردن event listener با تاخیر برای جلوگیری از تداخل
+          setTimeout(() => {
+            document.addEventListener('click', handleOutsideClick);
+          }, 100);
 
           function handleOutsideClick(e) {
-            if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
-              dropdownMenu.classList.add('d-none');
-              dropdownMenu.style.display = 'none';
-              dropdownMenu.style.visibility = 'hidden';
-              dropdownMenu.style.opacity = '0';
-              dropdownTrigger.setAttribute('aria-expanded', 'false');
+            // اگر کلیک روی trigger یا dropdown باشد، کاری نکن
+            if (dropdownTrigger.contains(e.target) || dropdownMenu.contains(e.target)) {
+              return;
             }
+
+            // فقط اگر کلیک خارج از هر دو باشد، ببند
+            dropdownMenu.classList.add('d-none');
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.style.visibility = 'hidden';
+            dropdownMenu.style.opacity = '0';
+            dropdownTrigger.setAttribute('aria-expanded', 'false');
           }
 
           // بستن دراپ‌داون با کلیک روی ESC
