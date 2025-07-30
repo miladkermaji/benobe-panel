@@ -67,9 +67,9 @@ class BestDoctorCreate extends Component
                 function ($attribute, $value, $fail) {
                     $exists = BestDoctor::where('doctor_id', $value)
                         ->when($this->clinic_id, function ($query) {
-                            return $query->where('clinic_id', $this->clinic_id);
+                            return $query->where('medical_center_id', $this->clinic_id);
                         }, function ($query) {
-                            return $query->whereNull('clinic_id');
+                            return $query->whereNull('medical_center_id');
                         })
                         ->exists();
 
@@ -108,7 +108,7 @@ class BestDoctorCreate extends Component
 
             $bestDoctor = BestDoctor::create([
                 'doctor_id'       => $this->doctor_id,
-                'clinic_id'       => $this->clinic_id,
+                'medical_center_id' => $this->clinic_id,
                 'best_doctor'     => $this->best_doctor,
                 'best_consultant' => $this->best_consultant,
                 'status'          => $this->status,

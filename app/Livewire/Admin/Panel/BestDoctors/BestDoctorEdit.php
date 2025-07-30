@@ -25,7 +25,7 @@ class BestDoctorEdit extends Component
         $this->bestdoctor = BestDoctor::findOrFail($bestdoctorId);
 
         $this->doctor_id       = $this->bestdoctor->doctor_id;
-        $this->clinic_id       = $this->bestdoctor->clinic_id;
+        $this->clinic_id       = $this->bestdoctor->medical_center_id;
         $this->best_doctor     = $this->bestdoctor->best_doctor;
         $this->best_consultant = $this->bestdoctor->best_consultant;
         $this->status          = $this->bestdoctor->status;
@@ -70,7 +70,7 @@ class BestDoctorEdit extends Component
             'doctor_id'       => [
                 'required',
                 'exists:doctors,id',
-                "unique:best_doctors,doctor_id,{$this->bestdoctor->id},id,clinic_id," . ($this->clinic_id ?? 'NULL'),
+                "unique:best_doctors,doctor_id,{$this->bestdoctor->id},id,medical_center_id," . ($this->clinic_id ?? 'NULL'),
             ],
             'clinic_id'       => 'nullable|exists:medical_centers,id',
             'best_doctor'     => 'boolean',
@@ -84,7 +84,7 @@ class BestDoctorEdit extends Component
         ]);
 
         $this->bestdoctor->doctor_id       = $this->doctor_id;
-        $this->bestdoctor->clinic_id       = $this->clinic_id;
+        $this->bestdoctor->medical_center_id       = $this->clinic_id;
         $this->bestdoctor->best_doctor     = $this->best_doctor ?? false;
         $this->bestdoctor->best_consultant = $this->best_consultant ?? false;
         $this->bestdoctor->status          = $this->status ?? false;
