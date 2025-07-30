@@ -130,12 +130,12 @@ class DoctorAppointmentController extends Controller
         if (is_null($clinicId)) {
             // فقط رکورد جنرال
             return \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctorId)
-                ->whereNull('clinic_id')
+                ->whereNull('medical_center_id')
                 ->first();
         } else {
             // فقط رکورد اختصاصی کلینیک
             return \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->first();
         }
     }
@@ -151,7 +151,7 @@ class DoctorAppointmentController extends Controller
         foreach ($clinics as $clinic) {
             $slotData = $this->getNextAvailableSlot($doctor, $clinic->id);
             $notes = DoctorNote::where('doctor_id', $doctor->id)
-                ->where('clinic_id', $clinic->id)
+                ->where('medical_center_id', $clinic->id)
                 ->where('appointment_type', 'in_person')
                 ->first();
             // استفاده از helper جدید
@@ -185,7 +185,7 @@ class DoctorAppointmentController extends Controller
     {
         $slotData = $this->getNextAvailableSlot($doctor, $clinic->id);
         $notes = DoctorNote::where('doctor_id', $doctor->id)
-            ->where('clinic_id', $clinic->id)
+            ->where('medical_center_id', $clinic->id)
             ->where('appointment_type', 'in_person')
             ->first();
         // استفاده از helper جدید
@@ -262,7 +262,7 @@ class DoctorAppointmentController extends Controller
 
         // دریافت نوبت‌های رزروشده
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where('medical_center_id', $clinicId)
             ->where(function ($query) {
                 $query->where('status', 'scheduled')
                     ->orWhere('status', 'pending_review');
@@ -285,7 +285,7 @@ class DoctorAppointmentController extends Controller
 
             // بررسی تعطیلات
             $holidays = DoctorHoliday::where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->where('status', 'active')
                 ->first();
             if ($holidays && $holidays->holiday_dates) {
@@ -298,7 +298,7 @@ class DoctorAppointmentController extends Controller
 
             // بررسی برنامه روزانه خاص
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->where('date', $checkDateString)
                 ->first();
 
@@ -322,13 +322,13 @@ class DoctorAppointmentController extends Controller
                 }
             } else {
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
+                    ->where('medical_center_id', $clinicId)
                     ->where('day', $dayName)
                     ->where('is_working', true)
                     ->first();
                 if (!$schedule) {
                     $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                        ->whereNull('clinic_id')
+                        ->whereNull('medical_center_id')
                         ->where('day', $dayName)
                         ->where('is_working', true)
                         ->first();

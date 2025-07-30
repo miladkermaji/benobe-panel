@@ -279,7 +279,7 @@ class AppointmentBookingController extends Controller
                 'email'            => 'nullable|email|unique:users,email',
                 'success_redirect' => 'nullable|url',
                 'error_redirect'   => 'nullable|url',
-                'clinic_id'        => 'nullable|integer|exists:clinics,id',
+                'clinic_id'        => 'nullable|integer|exists:medical_centers,id',
             ], [
                 'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
                 'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',

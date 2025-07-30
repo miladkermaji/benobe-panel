@@ -16,7 +16,7 @@ class PrescriptionRequestResource extends JsonResource
             'type' => $this->type,
             'description' => $this->description,
             'doctor_id' => $this->doctor_id,
-            'clinic' => $this->whenLoaded('clinic'),
+            'clinic' => $this->whenLoaded('medicalCenter'),
             'insurances' => $this->whenLoaded('insurances', function () {
                 $referralNames = ['سلامت همگانی(ایرانیان)', 'کمیته امداد', 'سایر اقشار', 'بهزیستی'];
                 return $this->insurances->map(function ($insurance) use ($referralNames) {

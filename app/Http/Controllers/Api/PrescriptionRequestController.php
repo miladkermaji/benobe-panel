@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Clinic;
 use App\Models\Insulin;
 use Illuminate\Http\Request;
 use App\Models\PrescriptionRequest;
@@ -11,6 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Models\PrescriptionInsurance;
 use Modules\Payment\Services\PaymentService;
+use App\Models\MedicalCenter;
 
 class PrescriptionRequestController extends Controller
 {
@@ -32,7 +32,7 @@ class PrescriptionRequestController extends Controller
                 'data' => null,
             ], 401);
         }
-        $prescriptions = $user->prescriptions()->with(['clinic', 'transaction', 'insurances.parent'])->latest()->get();
+        $prescriptions = $user->prescriptions()->with(['medicalCenter', 'transaction', 'insurances.parent'])->latest()->get();
         return response()->json([
             'status' => 'success',
             'data' => \App\Http\Resources\PrescriptionRequestResource::collection($prescriptions),
@@ -57,7 +57,7 @@ class PrescriptionRequestController extends Controller
             // لیست بیمه‌ها (ساختار درختی)
             $insurances = PrescriptionInsurance::with('children')->whereNull('parent_id')->get();
             // لیست کلینیک‌ها
-            $clinics = Clinic::select('id', 'name', 'prescription_fee')->get();
+            $clinics = MedicalCenter::where('type', 'clinic')->select('id', 'name', 'prescription_fee')->get();
 
             return response()->json([
                 'status' => 'success',
@@ -93,7 +93,7 @@ class PrescriptionRequestController extends Controller
         $validated = $request->validate([
             'type' => 'required|in:renew_lab,renew_drug,renew_insulin,sonography,mri,other',
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'prescription_insurance_id' => 'nullable|exists:prescription_insurances,id',
             'description' => [
                 $request->input('type') === 'other' ? 'required' : 'prohibited',
@@ -158,7 +158,7 @@ class PrescriptionRequestController extends Controller
         $clinic = null;
         $prescription_fee = null;
         if (!empty($validated['clinic_id'])) {
-            $clinic = Clinic::find($validated['clinic_id']);
+            $clinic = MedicalCenter::where('type', 'clinic')->find($validated['clinic_id']);
             $prescription_fee = $clinic?->prescription_fee;
         }
         $price = $prescription_fee > 0 ? (int)$prescription_fee : null;
