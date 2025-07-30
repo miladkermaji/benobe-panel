@@ -29,13 +29,16 @@ class DoctorProfileController extends Controller
              'province'  => fn ($q) => $q->select('id', 'name'),
              'city'      => fn ($q) => $q->select('id', 'name'),
              'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'policlinic')
-              ->select('id', 'doctor_id', 'name', 'address', 'province_id', 'city_id', 'phone_number', 'is_main_center'),
+              ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.phone_number', 'medical_centers.is_main_center'),
              'reviews'   => fn ($q) => $q->where('is_approved', true)
               ->with(['reviewable' => fn ($q) => $q->select('id', 'first_name', 'last_name')])
               ->orderBy('created_at', 'desc')
               ->limit(3),
              'messengers',
              'doctorTags',
+             'counselingConfig',
+             'appointmentConfig',
+             'workSchedules',
              'insurances' => fn ($q) => $q->select('insurances.id', 'insurances.name'), // اصلاح شده
             ])->find($doctorId);
 
@@ -110,6 +113,11 @@ class DoctorProfileController extends Controller
              ],
             ], 200);
         } catch (\Exception $e) {
+            Log::error('Doctor profile error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
              'status'  => 'error',
@@ -330,7 +338,9 @@ class DoctorProfileController extends Controller
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('medical_center_id', $clinicId)
+            ->when($clinicId, function ($query) use ($clinicId) {
+                return $query->where('medical_center_id', $clinicId);
+            })
             ->where(function ($query) {
                 $query->where('status', 'scheduled')
                       ->orWhere('status', 'pending_review');
