@@ -36,7 +36,7 @@ class ManualAppointmentCreate extends Component
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
             'user_id' => $this->user_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_date' => $this->appointment_date,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,
@@ -85,7 +85,7 @@ class ManualAppointmentCreate extends Component
         ManualAppointment::create([
             'doctor_id' => $this->doctor_id,
             'user_id' => $this->user_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_date' => $miladiDate,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,

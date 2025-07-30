@@ -34,7 +34,7 @@ class DoctorNoteEdit extends Component
     public function update()
     {
         $validator = Validator::make([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ], [
@@ -54,7 +54,7 @@ class DoctorNoteEdit extends Component
         }
 
         $this->doctorNote->update([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ]);

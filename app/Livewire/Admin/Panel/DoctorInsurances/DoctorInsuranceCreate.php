@@ -42,7 +42,7 @@ class DoctorInsuranceCreate extends Component
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,
@@ -84,7 +84,7 @@ class DoctorInsuranceCreate extends Component
         }
 
         $data = [
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,

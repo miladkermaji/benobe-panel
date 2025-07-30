@@ -45,7 +45,7 @@ class DoctorServiceEdit extends Component
         ]];
         $this->previousState = [
             'service_id' => $this->service_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -186,7 +186,7 @@ class DoctorServiceEdit extends Component
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $currentState = [
             'service_id' => $this->service_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -257,7 +257,7 @@ class DoctorServiceEdit extends Component
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([
                     'service_id' => $this->service_id,
-                    'clinic_id' => $this->clinic_id,
+                    'medical_center_id' => $this->clinic_id,
                     'insurance_id' => $pricing['insurance_id'],
                     'name' => $service->name,
                     'description' => $this->description,

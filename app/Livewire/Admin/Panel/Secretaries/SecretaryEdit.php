@@ -70,7 +70,7 @@ class SecretaryEdit extends Component
     {
         Log::info('update secretary', [
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
         ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
@@ -115,7 +115,7 @@ class SecretaryEdit extends Component
             'gender' => $this->gender,
             'email' => $this->email,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'is_active' => $this->is_active,
         ];
 

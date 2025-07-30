@@ -87,7 +87,7 @@ class DoctorServiceCreate extends Component
 
         DoctorService::create([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'insurance_id' => $this->insurance_id,
             'service_id' => $this->service_id,
             'name' => $this->name,

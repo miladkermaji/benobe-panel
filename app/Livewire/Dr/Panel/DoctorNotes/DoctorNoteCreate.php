@@ -52,7 +52,7 @@ class DoctorNoteCreate extends Component
     public function store()
     {
         $validator = Validator::make([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ], [
@@ -73,7 +73,7 @@ class DoctorNoteCreate extends Component
 
         DoctorNote::create([
             'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ]);

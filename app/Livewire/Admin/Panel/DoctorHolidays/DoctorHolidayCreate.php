@@ -28,7 +28,7 @@ class DoctorHolidayCreate extends Component
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'holiday_dates' => $this->holiday_dates,
             'status' => $this->status,
         ], [
@@ -71,7 +71,7 @@ class DoctorHolidayCreate extends Component
         } else {
             DoctorHoliday::create([
                 'doctor_id' => $this->doctor_id,
-                'clinic_id' => $this->clinic_id,
+                'medical_center_id' => $this->clinic_id,
                 'holiday_dates' => $gregorianDates,
                 'status' => $this->status,
             ]);

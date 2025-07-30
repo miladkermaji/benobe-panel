@@ -96,7 +96,7 @@ class BestDoctorCreate extends Component
         try {
             Log::info('Starting store method', [
                 'doctor_id' => $this->doctor_id,
-                'clinic_id' => $this->clinic_id,
+                'medical_center_id' => $this->clinic_id,
                 'best_doctor' => $this->best_doctor,
                 'best_consultant' => $this->best_consultant,
                 'status' => $this->status

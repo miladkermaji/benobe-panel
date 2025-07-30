@@ -66,7 +66,7 @@ class SecretaryCreate extends Component
     {
         Log::info('store secretary', [
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
         ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
@@ -112,7 +112,7 @@ class SecretaryCreate extends Component
             'email' => $this->email,
             'password' => $this->password ? Hash::make($this->password) : null,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'is_active' => $this->is_active,
         ];
 
@@ -126,7 +126,7 @@ class SecretaryCreate extends Component
         SecretaryPermission::create([
             'secretary_id' => $secretary->id,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->clinic_id,
             'permissions' => json_encode([
                 "dashboard",
                 "appointments",
