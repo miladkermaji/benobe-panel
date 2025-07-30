@@ -21,7 +21,7 @@ class DoctorListingController extends Controller
                 'province_id'                => 'nullable|integer|exists:zone,id',
                 'specialty_id'               => 'nullable|integer|exists:specialties,id',
                 'sex'                        => 'nullable|in:male,female,both',
-                // 'has_available_appointments' => 'nullable|boolean', // حذف اعتبارسنجی بولین
+                'has_available_appointments' => 'nullable|string|in:true,false,1,0',
                 'service_id'                 => 'nullable|integer|exists:services,id',
                 'insurance_id'               => 'nullable|integer|exists:insurances,id',
                 'limit'                      => 'nullable|integer|min:1|max:100',
@@ -79,7 +79,7 @@ class DoctorListingController extends Controller
                         'province'      => fn ($q) => $q->select('id', 'name'),
                         'clinics'       => fn ($q) => $q->where('is_active', true)
                             ->with(['city' => fn ($q) => $q->select('id', 'name')])
-                            ->select('clinics.id', 'clinics.doctor_id', 'clinics.address', 'clinics.province_id', 'clinics.city_id', 'clinics.is_main_clinic', 'clinics.payment_methods'),
+                            ->select('medical_centers.id', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.payment_methods', 'medical_centers.is_main_center'),
                         'workSchedules' => fn ($q) => $q->where('is_working', true)
                             ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
                         'appointments'  => fn ($q) => $q->where('status', 'scheduled')
@@ -181,8 +181,10 @@ class DoctorListingController extends Controller
                         break;
                     case 'appointment_soonest':
                         $doctors = $query->paginate($limit, ['*'], 'page', $page);
-                        $doctors->getCollection()->sortBy(function ($doctor) use ($serviceType) {
-                            $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
+                        $doctors->getCollection()->sortBy(function ($doctor) {
+                            $mainClinic = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
+                            $clinicId = $mainClinic ? $mainClinic->id : null;
+                            $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
                             return !empty($slotData['next_available_slot_gregorian']) ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
                         });
                         return $doctors;
@@ -203,11 +205,12 @@ class DoctorListingController extends Controller
             });
 
             $formattedDoctors = $doctors->map(function ($doctor) use ($serviceType) {
-                $mainClinic        = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+                $mainClinic        = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
                 $otherClinicsCount = $doctor->clinics->count() - 1;
                 $city              = $mainClinic && $mainClinic->city ? $mainClinic->city->name : ($doctor->city ? $doctor->city->name : 'نامشخص');
 
-                $slotData = $this->getNextAvailableSlot($doctor, $serviceType);
+                $clinicId = $mainClinic ? $mainClinic->id : null;
+                $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
 
                 $tags = $doctor->doctorTags->map(function ($tag) {
                     return [
@@ -276,6 +279,11 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
+            Log::error('Doctor listing error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
             return response()->json([
                 'status'  => 'error',
@@ -303,7 +311,9 @@ class DoctorListingController extends Controller
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('medical_center_id', $clinicId)
+            ->when($clinicId, function ($query) use ($clinicId) {
+                return $query->where('medical_center_id', $clinicId);
+            })
             ->where('status', 'scheduled')
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
