@@ -161,6 +161,9 @@ class HeaderComponent extends Component
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها
             $this->dispatch('medicalCenterSelected', ['medicalCenterId' => $medicalCenterId]);
+
+            // ارسال رویداد برای ریلود صفحه بعد از چند ثانیه
+            $this->dispatch('reloadPageAfterDelay', ['delay' => 3000]); // 3 ثانیه تاخیر
         }
     }
 

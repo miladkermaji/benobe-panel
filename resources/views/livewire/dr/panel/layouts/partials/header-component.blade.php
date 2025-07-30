@@ -202,9 +202,31 @@
             notificationBox.classList.add('d-none');
           }
         });
+
+        // گوش دادن به رویداد ریلود صفحه بعد از انتخاب مرکز درمانی
+        Livewire.on('reloadPageAfterDelay', (data) => {
+          const delay = data.delay || 3000; // پیش‌فرض 3 ثانیه
+
+          // نمایش پیام به کاربر
+          const message = document.createElement('div');
+          message.className = 'alert alert-info position-fixed';
+          message.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+          message.innerHTML = `
+            <div class="d-flex align-items-center">
+              <div class="spinner-border spinner-border-sm me-2" role="status">
+                <span class="visually-hidden">در حال بارگذاری...</span>
+              </div>
+              <span>مرکز درمانی تغییر کرد. صفحه در حال بروزرسانی...</span>
+            </div>
+          `;
+          document.body.appendChild(message);
+
+          // ریلود صفحه بعد از تاخیر
+          setTimeout(() => {
+            window.location.reload();
+          }, delay);
+        });
       });
     </script>
-  </div>
-  <div class="quick-access">
   </div>
 </div>
