@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
-use App\Models\ManualAppointmentSetting;
+use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 
 class ManualNobatController extends Controller
@@ -67,12 +67,12 @@ class ManualNobatController extends Controller
         $selectedClinicId = $this->getSelectedMedicalCenterId();
 
         // جستجوی تنظیمات با در نظر گرفتن کلینیک
-        $settings = ManualAppointmentSetting::where('doctor_id', $doctorId)
+        $settings = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             })
             ->first();
 
@@ -114,10 +114,10 @@ class ManualNobatController extends Controller
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // ذخیره یا به‌روزرسانی تنظیمات نوبت‌دهی دستی
-            $settings = ManualAppointmentSetting::updateOrCreate(
+            $settings = \App\Models\DoctorAppointmentConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $selectedClinicId === 'default' ? null : $selectedClinicId,
+                    'medical_center_id' => $selectedClinicId === 'default' ? null : $selectedClinicId,
                 ],
                 [
                     'is_active'             => $request->status,

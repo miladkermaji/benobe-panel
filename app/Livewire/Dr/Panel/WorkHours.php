@@ -197,18 +197,15 @@ class Workhours extends Component
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
         $this->dispatch('refresh-clinic-data');
         // مقداردهی اولیه تنظیمات نوبت دستی
-        $manualSetting = \App\Models\ManualAppointmentSetting::where('doctor_id', $this->doctorId)
-            ->where('medical_center_id', $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null)
-            ->first();
-        if ($manualSetting) {
-            $this->manualNobatActive = (bool) $manualSetting->is_active;
-            $this->manualNobatSendLink = $manualSetting->duration_send_link;
-            $this->manualNobatConfirmLink = $manualSetting->duration_confirm_link;
-            $this->manualNobatSettingId = $manualSetting->id;
+        if ($this->appointmentConfig) {
+            $this->manualNobatActive = (bool) $this->appointmentConfig->is_active;
+            $this->manualNobatSendLink = $this->appointmentConfig->duration_send_link ?? 3;
+            $this->manualNobatConfirmLink = $this->appointmentConfig->duration_confirm_link ?? 1;
+            $this->manualNobatSettingId = $this->appointmentConfig->id;
         } else {
             $this->manualNobatActive = false;
-            $this->manualNobatSendLink = 10;
-            $this->manualNobatConfirmLink = 30;
+            $this->manualNobatSendLink = 3;
+            $this->manualNobatConfirmLink = 1;
             $this->manualNobatSettingId = null;
         }
     }
@@ -2484,7 +2481,7 @@ class Workhours extends Component
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2511,7 +2508,7 @@ class Workhours extends Component
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2538,7 +2535,7 @@ class Workhours extends Component
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2565,7 +2562,7 @@ class Workhours extends Component
                 'duration_send_link' => (int) $value,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2592,7 +2589,7 @@ class Workhours extends Component
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $value,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
