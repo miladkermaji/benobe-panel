@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\Appointment;
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,7 @@ class Insurance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'clinic_id',
+        'medical_center_id',
         'name',
         'calculation_method',
         'appointment_price',
@@ -26,9 +25,9 @@ class Insurance extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     public function appointments()

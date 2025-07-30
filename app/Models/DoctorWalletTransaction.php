@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +13,7 @@ class DoctorWalletTransaction extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'amount',
         'status',
         'type',
@@ -33,9 +32,9 @@ class DoctorWalletTransaction extends Model
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
     public function appointment()
     {

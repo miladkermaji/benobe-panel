@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Doctorservices;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use App\Models\DoctorService;
 use App\Models\Insurance;
@@ -12,7 +12,7 @@ use Livewire\Component;
 class DoctorServiceCreate extends Component
 {
     public $doctor_id = null;
-    public $clinic_id;
+    public $medical_center_id;
     public $insurance_id;
     public $service_id;
     public $name;
@@ -32,7 +32,7 @@ class DoctorServiceCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
         $this->insurances = Insurance::all();
         $this->services = Service::all();
         $this->parentServices = DoctorService::whereNull('parent_id')->get();
@@ -42,7 +42,7 @@ class DoctorServiceCreate extends Component
     {
         return [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'insurance_id' => 'nullable|exists:insurances,id',
             'service_id' => 'nullable|exists:services,id',
             'name' => 'required|string|max:255',
@@ -58,7 +58,7 @@ class DoctorServiceCreate extends Component
     protected $messages = [
         'doctor_id.required' => 'لطفاً یک پزشک انتخاب کنید.',
         'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-        'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+        'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
         'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
         'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         'name.required' => 'لطفاً نام خدمت را وارد کنید.',
@@ -87,7 +87,7 @@ class DoctorServiceCreate extends Component
 
         DoctorService::create([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'insurance_id' => $this->insurance_id,
             'service_id' => $this->service_id,
             'name' => $this->name,
@@ -100,7 +100,7 @@ class DoctorServiceCreate extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'خدمت پزشک با موفقیت اضافه شد!');
-        $this->reset(['doctor_id', 'clinic_id', 'insurance_id', 'service_id', 'name', 'description', 'duration', 'price', 'discount', 'status', 'parent_id']);
+        $this->reset(['doctor_id', 'medical_center_id', 'insurance_id', 'service_id', 'name', 'description', 'duration', 'price', 'discount', 'status', 'parent_id']);
     }
 
     public function render()

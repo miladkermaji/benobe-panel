@@ -36,7 +36,7 @@ class ImagingCenterCreate extends Component
     public $longitude;
     public $consultation_fee;
     public $payment_methods;
-    public $is_active = true;
+    public $is_active = false;
     public $working_days = [];
     public $avatar;
     public $documents = [];

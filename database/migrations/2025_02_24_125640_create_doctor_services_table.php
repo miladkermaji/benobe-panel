@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('doctor_services', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id')->comment('شناسه دکتر مربوط به خدمت');
-            $table->unsignedBigInteger('clinic_id')->nullable()->comment('شناسه کلینیک مربوط به خدمت');
+            $table->unsignedBigInteger('medical_center_id')->nullable()->comment('شناسه مرکز درمانی مربوط به خدمت');
             $table->foreignId('insurance_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('set null');
             $table->string('name')->comment('نام خدمت');
@@ -27,7 +27,7 @@ return new class () extends Migration {
 
             // تعریف کلیدهای خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
             $table->foreign('parent_id')->references('id')->on('doctor_services')->onDelete('cascade');
         });
     }

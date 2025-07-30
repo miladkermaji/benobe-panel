@@ -276,7 +276,7 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -303,7 +303,7 @@ class DoctorListingController extends Controller
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where('medical_center_id', $clinicId)
             ->where('status', 'scheduled')
             ->where('appointment_date', '>=', $today->toDateString())
             ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())

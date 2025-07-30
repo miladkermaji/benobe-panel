@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin\Panel\Secretaries;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Secretary;
@@ -10,6 +9,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\MedicalCenter;
 
 class SecretaryEdit extends Component
 {
@@ -24,7 +24,7 @@ class SecretaryEdit extends Component
     public $email;
     public $password;
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $is_active;
     public $profile_photo;
 
@@ -41,17 +41,19 @@ class SecretaryEdit extends Component
         $this->gender = $this->secretary->gender;
         $this->email = $this->secretary->email;
         $this->doctor_id = $this->secretary->doctor_id;
-        $this->clinic_id = $this->secretary->clinic_id;
+        $this->medical_center_id = $this->secretary->medical_center_id;
         $this->is_active = $this->secretary->is_active;
 
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedDoctorId($value)
     {
-        $this->clinics = Clinic::where('doctor_id', $value)->get();
-        $this->clinic_id = null;
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'policlinic')->get();
+        $this->medical_center_id = null;
         $this->dispatch('refresh-clinic-select2', clinics: $this->clinics->toArray());
     }
 
@@ -68,7 +70,7 @@ class SecretaryEdit extends Component
     {
         Log::info('update secretary', [
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
         ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
@@ -79,7 +81,7 @@ class SecretaryEdit extends Component
             'email' => 'nullable|email|unique:secretaries,email,' . $this->secretary->id,
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'medical_center_id' => 'required|exists:medical_centers,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [
@@ -88,7 +90,7 @@ class SecretaryEdit extends Component
             'last_name.required' => 'لطفاً نام خانوادگی را وارد کنید.',
             'last_name.max' => 'نام خانوادگی نباید بیشتر از ۲۵۵ کاراکتر باشد.',
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'clinic_id.required' => 'لطفاً  مطب را انتخاب کنید.',
+            'medical_center_id.required' => 'لطفاً  مطب را انتخاب کنید.',
             'mobile.regex' => 'شماره موبایل باید با ۰۹ شروع شده و ۱۱ رقم باشد.',
             'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
             'national_code.required' => 'لطفاً کد ملی را وارد کنید.',
@@ -100,7 +102,7 @@ class SecretaryEdit extends Component
             'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
             'password.min' => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
             'doctor_id.exists' => 'دکتر انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'profile_photo.image' => 'فایل باید تصویر باشد.',
             'profile_photo.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
         ]);
@@ -113,7 +115,7 @@ class SecretaryEdit extends Component
             'gender' => $this->gender,
             'email' => $this->email,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'is_active' => $this->is_active,
         ];
 

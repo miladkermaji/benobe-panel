@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\CounselingDailySchedule;
 use App\Models\DoctorCounselingHoliday;
 use App\Models\DoctorCounselingWorkSchedule;
+use Livewire\Attributes\On;
 
 class CounselingSpecialDaysApoointment extends Component
 {
-    
-use HasSelectedClinic;
+    use HasSelectedClinic;
 
     public $time;
     public $editingSettingIndex = null;
@@ -60,6 +60,7 @@ use HasSelectedClinic;
     public $savePreviousRows = true;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
         'openTransferModal' => 'handleOpenTransferModal',
         'refresh-work-hours' => '$refresh',
         'refresh-timepicker' => '$refresh',
@@ -84,8 +85,8 @@ use HasSelectedClinic;
 
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
-        $this->selectedClinicId = 
-$this->getSelectedClinicId();
+        $this->selectedClinicId =
+$this->getSelectedMedicalCenterId();
 
         $this->loadCalendarData();
     }
@@ -133,6 +134,24 @@ $this->getSelectedClinicId();
             'calendarMonth' => $this->calendarMonth,
         ]);
     }
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
+    {
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+
+        // بروزرسانی selectedClinicId
+        $this->selectedClinicId = $medicalCenterId;
+
+        // ذخیره در سشن
+        session(['selectedClinicId' => $medicalCenterId]);
+
+        // بروزرسانی داده‌های تقویم
+        $this->loadCalendarData();
+
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات روزهای خاص مشاوره در حال بروزرسانی...');
+    }
     private function getAuthenticatedDoctor()
     {
         $doctor = Auth::guard('doctor')->user();
@@ -152,9 +171,9 @@ $this->getSelectedClinicId();
             return Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId) {
                 $holidaysQuery = DoctorCounselingHoliday::where('doctor_id', $doctorId)->where('status', 'active');
                 if ($this->selectedClinicId === 'default') {
-                    $holidaysQuery->whereNull('clinic_id');
+                    $holidaysQuery->whereNull('medical_center_id');
                 } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
-                    $holidaysQuery->where('clinic_id', $this->selectedClinicId);
+                    $holidaysQuery->where('medical_center_id', $this->selectedClinicId);
                 }
                 $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
                     $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
@@ -194,8 +213,8 @@ $this->getSelectedClinicId();
                 ->whereBetween('appointment_date', [$startDate, $endDate])
                 ->where('status', 'scheduled')
                 ->whereNull('deleted_at')
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->select('appointment_date')
                 ->groupBy('appointment_date')
                 ->get()
@@ -205,8 +224,8 @@ $this->getSelectedClinicId();
                         ->where('appointment_date', $appointment->appointment_date)
                         ->where('status', 'scheduled')
                         ->whereNull('deleted_at')
-                        ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                        ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                        ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                        ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                         ->count();
                     return [
                         'date' => $date,
@@ -284,7 +303,7 @@ $this->getSelectedClinicId();
             $holiday = DoctorCounselingHoliday::firstOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                     'status' => 'active',
                 ],
                 [
@@ -300,8 +319,8 @@ $this->getSelectedClinicId();
                 $holiday->save();
                 CounselingDailySchedule::where('doctor_id', $doctorId)
                     ->where('date', $this->selectedDate)
-                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                     ->delete();
                 $this->holidaysData = [
                     'status' => true,
@@ -343,8 +362,8 @@ $this->getSelectedClinicId();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $holiday = DoctorCounselingHoliday::where('doctor_id', $doctorId)
                 ->where('status', 'active')
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             if ($holiday) {
                 $holidayDates = is_string($holiday->holiday_dates)
@@ -395,8 +414,8 @@ $this->getSelectedClinicId();
         return Cache::remember($cacheKey, now()->addHours(1), function () use ($doctorId, $date) {
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $date)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             if ($specialSchedule && !empty($specialSchedule->consultation_hours)) {
                 $consultationHours = json_decode($specialSchedule->consultation_hours, true);
@@ -416,8 +435,8 @@ $this->getSelectedClinicId();
             $dayOfWeek = strtolower(Carbon::parse($date)->englishDayOfWeek);
             $workSchedule = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             $this->isFromSpecialDailySchedule = false;
             if ($workSchedule && !empty($workSchedule->work_hours)) {
@@ -472,8 +491,8 @@ $this->getSelectedClinicId();
                 $this->workSchedule = $workSchedule;
                 $specialSchedule = CounselingDailySchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
                     ->where('date', $this->selectedDate)
-                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                     ->first();
                 $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->consultation_hours);
             } else {
@@ -587,7 +606,7 @@ $this->getSelectedClinicId();
             $specialSchedule = CounselingDailySchedule::where([
                 'doctor_id' => $doctorId,
                 'date' => $this->selectedDate,
-                'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
             ])->first();
             $consultationHours = $specialSchedule && $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $isFromDoctorWorkSchedule = empty($consultationHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
@@ -614,7 +633,7 @@ $this->getSelectedClinicId();
                     [
                         'doctor_id' => $doctorId,
                         'date' => $this->selectedDate,
-                        'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                        'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                     ],
                     [
                         'consultation_hours' => json_encode([]),
@@ -680,7 +699,7 @@ $this->getSelectedClinicId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -823,8 +842,8 @@ $this->getSelectedClinicId();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             $isFromDoctorWorkSchedule = !$specialSchedule;
             if ($isFromDoctorWorkSchedule) {
@@ -859,8 +878,8 @@ $this->getSelectedClinicId();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             if (!$specialSchedule) {
                 $this->dispatch('show-toastr', type: 'error', message: 'برنامه کاری برای این تاریخ یافت نشد.');
@@ -984,7 +1003,7 @@ $this->getSelectedClinicId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1081,7 +1100,7 @@ $this->getSelectedClinicId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1223,7 +1242,7 @@ $this->getSelectedClinicId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1328,8 +1347,8 @@ $this->getSelectedClinicId();
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = CounselingDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
                 ->first();
             $isFromDoctorWorkSchedule = !$specialSchedule || empty($specialSchedule->work_hours);
             if ($isFromDoctorWorkSchedule) {
@@ -1582,7 +1601,7 @@ $this->getSelectedClinicId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),

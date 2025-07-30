@@ -85,9 +85,9 @@ class InsuranceComponent extends Component
         }
 
         if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $query->whereNull('medical_center_id');
         } else {
-            $query->where('clinic_id', $this->selectedClinicId);
+            $query->where('medical_center_id', $this->selectedClinicId);
         }
 
         $query->where('calculation_method', $this->calculation_method);
@@ -175,10 +175,10 @@ class InsuranceComponent extends Component
             return;
         }
 
-        $data['clinic_id'] = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        $data['medical_center_id'] = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
         $insurance = Insurance::create([
-            'clinic_id' => $data['clinic_id'],
+            'medical_center_id' => $data['medical_center_id'],
             'name' => $data['name'],
             'calculation_method' => $data['calculation_method'],
             'appointment_price' => $data['appointment_price'],
@@ -238,9 +238,9 @@ class InsuranceComponent extends Component
         }
 
         if ($this->selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $query->whereNull('medical_center_id');
         } else {
-            $query->where('clinic_id', $this->selectedClinicId);
+            $query->where('medical_center_id', $this->selectedClinicId);
         }
 
         $insurance = $query->firstOrFail();

@@ -68,7 +68,7 @@
 
             <form id="depositForm">
               @csrf
-              <input type="hidden" name="clinic_id" value="{{ $clinicId }}"> <!-- شناسه مطب -->
+              <input type="hidden" name="medical_center_id" value="{{ $clinicId }}"> <!-- شناسه مطب -->
               <input type="hidden" name="doctor_id" value="{{ $doctorId }}"> <!-- شناسه دکتر -->
               <input type="hidden" id="isCustomPrice" name="is_custom_price" value="0">
 
@@ -168,7 +168,7 @@
     });
 
     function loadDeposits() {
-      fetch("{{ route('cost.list', ['clinic_id' => $clinicId]) }}")
+      fetch("{{ route('cost.list', ['medical_center_id' => $clinicId]) }}")
         .then(response => response.json())
         .then(data => {
           const depositList = document.getElementById('depositList');

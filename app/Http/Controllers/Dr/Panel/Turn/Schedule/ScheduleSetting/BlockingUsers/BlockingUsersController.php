@@ -33,7 +33,7 @@ class BlockingUsersController extends Controller
 
         $query = UserBlocking::with('user')
             ->where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId);
+            ->where('medical_center_id', $clinicId);
 
         // اعمال جستجو
         if ($search) {
@@ -115,7 +115,7 @@ class BlockingUsersController extends Controller
 
             $isBlocked = UserBlocking::where('user_id', $user->id)
                 ->where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->where('status', 1)
                 ->exists();
 
@@ -126,7 +126,7 @@ class BlockingUsersController extends Controller
             $blockingUser = UserBlocking::create([
                 'user_id' => $user->id,
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $clinicId,
                 'blocked_at' => $blockedAt,
                 'unblocked_at' => $unblockedAt,
                 'reason' => $validated['reason'] ?? null,
@@ -205,7 +205,7 @@ class BlockingUsersController extends Controller
 
                 $isBlocked = UserBlocking::where('user_id', $user->id)
                     ->where('doctor_id', $doctorId)
-                    ->where('clinic_id', $clinicId)
+                    ->where('medical_center_id', $clinicId)
                     ->where('status', 1)
                     ->exists();
 
@@ -217,7 +217,7 @@ class BlockingUsersController extends Controller
                 $blockingUser = UserBlocking::create([
                     'user_id' => $user->id,
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
+                    'medical_center_id' => $clinicId,
                     'blocked_at' => $blockedAt,
                     'unblocked_at' => $unblockedAt,
                     'reason' => $validated['reason'] ?? null,
@@ -274,7 +274,7 @@ class BlockingUsersController extends Controller
             $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
             $userBlocking = UserBlocking::where('id', $request->id)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->firstOrFail();
 
             $userBlocking->status = $request->status;
@@ -305,7 +305,7 @@ class BlockingUsersController extends Controller
 
             SmsTemplate::create([
                 'doctor_id' => $doctor->id,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $clinicId,
                 'user_id' => $user->id,
                 'identifier' => Str::random(11),
                 'title' => $request->status == 1 ? 'مسدودی کاربر' : 'رفع مسدودی',
@@ -388,7 +388,7 @@ class BlockingUsersController extends Controller
                 }
             } elseif ($validated['recipient_type'] === 'blocked') {
                 $recipients = UserBlocking::where('user_blockings.doctor_id', $doctorId)
-                    ->where('user_blockings.clinic_id', $clinicId)
+                    ->where('user_blockings.medical_center_id', $clinicId)
                     ->where('user_blockings.status', 1)
                     ->join('users', 'user_blockings.user_id', '=', 'users.id')
                     ->pluck('users.mobile')
@@ -500,7 +500,7 @@ class BlockingUsersController extends Controller
         try {
             $userBlocking = UserBlocking::where('id', $id)
                 ->where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->firstOrFail();
 
             // بررسی درخواست برای تغییر وضعیت (فقط برای کاربران مسدود)
@@ -530,7 +530,7 @@ class BlockingUsersController extends Controller
                 // ثبت پیام در SmsTemplate
                 SmsTemplate::create([
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $clinicId,
+                    'medical_center_id' => $clinicId,
                     'user_id' => $user->id,
                     'identifier' => Str::random(11),
                     'title' => 'رفع مسدودی',
@@ -570,7 +570,7 @@ class BlockingUsersController extends Controller
 
             $userBlockings = UserBlocking::whereIn('id', $userIds)
                 ->where('doctor_id', $doctorId)
-                ->where('clinic_id', $clinicId)
+                ->where('medical_center_id', $clinicId)
                 ->with('user')
                 ->get();
 
@@ -634,7 +634,7 @@ class BlockingUsersController extends Controller
 
                     SmsTemplate::create([
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $clinicId,
+                        'medical_center_id' => $clinicId,
                         'user_id' => $sms['user_id'],
                         'identifier' => Str::random(11),
                         'title' => $sms['title'],
@@ -675,3 +675,4 @@ class BlockingUsersController extends Controller
         }
     }
 }
+

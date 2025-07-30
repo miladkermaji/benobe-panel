@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Panel\DoctorHolidays;
 
 use Carbon\Carbon;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
@@ -15,7 +15,7 @@ class DoctorHolidayEdit extends Component
 {
     public $doctorholiday;
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $holiday_dates = [];
     public $status;
     public $doctors = [];
@@ -27,10 +27,10 @@ class DoctorHolidayEdit extends Component
     {
         $this->doctorholiday = DoctorHoliday::findOrFail($id);
         $this->doctor_id = $this->doctorholiday->doctor_id;
-        $this->clinic_id = $this->doctorholiday->clinic_id;
+        $this->medical_center_id = $this->doctorholiday->medical_center_id;
         $this->status = $this->doctorholiday->status;
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
 
         $this->selectedDate = $date; // تاریخ URL رو ذخیره کن
 
@@ -64,19 +64,19 @@ class DoctorHolidayEdit extends Component
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'holiday_dates' => $this->holiday_dates,
             'status' => $this->status,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'holiday_dates' => 'required|array|min:1',
             'holiday_dates.*' => 'required|date',
             'status' => 'required|in:active,inactive',
         ], [
             'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
             'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'holiday_dates.required' => 'لطفاً حداقل یک تاریخ تعطیل انتخاب کنید.',
             'holiday_dates.array' => 'تاریخ‌های تعطیل باید به‌صورت آرایه باشند.',
             'holiday_dates.*.required' => 'هر تاریخ تعطیل باید معتبر باشد.',
@@ -121,7 +121,7 @@ class DoctorHolidayEdit extends Component
         // آپدیت دیتابیس
         $this->doctorholiday->update([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'holiday_dates' => $updatedDates,
             'status' => $this->status,
         ]);

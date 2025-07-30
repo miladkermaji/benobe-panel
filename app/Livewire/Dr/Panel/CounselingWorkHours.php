@@ -143,7 +143,7 @@ class CounselingWorkHours extends Component
         $this->appointmentConfig = DoctorCounselingConfig::firstOrCreate(
             [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ],
             [
                 'auto_scheduling' => true,
@@ -180,7 +180,7 @@ class CounselingWorkHours extends Component
                 DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $day,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => false,
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
@@ -254,9 +254,9 @@ class CounselingWorkHours extends Component
             ->where('day', $day)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -353,9 +353,9 @@ class CounselingWorkHours extends Component
                     ->where('day', $day)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -386,9 +386,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -397,7 +397,7 @@ class CounselingWorkHours extends Component
                 $schedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $this->scheduleModalDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'appointment_settings' => json_encode([]),
                 ]);
             }
@@ -458,9 +458,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -514,9 +514,9 @@ class CounselingWorkHours extends Component
         $this->workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get()
@@ -558,9 +558,9 @@ class CounselingWorkHours extends Component
             ->where('day', $this->emergencyModalDay)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -624,7 +624,7 @@ class CounselingWorkHours extends Component
 
             Log::info('Saving Counseling Config:', [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $this->activeClinicId,
+                'medical_center_id' => $this->activeClinicId,
                 'online_consultation' => $this->onlineConsultation,
                 'holiday_availability' => $this->holidayAvailability,
                 'has_phone_counseling' => $this->has_phone_counseling,
@@ -637,7 +637,7 @@ class CounselingWorkHours extends Component
                 $config = DoctorCounselingConfig::updateOrCreate(
                     [
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     ],
                     [
                         'calendar_days' => $this->calendarDays,
@@ -668,7 +668,7 @@ class CounselingWorkHours extends Component
                 Log::error('Error saving counseling config:', [
                     'error' => $e->getMessage(),
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId
+                    'medical_center_id' => $this->activeClinicId
                 ]);
                 throw $e;
             }
@@ -767,9 +767,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $targetDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -824,9 +824,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $targetDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -835,7 +835,7 @@ class CounselingWorkHours extends Component
                 $targetSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $targetDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([$sourceSlot]),
                     'appointment_settings' => json_encode($sourceAppointmentSettings),
@@ -1044,9 +1044,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1055,7 +1055,7 @@ class CounselingWorkHours extends Component
                 $workSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $day,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([]),
                 ]);
@@ -1115,9 +1115,9 @@ class CounselingWorkHours extends Component
                     ->where('day', $weekDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1126,7 +1126,7 @@ class CounselingWorkHours extends Component
                     $schedule = DoctorCounselingWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $weekDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                         'is_working' => false,
                         'work_hours' => json_encode([]),
                         'appointment_settings' => json_encode([]),
@@ -1218,9 +1218,9 @@ class CounselingWorkHours extends Component
                     ->where('day', $this->selectedDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1229,7 +1229,7 @@ class CounselingWorkHours extends Component
                     $workSchedule = DoctorCounselingWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $this->selectedDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                         'is_working' => true,
                         'work_hours' => json_encode([]),
                     ]);
@@ -1306,7 +1306,7 @@ class CounselingWorkHours extends Component
                     'error' => $e->getMessage(),
                     'doctor_id' => $doctorId,
                     'day' => $this->selectedDay,
-                    'clinic_id' => $this->activeClinicId
+                    'medical_center_id' => $this->activeClinicId
                 ]);
                 throw $e;
             }
@@ -1331,9 +1331,9 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1435,7 +1435,7 @@ class CounselingWorkHours extends Component
             $workSchedule = DoctorCounselingWorkSchedule::where([
                 'doctor_id' => $doctorId,
                 'day' => $englishDay,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
 
             if ($workSchedule) {
@@ -1446,7 +1446,7 @@ class CounselingWorkHours extends Component
                 $workSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $englishDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
                     'work_hours' => json_encode([]),
                 ]);
@@ -1538,7 +1538,7 @@ class CounselingWorkHours extends Component
             $workSchedule = DoctorCounselingWorkSchedule::where([
                 'doctor_id' => $doctorId,
                 'day' => $englishDay,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
             ])->first();
 
             if ($workSchedule) {
@@ -1549,7 +1549,7 @@ class CounselingWorkHours extends Component
                 $workSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $englishDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                     'is_working' => $isWorking,
                     'work_hours' => json_encode([]),
                 ]);
@@ -1588,12 +1588,12 @@ class CounselingWorkHours extends Component
             DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                 ],
                 [
                     'auto_scheduling' => $this->autoScheduling,
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
                 ]
             );
 

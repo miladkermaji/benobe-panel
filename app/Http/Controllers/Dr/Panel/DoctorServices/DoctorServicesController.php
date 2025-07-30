@@ -51,8 +51,8 @@ class DoctorServicesController extends Controller
 
         // دریافت کلینیک انتخاب شده از درخواست (با مقدار پیش‌فرض "default")
         $selectedClinicId = $request->get('selectedClinicId', 'default');
-        // اگر کلینیک انتخاب شده غیر از دیفالت بود، clinic_id رو ست می‌کنیم؛ در غیر این صورت null
-        $data['clinic_id'] = $selectedClinicId !== 'default' ? $selectedClinicId : null;
+        // اگر کلینیک انتخاب شده غیر از دیفالت بود، medical_center_id رو ست می‌کنیم؛ در غیر این صورت null
+        $data['medical_center_id'] = $selectedClinicId !== 'default' ? $selectedClinicId : null;
 
         DoctorService::create($data);
         return redirect()->route('dr-services.index')->with('success', 'خدمت با موفقیت ایجاد شد.');
@@ -62,7 +62,7 @@ class DoctorServicesController extends Controller
     {
         $selectedClinicId = request()->get('selectedClinicId', 'default');
         // اگر کلینیک انتخاب شده غیر از "default" باشد و خدمت متعلق به آن کلینیک نباشد، دسترسی رد شود
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return abort(403, 'Access denied');
         }
         $parentServices = DoctorService::where('id', '!=', $service->id)->get();
@@ -99,7 +99,7 @@ class DoctorServicesController extends Controller
         ]);
 
         $selectedClinicId = $request->get('selectedClinicId', 'default');
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return abort(403, 'Access denied');
         }
 
@@ -110,7 +110,7 @@ class DoctorServicesController extends Controller
     public function destroy(DoctorService $service)
     {
         $selectedClinicId = request()->get('selectedClinicId', 'default');
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return response()->json(['error' => 'Access denied'], 403);
         }
 

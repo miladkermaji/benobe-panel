@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id(); // شناسه منحصر به فرد برای هر رکورد
 
             $table->unsignedBigInteger('doctor_id'); // شناسه پزشک
-            $table->unsignedBigInteger('clinic_id')->nullable(); // شناسه پزشک
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // شناسه مرکز درمانی
 
             // تعریف روزهای هفته به صورت محدود
             $table->enum('day', [
@@ -45,12 +45,12 @@ return new class extends Migration {
                 ->references('id')
                 ->on('doctors')
                 ->onDelete('cascade'); // حذف رکوردهای مرتبط در صورت حذف پزشک
-            $table->foreign('clinic_id')
+            $table->foreign('medical_center_id')
                 ->references('id')
-                ->on('clinics')
+                ->on('medical_centers')
                 ->onDelete('cascade');
             // محدودیت یکتایی برای جلوگیری از تکرار رکوردها
-            $table->unique(['doctor_id', 'day','clinic_id']);
+            $table->unique(['doctor_id', 'day','medical_center_id']);
         });
     }
 

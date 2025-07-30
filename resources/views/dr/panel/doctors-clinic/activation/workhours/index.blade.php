@@ -1,8 +1,7 @@
-
 @extends('dr.panel.doctors-clinic.layouts.master')
 @section('styles')
   <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/activation/workhours/workhours.css') }}">
-   <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
 @endsection
 
@@ -15,7 +14,6 @@
   {{ route('duration.index', $clinicId) }}
 @endsection
 @section('content')
-
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
     <div class="roadmap-container mt-3">
       <div class="step completed">
@@ -60,12 +58,11 @@
     </div>
   </div>
   @livewire('dr.panel.work-hours', ['clinicId' => $clinicId])
-
 @endsection
 
 
 @section('scripts')
-    <script>
+  <script>
     document.getElementById('startAppointmentBtn').addEventListener('click', function() {
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
@@ -83,7 +80,7 @@
             method: 'POST',
             data: {
               doctor_id: "{{ $doctorId }}",
-              clinic_id: "{{ $clinicId }}",
+              medical_center_id: "{{ $clinicId }}",
               _token: "{{ csrf_token() }}"
             },
             beforeSend: function() {

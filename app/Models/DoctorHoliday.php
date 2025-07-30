@@ -11,7 +11,7 @@ class DoctorHoliday extends Model
     use HasFactory;
 
     protected $table = 'doctor_holidays';
-    protected $fillable = ['doctor_id', 'clinic_id', 'holiday_dates', 'status'];
+    protected $fillable = ['doctor_id', 'medical_center_id', 'holiday_dates', 'status'];
     protected $casts = [
         'holiday_dates' => 'array',
     ];
@@ -21,9 +21,9 @@ class DoctorHoliday extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
     public function getHolidayDatesAttribute($value)
     {

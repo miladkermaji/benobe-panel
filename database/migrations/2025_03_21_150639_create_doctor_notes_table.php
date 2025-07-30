@@ -10,7 +10,7 @@ return new class () extends Migration {
         Schema::create('doctor_notes', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id');
-            $table->unsignedBigInteger('clinic_id')->nullable(); // برای نوبت حضوری
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // برای نوبت حضوری
             $table->enum('appointment_type', ['in_person','online_phone','online_text','online_video'])->default('in_person');
             $table->text('notes')->nullable()->comment('توضیحات و ملاحظات پزشک برای این نوع نوبت');
 
@@ -22,11 +22,10 @@ return new class () extends Migration {
                 ->references('id')
                 ->on('doctors')
                 ->onDelete('cascade');
-            $table->foreign('clinic_id')
-                ->references('id')
-                ->on('clinics')
+            $table->foreign('medical_center_id')->references('id')
+                ->on('medical_centers')
                 ->onDelete('cascade');
-            $table->unique(['doctor_id', 'clinic_id', 'appointment_type']);
+            $table->unique(['doctor_id', 'medical_center_id', 'appointment_type']);
         });
     }
 

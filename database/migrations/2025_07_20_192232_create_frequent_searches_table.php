@@ -12,12 +12,15 @@ return new class () extends Migration {
     {
         Schema::create('frequent_searches', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('specialty_id')->nullable();
             $table->string('search_text');
             $table->unsignedInteger('search_count')->default(1);
             $table->timestamps();
 
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('specialty_id')->references('id')->on('specialties')->onDelete('set null');
+            $table->index('user_id');
             $table->index('specialty_id');
             $table->index('search_text');
         });

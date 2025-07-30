@@ -24,7 +24,7 @@ class DoctorServiceFactory extends Factory
 
         return [
             'doctor_id' => Doctor::inRandomOrder()->value('id') ?? null, // انتخاب تصادفی پزشک
-            'clinic_id' => Clinic::inRandomOrder()->value('id') ?? null, // انتخاب تصادفی مطب
+            'medical_center_id' => Clinic::inRandomOrder()->value('id') ?? null, // انتخاب تصادفی مطب
             'insurance_id' => $faker->optional(0.7)->numberBetween(1, 10), // فرض بر وجود 10 بیمه
             'name' => $faker->randomElement($serviceNames),
             'description' => $faker->optional(0.5)->realText(150), // توضیحات با 50% احتمال

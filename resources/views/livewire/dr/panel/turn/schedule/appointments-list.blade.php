@@ -1291,10 +1291,12 @@
         });
 
         function initializeDropdowns() {
-          const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-          dropdownElementList.map(function(dropdownToggleEl) {
-            return new bootstrap.Dropdown(dropdownToggleEl);
-          });
+          if (typeof bootstrap !== 'undefined') {
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            dropdownElementList.map(function(dropdownToggleEl) {
+              return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+          }
         }
         document.addEventListener('DOMContentLoaded', initializeDropdowns);
         const selectAllCheckbox = document.getElementById('select-all-row');

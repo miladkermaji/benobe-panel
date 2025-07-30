@@ -15,7 +15,7 @@ return new class () extends Migration {
             $table->unsignedBigInteger('doctor_id');
             $table->unsignedBigInteger('patient_id')->nullable();
             $table->unsignedBigInteger('insurance_id')->nullable();
-            $table->unsignedBigInteger('clinic_id')->nullable();            // مدت زمان مشاوره (دقیقه)
+            $table->unsignedBigInteger('medical_center_id')->nullable();            // مدت زمان مشاوره (دقیقه)
             $table->integer('actual_call_duration')->nullable(); // مدت زمان واقعی تماس (دقیقه)
             $table->enum('consultation_type', ['general', 'specialized', 'emergency'])->nullable();
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
@@ -75,7 +75,7 @@ return new class () extends Migration {
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
             $table->foreign('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('insurance_id')->references('id')->on('insurances')->onDelete('set null');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('set null');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('set null');
 
             // ایندکس‌ها
             $table->index(['doctor_id', 'patient_id', 'appointment_date'], 'counseling_idx');

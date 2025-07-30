@@ -1,4 +1,5 @@
 <?php
+
 namespace Database\Seeders;
 
 use App\Models\Clinic;
@@ -29,7 +30,7 @@ class OrderVisitSeeder extends Seeder
             OrderVisit::create([
                 'user_id'          => $user->id,
                 'doctor_id'        => $doctor->id,
-                'clinic_id'        => $clinic ? $clinic->id : null,
+                'medical_center_id'        => $clinic ? $clinic->id : null,
                 'mobile'           => $user->mobile ?? $faker->numerify('09#########'), // موبایل کاربر یا تصادفی
                 'payment_date'     => $faker->dateTimeBetween('-1 month', 'now'),
                 'bank_ref_id'      => $paymentMethod === 'online' ? $faker->numerify('30##########') : null,

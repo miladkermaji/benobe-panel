@@ -13,7 +13,10 @@ class DoctorClinicEdit extends Component
 {
     public $clinic;
     public $name;
+    public $title;
     public $phone_numbers = [''];
+    public $secretary_phone;
+    public $phone_number;
     public $province_id;
     public $city_id;
     public $postal_code;
@@ -21,21 +24,33 @@ class DoctorClinicEdit extends Component
     public $description;
     public $provinces;
     public $cities;
-    public $clinic_id;
-    public $prescription_fee = null;
+    public $medical_center_id;
+    public $prescription_tariff = null;
+    public $type = 'policlinic';
 
     public function mount($id)
     {
-        $this->clinic = \App\Models\Clinic::findOrFail($id);
-        $this->clinic_id = $id;
+        $this->clinic = \App\Models\MedicalCenter::findOrFail($id);
+        $this->medical_center_id = $id;
         $this->name = $this->clinic->name;
-        $this->phone_numbers = json_decode($this->clinic->phone_numbers, true) ?? [''];
+        $this->title = $this->clinic->title;
+
+        // Handle phone_numbers - could be JSON string or array
+        $phoneNumbers = $this->clinic->phone_numbers;
+        if (is_string($phoneNumbers)) {
+            $phoneNumbers = json_decode($phoneNumbers, true);
+        }
+        $this->phone_numbers = is_array($phoneNumbers) && !empty($phoneNumbers) ? $phoneNumbers : [''];
+
+        $this->secretary_phone = $this->clinic->secretary_phone;
+        $this->phone_number = $this->clinic->phone_number;
         $this->province_id = $this->clinic->province_id;
         $this->city_id = $this->clinic->city_id;
         $this->postal_code = $this->clinic->postal_code;
         $this->address = $this->clinic->address;
         $this->description = $this->clinic->description;
-        $this->prescription_fee = $this->clinic->prescription_fee;
+        $this->prescription_tariff = $this->clinic->prescription_tariff;
+        $this->type = $this->clinic->type ?? 'policlinic';
 
         $zones = Cache::remember('zones', 86400, function () {
             return \App\Models\Zone::where('status', 1)
@@ -60,31 +75,39 @@ class DoctorClinicEdit extends Component
     {
         $validator = Validator::make([
             'name' => $this->name,
+            'title' => $this->title,
             'phone_numbers' => $this->phone_numbers,
+            'secretary_phone' => $this->secretary_phone,
+            'phone_number' => $this->phone_number,
             'province_id' => $this->province_id,
             'city_id' => $this->city_id,
             'postal_code' => $this->postal_code,
             'address' => $this->address,
             'description' => $this->description,
-            'prescription_fee' => $this->prescription_fee,
+            'prescription_tariff' => $this->prescription_tariff,
+            'type' => $this->type,
         ], [
             'name' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'phone_numbers' => 'required|array|min:1',
             'phone_numbers.*' => 'required|string|max:15',
+            'secretary_phone' => 'nullable|string|max:15',
+            'phone_number' => 'nullable|string|max:15',
             'province_id' => 'required|exists:zone,id',
             'city_id' => 'required|exists:zone,id',
             'postal_code' => 'nullable|string',
             'address' => 'nullable|string',
             'description' => 'nullable|string',
-            'prescription_fee' => 'nullable|numeric|min:0',
+            'prescription_tariff' => 'nullable|numeric|min:0',
+            'type' => 'required|in:hospital,treatment_centers,clinic,imaging_center,laboratory,pharmacy,policlinic',
         ], [
             'name.required' => 'وارد کردن نام مطب الزامی است.',
             'phone_numbers.required' => 'وارد کردن حداقل یک شماره موبایل الزامی است.',
             'phone_numbers.*.required' => 'وارد کردن شماره موبایل الزامی است.',
             'province_id.required' => 'انتخاب استان الزامی است.',
             'city_id.required' => 'انتخاب شهر الزامی است.',
-            'prescription_fee.numeric' => 'تعرفه نسخه باید عددی باشد.',
-            'prescription_fee.min' => 'تعرفه نسخه نمی‌تواند منفی باشد.',
+            'prescription_tariff.numeric' => 'تعرفه نسخه باید عددی باشد.',
+            'prescription_tariff.min' => 'تعرفه نسخه نمی‌تواند منفی باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -94,13 +117,17 @@ class DoctorClinicEdit extends Component
 
         $this->clinic->update([
             'name' => $this->name,
-            'phone_numbers' => json_encode($this->phone_numbers),
+            'title' => $this->title,
+            'phone_numbers' => $this->phone_numbers,
+            'secretary_phone' => $this->secretary_phone,
+            'phone_number' => $this->phone_number,
             'province_id' => $this->province_id,
             'city_id' => $this->city_id,
             'postal_code' => $this->postal_code,
             'address' => $this->address,
             'description' => $this->description,
-            'prescription_fee' => $this->prescription_fee,
+            'prescription_tariff' => $this->prescription_tariff,
+            'type' => $this->type,
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'مطب با موفقیت ویرایش شد!');

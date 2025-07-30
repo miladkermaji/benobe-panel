@@ -62,7 +62,7 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content border-radius-6">
                 <div class="modal-header">
-                  <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> نسخه پر استفاده</h6>
+                  <h6 class="modal-title fw-bold text-dark" id="exampleModalCenterTitle"> نسخه پر استفاده</h6>
                   <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
@@ -81,14 +81,15 @@
           </div>
         </div>
         <div>
-          <button data-bs-toggle="modal" data-bs-target="#saveNoskheModalCenter" class="btn my-btn-primary h-50">نهایی سازی
+          <button data-bs-toggle="modal" data-bs-target="#saveNoskheModalCenter" class="btn my-btn-primary h-50">نهایی
+            سازی
             نسخه</button>
           <div class="modal  fade" id="saveNoskheModalCenter" tabindex="-1" role="dialog"
             aria-labelledby="endVisitModalCenterTitle" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
               <div class="modal-content border-radius-6">
                 <div class="modal-header">
-                  <h6 class="modal-title fw-bold" id="exampleModalCenterTitle"> ویزیت</h6>
+                  <h6 class="modal-title fw-bold text-dark" id="exampleModalCenterTitle"> ویزیت</h6>
                   <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>

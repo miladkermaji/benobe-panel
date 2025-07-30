@@ -99,7 +99,7 @@
       <div class="modal-content border-0 shadow-lg"
         style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px;">
         <div class="modal-header bg-gradient-primary text-white border-0">
-          <h5 class="modal-title fw-bold" id="previewModalLabel">پیش‌نمایش مدرک</h5>
+          <h5 class="modal-title fw-bold text-dark" id="previewModalLabel">پیش‌نمایش مدرک</h5>
           <button type="button" class="close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>

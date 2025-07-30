@@ -4,7 +4,7 @@ function initializeDashboard() {
         $("#activation-modal").modal("show");
     }
 
-    // متغیر جهانی برای clinic_id، مقدار اولیه از Livewire
+    // متغیر جهانی برای medical_center_id، مقدار اولیه از Livewire
     let selectedClinicId = window.selectedClinicId || "default";
     // Ensure the value is always a string
     if (selectedClinicId === null || selectedClinicId === undefined) {
@@ -13,31 +13,34 @@ function initializeDashboard() {
         selectedClinicId = String(selectedClinicId);
     }
     console.log("Initial selectedClinicId:", selectedClinicId);
-    
+
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
         // Ensure we have a valid detail object
         const detail = event.detail || {};
         let newClinicId = detail.clinicId;
-        
+
         // Log the raw clinicId for debugging
-        console.log('Dashboard received clinicId:', newClinicId);
-        
+        console.log("Dashboard received clinicId:", newClinicId);
+
         // Normalize the clinicId - treat null/undefined as 'default'
-        newClinicId = (newClinicId === null || newClinicId === undefined) ? 'default' : newClinicId.toString();
-        
+        newClinicId =
+            newClinicId === null || newClinicId === undefined
+                ? "default"
+                : newClinicId.toString();
+
         // Only proceed if the clinic ID has actually changed
         if (newClinicId !== selectedClinicId) {
             selectedClinicId = newClinicId;
             console.log("Clinic changed to:", selectedClinicId);
-            
+
             // Store the previous clinic ID to prevent unnecessary reloads
             window.previousClinicId = selectedClinicId;
-            
+
             // Load charts with the new clinic ID
             loadCharts(); // به‌روزرسانی نمودارها پس از تغییر کلینیک
         } else {
-            console.log('Clinic selection unchanged, skipping chart reload');
+            console.log("Clinic selection unchanged, skipping chart reload");
         }
     });
 
@@ -50,7 +53,7 @@ function initializeDashboard() {
             url: chartUrl,
             method: "GET",
             data: {
-                clinic_id: selectedClinicId,  // Always send the value as is
+                medical_center_id: selectedClinicId, // Always send the value as is
                 _t: new Date().getTime(),
             },
             success: function (response) {
@@ -182,12 +185,16 @@ function initializeDashboard() {
 
     // 📊 نمودار تعداد ویزیت‌ها - نمودار میله‌ای برای مقایسه بهتر
     function renderPerformanceChart(data) {
-        const chartElement = document.getElementById("doctor-performance-chart");
+        const chartElement = document.getElementById(
+            "doctor-performance-chart"
+        );
         if (!chartElement) {
-            console.log("Performance chart container not found, skipping rendering");
+            console.log(
+                "Performance chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.performanceChart) {
             window.performanceChart.destroy();
@@ -271,7 +278,7 @@ function initializeDashboard() {
             console.log("Income chart container not found, skipping rendering");
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.incomeChart) {
             window.incomeChart.destroy();
@@ -343,10 +350,12 @@ function initializeDashboard() {
     function renderPatientChart(data) {
         const chartElement = document.getElementById("doctor-patient-chart");
         if (!chartElement) {
-            console.log("Patient chart container not found, skipping rendering");
+            console.log(
+                "Patient chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.patientChart) {
             window.patientChart.destroy();
@@ -407,10 +416,12 @@ function initializeDashboard() {
     function renderAppointmentTypesChart(data) {
         const chartElement = document.getElementById("doctor-status-chart");
         if (!chartElement) {
-            console.log("Appointment types chart container not found, skipping rendering");
+            console.log(
+                "Appointment types chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.statusChart) {
             window.statusChart.destroy();
@@ -498,10 +509,12 @@ function initializeDashboard() {
     function renderStatusPieChart(data) {
         const chartElement = document.getElementById("doctor-status-pie-chart");
         if (!chartElement) {
-            console.log("Status pie chart container not found, skipping rendering");
+            console.log(
+                "Status pie chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.statusPieChart) {
             window.statusPieChart.destroy();
@@ -564,12 +577,16 @@ function initializeDashboard() {
 
     // 📉 نمودار روند بیماران - نمودار خطی با ناحیه
     function renderPatientTrendChart(data) {
-        const chartElement = document.getElementById("doctor-patient-trend-chart");
+        const chartElement = document.getElementById(
+            "doctor-patient-trend-chart"
+        );
         if (!chartElement) {
-            console.log("Patient trend chart container not found, skipping rendering");
+            console.log(
+                "Patient trend chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.patientTrendChart) {
             window.patientTrendChart.destroy();
@@ -630,10 +647,12 @@ function initializeDashboard() {
     function renderCounselingChart(data) {
         const chartElement = document.getElementById("doctor-counseling-chart");
         if (!chartElement) {
-            console.log("Counseling chart container not found, skipping rendering");
+            console.log(
+                "Counseling chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.counselingChart) {
             window.counselingChart.destroy();
@@ -717,7 +736,7 @@ function initializeDashboard() {
             console.log("Manual chart container not found, skipping rendering");
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.manualChart) {
             window.manualChart.destroy();
@@ -782,12 +801,16 @@ function initializeDashboard() {
 
     // 💸 نمودار درآمد کلی - نمودار خطی با ناحیه
     function renderTotalIncomeChart(data) {
-        const chartElement = document.getElementById("doctor-total-income-chart");
+        const chartElement = document.getElementById(
+            "doctor-total-income-chart"
+        );
         if (!chartElement) {
-            console.log("Total income chart container not found, skipping rendering");
+            console.log(
+                "Total income chart container not found, skipping rendering"
+            );
             return;
         }
-        
+
         let ctx = chartElement.getContext("2d");
         if (window.totalIncomeChart) {
             window.totalIncomeChart.destroy();
@@ -907,7 +930,7 @@ function initializeDashboard() {
 }
 
 // Initialize when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initializeDashboard);
+document.addEventListener("DOMContentLoaded", initializeDashboard);
 
 // Also initialize when Livewire finishes loading
-document.addEventListener('livewire:load', initializeDashboard);
+document.addEventListener("livewire:load", initializeDashboard);

@@ -72,10 +72,10 @@ return new class () extends Migration {
         WHERE uuid IS NULL
     ');
     
-// اجرای Seeder به صورت خودکار
+/* // اجرای Seeder به صورت خودکار
 Artisan::call('db:seed', [
    '--class' => 'DoctorSeeder',
-        ]);
+        ]); */
 
 
     }

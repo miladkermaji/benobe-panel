@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use App\Models\MedicalCenter;
 
 class AppointmentController extends Controller
 {
@@ -181,12 +182,12 @@ class AppointmentController extends Controller
                                 $query->select('id', 'name');
                             }]);
                     },
-                    'clinic' => function ($query) {
+                    'medicalCenter' => function ($query) {
                         $query->select('id', 'address');
                     },
                     'patientable',
                 ])
-                ->select('id', 'doctor_id', 'clinic_id', 'patientable_id', 'patientable_type', 'appointment_date', 'appointment_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
+                ->select('id', 'doctor_id', 'medical_center_id', 'patientable_id', 'patientable_type', 'appointment_date', 'appointment_time', 'status', 'consultation_type', 'fee', 'notes', 'tracking_code')
                 ->get();
 
             // فرمت کردن داده‌ها
@@ -206,9 +207,9 @@ class AppointmentController extends Controller
                         'name' => $appointment->doctor->first_name . ' ' . $appointment->doctor->last_name,
                         'specialty' => $appointment->doctor->specialty ? $appointment->doctor->specialty->name : null,
                     ] : null,
-                    'clinic' => $appointment->clinic ? [
-                        'id' => $appointment->clinic->id,
-                        'address' => $appointment->clinic->address,
+                    'clinic' => $appointment->medicalCenter ? [
+                        'id' => $appointment->medicalCenter->id,
+                        'address' => $appointment->medicalCenter->address,
                     ] : null,
                     'patient' => $patient ? [
                         'mobile' => $patient->mobile ?? null,

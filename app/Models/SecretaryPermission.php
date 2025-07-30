@@ -9,7 +9,7 @@ class SecretaryPermission extends Model
     protected $fillable = [
         'secretary_id',
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'permissions',
         'has_access',
     ];
@@ -29,8 +29,8 @@ class SecretaryPermission extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

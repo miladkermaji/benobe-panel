@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Clinic;
 use Illuminate\Database\Eloquent\Model;
 
 class ManualAppointmentSetting extends Model
@@ -16,7 +15,7 @@ class ManualAppointmentSetting extends Model
      */
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'is_active',
         'duration_send_link',
         'duration_confirm_link',
@@ -25,32 +24,31 @@ class ManualAppointmentSetting extends Model
     /**
      * رابطه با مدل پزشک
      */
-    // در مدل ManualAppointmentSetting
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
-    // در مدل ManualAppointmentSetting
+
     public static function boot()
     {
         parent::boot();
 
         static::saving(function ($model) {
-            // بررسی یکتایی ترکیب doctor_id و clinic_id (حتی وقتی clinic_id نال است)
+            // بررسی یکتایی ترکیب doctor_id و medical_center_id (حتی وقتی medical_center_id نال است)
             $exists = ManualAppointmentSetting::where('doctor_id', $model->doctor_id)
-                ->where('clinic_id', $model->clinic_id)
+                ->where('medical_center_id', $model->medical_center_id)
                 ->when($model->exists, function ($query) use ($model) {
                     $query->where('id', '!=', $model->id);
                 })
                 ->exists();
 
             if ($exists) {
-                throw new \Exception('این پزشک قبلاً برای این کلینیک تنظیمات دارد.');
+                throw new \Exception('این پزشک قبلاً برای این مرکز درمانی تنظیمات دارد.');
             }
         });
     }

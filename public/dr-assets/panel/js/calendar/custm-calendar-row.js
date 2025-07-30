@@ -126,6 +126,19 @@ $(document).ready(function () {
         }, 1000)
     );
 
+    // گوش دادن به رویداد تغییر مرکز درمانی
+    Livewire.on(
+        "medicalCenterSelected",
+        debounceUpdate(function (event) {
+            // بروزرسانی selectedClinicId در localStorage
+            const medicalCenterId = event.detail?.medicalCenterId || null;
+            localStorage.setItem("selectedClinicId", medicalCenterId);
+            
+            // بروزرسانی تقویم
+            fetchAppointmentsCount();
+        }, 1000)
+    );
+
     function fetchAppointmentsCount() {
         if (!calendar.length) {
             return;

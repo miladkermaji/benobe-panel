@@ -18,7 +18,7 @@ class UserBlockingCreate extends Component
     public $blocked_at;
     public $unblocked_at;
     public $reason;
-    public $clinic_id;
+    public $medical_center_id;
     public $status = true;
     public $clinics = [];
 

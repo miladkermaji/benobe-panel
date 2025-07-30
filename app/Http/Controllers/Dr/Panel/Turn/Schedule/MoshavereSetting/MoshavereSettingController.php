@@ -36,16 +36,16 @@ class MoshavereSettingController extends Controller
                 })
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->get();
 
             // بررسی یا ایجاد تنظیمات مشاوره آنلاین
             $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-                ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+                ['doctor_id' => $doctorId, 'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
                 [
                     'auto_scheduling'      => true,
                     'calendar_days'        => 30,
@@ -79,7 +79,7 @@ class MoshavereSettingController extends Controller
         $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
 
         $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-            ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+            ['doctor_id' => $doctorId, 'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
             [
                 'auto_scheduling'      => true,
                 'online_consultation'  => false,
@@ -90,9 +90,9 @@ class MoshavereSettingController extends Controller
         $workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -121,9 +121,9 @@ class MoshavereSettingController extends Controller
                 ->where('day', $validated['source_day'])
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -140,7 +140,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $targetDay,
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working' => true,
@@ -228,9 +228,9 @@ class MoshavereSettingController extends Controller
                 ->where('day', $day)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -258,9 +258,9 @@ class MoshavereSettingController extends Controller
                 ->where('day', $day)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -269,7 +269,7 @@ class MoshavereSettingController extends Controller
                 $workSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctor->id,
                     'day' => $day,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([$newSlot]),
                 ]);
@@ -288,9 +288,9 @@ class MoshavereSettingController extends Controller
         $updatedSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -341,9 +341,9 @@ class MoshavereSettingController extends Controller
             ->where('day', $validated['day'])
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -369,7 +369,7 @@ class MoshavereSettingController extends Controller
                 [
                     'doctor_id' => $doctor->id,
                     'day'       => $validated['day'],
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 ['is_working' => true, 'work_hours' => "[]"]// مقداردهی با رشته‌ی `[]`
             );
@@ -444,7 +444,7 @@ class MoshavereSettingController extends Controller
                 [
                     'doctor_id' => $doctor->id,
                     'day'       => $validated['day'],
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
                     'is_working' => $isWorking,
@@ -479,7 +479,7 @@ class MoshavereSettingController extends Controller
             $appointmentConfig = DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 ['auto_scheduling' => $autoScheduling]
             );
@@ -539,9 +539,9 @@ class MoshavereSettingController extends Controller
                     ->where('day', $validated['day'])
                     ->where(function ($query) use ($selectedClinicId) {
                         if ($selectedClinicId !== 'default') {
-                            $query->where('clinic_id', $selectedClinicId);
+                            $query->where('medical_center_id', $selectedClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -582,7 +582,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $validated['day'],
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working'           => true,
@@ -633,9 +633,9 @@ class MoshavereSettingController extends Controller
             ->where('day', $request->day)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -690,7 +690,7 @@ class MoshavereSettingController extends Controller
             $counselingConfig = DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
                     'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
@@ -722,7 +722,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $day,
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working'           => $dayConfig['is_working'] ?? false,
@@ -776,9 +776,9 @@ class MoshavereSettingController extends Controller
                 })
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->get();
@@ -841,9 +841,9 @@ class MoshavereSettingController extends Controller
                 ->where('day', $validated['day'])
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -919,9 +919,9 @@ class MoshavereSettingController extends Controller
         $workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -950,9 +950,9 @@ class MoshavereSettingController extends Controller
                 ->where('day', $validated['day'])
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1032,9 +1032,9 @@ class MoshavereSettingController extends Controller
             ->where('day', $dayOfWeek) // بررسی روز هفته
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId !== 'default') {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();

@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Secretary;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\SecretaryPermission;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -23,8 +23,8 @@ class SecretaryCreate extends Component
     public $email;
     public $password;
     public $doctor_id;
-    public $clinic_id;
-    public $is_active = true;
+    public $medical_center_id;
+    public $is_active = false;
     public $profile_photo;
 
     public $doctors = [];
@@ -33,24 +33,28 @@ class SecretaryCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = $this->doctor_id ? Clinic::where('doctor_id', $this->doctor_id)->get() : collect();
+        $this->clinics = $this->doctor_id ? MedicalCenter::whereHas('doctors', function ($query) {
+            $query->where('doctor_id', $this->doctor_id);
+        })->where('type', 'policlinic')->get() : collect();
     }
 
     public function updatedDoctorId($value)
     {
-        $clinics = Clinic::where('doctor_id', $value)->get();
+        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'policlinic')->get();
         Log::info('updatedDoctorId', [
             'doctor_id' => $value,
             'clinics' => $clinics->toArray(),
         ]);
         $this->clinics = $clinics;
-        $this->clinic_id = null;
+        $this->medical_center_id = null;
         $this->dispatch('refresh-clinic-select2', clinics: $clinics->toArray());
     }
 
     public function updatedClinicId($value)
     {
-        Log::info('Clinic selected', ['clinic_id' => $value]);
+        Log::info('Clinic selected', ['medical_center_id' => $value]);
     }
 
     public function getPhotoPreviewProperty()
@@ -62,7 +66,7 @@ class SecretaryCreate extends Component
     {
         Log::info('store secretary', [
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
         ]);
         $this->validate([
             'first_name' => 'required|string|max:255',
@@ -73,7 +77,7 @@ class SecretaryCreate extends Component
             'email' => 'nullable|email|unique:secretaries,email',
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'medical_center_id' => 'required|exists:medical_centers,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [
@@ -82,7 +86,7 @@ class SecretaryCreate extends Component
             'last_name.required' => 'لطفاً نام خانوادگی را وارد کنید.',
             'last_name.max' => 'نام خانوادگی نباید بیشتر از ۲۵۵ کاراکتر باشد.',
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
-            'clinic_id.required' => 'لطفاً  مطب را انتخاب کنید.',
+            'medical_center_id.required' => 'لطفاً  مطب را انتخاب کنید.',
             'mobile.regex' => 'شماره موبایل باید با ۰۹ شروع شده و ۱۱ رقم باشد.',
             'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
             'national_code.required' => 'لطفاً کد ملی را وارد کنید.',
@@ -94,7 +98,7 @@ class SecretaryCreate extends Component
             'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
             'password.min' => 'رمز عبور باید حداقل ۶ کاراکتر باشد.',
             'doctor_id.exists' => 'دکتر انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'profile_photo.image' => 'فایل باید تصویر باشد.',
             'profile_photo.max' => 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.',
         ]);
@@ -108,7 +112,7 @@ class SecretaryCreate extends Component
             'email' => $this->email,
             'password' => $this->password ? Hash::make($this->password) : null,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'is_active' => $this->is_active,
         ];
 
@@ -122,7 +126,7 @@ class SecretaryCreate extends Component
         SecretaryPermission::create([
             'secretary_id' => $secretary->id,
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'permissions' => json_encode([
                 "dashboard",
                 "appointments",

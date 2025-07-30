@@ -5,14 +5,14 @@ namespace App\Livewire\Admin\Panel\ManualAppointmentSettings;
 use Livewire\Component;
 use App\Models\ManualAppointmentSetting;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 
 class ManualAppointmentSettingCreate extends Component
 {
     public $doctor_id;
-    public $clinic_id;
-    public $is_active = true;
+    public $medical_center_id;
+    public $is_active = false;
     public $duration_send_link = 3;
     public $duration_confirm_link = 1;
     public $doctors;
@@ -26,56 +26,57 @@ class ManualAppointmentSettingCreate extends Component
 
     public function updatedDoctorId($value)
     {
-        $this->clinic_id = null;
+        $this->medical_center_id = null;
         $this->loadClinics();
     }
 
-protected function loadClinics()
-{
-    $existingClinics = $this->doctor_id 
-        ? ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
-            ->whereNotNull('clinic_id')
-            ->pluck('clinic_id')
-            ->toArray()
-        : [];
+    protected function loadClinics()
+    {
+        $existingClinics = $this->doctor_id
+            ? ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
+                ->whereNotNull('medical_center_id')
+                ->pluck('medical_center_id')
+                ->toArray()
+            : [];
 
-    $clinics = Clinic::whereNotIn('id', $existingClinics)
-        ->get()
-        ->map(function ($clinic) {
-            return [
-                'id' => $clinic->id,
-                'name' => $clinic->name
-            ];
-        })
-        ->toArray();
-    
-    // Add general settings option
-    $generalSetting = [
-        'id' => null,
-        'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
-    ];
-    
-    $this->clinics = array_merge([$generalSetting], $clinics);
-}
+        $clinics = MedicalCenter::whereNotIn('id', $existingClinics)
+            ->where('type', 'policlinic')
+            ->get()
+            ->map(function ($clinic) {
+                return [
+                    'id' => $clinic->id,
+                    'name' => $clinic->name
+                ];
+            })
+            ->toArray();
+
+        // Add general settings option
+        $generalSetting = [
+            'id' => null,
+            'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
+        ];
+
+        $this->clinics = array_merge([$generalSetting], $clinics);
+    }
 
     public function store()
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'is_active' => $this->is_active,
             'duration_send_link' => $this->duration_send_link,
             'duration_confirm_link' => $this->duration_confirm_link,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'is_active' => 'required|boolean',
             'duration_send_link' => 'required|integer|min:1',
             'duration_confirm_link' => 'required|integer|min:1',
         ], [
             'doctor_id.required' => 'انتخاب پزشک الزامی است.',
             'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'is_active.required' => 'وضعیت تأیید دو مرحله‌ای الزامی است.',
             'is_active.boolean' => 'وضعیت تأیید دو مرحله‌ای باید بله یا خیر باشد.',
             'duration_send_link.required' => 'زمان ارسال لینک الزامی است.',
@@ -93,11 +94,11 @@ protected function loadClinics()
 
         // بررسی یکتایی تنظیمات
         $exists = ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
-            ->where('clinic_id', $this->clinic_id)
+            ->where('medical_center_id', $this->medical_center_id)
             ->exists();
 
         if ($exists) {
-            $message = $this->clinic_id
+            $message = $this->medical_center_id
                 ? 'این پزشک قبلاً برای این کلینیک تنظیمات دارد.'
                 : 'این پزشک قبلاً تنظیمات عمومی دارد.';
 
@@ -107,7 +108,7 @@ protected function loadClinics()
 
         ManualAppointmentSetting::create([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'is_active' => $this->is_active,
             'duration_send_link' => $this->duration_send_link,
             'duration_confirm_link' => $this->duration_confirm_link,

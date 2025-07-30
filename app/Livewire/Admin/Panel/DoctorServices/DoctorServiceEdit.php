@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Doctorservices;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use App\Models\DoctorService;
 use App\Models\Insurance;
@@ -13,7 +13,7 @@ class DoctorServiceEdit extends Component
 {
     public $doctorService;
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $insurance_id;
     public $service_id;
     public $name;
@@ -34,7 +34,7 @@ class DoctorServiceEdit extends Component
     {
         $this->doctorService = DoctorService::findOrFail($id);
         $this->doctor_id = $this->doctorService->doctor_id;
-        $this->clinic_id = $this->doctorService->clinic_id;
+        $this->medical_center_id = $this->doctorService->medical_center_id;
         $this->insurance_id = $this->doctorService->insurance_id;
         $this->service_id = $this->doctorService->service_id;
         $this->name = $this->doctorService->name;
@@ -46,7 +46,7 @@ class DoctorServiceEdit extends Component
         $this->parent_id = $this->doctorService->parent_id;
 
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
         $this->insurances = Insurance::all();
         $this->services = Service::all();
         $this->parentServices = DoctorService::whereNull('parent_id')->where('id', '!=', $id)->get();
@@ -56,7 +56,7 @@ class DoctorServiceEdit extends Component
     {
         return [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'insurance_id' => 'nullable|exists:insurances,id',
             'service_id' => 'nullable|exists:services,id',
             'name' => 'required|string|max:255|unique:doctor_services,name,' . $this->doctorService->id,
@@ -72,7 +72,7 @@ class DoctorServiceEdit extends Component
     protected $messages = [
         'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
         'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-        'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+        'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
         'insurance_id.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
         'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
         'name.required' => 'لطفاً نام خدمت را وارد کنید.',
@@ -105,7 +105,7 @@ class DoctorServiceEdit extends Component
 
         $this->doctorService->update([
             'doctor_id' => $this->doctor_id,
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'insurance_id' => $this->insurance_id,
             'service_id' => $this->service_id,
             'name' => $this->name,

@@ -72,6 +72,16 @@ $(document).ready(function () {
         fetchAppointmentsCount();
     });
 
+    // گوش دادن به رویداد تغییر مرکز درمانی
+    Livewire.on("medicalCenterSelected", function (event) {
+        // بروزرسانی selectedClinicId در localStorage
+        const medicalCenterId = event.detail?.medicalCenterId || null;
+        localStorage.setItem("selectedClinicId", medicalCenterId);
+
+        // بروزرسانی تقویم
+        fetchAppointmentsCount();
+    });
+
     function fetchAppointmentsCount() {
         if (!calendar.length) {
             console.error("Calendar element not found, aborting AJAX");

@@ -4,7 +4,6 @@ namespace App\Livewire\Dr\Panel;
 
 use Carbon\Carbon;
 use App\Models\User;
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Appointment;
@@ -21,15 +20,16 @@ use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use Livewire\Attributes\On;
 
 class Workhours extends Component
 {
     use HasSelectedClinic;
     public $showSaveButton = false;
     public $calculationMode = 'count'; // حالت پیش‌فرض: تعداد نوبت‌ها
-    public $selectedClinicId = 'default';
-    public $clinicId; // برای صفحه جدید (مثل activation/workhours/{clinic})
-    public $activeClinicId; // پراپرتی مشترک برای کوئری‌ها
+    public $selectedMedicalCenterId = 'default';
+    public $medicalCenterId; // برای صفحه جدید (مثل activation/workhours/{medicalCenter})
+    public $activeMedicalCenterId; // پراپرتی مشترک برای کوئری‌ها
     public $appointmentConfig;
     public $workSchedules;
     public $selectedDay;
@@ -125,7 +125,24 @@ class Workhours extends Component
         'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
     protected $listeners = [
+        'updateSelectedDate' => 'updateSelectedDate',
+        'searchAllDates' => 'searchAllDates',
+        'cancelAppointments' => 'cancelAppointments',
+        'blockUser' => 'handleBlockUser',
+        'blockMultipleUsers' => 'handleBlockMultipleUsers',
+        'confirm-partial-reschedule' => 'confirmPartialReschedule',
+        'rescheduleAppointment' => 'handleRescheduleAppointment',
         'setSelectedClinicId' => 'setSelectedClinicId',
+        'setCalendarDate' => 'setCalendarDate',
+        'confirm-search-all-dates' => 'searchAllDates',
+        'show-first-available-confirm' => 'showFirstAvailableConfirm',
+        'applyDiscount' => 'applyDiscount',
+        'get-services' => 'getServices',
+        'getAvailableTimesForDate' => 'getAvailableTimesForDate',
+        'openAddSickModal' => 'handleOpenAddSickModal',
+        'getAppointmentDetails' => 'getAppointmentDetails',
+        'testAvailableTimes' => 'testAvailableTimes',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
     ];
     public $isActivationPage = false;
     // --- Manual Appointment Setting Properties ---
@@ -138,21 +155,21 @@ class Workhours extends Component
         $this->showSaveButton = request()->routeIs('dr-workhours');
         $this->isActivationPage = request()->is('dr/panel/doctors-clinic/activation/workhours/*');
         $this->showSaveButton = !$this->isActivationPage;
-        // تنظیم activeClinicId
-        $this->activeClinicId = $this->resolveClinicId();
+        // تنظیم activeMedicalCenterId
+        $this->activeMedicalCenterId = $this->resolveMedicalCenterId();
         // دریافت اطلاعات دکتر
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $this->doctorId = $doctor instanceof Doctor ? $doctor->id : $doctor->doctor_id;
         // بررسی وجود کلینیک
-        if ($this->activeClinicId !== 'default' && !Clinic::where('id', $this->activeClinicId)->exists()) {
-            $this->activeClinicId = 'default';
-            session()->flash('error', 'The selected clinic does not exist. Using default settings instead.');
+        if ($this->activeMedicalCenterId !== 'default' && !Doctor::where('id', $this->activeMedicalCenterId)->exists()) {
+            $this->activeMedicalCenterId = 'default';
+            session()->flash('error', 'The selected medical center does not exist. Using default settings instead.');
         }
         // تنظیمات نوبت‌دهی
         $this->appointmentConfig = DoctorAppointmentConfig::firstOrCreate(
             [
                 'doctor_id' => $this->doctorId,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
             ],
             [
                 'auto_scheduling' => true,
@@ -160,7 +177,7 @@ class Workhours extends Component
                 'holiday_availability' => true,
             ]
         );
-        $this->selectedClinicId = $this->activeClinicId;
+        $this->selectedMedicalCenterId = $this->activeMedicalCenterId;
         $this->refreshWorkSchedules();
         // آماده‌سازی آرایه‌های روزهای کاری
         $daysOfWeek = ['saturday', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
@@ -198,35 +215,32 @@ class Workhours extends Component
         $this->selectedScheduleDays = array_fill_keys($daysOfWeek, false);
         $this->dispatch('refresh-clinic-data');
         // مقداردهی اولیه تنظیمات نوبت دستی
-        $manualSetting = \App\Models\ManualAppointmentSetting::where('doctor_id', $this->doctorId)
-            ->where('clinic_id', $this->activeClinicId !== 'default' ? $this->activeClinicId : null)
-            ->first();
-        if ($manualSetting) {
-            $this->manualNobatActive = (bool) $manualSetting->is_active;
-            $this->manualNobatSendLink = $manualSetting->duration_send_link;
-            $this->manualNobatConfirmLink = $manualSetting->duration_confirm_link;
-            $this->manualNobatSettingId = $manualSetting->id;
+        if ($this->appointmentConfig) {
+            $this->manualNobatActive = (bool) $this->appointmentConfig->is_active;
+            $this->manualNobatSendLink = $this->appointmentConfig->duration_send_link ?? 3;
+            $this->manualNobatConfirmLink = $this->appointmentConfig->duration_confirm_link ?? 1;
+            $this->manualNobatSettingId = $this->appointmentConfig->id;
         } else {
             $this->manualNobatActive = false;
-            $this->manualNobatSendLink = 10;
-            $this->manualNobatConfirmLink = 30;
+            $this->manualNobatSendLink = 3;
+            $this->manualNobatConfirmLink = 1;
             $this->manualNobatSettingId = null;
         }
     }
     /**
-     * Resolve clinic ID based on request or session.
+     * Resolve medical center ID based on request or session.
      */
-    private function resolveClinicId(): string
+    private function resolveMedicalCenterId(): string
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
             return request()->route('clinic') ?? 'default';
         }
-        return $this->getSelectedClinicId() ?? 'default';
+        return $this->getSelectedMedicalCenterId() ?? 'default';
     }
     public function autoSaveCalendarDays()
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             // اعتبارسنجی
             $this->validate([
                 'calendarDays' => 'required|integer|min:1',
@@ -243,7 +257,7 @@ class Workhours extends Component
             $this->appointmentConfig = DoctorAppointmentConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                 ],
                 [
                     'calendar_days' => (int) $this->calendarDays,
@@ -285,10 +299,10 @@ class Workhours extends Component
     {
         try {
             // تنظیم clinicId و activeClinicId
-            $this->selectedClinicId = $clinicId;
-            $this->activeClinicId = $this->clinicId ?? $clinicId;
+            $this->selectedMedicalCenterId = $clinicId;
+            $this->activeMedicalCenterId = $this->medicalCenterId ?? $clinicId;
             // ذخیره clinicId در سشن
-            session(['selectedClinicId' => $clinicId]);
+            session(['selectedMedicalCenterId' => $clinicId]);
             // بازنشانی پراپرتی‌ها
             $this->reset(['workSchedules', 'isWorking', 'slots']);
             // بارگذاری مجدد داده‌ها
@@ -298,6 +312,31 @@ class Workhours extends Component
         } catch (\Exception $e) {
             $this->showErrorMessage('خطا در تنظیم کلینیک: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
+    }
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
+    {
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+
+        // بروزرسانی selectedMedicalCenterId
+        $this->selectedMedicalCenterId = $medicalCenterId;
+        $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
+
+        // ذخیره در سشن
+        session(['selectedMedicalCenterId' => $medicalCenterId]);
+
+        // بازنشانی پراپرتی‌ها
+        $this->reset(['workSchedules', 'isWorking', 'slots']);
+
+        // بارگذاری مجدد داده‌ها
+        $this->mount();
+
+        // ارسال رویداد رفرش
+        $this->dispatch('refresh-clinic-data');
+
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات ساعات کاری در حال بروزرسانی...');
     }
     public function forceRefreshSettings()
     {
@@ -325,13 +364,13 @@ class Workhours extends Component
     public $editingSetting = null; // داده‌های تنظیم در حال ویرایش
     public function openScheduleModal($day, $index)
     {
-        // تنظیم activeClinicId
+        // تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         $this->scheduleModalDay = $day;
         $this->scheduleModalIndex = $index;
@@ -345,10 +384,10 @@ class Workhours extends Component
         $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
             ->where('day', $this->scheduleModalDay)
             ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                if ($this->activeMedicalCenterId !== 'default') {
+                    $query->where('medical_center_id', $this->activeMedicalCenterId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })->first();
         if ($schedule && $schedule->appointment_settings) {
@@ -391,13 +430,13 @@ class Workhours extends Component
     public function saveSchedule($startTime, $endTime)
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // اعتبارسنجی
             $validator = Validator::make([
@@ -443,17 +482,17 @@ class Workhours extends Component
             $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                    if ($this->activeMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $this->activeMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })->first();
             if (!$schedule) {
                 $schedule = DoctorWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $this->scheduleModalDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
@@ -550,13 +589,13 @@ class Workhours extends Component
     public function autoSaveSchedule($day, $index)
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // اعتبارسنجی
             $validator = Validator::make(
@@ -595,17 +634,17 @@ class Workhours extends Component
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                    if ($this->activeMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $this->activeMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })->first();
             if (!$schedule) {
                 $schedule = DoctorWorkSchedule::create([
                     'doctor_id' => $this->doctorId,
                     'day' => $this->scheduleModalDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([]),
                     'appointment_settings' => json_encode([]),
@@ -696,13 +735,13 @@ class Workhours extends Component
     }
     public function addScheduleSetting($day)
     {
-        // اضافه کردن شرط برای تنظیم activeClinicId
+        // اضافه کردن شرط برای تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         if (!isset($this->scheduleSettings[$day])) {
             $this->scheduleSettings[$day] = [];
@@ -749,13 +788,13 @@ class Workhours extends Component
     public function deleteScheduleSetting($day, $index)
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // نگاشت روزهای انگلیسی به فارسی
             $dayTranslations = [
@@ -771,10 +810,10 @@ class Workhours extends Component
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                    if ($this->activeMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $this->activeMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })->first();
             if (!$schedule) {
@@ -817,13 +856,13 @@ class Workhours extends Component
     public function deleteScheduleSettingsForDay($day)
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // نگاشت روزهای انگلیسی به فارسی
             $dayTranslations = [
@@ -839,10 +878,10 @@ class Workhours extends Component
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                    if ($this->activeMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $this->activeMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })->first();
             if (!$schedule) {
@@ -919,13 +958,13 @@ class Workhours extends Component
             throw new \Exception('اطلاعات منبع کپی نامعتبر است. لطفاً مجدداً تلاش کنید.');
         }
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // اعتبارسنجی روزهای انتخاب‌شده - ابتدا از selectedCopyScheduleDays، سپس از selectedDays
             $filteredDays = array_filter($this->selectedCopyScheduleDays);
@@ -960,10 +999,10 @@ class Workhours extends Component
             $currentSchedule = DoctorWorkSchedule::where('doctor_id', $this->doctorId)
                 ->where('day', $this->copySourceDay)
                 ->where(function ($query) {
-                    if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                    if ($this->activeMedicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $this->activeMedicalCenterId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })->first();
             if (!$currentSchedule) {
@@ -1085,11 +1124,11 @@ class Workhours extends Component
     public function refreshWorkSchedules()
     {
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('clinic') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
@@ -1097,10 +1136,10 @@ class Workhours extends Component
             ->select(['id', 'day', 'is_working', 'work_hours', 'appointment_settings', 'emergency_times'])
             ->where('doctor_id', $doctorId)
             ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                if ($this->activeMedicalCenterId !== 'default') {
+                    $query->where('medical_center_id', $this->activeMedicalCenterId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get()
@@ -1178,23 +1217,23 @@ class Workhours extends Component
     }
     public function saveEmergencyTimes()
     {
-        // اضافه کردن شرط برای تنظیم activeClinicId
+        // اضافه کردن شرط برای تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $this->emergencyModalDay)
             ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                if ($this->activeMedicalCenterId !== 'default') {
+                    $query->where('medical_center_id', $this->activeMedicalCenterId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -1224,13 +1263,13 @@ class Workhours extends Component
     public function saveWorkSchedule()
     {
         try {
-            // اضافه کردن شرط برای تنظیم activeClinicId
+            // اضافه کردن شرط برای تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             $rules = [];
             $messages = [];
@@ -1265,7 +1304,7 @@ class Workhours extends Component
                 $config = DoctorAppointmentConfig::withoutGlobalScopes()->updateOrCreate(
                     [
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     ],
                     $data
                 );
@@ -1328,13 +1367,13 @@ class Workhours extends Component
     public function autoSaveTimeSlot($day, $index)
     {
         try {
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             // اعتبارسنجی داده‌ها
             $validator = Validator::make(
@@ -1381,10 +1420,10 @@ class Workhours extends Component
                     ->where('doctor_id', $doctorId)
                     ->where('day', $day)
                     ->where(function ($query) {
-                        if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                        if ($this->activeMedicalCenterId !== 'default') {
+                            $query->where('medical_center_id', $this->activeMedicalCenterId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1392,7 +1431,7 @@ class Workhours extends Component
                     $workSchedule = DoctorWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $day,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                         'is_working' => true,
                         'work_hours' => json_encode([]),
                         'appointment_settings' => json_encode([]),
@@ -1509,23 +1548,23 @@ class Workhours extends Component
             ];
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            // تنظیم activeClinicId
+            // تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             DB::beginTransaction();
             try {
                 $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $day)
                     ->where(function ($query) {
-                        if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                        if ($this->activeMedicalCenterId !== 'default') {
+                            $query->where('medical_center_id', $this->activeMedicalCenterId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1533,7 +1572,7 @@ class Workhours extends Component
                     $workSchedule = DoctorWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $day,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                         'is_working' => true,
                         'work_hours' => '[]',
                         'appointment_settings' => '[]',
@@ -1641,13 +1680,13 @@ class Workhours extends Component
     public function copySchedule($replace = false)
     {
         try {
-            // اضافه کردن شرط برای تنظیم activeClinicId
+            // اضافه کردن شرط برای تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             if (!$replace && !empty($this->copySource['day'])) {
                 $this->storedCopySource = $this->copySource;
@@ -1688,10 +1727,10 @@ class Workhours extends Component
                     $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                         ->where('day', $targetDay)
                         ->where(function ($query) {
-                            if ($this->activeClinicId !== 'default') {
-                                $query->where('clinic_id', $this->activeClinicId);
+                            if ($this->activeMedicalCenterId !== 'default') {
+                                $query->where('medical_center_id', $this->activeMedicalCenterId);
                             } else {
-                                $query->whereNull('clinic_id');
+                                $query->whereNull('medical_center_id');
                             }
                         })
                         ->first();
@@ -1734,10 +1773,10 @@ class Workhours extends Component
                     $targetSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                         ->where('day', $targetDay)
                         ->where(function ($query) {
-                            if ($this->activeClinicId !== 'default') {
-                                $query->where('clinic_id', $this->activeClinicId);
+                            if ($this->activeMedicalCenterId !== 'default') {
+                                $query->where('medical_center_id', $this->activeMedicalCenterId);
                             } else {
-                                $query->whereNull('clinic_id');
+                                $query->whereNull('medical_center_id');
                             }
                         })
                         ->first();
@@ -1745,7 +1784,7 @@ class Workhours extends Component
                         $targetSchedule = DoctorWorkSchedule::create([
                             'doctor_id' => $doctorId,
                             'day' => $targetDay,
-                            'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                            'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                             'is_working' => true,
                             'work_hours' => json_encode([$sourceSlot]),
                             'appointment_settings' => json_encode($sourceAppointmentSettings),
@@ -1984,23 +2023,23 @@ class Workhours extends Component
     {
         $this->isEmergencyModalOpen = $isOpen;
     }
-    public function updatedSelectedClinicId()
+    public function updatedSelectedMedicalCenterId()
     {
-        $this->activeClinicId = $this->selectedClinicId;
+        $this->activeMedicalCenterId = $this->selectedMedicalCenterId;
         $this->reset(['workSchedules', 'isWorking', 'slots']);
-        $this->mount($this->clinicId);
+        $this->mount($this->medicalCenterId);
         $this->dispatch('refresh-clinic-data');
     }
     public function saveTimeSlot()
     {
         try {
-            // اضافه کردن شرط برای تنظیم activeClinicId
+            // اضافه کردن شرط برای تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             $this->validate([
                 'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
@@ -2016,10 +2055,10 @@ class Workhours extends Component
                     ->where('doctor_id', $doctorId)
                     ->where('day', $this->selectedDay)
                     ->where(function ($query) {
-                        if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                        if ($this->activeMedicalCenterId !== 'default') {
+                            $query->where('medical_center_id', $this->activeMedicalCenterId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -2027,7 +2066,7 @@ class Workhours extends Component
                     $workSchedule = DoctorWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $this->selectedDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                         'is_working' => true,
                         'work_hours' => json_encode([]),
                     ]);
@@ -2100,13 +2139,13 @@ class Workhours extends Component
     public function deleteTimeSlot($day, $index)
     {
         try {
-            // اضافه کردن شرط برای تنظیم activeClinicId
+            // اضافه کردن شرط برای تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
@@ -2116,10 +2155,10 @@ class Workhours extends Component
                     ->where('doctor_id', $doctorId)
                     ->where('day', $day)
                     ->where(function ($query) {
-                        if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                        if ($this->activeMedicalCenterId !== 'default') {
+                            $query->where('medical_center_id', $this->activeMedicalCenterId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -2180,13 +2219,13 @@ class Workhours extends Component
     public function updateWorkDayStatus($day)
     {
         try {
-            // اضافه کردن شرط برای تنظیم activeClinicId
+            // اضافه کردن شرط برای تنظیم activeMedicalCenterId
             if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-                $currentClinicId = request()->route('clinic') ?? 'default';
-                $this->activeClinicId = $currentClinicId;
+                $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+                $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
-                $clinicId = $this->activeClinicId;
-                $this->activeClinicId = $clinicId ?? 'default';
+                $medicalCenterId = $this->activeMedicalCenterId;
+                $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
             }
             $dayMap = [
                 'شنبه' => 'saturday',
@@ -2210,7 +2249,7 @@ class Workhours extends Component
                     ->where([
                         'doctor_id' => $doctorId,
                         'day' => $englishDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     ])
                     ->first();
                 if ($workSchedule) {
@@ -2219,7 +2258,7 @@ class Workhours extends Component
                     DoctorWorkSchedule::create([
                         'doctor_id' => $doctorId,
                         'day' => $englishDay,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                         'is_working' => $isWorking,
                         'work_hours' => json_encode([]),
                     ]);
@@ -2263,13 +2302,13 @@ class Workhours extends Component
             ]);
             return;
         }
-        // تنظیم activeClinicId
+        // تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         // بررسی تکمیل بودن اسلات قبلی
         if (!empty($this->slots[$day])) {
@@ -2294,10 +2333,10 @@ class Workhours extends Component
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $day)
             ->where(function ($query) {
-                if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                if ($this->activeMedicalCenterId !== 'default') {
+                    $query->where('medical_center_id', $this->activeMedicalCenterId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -2305,7 +2344,7 @@ class Workhours extends Component
             $workSchedule = DoctorWorkSchedule::create([
                 'doctor_id' => $doctorId,
                 'day' => $day,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                 'is_working' => true,
                 'work_hours' => '[]',
             ]);
@@ -2337,13 +2376,13 @@ class Workhours extends Component
     }
     public function updatedIsWorking($value, $key)
     {
-        // اضافه کردن شرط برای تنظیم activeClinicId
+        // اضافه کردن شرط برای تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         $dayMap = [
             'saturday' => 'شنبه',
@@ -2369,7 +2408,7 @@ class Workhours extends Component
             $workSchedule = DoctorWorkSchedule::where([
                 'doctor_id' => $doctorId,
                 'day' => $englishDay,
-                'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
             ])->first();
             if ($workSchedule) {
                 $workSchedule->update([
@@ -2379,7 +2418,7 @@ class Workhours extends Component
                 $workSchedule = DoctorWorkSchedule::create([
                     'doctor_id' => $doctorId,
                     'day' => $englishDay,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     'is_working' => $isWorking,
                     'work_hours' => json_encode([]),
                 ]);
@@ -2407,13 +2446,13 @@ class Workhours extends Component
     }
     public function updateAutoScheduling()
     {
-        // اضافه کردن شرط برای تنظیم activeClinicId
+        // اضافه کردن شرط برای تنظیم activeMedicalCenterId
         if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
-            $currentClinicId = request()->route('clinic') ?? 'default';
-            $this->activeClinicId = $currentClinicId;
+            $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
+            $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
-            $clinicId = $this->activeClinicId;
-            $this->activeClinicId = $clinicId ?? 'default';
+            $medicalCenterId = $this->activeMedicalCenterId;
+            $this->activeMedicalCenterId = $medicalCenterId ?? 'default';
         }
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
@@ -2423,7 +2462,7 @@ class Workhours extends Component
                 $data = [
                     'auto_scheduling' => (bool) $this->autoScheduling,
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                 ];
                 // فقط در حالت نوبت‌دهی آنلاین + دستی، calendar_days و holiday_availability رو ذخیره کن
                 if ($this->autoScheduling) {
@@ -2441,7 +2480,7 @@ class Workhours extends Component
                 $config = DoctorAppointmentConfig::updateOrCreate(
                     [
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                        'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                     ],
                     $data
                 );
@@ -2475,17 +2514,17 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $medicalCenterId = $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null;
             $data = [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
             ];
             $values = [
                 'is_active' => (bool) $this->manualNobatActive,
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2502,17 +2541,17 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $medicalCenterId = $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null;
             $data = [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
             ];
             $values = [
                 'is_active' => (bool) $this->manualNobatActive,
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2529,17 +2568,17 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $medicalCenterId = $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null;
             $data = [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
             ];
             $values = [
                 'is_active' => (bool) $value,
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2556,17 +2595,17 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $medicalCenterId = $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null;
             $data = [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
             ];
             $values = [
                 'is_active' => (bool) $this->manualNobatActive,
                 'duration_send_link' => (int) $value,
                 'duration_confirm_link' => (int) $this->manualNobatConfirmLink,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2583,17 +2622,17 @@ class Workhours extends Component
         try {
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-            $clinicId = $this->activeClinicId !== 'default' ? $this->activeClinicId : null;
+            $medicalCenterId = $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null;
             $data = [
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
             ];
             $values = [
                 'is_active' => (bool) $this->manualNobatActive,
                 'duration_send_link' => (int) $this->manualNobatSendLink,
                 'duration_confirm_link' => (int) $value,
             ];
-            $setting = \App\Models\ManualAppointmentSetting::updateOrCreate($data, $values);
+            $setting = \App\Models\DoctorAppointmentConfig::updateOrCreate($data, $values);
             $this->manualNobatSettingId = $setting->id;
             // به‌روزرسانی مقادیر در کامپوننت از دیتابیس
             $this->manualNobatActive = (bool) $setting->is_active;
@@ -2622,7 +2661,7 @@ class Workhours extends Component
             $config = DoctorAppointmentConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->activeClinicId !== 'default' ? $this->activeClinicId : null,
+                    'medical_center_id' => $this->activeMedicalCenterId !== 'default' ? $this->activeMedicalCenterId : null,
                 ],
                 $data
             );
@@ -2641,5 +2680,23 @@ class Workhours extends Component
         $this->copySourceDay = $day;
         $this->copySourceIndex = $index;
         Log::info('openCopyScheduleModal called', ['copySourceDay' => $day, 'copySourceIndex' => $index]);
+    }
+    public function setSelectedMedicalCenterId($medicalCenterId)
+    {
+        try {
+            // تنظیم medicalCenterId و activeMedicalCenterId
+            $this->selectedMedicalCenterId = $medicalCenterId;
+            $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
+            // ذخیره medicalCenterId در سشن
+            session(['selectedMedicalCenterId' => $medicalCenterId]);
+            // بازنشانی پراپرتی‌ها
+            $this->reset(['workSchedules', 'isWorking', 'slots']);
+            // بارگذاری مجدد داده‌ها
+            $this->mount();
+            // ارسال رویداد رفرش
+            $this->dispatch('refresh-clinic-data');
+        } catch (\Exception $e) {
+            $this->showErrorMessage('خطا در تنظیم مرکز درمانی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
+        }
     }
 }

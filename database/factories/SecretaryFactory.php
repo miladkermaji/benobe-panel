@@ -29,7 +29,7 @@ class SecretaryFactory extends Factory
         $doctor = Doctor::inRandomOrder()->value('id') ?? null;
         $clinic = Clinic::inRandomOrder()->value('id') ?? null;
 
-        // تولید شماره موبایل و کد ملی منحصربه‌فرد برای ترکیب doctor_id و clinic_id
+        // تولید شماره موبایل و کد ملی منحصربه‌فرد برای ترکیب doctor_id و medical_center_id
         $mobile = $faker->unique()->numerify('09########');
         $nationalCode = $faker->unique()->numerify('##########');
 
@@ -38,7 +38,7 @@ class SecretaryFactory extends Factory
 
         return [
             'doctor_id' => $doctor,
-            'clinic_id' => $clinic,
+            'medical_center_id' => $clinic,
             'first_name' => $firstName,
             'last_name' => $lastName,
             'display_name' => $displayName,

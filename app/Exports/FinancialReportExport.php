@@ -32,7 +32,7 @@ class FinancialReportExport implements FromCollection, WithHeadings, WithMapping
             $query->where('status', $this->filters['transactionStatus']);
         }
         if (!empty($this->filters['clinicId'])) {
-            $query->where('clinic_id', $this->filters['clinicId']);
+            $query->where('medical_center_id', $this->filters['clinicId']);
         }
         if (!empty($this->filters['minAmount'])) {
             $query->where('amount', '>=', $this->filters['minAmount']);

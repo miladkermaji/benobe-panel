@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ class DoctorCounselingConfig extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'auto_scheduling',
         'calendar_days',
         'online_consultation',
@@ -45,8 +46,8 @@ class DoctorCounselingConfig extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

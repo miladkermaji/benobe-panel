@@ -561,7 +561,7 @@ class AuthController extends Controller
         } elseif ($model instanceof Secretary) {
             $validationRules = array_merge($commonFields, [
                 'sex' => 'nullable|in:male,female', // Secretaries have limited gender options
-                'national_code' => 'nullable|string|size:10|unique:secretaries,national_code,' . $model->id . ',id,doctor_id,' . ($model->doctor_id ?? 'NULL') . ',clinic_id,' . ($model->clinic_id ?? 'NULL'),
+                'national_code' => 'nullable|string|size:10|unique:secretaries,national_code,' . $model->id . ',id,doctor_id,' . ($model->doctor_id ?? 'NULL') . ',medical_center_id,' . ($model->medical_center_id ?? 'NULL'),
                 'email' => 'nullable|email|unique:secretaries,email,' . $model->id,
             ]);
             $userForSync = User::where('mobile', $model->mobile)->first();

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Admin\Manager;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +25,7 @@ class Secretary extends Authenticatable implements JWTSubject
         'city_id',
         'province_id',
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
     ];
 
     /**
@@ -67,9 +66,14 @@ class Secretary extends Authenticatable implements JWTSubject
         return $this->belongsTo(\App\Models\Zone::class, 'city_id');
     }
 
+    public function medicalCenter()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+    }
+
     public function clinic()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     public function permissions()

@@ -365,7 +365,7 @@
       <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content rounded-3 shadow-lg border-0" style="background: #ffffff;">
           <div class="modal-header bg-gradient-primary text-white p-3 rounded-top-3">
-            <h5 class="modal-title fw-bold text-shadow text-dark" id="previewModalLabel">پیش‌نمایش مدرک</h5>
+            <h5 class="modal-title fw-bold text-dark text-shadow text-dark" id="previewModalLabel">پیش‌نمایش مدرک</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
               aria-label="Close"></button>
           </div>
@@ -447,33 +447,36 @@
         });
 
         Livewire.on('showPreview', (event) => {
-          const modal = new bootstrap.Modal(document.getElementById('previewModal'));
-          const content = document.getElementById('previewContent');
-          const downloadLink = document.getElementById('downloadLink');
-          content.innerHTML = '';
+          if (typeof bootstrap !== 'undefined') {
+            const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+            const content = document.getElementById('previewContent');
+            const downloadLink = document.getElementById('downloadLink');
+            content.innerHTML = '';
 
-          const fileType = event.type.toLowerCase().split('/').pop();
-          const imageTypes = ['jpg', 'jpeg', 'png'];
-          const documentTypes = ['doc', 'docx'];
+            const fileType = event.type.toLowerCase().split('/').pop();
+            const imageTypes = ['jpg', 'jpeg', 'png'];
+            const documentTypes = ['doc', 'docx'];
 
-          if (imageTypes.includes(fileType)) {
-            content.innerHTML =
-              `<img src="${event.path}" class="img-fluid rounded-3" style="max-height: 500px;" alt="پیش‌نمایش مدرک">`;
-          } else if (fileType === 'pdf') {
-            content.innerHTML =
-              `<iframe src="${event.path}" class="w-100 rounded-3" style="height: 500px;"></iframe>`;
-          } else if (documentTypes.includes(fileType)) {
-            const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(event.path)}&embedded=true`;
-            content.innerHTML =
-              `<iframe src="${viewerUrl}" class="w-100 rounded-3" style="height: 500px;"></iframe>`;
-          } else {
-            content.innerHTML = `<p class="text-muted">نوع فایل ناشناخته است: ${event.type}.</p>`;
+            if (imageTypes.includes(fileType)) {
+              content.innerHTML =
+                `<img src="${event.path}" class="img-fluid rounded-3" style="max-height: 500px;" alt="پیش‌نمایش مدرک">`;
+            } else if (fileType === 'pdf') {
+              content.innerHTML =
+                `<iframe src="${event.path}" class="w-100 rounded-3" style="height: 500px;"></iframe>`;
+            } else if (documentTypes.includes(fileType)) {
+              const viewerUrl =
+                `https://docs.google.com/viewer?url=${encodeURIComponent(event.path)}&embedded=true`;
+              content.innerHTML =
+                `<iframe src="${viewerUrl}" class="w-100 rounded-3" style="height: 500px;"></iframe>`;
+            } else {
+              content.innerHTML = `<p class="text-muted">نوع فایل ناشناخته است: ${event.type}.</p>`;
+            }
+
+            downloadLink.href = event.path;
+            downloadLink.download = `document.${fileType}`;
+
+            modal.show();
           }
-
-          downloadLink.href = event.path;
-          downloadLink.download = `document.${fileType}`;
-
-          modal.show();
         });
       });
     </script>

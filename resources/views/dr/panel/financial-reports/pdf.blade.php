@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>گزارش مالی</title>
   <style>
-    @import url('{{ asset("dr-assets/fonts/vazir/font-face.css") }}');
+    @import url('{{ asset('dr-assets/fonts/vazir/font-face.css') }}');
 
     @font-face {
       font-family: Vazir;
@@ -92,10 +92,10 @@
             {{ \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($transaction['date']))->format('Y/m/d H:i') }}
           </td>
           <td>
-            @if ($transaction['clinic_id'])
-              {{ \App\Models\Clinic::find($transaction['clinic_id']) ? \App\Models\Clinic::find($transaction['clinic_id'])->name : 'بدون کلینیک' }}
+            @if ($transaction['medical_center_id'])
+              {{ \App\Models\MedicalCenter::find($transaction['medical_center_id']) ? \App\Models\MedicalCenter::find($transaction['medical_center_id'])->name : 'بدون مرکز درمانی' }}
             @else
-              بدون کلینیک
+              بدون مرکز درمانی
             @endif
           </td>
           <td>

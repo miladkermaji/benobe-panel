@@ -5,14 +5,14 @@ namespace App\Livewire\Admin\Panel\Insurances;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Insurance;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 
 class InsuranceCreate extends Component
 {
     use WithFileUploads;
 
-    public $clinic_id;
+    public $medical_center_id;
     public $name;
     public $calculation_method = 0;
     public $appointment_price;
@@ -25,7 +25,7 @@ class InsuranceCreate extends Component
     public function mount()
     {
         $this->photoPreview = asset('default-avatar.png');
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedPhoto()
@@ -36,7 +36,7 @@ class InsuranceCreate extends Component
     public function store()
     {
         $validator = Validator::make([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,
@@ -44,7 +44,7 @@ class InsuranceCreate extends Component
             'final_price' => $this->final_price,
             'photo' => $this->photo,
         ], [
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'name' => 'required|string|max:255',
             'calculation_method' => 'required|in:0,1',
             'appointment_price' => 'nullable|numeric|min:0',
@@ -52,7 +52,7 @@ class InsuranceCreate extends Component
             'final_price' => 'nullable|numeric|min:0',
             'photo' => 'nullable|image|max:2048',
         ], [
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'name.required' => 'نام بیمه الزامی است.',
             'name.string' => 'نام بیمه باید رشته باشد.',
             'name.max' => 'نام بیمه نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
@@ -75,7 +75,7 @@ class InsuranceCreate extends Component
         }
 
         $data = [
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,

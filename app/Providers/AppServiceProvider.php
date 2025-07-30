@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\Clinic;
 use App\Models\Appointment;
 use App\Models\DoctorService;
 use Illuminate\Support\Facades\Auth;
@@ -29,17 +28,8 @@ class AppServiceProvider extends ServiceProvider
     {
 
         View::composer('dr.panel.layouts.master', function ($view) {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $clinics  = Clinic::where('doctor_id', $doctorId)->get();
-
-            $view->with('clinics', $clinics);
-        });
-
-        View::composer('livewire.dr.panel.layouts.partials.header-component', function ($view) {
-             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $clinics  = Clinic::where('doctor_id', $doctorId)->get();
-
-            $view->with('clinics', $clinics);
+            $medicalCenters = collect(); // فعلاً خالی
+            $view->with('medicalCenters', $medicalCenters);
         });
 
         Appointment::observe(AppointmentObserver::class);

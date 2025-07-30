@@ -12,7 +12,7 @@ class SpecialDailySchedule extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'date',
         'work_hours',
         'appointment_settings',
@@ -31,8 +31,8 @@ class SpecialDailySchedule extends Model
     {
         return $this->belongsTo(Doctor::class);
     }
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

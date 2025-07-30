@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Panel\Bestdoctors;
 
 use App\Models\BestDoctor;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 class BestDoctorCreate extends Component
 {
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $best_doctor     = false;
     public $best_consultant = false;
     public $status          = true;
@@ -30,7 +30,9 @@ class BestDoctorCreate extends Component
         Log::info('Loading clinics for doctor_id: ' . $this->doctor_id);
 
         if ($this->doctor_id) {
-            $clinics = Clinic::where('doctor_id', $this->doctor_id)->get();
+            $clinics = MedicalCenter::whereHas('doctors', function ($query) {
+                $query->where('doctor_id', $this->doctor_id);
+            })->where('type', 'policlinic')->get();
             Log::info('Found clinics:', ['count' => $clinics->count(), 'clinics' => $clinics->toArray()]);
             $this->clinics = $clinics;
 
@@ -52,7 +54,7 @@ class BestDoctorCreate extends Component
     {
         Log::info('Doctor ID updated:', ['old_value' => $this->doctor_id, 'new_value' => $value]);
         $this->doctor_id = $value;
-        $this->clinic_id = null;
+        $this->medical_center_id = null;
         $this->loadClinics();
     }
 
@@ -64,10 +66,10 @@ class BestDoctorCreate extends Component
                 'exists:doctors,id',
                 function ($attribute, $value, $fail) {
                     $exists = BestDoctor::where('doctor_id', $value)
-                        ->when($this->clinic_id, function ($query) {
-                            return $query->where('clinic_id', $this->clinic_id);
+                        ->when($this->medical_center_id, function ($query) {
+                            return $query->where('medical_center_id', $this->medical_center_id);
                         }, function ($query) {
-                            return $query->whereNull('clinic_id');
+                            return $query->whereNull('medical_center_id');
                         })
                         ->exists();
 
@@ -76,7 +78,7 @@ class BestDoctorCreate extends Component
                     }
                 },
             ],
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'best_doctor' => 'boolean',
             'best_consultant' => 'boolean',
             'status' => 'boolean',
@@ -86,7 +88,7 @@ class BestDoctorCreate extends Component
     protected $messages = [
         'doctor_id.required' => 'لطفاً یک پزشک انتخاب کنید.',
         'doctor_id.exists' => 'پزشک انتخاب شده معتبر نیست.',
-        'clinic_id.exists' => 'کلینیک انتخاب شده معتبر نیست.',
+        'medical_center_id.exists' => 'کلینیک انتخاب شده معتبر نیست.',
     ];
 
     public function store()
@@ -94,7 +96,7 @@ class BestDoctorCreate extends Component
         try {
             Log::info('Starting store method', [
                 'doctor_id' => $this->doctor_id,
-                'clinic_id' => $this->clinic_id,
+                'medical_center_id' => $this->medical_center_id,
                 'best_doctor' => $this->best_doctor,
                 'best_consultant' => $this->best_consultant,
                 'status' => $this->status
@@ -106,7 +108,7 @@ class BestDoctorCreate extends Component
 
             $bestDoctor = BestDoctor::create([
                 'doctor_id'       => $this->doctor_id,
-                'clinic_id'       => $this->clinic_id,
+                'medical_center_id' => $this->medical_center_id,
                 'best_doctor'     => $this->best_doctor,
                 'best_consultant' => $this->best_consultant,
                 'status'          => $this->status,

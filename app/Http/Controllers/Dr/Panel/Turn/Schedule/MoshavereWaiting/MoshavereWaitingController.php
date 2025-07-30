@@ -90,10 +90,10 @@ class MoshavereWaitingController extends Controller
         $appointments = CounselingAppointment::with('patient')
             ->where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) {
-                return $query->whereNull('clinic_id');
+                return $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                return $query->where('clinic_id', $selectedClinicId);
+                return $query->where('medical_center_id', $selectedClinicId);
             })
             ->when($gregorianDate, function ($query) use ($gregorianDate) {
                 return $query->where('appointment_date', $gregorianDate);
@@ -137,10 +137,10 @@ class MoshavereWaitingController extends Controller
             ->where('status', '!=', 'cancelled') // فقط نوبت‌های فعال
             ->whereNull('deleted_at')
             ->when($selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             })
             ->get();
 
@@ -181,9 +181,9 @@ class MoshavereWaitingController extends Controller
             ->where('appointment_date', $gregorianDate);
 
         if ($selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $query->whereNull('medical_center_id');
         } else {
-            $query->where('clinic_id', $selectedClinicId);
+            $query->where('medical_center_id', $selectedClinicId);
         }
 
         $appointments = $query->get();
@@ -254,7 +254,7 @@ class MoshavereWaitingController extends Controller
         // Check for special schedule
         $specialScheduleQuery = CounselingDailySchedule::where('date', $date);
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $specialScheduleQuery->where('clinic_id', $selectedClinicId);
+            $specialScheduleQuery->where('medical_center_id', $selectedClinicId);
         }
         $specialSchedule = $specialScheduleQuery->first();
 
@@ -270,7 +270,7 @@ class MoshavereWaitingController extends Controller
         $workScheduleQuery = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $dayOfWeek);
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $workScheduleQuery->where('clinic_id', $selectedClinicId);
+            $workScheduleQuery->where('medical_center_id', $selectedClinicId);
         }
         $workSchedule = $workScheduleQuery->first();
 
@@ -295,12 +295,12 @@ class MoshavereWaitingController extends Controller
         // دریافت تعطیلی‌های پزشک با توجه به کلینیک
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
-                // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (clinic_id = NULL)
-                $query->whereNull('clinic_id');
+                // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (medical_center_id = NULL)
+                $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // اگر کلینیک خاص ارسال شود
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             });
 
         $holidays     = $holidaysQuery->first();
@@ -328,12 +328,12 @@ class MoshavereWaitingController extends Controller
             $appointmentQuery = CounselingAppointment::where('doctor_id', $doctorId)
                 ->where('appointment_date', $date)
                 ->when($selectedClinicId === 'default', function ($query) {
-                    // فقط نوبت‌های بدون کلینیک (clinic_id = NULL) بازگردانده شود
-                    $query->whereNull('clinic_id');
+                    // فقط نوبت‌های بدون کلینیک (medical_center_id = NULL) بازگردانده شود
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // نوبت‌های کلینیک مشخص‌شده بازگردانده شود
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 });
 
             return ! $appointmentQuery->exists();
@@ -362,11 +362,11 @@ class MoshavereWaitingController extends Controller
                 ->where('appointment_date', $validated['old_date'])
                 ->when($selectedClinicId === 'default', function ($query) {
                     // اگر selectedClinicId برابر با 'default' باشد، فقط نوبت‌های بدون کلینیک را در نظر بگیرد
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // در غیر این صورت، نوبت‌های مربوط به کلینیک مشخص‌شده را بررسی کند
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 });
 
             $appointments = $appointmentsQuery->get();
@@ -385,10 +385,10 @@ class MoshavereWaitingController extends Controller
             $workHours = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->first();
 
@@ -399,7 +399,7 @@ class MoshavereWaitingController extends Controller
                     'message' => 'ساعات کاری پزشک برای تاریخ جدید یافت نشد.',
                     'debug'   => [
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $selectedClinicId,
+                        'medical_center_id' => $selectedClinicId,
                         'day'       => $dayOfWeek,
                     ],
                 ], 400);
@@ -484,9 +484,9 @@ class MoshavereWaitingController extends Controller
             $appointments = CounselingAppointment::where('doctor_id', $doctorId)
                 ->whereDate('appointment_date', $oldDateGregorian)
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->get();
 
@@ -497,10 +497,10 @@ class MoshavereWaitingController extends Controller
             $workHours = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', strtolower(Carbon::parse($validated['new_date'])->format('l')))
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->first();
 
@@ -563,9 +563,9 @@ class MoshavereWaitingController extends Controller
         $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }
             })
             ->first();
@@ -580,9 +580,9 @@ class MoshavereWaitingController extends Controller
             ->whereNull('deleted_at') // فقط نوبت‌های فعال
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }
             })
             ->get();
@@ -593,9 +593,9 @@ class MoshavereWaitingController extends Controller
             ->where('day', $dayOfWeek)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }
             })
             ->first();
@@ -640,11 +640,11 @@ class MoshavereWaitingController extends Controller
             ->with(['patient', 'insurance']);
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
-            $query->whereNull('clinic_id');
+            // اگر selectedClinicId برابر با 'default' باشد، medical_center_id باید NULL یا خالی باشد
+            $query->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
-            $query->where('clinic_id', $selectedClinicId);
+            // اگر selectedClinicId مقدار داشت، medical_center_id باید با آن مطابقت داشته باشد
+            $query->where('medical_center_id', $selectedClinicId);
         }
 
         $appointments = $query->get();
@@ -682,11 +682,11 @@ class MoshavereWaitingController extends Controller
 
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
-            $appointmentsQuery->whereNull('clinic_id');
+            // اگر selectedClinicId برابر با 'default' باشد، medical_center_id باید NULL یا خالی باشد
+            $appointmentsQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
-            $appointmentsQuery->where('clinic_id', $selectedClinicId);
+            // اگر selectedClinicId مقدار داشت، medical_center_id باید با آن مطابقت داشته باشد
+            $appointmentsQuery->where('medical_center_id', $selectedClinicId);
         }
 
         // اجرای کوئری و دریافت نتایج
@@ -740,7 +740,7 @@ class MoshavereWaitingController extends Controller
         $selectedClinicId = $request->input('selectedClinicId');
         $query            = CounselingAppointment::withTrashed(); // اضافه کردن withTrashed برای نمایش نوبت‌های لغو شده
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $query->where('clinic_id', $selectedClinicId);
+            $query->where('medical_center_id', $selectedClinicId);
         }
         // فیلتر بر اساس `status`
         if (! empty($status)) {
@@ -806,7 +806,7 @@ class MoshavereWaitingController extends Controller
 
         // اگر selectedClinicId وجود دارد و برابر 'default' نیست، فیلتر را اعمال کنید
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $specialWorkHoursQuery->where('clinic_id', $selectedClinicId);
+            $specialWorkHoursQuery->where('medical_center_id', $selectedClinicId);
         }
 
         $specialWorkHours = $specialWorkHoursQuery->first();
@@ -820,7 +820,7 @@ class MoshavereWaitingController extends Controller
                 'doctor_id'  => auth()->guard('doctor')->user()->id,
                 'date'       => $date,
                 'work_hours' => json_encode($workHours),
-                'clinic_id'  => $selectedClinicId, // اضافه کردن clinic_id به رکورد جدید
+                'medical_center_id'  => $selectedClinicId, // اضافه کردن medical_center_id به رکورد جدید
             ]);
         }
 

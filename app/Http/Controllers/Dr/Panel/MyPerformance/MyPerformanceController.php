@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Dr\Panel\MyPerformance;
 
 use App\Models\User;
-use App\Models\Clinic;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use App\Models\ManualAppointment;
@@ -29,23 +28,26 @@ class MyPerformanceController extends Controller
         }
 
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        $clinic = $this->getSelectedClinic();
-        $clinicId = $this->getSelectedClinicId();
+        $medicalCenter = $this->getSelectedMedicalCenter();
+        $medicalCenterId = $this->getSelectedMedicalCenterId();
 
         $doctor = Doctor::with([
-            'clinics',
+            'medicalCenters',
             'messengers',
             'reviews',
-            'appointments' => function ($query) use ($clinicId) {
-                $query->when($clinicId, function ($q) use ($clinicId) {
-                    $q->where('clinic_id', $clinicId);
+            'appointments' => function ($query) use ($medicalCenterId) {
+                $query->when($medicalCenterId, function ($q) use ($medicalCenterId) {
+                    $q->where('medical_center_id', $medicalCenterId);
                 })
                 ->whereDate('appointment_date', now()->toDateString());
             }
         ])->find($doctorId);
 
-        $clinics = Clinic::where('doctor_id', $doctorId)->get();
-        return view('dr.panel.my-performance.index', compact('clinics', 'clinic', 'clinicId'));
+        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->get();
+        
+        return view('dr.panel.my-performance.index', compact('medicalCenters', 'medicalCenter', 'medicalCenterId'));
     }
 
     /**
@@ -245,40 +247,40 @@ class MyPerformanceController extends Controller
      */
     public function chart()
     {
-        $clinics = Clinic::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->get();
-        return view('dr.panel.my-performance.chart.index', compact('clinics'));
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->get();
+        return view('dr.panel.my-performance.chart.index', compact('medicalCenters'));
     }
 
     public function getChartData(Request $request)
     {
-        $clinicId =
-$this->getSelectedClinicId()
- ?? 'default';
-
+        $medicalCenterId = $this->getSelectedMedicalCenterId() ?? 'default';
 
         // Convert empty string, null, or 'null' to 'default'
-        if (empty($clinicId) || $clinicId === 'null') {
-            $clinicId = 'default';
+        if (empty($medicalCenterId) || $medicalCenterId === 'null') {
+            $medicalCenterId = 'default';
         }
 
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
-        // Validate clinic_id
-        if ($clinicId !== 'default' && !is_numeric($clinicId)) {
-            return response()->json(['error' => 'مقدار clinic_id نامعتبر است'], 400);
+        // Validate medical_center_id
+        if ($medicalCenterId !== 'default' && !is_numeric($medicalCenterId)) {
+            return response()->json(['error' => 'مقدار medical_center_id نامعتبر است'], 400);
         }
 
-        $clinicCondition = function ($query) use ($clinicId) {
-            if ($clinicId === 'default') {
-                $query->whereNull('clinic_id');
+        $medicalCenterCondition = function ($query) use ($medicalCenterId) {
+            if ($medicalCenterId === 'default') {
+                $query->whereNull('medical_center_id');
             } else {
-                $query->whereNotNull('clinic_id')->where('clinic_id', $clinicId);
+                $query->whereNotNull('medical_center_id')->where('medical_center_id', $medicalCenterId);
             }
         };
 
         // 1. نوبت‌های معمولی (appointments) - هفتگی
         $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition);
+            ->where($medicalCenterCondition);
 
         $appointments = $appointmentsQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
@@ -292,7 +294,7 @@ $this->getSelectedClinicId()
 
         // 2. درآمد ماهانه (بدون تغییر)
         $monthlyIncomeQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition);
+            ->where($medicalCenterCondition);
 
         $monthlyIncome = $monthlyIncomeQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -304,7 +306,7 @@ $this->getSelectedClinicId()
 
         // 3. بیماران جدید - هفتگی
         $newPatientsQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
+            ->where($medicalCenterCondition)
             ->where('patientable_type', 'App\\Models\\User')
             ->join('users', 'appointments.patientable_id', '=', 'users.id');
 
@@ -317,7 +319,7 @@ $this->getSelectedClinicId()
 
         // 4. نوبت‌های مشاوره - هفتگی
         $counselingQuery = CounselingAppointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition);
+            ->where($medicalCenterCondition);
 
         $counselingAppointments = $counselingQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
@@ -331,7 +333,7 @@ $this->getSelectedClinicId()
 
         // 5. نوبت‌های دستی - هفتگی
         $manualQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
+            ->where($medicalCenterCondition)
             ->where('appointment_type', 'manual');
 
         $manualAppointments = $manualQuery
@@ -344,7 +346,7 @@ $this->getSelectedClinicId()
 
         // 6. درآمد کلی (بدون تغییر)
         $totalIncomeQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition)
+            ->where($medicalCenterCondition)
             ->where('payment_status', 'paid')
             ->where('status', 'attended');
 
@@ -354,7 +356,7 @@ $this->getSelectedClinicId()
             ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
             ->union(
                 CounselingAppointment::where('doctor_id', $doctorId)
-                    ->where($clinicCondition)
+                    ->where($medicalCenterCondition)
                     ->where('payment_status', 'paid')
                     ->where('status', 'attended')
                     ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
@@ -373,7 +375,7 @@ $this->getSelectedClinicId()
 
         // 7. انواع نوبت‌ها - هفتگی
         $appointmentTypesQuery = Appointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition);
+            ->where($medicalCenterCondition);
 
         $appointmentTypes = $appointmentTypesQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
@@ -386,7 +388,7 @@ $this->getSelectedClinicId()
 
         // اضافه کردن داده‌های مشاوره به انواع نوبت‌ها
         $counselingTypesQuery = CounselingAppointment::where('doctor_id', $doctorId)
-            ->where($clinicCondition);
+            ->where($medicalCenterCondition);
 
         $counselingTypes = $counselingTypesQuery
             ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,

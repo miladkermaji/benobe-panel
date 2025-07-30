@@ -28,8 +28,8 @@ class DoctorProfileController extends Controller
              'specialty' => fn ($q) => $q->select('id', 'name'),
              'province'  => fn ($q) => $q->select('id', 'name'),
              'city'      => fn ($q) => $q->select('id', 'name'),
-             'clinics'   => fn ($q) => $q->where('is_active', true)
-              ->select('id', 'doctor_id', 'name', 'address', 'province_id', 'city_id', 'phone_number', 'is_main_clinic'),
+             'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'policlinic')
+              ->select('id', 'doctor_id', 'name', 'address', 'province_id', 'city_id', 'phone_number', 'is_main_center'),
              'reviews'   => fn ($q) => $q->where('is_approved', true)
               ->with(['reviewable' => fn ($q) => $q->select('id', 'first_name', 'last_name')])
               ->orderBy('created_at', 'desc')
@@ -87,7 +87,7 @@ class DoctorProfileController extends Controller
             $appointments = $this->getAppointments($doctor);
 
             // آدرس و تلفن تماس
-            $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+            $mainClinic = $doctor->medicalCenters->where('is_main_center', true)->first() ?? $doctor->medicalCenters->first();
             $addressData = [
              'address'      => $mainClinic ? $mainClinic->address : 'آدرس ی ثبت نشده',
              'phone_number' => $mainClinic ? $mainClinic->phone_number : 'نامشخص',
@@ -152,7 +152,7 @@ class DoctorProfileController extends Controller
     private function getAppointments($doctor)
     {
         $today = Carbon::today('Asia/Tehran');
-        $mainClinic = $doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first();
+        $mainClinic = $doctor->medicalCenters->where('is_main_center', true)->first() ?? $doctor->medicalCenters->first();
 
         // نوبت حضوری
         $inPersonSlotData = $this->getNextAvailableSlot($doctor, $mainClinic ? $mainClinic->id : null);
@@ -330,7 +330,7 @@ class DoctorProfileController extends Controller
         }
 
         $bookedAppointments = Appointment::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where('medical_center_id', $clinicId)
             ->where(function ($query) {
                 $query->where('status', 'scheduled')
                       ->orWhere('status', 'pending_review');

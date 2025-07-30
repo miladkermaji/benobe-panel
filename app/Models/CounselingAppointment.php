@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\User;
-use App\Models\Clinic;
 use App\Models\Doctor;
 use App\Models\Insurance;
 use Morilog\Jalali\Jalalian;
@@ -23,7 +22,7 @@ class CounselingAppointment extends Model
           'doctor_id',
           'patient_id',
           'insurance_id',
-          'clinic_id',
+          'medical_center_id',
           'actual_call_duration',
           'consultation_type',
           'priority',
@@ -56,19 +55,22 @@ class CounselingAppointment extends Model
         'appointment_time' => 'datetime:H:i:s', // تبدیل به Carbon برای زمان
         'reserved_at' => 'datetime', // اضافه کردن cast برای reserved_at
     ];
+
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
     }
+
     public function specialty()
     {
         return $this->belongsTo(Specialty::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
+
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id');
@@ -78,10 +80,12 @@ class CounselingAppointment extends Model
     {
         return $this->belongsTo(Insurance::class);
     }
+
     public function pattern()
     {
         return $this->belongsTo(AppointmentPattern::class);
     }
+
     public function getJalaliAppointmentDateAttribute()
     {
         return Jalalian::fromCarbon($this->appointment_date)->format('Y/m/d');
@@ -90,15 +94,12 @@ class CounselingAppointment extends Model
     // Accessor برای وضعیت پرداخت (اگر وجود داشته باشه)
     public function getPaymentStatusLabelAttribute()
     {
-        switch ($this->payment_status) {
-            case 'paid':
-                return 'پرداخت شده';
-            case 'unpaid':
-                return 'پرداخت نشده';
-            case 'pending':
-                return 'در انتظار پرداخت';
-            default:
-                return 'نامشخص';
-        }
+        return match($this->payment_status) {
+            'pending' => 'در انتظار پرداخت',
+            'paid' => 'پرداخت شده',
+            'unpaid' => 'پرداخت نشده',
+            'failed' => 'ناموفق',
+            default => 'نامشخص'
+        };
     }
 }

@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\ClinicDepositSettings;
 use Livewire\Component;
 use App\Models\ClinicDepositSetting;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
@@ -13,7 +13,7 @@ class ClinicDepositSettingsCreate extends Component
 {
     public $form = [
         'doctor_id' => '',
-        'clinic_id' => '',
+        'medical_center_id' => '',
         'deposit_amount' => '',
         'no_deposit' => false,
         'notes' => '',
@@ -29,8 +29,10 @@ class ClinicDepositSettingsCreate extends Component
 
     public function updatedFormDoctorId($value)
     {
-        $this->clinics = Clinic::where('doctor_id', $value)->get();
-        $this->form['clinic_id'] = '';
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'policlinic')->get();
+        $this->form['medical_center_id'] = '';
 
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {
             return ['id' => $clinic->id, 'text' => $clinic->name];
@@ -51,14 +53,14 @@ class ClinicDepositSettingsCreate extends Component
         try {
             $validator = Validator::make($this->form, [
                 'doctor_id' => 'required|exists:doctors,id',
-                'clinic_id' => 'nullable|exists:clinics,id',
+                'medical_center_id' => 'nullable|exists:medical_centers,id',
                 'deposit_amount' => 'required|numeric|min:0',
                 'no_deposit' => 'boolean',
                 'notes' => 'nullable|string|max:500',
             ], [
                 'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
                 'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-                'clinic_id.exists' => 'مطب انتخاب‌شده معتبر نیست.',
+                'medical_center_id.exists' => 'مطب انتخاب‌شده معتبر نیست.',
                 'deposit_amount.required' => 'مبلغ بیعانه الزامی است.',
                 'deposit_amount.numeric' => 'مبلغ بیعانه باید عددی باشد.',
                 'deposit_amount.min' => 'مبلغ بیعانه نمی‌تواند منفی باشد.',
@@ -73,7 +75,7 @@ class ClinicDepositSettingsCreate extends Component
             }
 
             $data = $this->form;
-            $data['clinic_id'] = $data['clinic_id'] === '' ? null : $data['clinic_id'];
+            $data['medical_center_id'] = $data['medical_center_id'] === '' ? null : $data['medical_center_id'];
             unset($data['no_deposit']);
 
             ClinicDepositSetting::create($data);

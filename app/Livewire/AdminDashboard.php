@@ -73,10 +73,10 @@ class AdminDashboard extends Component
             ->pluck('count', 'day')
             ->toArray();
 
-        $this->clinicActivity = Appointment::selectRaw('clinic_id, COUNT(*) as count')
+        $this->clinicActivity = Appointment::selectRaw('medical_center_id, COUNT(*) as count')
             ->whereNull('appointments.deleted_at')
-            ->groupBy('clinic_id')
-            ->pluck('count', 'clinic_id')
+            ->groupBy('medical_center_id')
+            ->pluck('count', 'medical_center_id')
             ->toArray();
 
         $this->clinicActivityLabels = collect(array_keys($this->clinicActivity))

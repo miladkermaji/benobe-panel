@@ -14,7 +14,7 @@ return new class () extends Migration {
             $table->id();
             $table->unsignedBigInteger('user_id')->nullable(); // کاربر مسدود شده
             $table->unsignedBigInteger('doctor_id')->nullable(); // دکتری که کاربر نزد او مسدود شده است
-            $table->unsignedBigInteger('clinic_id')->nullable(); // دکتری که کاربر نزد او مسدود شده است
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // مرکز درمانی که کاربر نزد آن مسدود شده است
 
             $table->unsignedBigInteger('manager_id')->nullable(); // مدیری که کاربر رو مسدود کرده
 
@@ -32,7 +32,7 @@ return new class () extends Migration {
             $table->foreign('manager_id')->references('id')->on('managers')->onDelete('set null');
 
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
         });
 
     }

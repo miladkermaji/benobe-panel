@@ -6,10 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class DoctorNote extends Model
 {
-    protected $table = 'doctor_notes';
-
     protected $fillable = [
-        'doctor_id', 'clinic_id', 'appointment_type', 'notes', 'status'
+        'doctor_id',
+        'medical_center_id',
+        'appointment_type',
+        'notes',
+        'status',
     ];
 
     public function doctor()
@@ -17,8 +19,8 @@ class DoctorNote extends Model
         return $this->belongsTo(Doctor::class);
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 class DoctorNoteEdit extends Component
 {
     public $doctorNote;
-    public $clinic_id;
+    public $medical_center_id;
     public $appointment_type;
     public $notes;
     public $clinics;
@@ -19,7 +19,7 @@ class DoctorNoteEdit extends Component
     public function mount($id)
     {
         $this->doctorNote = DoctorNote::findOrFail($id);
-        $this->clinic_id = $this->doctorNote->clinic_id;
+        $this->medical_center_id = $this->doctorNote->medical_center_id;
         $this->appointment_type = $this->doctorNote->appointment_type;
         $this->notes = $this->doctorNote->notes;
 
@@ -34,15 +34,15 @@ class DoctorNoteEdit extends Component
     public function update()
     {
         $validator = Validator::make([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ], [
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
             'notes' => 'nullable|string|max:1000',
         ], [
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'appointment_type.required' => 'نوع نوبت الزامی است.',
             'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی ویدیویی یا متنی باشد.',
             'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
@@ -54,7 +54,7 @@ class DoctorNoteEdit extends Component
         }
 
         $this->doctorNote->update([
-            'clinic_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ]);

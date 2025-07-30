@@ -886,10 +886,12 @@
         });
 
         function initializeDropdowns() {
-          const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-          dropdownElementList.map(function(dropdownToggleEl) {
-            return new bootstrap.Dropdown(dropdownToggleEl);
-          });
+          if (typeof bootstrap !== 'undefined') {
+            const dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            dropdownElementList.map(function(dropdownToggleEl) {
+              return new bootstrap.Dropdown(dropdownToggleEl);
+            });
+          }
         }
 
         document.addEventListener('DOMContentLoaded', initializeDropdowns);
@@ -1084,7 +1086,11 @@
             }
 
             @this.set('selectedMobiles', mobiles);
-            window.open-modal('block-user-modal');
+            window.dispatchEvent(new CustomEvent('open-modal', {
+              detail: {
+                name: 'block-user-modal'
+              }
+            }));
           });
         } else {
           console.warn('دکمه مسدود کردن کاربران پیدا نشد');

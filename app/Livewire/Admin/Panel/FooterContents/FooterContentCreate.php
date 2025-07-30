@@ -19,7 +19,7 @@ class FooterContentCreate extends Component
     public $icon;
     public $image;
     public $order = 0;
-    public $is_active = true;
+    public $is_active = false;
 
     public function store()
     {

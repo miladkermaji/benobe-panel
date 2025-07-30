@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Dr\Panel\DoctorServices;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Service;
 use App\Models\Insurance;
 use Livewire\Component;
@@ -38,7 +38,7 @@ class DoctorServiceList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-        $this->selectedClinicId = $this->getSelectedClinicId();
+        $this->selectedClinicId = $this->getSelectedMedicalCenterId();
         // باز بودن پیش‌فرض در دسکتاپ
         if ($this->isDesktop()) {
             $this->openServices = Service::whereHas('doctorServices', function ($query) {
@@ -57,10 +57,14 @@ class DoctorServiceList extends Component
 
     public function setSelectedClinicId($clinicId)
     {
-        $this->selectedClinicId = $this->getSelectedClinicId() ?? 'default';
+        $this->selectedClinicId = $this->getSelectedMedicalCenterId() ?? 'default';
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
-            $clinic = Clinic::where('id', $this->selectedClinicId)->where('doctor_id', $doctorId)->first();
+            $clinic = MedicalCenter::where('id', $this->selectedClinicId)
+                ->whereHas('doctors', function ($query) use ($doctorId) {
+                    $query->where('doctor_id', $doctorId);
+                })
+                ->first();
             if (!$clinic) {
                 $this->selectedClinicId = 'default';
             }
@@ -91,7 +95,7 @@ class DoctorServiceList extends Component
             }
             DoctorService::create([
                 'doctor_id' => $doctorId,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $clinicId,
                 'insurance_id' => 72,
                 'service_id' => $visitService->id,
                 'name' => 'ویزیت',
@@ -103,7 +107,7 @@ class DoctorServiceList extends Component
                 'parent_id' => null,
             ]);
         } else {
-           
+
         }
     }
 
@@ -119,7 +123,10 @@ class DoctorServiceList extends Component
         $this->selectedClinicId = $clinicId;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
-            $clinic = Clinic::where('id', $this->selectedClinicId)->where('doctor_id', $doctorId)->first();
+            $clinic = MedicalCenter::where('id', $this->selectedClinicId)
+                ->whereHas('doctors', function ($query) use ($doctorId) {
+                    $query->where('doctor_id', $doctorId);
+                })->first();
             if (!$clinic) {
                 $this->selectedClinicId = 'default';
             }
@@ -141,9 +148,9 @@ class DoctorServiceList extends Component
                   })
                   ->with('insurance');
             if ($this->selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             } else {
-                $query->where('clinic_id', $this->selectedClinicId);
+                $query->where('medical_center_id', $this->selectedClinicId);
             }
         }])
         ->whereHas('doctorServices', function ($query) use ($doctorId) {
@@ -153,15 +160,15 @@ class DoctorServiceList extends Component
                         ->orWhere('description', 'like', '%' . $this->search . '%');
                   });
             if ($this->selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             } else {
-                $query->where('clinic_id', $this->selectedClinicId);
+                $query->where('medical_center_id', $this->selectedClinicId);
             }
         })
         ->where('status', true);
 
         $paginated = $query->paginate($this->perPage);
-  
+
 
         $paginated->getCollection()->each(function ($service) {
             $service->isOpen = in_array($service->id, $this->openServices);

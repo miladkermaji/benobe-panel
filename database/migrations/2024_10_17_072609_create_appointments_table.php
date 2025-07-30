@@ -10,9 +10,10 @@ return new class () extends Migration {
         Schema::create('appointments', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id');
-            $table->unsignedBigInteger('patient_id')->nullable();
+            $table->unsignedBigInteger('patientable_id')->nullable();
+            $table->string('patientable_type')->nullable();
             $table->unsignedBigInteger('insurance_id')->nullable();
-            $table->unsignedBigInteger('clinic_id')->nullable();
+            $table->unsignedBigInteger('medical_center_id')->nullable();
             // فیلدهای جدید
             $table->enum('consultation_type', ['general', 'specialized', 'emergency'])->nullable();
             $table->enum('priority', ['low', 'medium', 'high'])->default('medium');
@@ -49,16 +50,16 @@ return new class () extends Migration {
             $table->softDeletes();
 
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('patient_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('insurance_id')->references('id')->on('insurances')->onDelete('set null');
-            $table->foreign('clinic_id')
+            $table->foreign('medical_center_id')
                 ->references('id')
-                ->on('clinics')
+                ->on('medical_centers')
                 ->onDelete('set null');
 
             $table->index(['doctor_id', 'appointment_date'], 'idx_doctor_date');
-            $table->index(['doctor_id', 'clinic_id'], 'idx_doctor_clinic');
+            $table->index(['doctor_id', 'medical_center_id'], 'idx_doctor_medical_center');
             $table->index(['doctor_id', 'status'], 'idx_doctor_status');
+            $table->index(['patientable_id', 'patientable_type']);
 
         });
     }

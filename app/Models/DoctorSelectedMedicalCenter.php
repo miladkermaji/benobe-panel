@@ -4,13 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DoctorSelectedClinic extends Model
+class DoctorSelectedMedicalCenter extends Model
 {
-    protected $table = 'doctor_selected_clinics';
+    protected $table = 'doctor_selected_medical_centers';
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
     ];
 
     public function doctor()
@@ -18,8 +18,8 @@ class DoctorSelectedClinic extends Model
         return $this->belongsTo(Doctor::class, 'doctor_id');
     }
 
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

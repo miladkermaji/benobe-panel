@@ -4,14 +4,14 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     public function up(): void
     {
         Schema::create('order_visits', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('doctor_id');
-            $table->unsignedBigInteger('clinic_id')->nullable(); // کلینیک (nullable)
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // مرکز درمانی (nullable)
             $table->string('mobile', 11)->index();
             $table->timestamp('payment_date')->nullable();
             $table->string('bank_ref_id')->nullable()->index();
@@ -27,7 +27,7 @@ return new class extends Migration {
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('set null');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('set null');
         });
     }
 

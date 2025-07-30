@@ -1,6 +1,6 @@
 @php
-use Morilog\Jalali\Jalalian;
-use Illuminate\Support\Carbon;
+  use Morilog\Jalali\Jalalian;
+  use Illuminate\Support\Carbon;
 @endphp
 
 <div class="container" dir="rtl" wire:init="loadReports">
@@ -185,10 +185,10 @@ use Illuminate\Support\Carbon;
                 <td>{{ $transactions->firstItem() + $index }}</td>
                 <td>{{ Jalalian::fromCarbon(Carbon::parse($transaction['date']))->format('Y/m/d H:i') }}</td>
                 <td>
-                  @if ($transaction['clinic_id'])
-                    {{ \App\Models\Clinic::find($transaction['clinic_id']) ? \App\Models\Clinic::find($transaction['clinic_id'])->name : 'بدون کلینیک' }}
+                  @if ($transaction['medical_center_id'])
+                    {{ \App\Models\MedicalCenter::find($transaction['medical_center_id']) ? \App\Models\MedicalCenter::find($transaction['medical_center_id'])->name : 'بدون مرکز درمانی' }}
                   @else
-                    بدون کلینیک
+                    بدون مرکز درمانی
                   @endif
                 </td>
                 <td>{{ $this->formatTransactionType($transaction['transaction_type']) }}</td>
@@ -220,7 +220,8 @@ use Illuminate\Support\Carbon;
             <tr class="total-row">
               <td colspan="5" class="total-label fw-bolder fs-5">جمع کل</td>
               <td class="fw-bolder fs-5">{{ number_format($totalAmount) }}</td>
-              <td colspan="4" class="total-label fw-bolder fs-5">جمع امروز: {{ number_format($todayAmount) }} تومان</td>
+              <td colspan="4" class="total-label fw-bolder fs-5">جمع امروز: {{ number_format($todayAmount) }}
+                تومان</td>
             </tr>
           @endif
         </tfoot>
@@ -233,22 +234,24 @@ use Illuminate\Support\Carbon;
             <div class="transaction-card" data-index="{{ $index }}">
               <div class="transaction-card-header">
                 <span class="transaction-index">{{ $transactions->firstItem() + $index }}</span>
-                <span class="transaction-date">{{ Jalalian::fromCarbon(Carbon::parse($transaction['date']))->format('Y/m/d H:i') }}</span>
+                <span
+                  class="transaction-date">{{ Jalalian::fromCarbon(Carbon::parse($transaction['date']))->format('Y/m/d H:i') }}</span>
               </div>
               <div class="transaction-card-body">
                 <div class="transaction-item">
                   <span class="transaction-label">کلینیک:</span>
                   <span class="transaction-value">
-                    @if ($transaction['clinic_id'])
-                      {{ \App\Models\Clinic::find($transaction['clinic_id']) ? \App\Models\Clinic::find($transaction['clinic_id'])->name : 'بدون کلینیک' }}
+                    @if ($transaction['medical_center_id'])
+                      {{ \App\Models\MedicalCenter::find($transaction['medical_center_id']) ? \App\Models\MedicalCenter::find($transaction['medical_center_id'])->name : 'بدون مرکز درمانی' }}
                     @else
-                      بدون کلینیک
+                      بدون مرکز درمانی
                     @endif
                   </span>
                 </div>
                 <div class="transaction-item">
                   <span class="transaction-label">نوع:</span>
-                  <span class="transaction-value">{{ $this->formatTransactionType($transaction['transaction_type']) }}</span>
+                  <span
+                    class="transaction-value">{{ $this->formatTransactionType($transaction['transaction_type']) }}</span>
                 </div>
                 <div class="transaction-item">
                   <span class="transaction-label">وضعیت:</span>
@@ -260,7 +263,8 @@ use Illuminate\Support\Carbon;
                 </div>
                 <div class="transaction-item">
                   <span class="transaction-label">روش پرداخت:</span>
-                  <span class="transaction-value">{{ $this->formatPaymentMethod($transaction['payment_method']) }}</span>
+                  <span
+                    class="transaction-value">{{ $this->formatPaymentMethod($transaction['payment_method']) }}</span>
                 </div>
                 <div class="transaction-item">
                   <span class="transaction-label">بیمه:</span>
@@ -323,31 +327,31 @@ use Illuminate\Support\Carbon;
 
   <!-- JavaScript Scripts -->
   <script>
-  function toggleFilters() {
-        const filtersBody = document.getElementById('filters-body');
-        filtersBody.classList.toggle('active');
-      }
+    function toggleFilters() {
+      const filtersBody = document.getElementById('filters-body');
+      filtersBody.classList.toggle('active');
+    }
 
-      function showMore() {
-        const cards = document.querySelectorAll('.transaction-card');
-        cards.forEach(card => card.style.display = 'block');
-        document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'none';
-        document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'inline-flex';
-      }
+    function showMore() {
+      const cards = document.querySelectorAll('.transaction-card');
+      cards.forEach(card => card.style.display = 'block');
+      document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'none';
+      document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'inline-flex';
+    }
 
-      function showLess() {
-        const cards = document.querySelectorAll('.transaction-card');
-        cards.forEach((card, index) => {
-          if (index >= 2) card.style.display = 'none';
-        });
-        document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'inline-flex';
-        document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'none';
-      }
-
-      // Initially hide cards beyond the first two
+    function showLess() {
       const cards = document.querySelectorAll('.transaction-card');
       cards.forEach((card, index) => {
         if (index >= 2) card.style.display = 'none';
       });
+      document.querySelector('.btn-toggle[onclick="showMore()"]').style.display = 'inline-flex';
+      document.querySelector('.btn-toggle[onclick="showLess()"]').style.display = 'none';
+    }
+
+    // Initially hide cards beyond the first two
+    const cards = document.querySelectorAll('.transaction-card');
+    cards.forEach((card, index) => {
+      if (index >= 2) card.style.display = 'none';
+    });
   </script>
 </div>

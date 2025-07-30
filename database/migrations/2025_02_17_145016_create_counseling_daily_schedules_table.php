@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('counseling_daily_schedules', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id'); // ارتباط با پزشک
-            $table->unsignedBigInteger('clinic_id')->nullable(); // ارتباط با کلینیک
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // ارتباط با مرکز درمانی
             $table->date('date'); // تاریخ روز خاص
             $table->json('consultation_hours'); // ساعات مشاوره به‌صورت JSON
 
@@ -25,7 +25,7 @@ return new class () extends Migration {
 
             // کلید خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('clinics')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
         });
     }
 

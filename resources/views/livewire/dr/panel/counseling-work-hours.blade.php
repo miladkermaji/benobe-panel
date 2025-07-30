@@ -206,8 +206,7 @@
                                 </div>
                                 <div class="d-flex align-items-center">
                                   <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
-                                    <button type="button"
-                                      class="btn text-black btn-sm btn-light  schedule-btn"
+                                    <button type="button" class="btn text-black btn-sm btn-light  schedule-btn"
                                       data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -283,8 +282,7 @@
                               </div>
                               <div class="d-flex align-items-center">
                                 <x-custom-tooltip title="زمانبندی باز شدن نوبت ها" placement="top">
-                                  <button type="button"
-                                    class="btn text-black btn-sm btn-light schedule-btn"
+                                  <button type="button" class="btn text-black btn-sm btn-light schedule-btn"
                                     data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
@@ -372,7 +370,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h6 class="modal-title fw-bold" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
+          <h6 class="modal-title fw-bold text-dark" id="emergencyModalLabel">انتخاب زمان‌های اورژانسی</h6>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -400,7 +398,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h5 class="modal-title fw-bold" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
+          <h5 class="modal-title fw-bold text-dark" id="scheduleModalLabel">تنظیم زمان‌بندی</h5>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">×</span>
           </button>
@@ -523,7 +521,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content rounded-2" id="calculate-modal">
         <div class="modal-header rounded-2">
-          <h6 class="modal-title fw-bold" id="CalculatorModalLabel">انتخاب تعداد نوبت یا زمان ویزیت:</h6>
+          <h6 class="modal-title fw-bold text-dark" id="CalculatorModalLabel">انتخاب تعداد نوبت یا زمان ویزیت:</h6>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -575,7 +573,7 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-radius-6">
-          <h5 class="modal-title fw-bold" id="checkboxModalLabel">کپی برنامه کاری</h5>
+          <h5 class="modal-title fw-bold text-dark" id="checkboxModalLabel">کپی برنامه کاری</h5>
           <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
             <span aria-hidden="true">×</span>
           </button>

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Log;
@@ -20,17 +20,18 @@ class ActivationWorkhoursController extends Controller
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $hasCollaboration = DoctorAppointmentConfig::where('doctor_id', $doctorId)
-            ->where('clinic_id', $clinicId)
+            ->where('medical_center_id', $clinicId)
             ->where('collaboration_with_other_sites', true)
             ->exists();
 
         return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'hasCollaboration']));
     }
+
     public function store(Request $request)
     {
         $request->validate([
             'doctor_id'          => 'required|exists:doctors,id',
-            'clinic_id'          => 'required|exists:clinics,id',
+            'medical_center_id'          => 'required|exists:medical_centers,id',
             'day'                => 'required|array|min:1',
             'day.*'              => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
             'work_hours'         => 'required|array|min:1',
@@ -38,8 +39,8 @@ class ActivationWorkhoursController extends Controller
             'work_hours.*.end'   => ['required', 'date_format:H:i', 'after:work_hours.*.start'],
         ]);
 
-        $appointmentDuration = DoctorAppointmentConfig::where('clinic_id', $request->clinic_id)->first()->appointment_duration;
-        Log::info("Appointment Duration for clinic_id {$request->clinic_id}: {$appointmentDuration}");
+        $appointmentDuration = DoctorAppointmentConfig::where('medical_center_id', $request->medical_center_id)->first()->appointment_duration;
+        Log::info("Appointment Duration for medical_center_id {$request->medical_center_id}: {$appointmentDuration}");
 
         $dayTranslations = [
             'saturday'  => 'شنبه',
@@ -54,7 +55,7 @@ class ActivationWorkhoursController extends Controller
         foreach ($request->day as $day) {
             $schedule = DoctorWorkSchedule::firstOrNew([
                 'doctor_id' => $request->doctor_id,
-                'clinic_id' => $request->clinic_id,
+                'medical_center_id' => $request->medical_center_id,
                 'day'       => $day,
             ]);
 
@@ -114,22 +115,23 @@ class ActivationWorkhoursController extends Controller
 
     public function getWorkHours($clinicId, $doctorId)
     {
-        $schedules = DoctorWorkSchedule::where('clinic_id', $clinicId)
+        $schedules = DoctorWorkSchedule::where('medical_center_id', $clinicId)
             ->where('doctor_id', $doctorId)
             ->get(['day', 'work_hours']);
 
         return response()->json($schedules);
     }
+
     public function startAppointment(Request $request)
     {
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'medical_center_id' => 'required|exists:medical_centers,id',
         ]);
 
         // بررسی اینکه آیا ساعت کاری تعریف شده است
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $request->doctor_id)
-            ->where('clinic_id', $request->clinic_id)
+            ->where('medical_center_id', $request->medical_center_id)
             ->whereNotNull('work_hours')
             ->first();
 
@@ -138,7 +140,7 @@ class ActivationWorkhoursController extends Controller
         }
 
         // تغییر فیلد is_active به 1
-        $clinic = Clinic::findOrFail($request->clinic_id);
+        $clinic = MedicalCenter::findOrFail($request->medical_center_id);
         $clinic->is_active = 1;
         $clinic->save();
 
@@ -149,7 +151,7 @@ class ActivationWorkhoursController extends Controller
     {
         $request->validate([
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'medical_center_id' => 'required|exists:medical_centers,id',
             'days'      => 'required|array|min:1',
             'days.*'    => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
             'start'     => ['required', 'date_format:H:i'],
@@ -158,7 +160,7 @@ class ActivationWorkhoursController extends Controller
 
         foreach ($request->days as $day) {
             $schedule = DoctorWorkSchedule::where('doctor_id', $request->doctor_id)
-                ->where('clinic_id', $request->clinic_id)
+                ->where('medical_center_id', $request->medical_center_id)
                 ->where('day', $day)
                 ->first();
 
@@ -179,5 +181,4 @@ class ActivationWorkhoursController extends Controller
 
         return response()->json(['success' => true, 'message' => 'ساعات کاری با موفقیت حذف شد.']);
     }
-
 }

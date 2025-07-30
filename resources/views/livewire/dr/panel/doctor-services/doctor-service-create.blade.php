@@ -58,13 +58,13 @@
             </div>
             <!-- کلینیک -->
             <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.debounce.500ms="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.debounce.500ms="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="" selected>انتخاب کلینیک</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک</label>
+              <label for="medical_center_id" class="form-label">مرکز درمانی</label>
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
@@ -176,7 +176,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#selected_service, #clinic_id, [id^="insurance_id_"]').each(function() {
+        $('#selected_service, #medical_center_id, [id^="insurance_id_"]').each(function() {
           if ($(this).hasClass('select2-hidden-accessible')) {
             $(this).select2('destroy');
           }
@@ -189,9 +189,9 @@
           dropdownAutoWidth: true,
           minimumResultsForSearch: 5
         });
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
-          placeholder: 'انتخاب کلینیک',
+          placeholder: 'انتخاب مرکز درمانی',
           allowClear: true,
           width: '100%',
           dropdownAutoWidth: true,
@@ -208,9 +208,9 @@
           });
         });
         const selectedService = @json($selected_service);
-        const clinicId = @json($clinic_id);
+        const clinicId = @json($medical_center_id);
         $('#selected_service').val(selectedService || '').trigger('change');
-        $('#clinic_id').val(clinicId || '').trigger('change');
+        $('#medical_center_id').val(clinicId || '').trigger('change');
         @foreach ($pricing as $index => $price)
           $('#insurance_id_{{ $index }}').val(@json($price['insurance_id']) || '').trigger('change');
         @endforeach
@@ -223,12 +223,12 @@
       $('#selected_service').on('select2:clear', function() {
         @this.set('selected_service', null);
       });
-      $('#clinic_id').on('select2:select', function(e) {
+      $('#medical_center_id').on('select2:select', function(e) {
         const value = e.target.value === '' ? null : e.target.value;
-        @this.set('clinic_id', value);
+        @this.set('medical_center_id', value);
       });
-      $('#clinic_id').on('select2:clear', function() {
-        @this.set('clinic_id', null);
+      $('#medical_center_id').on('select2:clear', function() {
+        @this.set('medical_center_id', null);
       });
       $(document).on('select2:select', '[id^="insurance_id_"]', function(e) {
         const index = $(this).attr('id').replace('insurance_id_', '');
@@ -243,7 +243,7 @@
         clinicId
       }) => {
         if (clinicId) {
-          $('#clinic_id').val(clinicId).trigger('change');
+          $('#medical_center_id').val(clinicId).trigger('change');
         }
       });
       Livewire.on('show-alert', (event) => {
@@ -269,10 +269,10 @@
       });
       document.addEventListener('livewire:updated', function() {
         const currentService = $('#selected_service').val();
-        const currentClinic = $('#clinic_id').val();
+        const currentClinic = $('#medical_center_id').val();
         initializeSelect2();
         $('#selected_service').val(currentService).trigger('change');
-        $('#clinic_id').val(currentClinic).trigger('change');
+        $('#medical_center_id').val(currentClinic).trigger('change');
       });
     });
   </script>

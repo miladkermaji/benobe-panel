@@ -4,8 +4,9 @@ namespace App\Livewire\Dr\Panel\Layouts\Partials;
 
 use Livewire\Component;
 use App\Models\DoctorWallet;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use App\Models\NotificationRecipient;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -14,25 +15,24 @@ class HeaderComponent extends Component
     public $walletBalance = 0;
     public $notifications;
     public $unreadCount = 0;
-    public $selectedClinicId = null;
-    public $selectedClinicName = 'مشاوره آنلاین به نوبه';
-    public $clinics = [];
+    public $selectedMedicalCenterId = null;
+    public $selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+    public $medicalCenters;
 
     public function mount()
     {
         $this->notifications = new Collection();
+        $this->medicalCenters = new Collection(); // Initialize medicalCenters
 
         if (Auth::guard('doctor')->check()) {
             $doctor = Auth::guard('doctor')->user();
             $doctorId = $doctor->id;
             $doctorMobile = $doctor->mobile;
 
-
-            // بارگذاری کلینیک‌ها
-            $this->loadClinics($doctor);
-
-            // تنظیم کلینیک انتخاب‌شده
-            $this->setSelectedClinicFromDatabase($doctor);
+            // بارگذاری مراکز درمانی
+            $this->loadMedicalCenters($doctor);
+            // تنظیم مرکز درمانی انتخاب‌شده
+            $this->setSelectedMedicalCenterFromDatabase($doctor);
 
             $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
                 ->sum('balance');
@@ -56,11 +56,11 @@ class HeaderComponent extends Component
             $doctorId = $secretary->doctor_id;
             $secretaryMobile = $secretary->mobile;
 
-            // بارگذاری کلینیک‌ها
-            $this->loadClinics($secretary->doctor);
+            // بارگذاری مراکز درمانی
+            $this->loadMedicalCenters($secretary->doctor);
 
-            // تنظیم کلینیک انتخاب‌شده
-            $this->setSelectedClinicFromDatabase($secretary->doctor);
+            // تنظیم مرکز درمانی انتخاب‌شده
+            $this->setSelectedMedicalCenterFromDatabase($secretary->doctor);
 
             if ($doctorId) {
                 $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
@@ -85,71 +85,85 @@ class HeaderComponent extends Component
         $this->unreadCount = $this->notifications->count();
     }
 
-    protected function loadClinics($doctor)
+    protected function loadMedicalCenters($doctor)
     {
         if ($doctor) {
-            $this->clinics = $doctor->clinics()->select('id', 'name', 'is_active', 'province_id', 'city_id')->with(['province', 'city'])->get();
+            $this->medicalCenters = $doctor->medicalCenters()
+                ->select('medical_centers.*')
+                ->where('medical_centers.type', 'policlinic')
+                ->with(['province', 'city'])
+                ->get();
         }
     }
 
-    protected function setSelectedClinicFromDatabase($doctor)
+    protected function setSelectedMedicalCenterFromDatabase($doctor)
     {
         if ($doctor) {
-            // اگر دکتر کلینیک انتخاب‌شده‌ای دارد، از آن استفاده کن
-            if ($doctor->selectedClinic) {
-                $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
-                $this->selectedClinicName = $this->selectedClinicId
-                    ? $doctor->selectedClinic->clinic->name
-                    : 'مشاوره آنلاین به نوبه';
+            // اگر دکتر مرکز درمانی انتخاب‌شده‌ای دارد، از آن استفاده کن
+            if ($doctor->selectedMedicalCenter) {
+                if ($doctor->selectedMedicalCenter->medical_center_id) {
+                    $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
+                    $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+                } else {
+                    // مشاوره آنلاین انتخاب شده
+                    $this->selectedMedicalCenterId = null;
+                    $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+                }
                 return;
             }
 
-            // اگر کلینیک انتخاب‌شده‌ای ندارد، بررسی کن که آیا کلینیک فعالی دارد یا نه
-            $activeClinics = $this->clinics->where('is_active', true);
+            // اگر رکوردی وجود ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
+            $activeMedicalCenters = $doctor->medicalCenters()
+                ->where('medical_centers.type', 'policlinic')
+                ->get();
 
-            if ($activeClinics->count() > 0) {
-                // اولین کلینیک فعال را انتخاب کن
-                $firstActiveClinic = $activeClinics->first();
-                // کلینیک انتخاب‌شده را در دیتابیس ذخیره کن
-                $doctor->setSelectedClinic($firstActiveClinic->id);
+            if ($activeMedicalCenters->count() > 0) {
+                // اولین مرکز درمانی فعال را انتخاب کن
+                $firstActiveMedicalCenter = $activeMedicalCenters->first();
+                // مرکز درمانی انتخاب‌شده را در دیتابیس ذخیره کن
+                $doctor->setSelectedMedicalCenter($firstActiveMedicalCenter->id);
                 $doctor->refresh();
-                $this->selectedClinicId = $doctor->selectedClinic->clinic_id;
-                $this->selectedClinicName = $doctor->selectedClinic->clinic->name;
-            } else {
-                // هیچ کلینیک فعالی ندارد، روی مشاوره آنلاین بگذار
-                $this->selectedClinicId = null;
-                $this->selectedClinicName = 'مشاوره آنلاین به نوبه';
 
-                // در دیتابیس هم null ذخیره کن
-                $doctor->setSelectedClinic(null);
+                $this->selectedMedicalCenterId = $firstActiveMedicalCenter->id;
+                $this->selectedMedicalCenterName = $firstActiveMedicalCenter->name;
+            } else {
+                // هیچ مرکز درمانی فعالی ندارد، روی مشاوره آنلاین بگذار
+                $this->selectedMedicalCenterId = null;
+                $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+
+                // در دیتابیس رکورد با medical_center_id = null ایجاد کن
+                $doctor->setSelectedMedicalCenter(null);
             }
         }
     }
 
-    public function selectClinic($clinicId = null)
+    public function selectMedicalCenter($medicalCenterId = null)
     {
         $doctor = Auth::guard('doctor')->check()
             ? Auth::guard('doctor')->user()
             : Auth::guard('secretary')->user()->doctor;
 
         if ($doctor) {
-            // اعتبارسنجی کلینیک
-            if ($clinicId && !$doctor->clinics()->where('id', $clinicId)->exists()) {
-                $this->addError('clinic', 'کلینیک انتخاب‌شده معتبر نیست.');
+            // اعتبارسنجی مرکز درمانی - فقط کلینیک‌ها
+            if ($medicalCenterId && !$doctor->medicalCenters()->where('medical_centers.id', $medicalCenterId)->where('medical_centers.type', 'policlinic')->exists()) {
+                $this->addError('medical_center', 'مرکز درمانی انتخاب‌شده معتبر نیست.');
                 return;
             }
 
-            // ذخیره کلینیک انتخاب‌شده
-            $doctor->setSelectedClinic($clinicId);
+            // ذخیره مرکز درمانی انتخاب‌شده
+            $doctor->setSelectedMedicalCenter($medicalCenterId);
 
             // به‌روزرسانی مقادیر
-            $this->selectedClinicId = $clinicId;
-            $this->selectedClinicName = $clinicId
-                ? $doctor->clinics()->find($clinicId)->name
+            $this->selectedMedicalCenterId = $medicalCenterId;
+            $this->selectedMedicalCenterName = $medicalCenterId
+                ? $doctor->medicalCenters()->where('medical_centers.type', 'policlinic')->find($medicalCenterId)->name
                 : 'مشاوره آنلاین به نوبه';
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها
-            $this->dispatch('clinicSelected', ['clinicId' => $clinicId]);
+            $this->dispatch('medicalCenterSelected', ['medicalCenterId' => $medicalCenterId]);
+
+            // ارسال رویداد برای ریلود صفحه بعد از چند ثانیه
+            $this->dispatch('reloadPageAfterDelay', ['delay' => 3000]); // 3 ثانیه تاخیر
         }
     }
 

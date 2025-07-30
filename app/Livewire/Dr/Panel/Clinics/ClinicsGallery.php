@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Livewire\Dr\Panel\Clinics;
 
 use App\Models\Clinic;
@@ -30,7 +31,7 @@ class ClinicsGallery extends Component
         foreach ($this->images as $index => $image) {
             $path = $image->store('clinic_galleries', 'public');
             ClinicGallery::create([
-                'clinic_id'  => $this->clinic->id,
+                'medical_center_id'  => $this->clinic->id,
                 'image_path' => $path,
                 'caption'    => $this->captions[$index] ?? null,
             ]);

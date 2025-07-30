@@ -25,7 +25,7 @@ class SecretaryList extends Component
     public $showCreate = false;
     public $showEdit = false;
     public $editId = null;
-    public $clinic_id;
+    public $medical_center_id;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -37,7 +37,7 @@ class SecretaryList extends Component
 
     public function mount()
     {
-        $this->clinic_id = $this->getSelectedClinicId();
+        $this->medical_center_id = $this->getSelectedMedicalCenterId();
     }
 
     public function loadSecretaries()
@@ -135,7 +135,7 @@ class SecretaryList extends Component
     public function render()
     {
         $secretaries = Secretary::query()
-            ->where('clinic_id', $this->clinic_id)
+            ->where('medical_center_id', $this->medical_center_id)
             ->when($this->search, fn ($q) => $q->where(function ($q) {
                 $q->where('first_name', 'like', "%{$this->search}%")
                   ->orWhere('last_name', 'like', "%{$this->search}%")

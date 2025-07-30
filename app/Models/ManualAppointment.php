@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\User;
@@ -14,7 +15,7 @@ class ManualAppointment extends Model
     protected $fillable = [
         'user_id',
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'insurance_id',
         'appointment_date',
         'appointment_time',
@@ -36,6 +37,12 @@ class ManualAppointment extends Model
     {
         return $this->belongsTo(Doctor::class);
     }
+
+    public function medicalCenter()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+    }
+
     public function insurance()
     {
         return $this->belongsTo(Insurance::class);

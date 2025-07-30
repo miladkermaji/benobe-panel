@@ -124,12 +124,12 @@ class SpecialWorkhours extends Component
 
             // تلاش برای دریافت از کش
             $cachedSchedule = Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId, $gregorianDate, $dayOfWeek) {
-                Log::info("Fetching work schedule from DB for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+                Log::info("Fetching work schedule from DB for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, medical_center_id: {$this->clinicId}");
 
                 $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                     ->where('date', $gregorianDate)
-                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                     ->first();
 
                 if ($specialSchedule) {
@@ -158,12 +158,12 @@ class SpecialWorkhours extends Component
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $dayOfWeek)
                     ->where('is_working', true)
-                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                     ->first();
 
                 if (!$schedule) {
-                    Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+                    Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, medical_center_id: {$this->clinicId}");
                     return ['status' => false, 'data' => []];
                 }
 
@@ -203,8 +203,8 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                 ->first();
 
             $emergencyTimes = $specialSchedule && $specialSchedule->emergency_times
@@ -277,8 +277,8 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                 ->first();
 
             if ($specialSchedule) {
@@ -295,7 +295,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $parsedDate->toDateString(),
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -346,8 +346,8 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                 ->first();
 
             if (!$specialSchedule) {
@@ -439,7 +439,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -521,7 +521,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -560,7 +560,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -613,8 +613,8 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
-                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->clinicId))
                 ->first();
 
             if (!$specialSchedule) {
@@ -741,7 +741,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),

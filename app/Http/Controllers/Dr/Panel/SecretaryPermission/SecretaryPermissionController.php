@@ -14,7 +14,7 @@ class SecretaryPermissionController extends Controller
     public function index(Request $request)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedClinicId();
+        $medicalCenterId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form');
@@ -25,11 +25,11 @@ class SecretaryPermissionController extends Controller
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->with('permissions')
-            ->when($clinicId !== null, function ($query) use ($clinicId) {
-                $query->where('clinic_id', $clinicId);
+            ->when($medicalCenterId !== null, function ($query) use ($medicalCenterId) {
+                $query->where('medical_center_id', $medicalCenterId);
             })
-            ->when($clinicId === null, function ($query) {
-                $query->whereNull('clinic_id');
+            ->when($medicalCenterId === null, function ($query) {
+                $query->whereNull('medical_center_id');
             })
             ->get();
 
@@ -45,7 +45,7 @@ class SecretaryPermissionController extends Controller
     public function update(Request $request, $secretaryId)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedClinicId();
+        $clinicId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
             return response()->json([
@@ -61,14 +61,14 @@ class SecretaryPermissionController extends Controller
         // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
-        // یافتن دسترسی موجود بر اساس doctor_id, secretary_id و clinic_id
+        // یافتن دسترسی موجود بر اساس doctor_id, secretary_id و medical_center_id
         $permission = SecretaryPermission::where('doctor_id', $doctorId)
             ->where('secretary_id', $secretaryId)
             ->where(function ($query) use ($clinicId) {
                 if ($clinicId) {
-                    $query->where('clinic_id', $clinicId);
+                    $query->where('medical_center_id', $clinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })->first();
 
@@ -82,7 +82,7 @@ class SecretaryPermissionController extends Controller
             SecretaryPermission::create([
                 'doctor_id'    => $doctorId,
                 'secretary_id' => $secretaryId,
-                'clinic_id'    => $clinicId,
+                'medical_center_id'    => $clinicId,
                 'permissions'  => json_encode($request->permissions),
             ]);
         }

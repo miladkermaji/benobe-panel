@@ -191,27 +191,28 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return $this->morphMany(Transaction::class, 'transactable');
     }
-    public function selectedClinic()
+    public function selectedMedicalCenter()
     {
-        return $this->hasOne(DoctorSelectedClinic::class, 'doctor_id');
+        return $this->hasOne(DoctorSelectedMedicalCenter::class, 'doctor_id');
     }
 
     /**
-     * دریافت کلینیک انتخاب‌شده یا مقدار پیش‌فرض (مشاوره آنلاین)
+     * دریافت مرکز درمانی انتخاب‌شده یا مقدار پیش‌فرض (مشاوره آنلاین)
      */
-    public function getCurrentClinicAttribute()
+    public function getCurrentMedicalCenterAttribute()
     {
-        return $this->selectedClinic?->clinic ?? null;
+        return $this->selectedMedicalCenter?->medicalCenter ?? null;
     }
 
     /**
-     * تنظیم کلینیک انتخاب‌شده
+     * تنظیم مرکز درمانی انتخاب‌شده
      */
-    public function setSelectedClinic($clinicId = null)
+    public function setSelectedMedicalCenter($medicalCenterId = null)
     {
-        $this->selectedClinic()->updateOrCreate(
+        // همیشه رکورد را ایجاد یا به‌روزرسانی کن، حتی اگر medical_center_id null باشد
+        $this->selectedMedicalCenter()->updateOrCreate(
             ['doctor_id' => $this->id],
-            ['clinic_id' => $clinicId]
+            ['medical_center_id' => $medicalCenterId]
         );
     }
     public function getJalaliCreatedAtAttribute()
@@ -227,10 +228,6 @@ class Doctor extends Authenticatable implements JWTSubject
         return "$this->first_name $this->last_name";
     }
 
-    public function clinics()
-    {
-        return $this->hasMany(Clinic::class, 'doctor_id');
-    }
     public function walletTransactions()
     {
         return $this->hasMany(DoctorWalletTransaction::class);
@@ -378,7 +375,7 @@ class Doctor extends Authenticatable implements JWTSubject
     }
     public function depositSettings()
     {
-        return $this->hasMany(ClinicDepositSetting::class);
+        return $this->hasMany(MedicalCenterDepositSetting::class, 'doctor_id');
     }
 
     public function insurances()
@@ -391,23 +388,9 @@ class Doctor extends Authenticatable implements JWTSubject
         return $this->belongsTo(Hospital::class);
     }
 
-    public function attachClinic($clinicId)
-    {
-        return $this->clinics()->attach($clinicId);
-    }
-
-    public function detachClinic($clinicId)
-    {
-        return $this->clinics()->detach($clinicId);
-    }
-
-    public function syncClinics($clinicIds)
-    {
-        return $this->clinics()->sync($clinicIds);
-    }
     public function medicalCenters()
     {
-        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center');
+        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center', 'doctor_id', 'medical_center_id');
     }
     public function permissions()
     {
@@ -481,12 +464,20 @@ class Doctor extends Authenticatable implements JWTSubject
     public function services()
     {
         return $this->belongsToMany(Service::class, 'doctor_services', 'doctor_id', 'service_id')
-            ->withPivot(['clinic_id', 'insurance_id', 'name', 'description', 'status', 'duration', 'price', 'discount', 'parent_id']);
+            ->withPivot(['medical_center_id', 'insurance_id', 'name', 'description', 'status', 'duration', 'price', 'discount', 'parent_id']);
     }
 
     public function prescriptions()
     {
         return $this->morphMany(PrescriptionRequest::class, 'requestable');
+    }
+
+    /**
+     * Compatibility: legacy code expects $doctor->clinics or $doctor->clinics()
+     */
+    public function clinics()
+    {
+        return $this->medicalCenters();
     }
 
     /**

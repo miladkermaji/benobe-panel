@@ -350,13 +350,17 @@
             document.addEventListener('livewire:init', function() {
               Livewire.on('showTrackingModal', () => {
                 setTimeout(function() {
-                  var modal = new bootstrap.Modal(document.getElementById('trackingModal'));
-                  modal.show();
+                  if (typeof bootstrap !== 'undefined') {
+                    var modal = new bootstrap.Modal(document.getElementById('trackingModal'));
+                    modal.show();
+                  }
                 }, 100);
               });
               Livewire.on('hideTrackingModal', () => {
-                var modal = bootstrap.Modal.getInstance(document.getElementById('trackingModal'));
-                if (modal) modal.hide();
+                if (typeof bootstrap !== 'undefined') {
+                  var modal = bootstrap.Modal.getInstance(document.getElementById('trackingModal'));
+                  if (modal) modal.hide();
+                }
               });
               Livewire.on('show-alert', (event) => {
                 toastr[event.type](event.message);
@@ -516,13 +520,17 @@
         document.addEventListener('livewire:init', function() {
           Livewire.on('showPatientInfoModal', () => {
             setTimeout(function() {
-              var modal = new bootstrap.Modal(document.getElementById('patientInfoModal'));
-              modal.show();
+              if (typeof bootstrap !== 'undefined') {
+                var modal = new bootstrap.Modal(document.getElementById('patientInfoModal'));
+                modal.show();
+              }
             }, 100);
           });
           Livewire.on('hidePatientInfoModal', () => {
-            var modal = bootstrap.Modal.getInstance(document.getElementById('patientInfoModal'));
-            if (modal) modal.hide();
+            if (typeof bootstrap !== 'undefined') {
+              var modal = bootstrap.Modal.getInstance(document.getElementById('patientInfoModal'));
+              if (modal) modal.hide();
+            }
           });
         });
       </script>

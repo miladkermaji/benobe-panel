@@ -1,14 +1,14 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class DoctorWorkSchedule extends Model
 {
-
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'day',
         'is_working', // اضافه کردن is_working به فیلدهای قابل پر شدن
         'work_hours',
@@ -26,6 +26,11 @@ class DoctorWorkSchedule extends Model
     public function doctor()
     {
         return $this->belongsTo(Doctor::class);
+    }
+
+    public function medicalCenter()
+    {
+        return $this->belongsTo(MedicalCenter::class);
     }
 
     private function getDayNameInPersian($day)

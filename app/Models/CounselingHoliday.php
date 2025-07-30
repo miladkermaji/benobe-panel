@@ -1,7 +1,7 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +14,7 @@ class CounselingHoliday extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'holiday_dates',
         'status',
     ];
@@ -33,11 +33,11 @@ class CounselingHoliday extends Model
     }
 
     /**
-     * رابطه با کلینیک
+     * رابطه با مرکز درمانی
      */
-    public function clinic()
+    public function medicalCenter()
     {
-        return $this->belongsTo(Clinic::class);
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     /**

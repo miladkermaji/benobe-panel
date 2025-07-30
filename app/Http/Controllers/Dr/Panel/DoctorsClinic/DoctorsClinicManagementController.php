@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
 
 use App\Models\Zone;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
-use App\Models\ClinicDepositSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Dr\Controller;
 use App\Traits\HasSelectedClinic;
 use App\Helpers\PersianNumber;
+use App\Models\MedicalCenterDepositSetting;
 
 class DoctorsClinicManagementController extends Controller
 {
@@ -75,16 +75,22 @@ class DoctorsClinicManagementController extends Controller
             'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
-        Clinic::create([
-            'doctor_id'     => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
-            'name'          => $request->name,
-            'phone_numbers' => json_encode($request->phone_numbers),
-            'address'       => $request->address,
-            'province_id'   => $request->province_id,
-            'city_id'       => $request->city_id,
-            'postal_code'   => $request->postal_code,
-            'description'   => $request->description,
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        $medicalCenter = MedicalCenter::create([
+            'name' => $request->name,
+            'phone_numbers' => $request->phone_numbers,
+            'province_id' => $request->province_id,
+            'city_id' => $request->city_id,
+            'postal_code' => $request->postal_code,
+            'address' => $request->address,
+            'description' => $request->description,
+            'type' => 'policlinic',
+            'is_active' => true,
         ]);
+
+        // Attach the doctor to the medical center
+        $medicalCenter->doctors()->attach($doctorId);
 
         return response()->json(['message' => 'مطب با موفقیت اضافه شد']);
     }
@@ -117,7 +123,7 @@ class DoctorsClinicManagementController extends Controller
             'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         $clinic->update([
             'name'          => $request->name,
             'phone_numbers' => json_encode($request->phone_numbers),
@@ -133,7 +139,7 @@ class DoctorsClinicManagementController extends Controller
 
     public function edit($id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         return view('dr.panel.doctors-clinic.edit', compact('clinic'));
     }
 
@@ -145,7 +151,7 @@ class DoctorsClinicManagementController extends Controller
 
     public function destroy($id)
     {
-        $clinic = Clinic::findOrFail($id);
+        $clinic = MedicalCenter::findOrFail($id);
         $clinic->delete();
 
         return response()->json(['message' => 'مطب با موفقیت حذف شد']);
@@ -169,16 +175,29 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
-            $clinics = Clinic::where('doctor_id', $doctorId)->get();
-            $deposits = ClinicDepositSetting::where('doctor_id', $doctorId)
-                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                }, function ($query) {
-                    $query->whereNull('clinic_id');
-                })
-                ->get();
+            // Get clinics with error handling
+            try {
+                $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+                    $query->where('doctor_id', $doctorId);
+                })->where('type', 'policlinic')->get();
+            } catch (\Exception $e) {
+                $clinics = collect([]);
+            }
+
+            // Get deposits with error handling
+            try {
+                $deposits = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
+                    ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                        $query->where('medical_center_id', $selectedClinicId);
+                    }, function ($query) {
+                        $query->whereNull('medical_center_id');
+                    })
+                    ->get();
+            } catch (\Exception $e) {
+                $deposits = collect([]);
+            }
 
             return view('dr.panel.doctors-clinic.deposit', compact('clinics', 'deposits', 'selectedClinicId', 'doctorId'));
         } catch (\Exception $e) {
@@ -190,7 +209,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -225,7 +244,9 @@ class DoctorsClinicManagementController extends Controller
             $validated = $request->validate($rules, $messages);
 
             $clinicId = $selectedClinicId === 'default' ? null : $selectedClinicId;
-            if ($clinicId && !Clinic::where('id', $clinicId)->where('doctor_id', $doctorId)->exists()) {
+            if ($clinicId && !MedicalCenter::where('id', $clinicId)->whereHas('doctors', function ($query) use ($doctorId) {
+                $query->where('doctor_id', $doctorId);
+            })->exists()) {
                 return response()->json([
                     'success' => false,
                     'message' => 'مطب انتخاب‌شده معتبر نیست یا متعلق به شما نیست.'
@@ -233,12 +254,12 @@ class DoctorsClinicManagementController extends Controller
             }
 
             // بررسی وجود بیعانه قبلی
-            $existingDeposit = ClinicDepositSetting::where('doctor_id', $doctorId)
+            $existingDeposit = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($clinicId) {
                     if ($clinicId) {
-                        $query->where('clinic_id', $clinicId);
+                        $query->where('medical_center_id', $clinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->exists();
@@ -261,8 +282,8 @@ class DoctorsClinicManagementController extends Controller
                 ], 422);
             }
 
-            $deposit = ClinicDepositSetting::create([
-                'clinic_id' => $clinicId,
+            $deposit = MedicalCenterDepositSetting::create([
+                'medical_center_id' => $clinicId,
                 'doctor_id' => $doctorId,
                 'deposit_amount' => $depositAmount,
                 'is_custom_price' => $validated['is_custom_price'],
@@ -293,7 +314,7 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -327,12 +348,12 @@ class DoctorsClinicManagementController extends Controller
 
             $validated = $request->validate($rules, $messages);
 
-            $deposit = ClinicDepositSetting::where('id', $id)
+            $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->first();
 
@@ -382,14 +403,14 @@ class DoctorsClinicManagementController extends Controller
     {
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $selectedClinicId = $this->getSelectedClinicId();
+            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
-            $deposit = ClinicDepositSetting::where('id', $id)
+            $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->first();
 
