@@ -2,34 +2,35 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\Doctor;
-use App\Models\Clinic;
-use App\Models\MedicalCenter;
-use App\Models\CounselingAppointment;
-use App\Models\DoctorCounselingConfig;
-use App\Models\DoctorCounselingWorkSchedule;
-use App\Models\DoctorAppointmentConfig;
-use App\Models\DoctorWorkSchedule;
-use App\Models\Appointment;
-use App\Models\Insurance;
-use App\Models\Service;
-use App\Models\Zone;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Morilog\Jalali\Jalalian;
+use App\Models\Zone;
+use App\Models\Clinic;
+use App\Models\Doctor;
+use App\Models\Service;
+use App\Models\Insurance;
 use App\Models\DoctorNote;
+use App\Models\Appointment;
+use Illuminate\Http\Request;
+use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
+use App\Models\MedicalCenter;
 use App\Models\DoctorHolidays;
+use App\Models\DoctorWorkSchedule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
 use App\Models\SpecialDailySchedule;
+use Illuminate\Support\Facades\Auth;
+use App\Models\CounselingAppointment;
 use App\Models\SpecialDailySchedules;
+use Illuminate\Support\Facades\Cache;
+use App\Models\DoctorCounselingConfig;
 use App\Models\CounselingDailySchedule;
+use App\Models\DoctorAppointmentConfig;
 use App\Models\DoctorCounselingHoliday;
 use App\Models\CounselingDailySchedules;
 use App\Models\DoctorCounselingHolidays;
-use Illuminate\Support\Facades\Log;
+use App\Models\DoctorCounselingWorkSchedule;
 
 class DoctorAppointmentController extends Controller
 {
