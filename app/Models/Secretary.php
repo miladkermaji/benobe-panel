@@ -71,6 +71,11 @@ class Secretary extends Authenticatable implements JWTSubject
         return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
+    public function clinic()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+    }
+
     public function permissions()
     {
         return $this->hasMany(SecretaryPermission::class, 'secretary_id');

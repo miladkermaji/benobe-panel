@@ -36,7 +36,6 @@ class BestDoctorEdit extends Component
 
     public function loadClinics()
     {
-
         if ($this->doctor_id) {
             $clinics = MedicalCenter::whereHas('doctors', function ($query) {
                 $query->where('doctor_id', $this->doctor_id);
@@ -50,10 +49,10 @@ class BestDoctorEdit extends Component
                     'id' => $clinic->id,
                     'text' => $clinic->name
                 ];
-            })->toArray());
+            })->toArray(), selectedClinicId: $this->clinic_id);
         } else {
             $this->clinics = collect();
-            $this->dispatch('clinics-updated', clinics: []);
+            $this->dispatch('clinics-updated', clinics: [], selectedClinicId: null);
         }
     }
 

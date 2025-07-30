@@ -253,14 +253,28 @@
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
-        }).val('{{ $doctor_id ?? '' }}').trigger('change');
+        });
 
         // Initialize Select2 for clinic
         $('#clinic_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
-        }).val('{{ $clinic_id ?? '' }}').trigger('change');
+        });
+
+        // Set initial values after initialization
+        setTimeout(() => {
+          const doctorId = @json($doctor_id);
+          const clinicId = @json($clinic_id);
+
+          if (doctorId) {
+            $('#doctor_id').val(doctorId).trigger('change');
+          }
+
+          if (clinicId) {
+            $('#clinic_id').val(clinicId).trigger('change');
+          }
+        }, 100);
       }
 
       // Initial setup
@@ -308,19 +322,17 @@
           data: options
         });
 
-        // Reset the selected value
-        $('#clinic_id').val('').trigger('change');
+        // Set the selected value if provided
+        if (data.selectedClinicId) {
+          $('#clinic_id').val(data.selectedClinicId).trigger('change');
+        } else {
+          $('#clinic_id').val('').trigger('change');
+        }
       });
 
       // Reinitialize Select2 after Livewire updates
       document.addEventListener('livewire:update', () => {
         initializeSelect2();
-
-        // Restore the current values after reinitialization
-        const doctorId = @json($doctor_id);
-        const clinicId = @json($clinic_id);
-        $('#doctor_id').val(doctorId || '').trigger('change');
-        $('#clinic_id').val(clinicId || '').trigger('change');
       });
 
       // Handle alerts
