@@ -40,7 +40,12 @@ trait HasSelectedClinic
             return null;
         }
 
-        return $doctor->selectedMedicalCenter?->medical_center_id; // ID مرکز درمانی انتخاب‌شده یا null برای مشاوره آنلاین
+        $selectedMedicalCenter = $doctor->selectedMedicalCenter;
+        if (!$selectedMedicalCenter) {
+            return null; // هیچ رکوردی در جدول وجود ندارد
+        }
+
+        return $selectedMedicalCenter->medical_center_id; // ID مرکز درمانی انتخاب‌شده یا null برای مشاوره آنلاین
     }
 
     /**

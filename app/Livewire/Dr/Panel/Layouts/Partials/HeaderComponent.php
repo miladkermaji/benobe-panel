@@ -117,8 +117,16 @@ class HeaderComponent extends Component
                 // مرکز درمانی انتخاب‌شده را در دیتابیس ذخیره کن
                 $doctor->setSelectedMedicalCenter($firstActiveMedicalCenter->id);
                 $doctor->refresh();
-                $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
-                $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+
+                // بررسی مجدد که آیا رکورد ایجاد شده است
+                if ($doctor->selectedMedicalCenter) {
+                    $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
+                    $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+                } else {
+                    // اگر رکورد ایجاد نشده، از مقادیر محلی استفاده کن
+                    $this->selectedMedicalCenterId = $firstActiveMedicalCenter->id;
+                    $this->selectedMedicalCenterName = $firstActiveMedicalCenter->name;
+                }
             } else {
                 // هیچ مرکز درمانی فعالی ندارد، روی مشاوره آنلاین بگذار
                 $this->selectedMedicalCenterId = null;
