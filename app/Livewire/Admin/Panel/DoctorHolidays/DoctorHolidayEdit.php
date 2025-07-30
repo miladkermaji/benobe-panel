@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin\Panel\DoctorHolidays;
 
 use Carbon\Carbon;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
@@ -30,7 +30,7 @@ class DoctorHolidayEdit extends Component
         $this->clinic_id = $this->doctorholiday->clinic_id;
         $this->status = $this->doctorholiday->status;
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
 
         $this->selectedDate = $date; // تاریخ URL رو ذخیره کن
 

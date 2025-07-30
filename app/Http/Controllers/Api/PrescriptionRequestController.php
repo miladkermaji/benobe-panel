@@ -57,7 +57,7 @@ class PrescriptionRequestController extends Controller
             // لیست بیمه‌ها (ساختار درختی)
             $insurances = PrescriptionInsurance::with('children')->whereNull('parent_id')->get();
             // لیست کلینیک‌ها
-            $clinics = MedicalCenter::where('type', 'clinic')->select('id', 'name', 'prescription_fee')->get();
+            $clinics = MedicalCenter::where('type', 'policlinic')->select('id', 'name', 'prescription_fee')->get();
 
             return response()->json([
                 'status' => 'success',

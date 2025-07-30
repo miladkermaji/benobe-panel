@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Doctorservices;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use App\Models\DoctorService;
 use App\Models\Insurance;
@@ -46,7 +46,7 @@ class DoctorServiceEdit extends Component
         $this->parent_id = $this->doctorService->parent_id;
 
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
         $this->insurances = Insurance::all();
         $this->services = Service::all();
         $this->parentServices = DoctorService::whereNull('parent_id')->where('id', '!=', $id)->get();

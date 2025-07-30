@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Admin\Panel\Doctorservices;
 
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\Doctor;
 use App\Models\DoctorService;
 use App\Models\Insurance;
@@ -32,7 +32,7 @@ class DoctorServiceCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
         $this->insurances = Insurance::all();
         $this->services = Service::all();
         $this->parentServices = DoctorService::whereNull('parent_id')->get();

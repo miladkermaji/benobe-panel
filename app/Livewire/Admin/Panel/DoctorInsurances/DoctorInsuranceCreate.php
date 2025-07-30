@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Insurance;
 use App\Models\Doctor;
 use App\Models\DoctorInsurance;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 
 class DoctorInsuranceCreate extends Component
@@ -30,7 +30,7 @@ class DoctorInsuranceCreate extends Component
     {
         $this->photoPreview = asset('default-avatar.png');
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
     }
 
     public function updatedPhoto()

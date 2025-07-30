@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\ManualAppointmentSettings;
 use Livewire\Component;
 use App\Models\ManualAppointmentSetting;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 
 class ManualAppointmentSettingEdit extends Component
@@ -34,7 +34,8 @@ class ManualAppointmentSettingEdit extends Component
 
     protected function loadClinics()
     {
-        $clinics = Clinic::all()
+        $clinics = MedicalCenter::where('type', 'policlinic')
+            ->get()
             ->map(function ($clinic) {
                 return [
                     'id' => $clinic->id,

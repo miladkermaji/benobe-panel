@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\ManualAppointmentSettings;
 use Livewire\Component;
 use App\Models\ManualAppointmentSetting;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 
 class ManualAppointmentSettingCreate extends Component
@@ -39,7 +39,8 @@ class ManualAppointmentSettingCreate extends Component
                 ->toArray()
             : [];
 
-        $clinics = Clinic::whereNotIn('id', $existingClinics)
+        $clinics = MedicalCenter::whereNotIn('id', $existingClinics)
+            ->where('type', 'clinic')
             ->get()
             ->map(function ($clinic) {
                 return [

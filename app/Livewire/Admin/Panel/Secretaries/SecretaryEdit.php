@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Admin\Panel\Secretaries;
 
-use App\Models\Clinic;
 use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Secretary;
@@ -46,7 +45,7 @@ class SecretaryEdit extends Component
         $this->is_active = $this->secretary->is_active;
 
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedDoctorId($value)

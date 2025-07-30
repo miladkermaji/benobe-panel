@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Models\ManualAppointment;
 use App\Models\User;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Validator;
 use Morilog\Jalali\Jalalian;
 use Carbon\Carbon;

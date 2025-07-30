@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\Insurance;
 use App\Models\Doctor;
 use App\Models\DoctorInsurance;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,7 +40,7 @@ class DoctorInsuranceEdit extends Component
         $this->final_price = $this->insurance->final_price;
         $this->photoPreview = $this->insurance->photo ? Storage::url($this->insurance->photo) : asset('default-avatar.png');
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedPhoto()

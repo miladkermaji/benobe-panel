@@ -6,7 +6,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorHoliday;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Morilog\Jalali\Jalalian;
 
 class DoctorHolidayCreate extends Component
@@ -21,7 +21,7 @@ class DoctorHolidayCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function store()

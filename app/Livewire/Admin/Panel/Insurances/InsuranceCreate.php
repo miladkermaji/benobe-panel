@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\Insurances;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Insurance;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 
 class InsuranceCreate extends Component
@@ -25,7 +25,7 @@ class InsuranceCreate extends Component
     public function mount()
     {
         $this->photoPreview = asset('default-avatar.png');
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
     }
 
     public function updatedPhoto()

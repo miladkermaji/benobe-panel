@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\Insurances;
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Insurance;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 
@@ -34,7 +34,7 @@ class InsuranceEdit extends Component
         $this->insurance_percent = $this->insurance->insurance_percent;
         $this->final_price = $this->insurance->final_price;
         $this->photoPreview = $this->insurance->photo ? Storage::url($this->insurance->photo) : asset('default-avatar.png');
-        $this->clinics = Clinic::all();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedPhoto()
