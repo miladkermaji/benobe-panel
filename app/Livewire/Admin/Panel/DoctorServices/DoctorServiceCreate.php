@@ -42,7 +42,7 @@ class DoctorServiceCreate extends Component
     {
         return [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'insurance_id' => 'nullable|exists:insurances,id',
             'service_id' => 'nullable|exists:services,id',
             'name' => 'required|string|max:255',

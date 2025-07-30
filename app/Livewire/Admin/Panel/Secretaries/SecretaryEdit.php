@@ -10,6 +10,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use App\Models\MedicalCenter;
 
 class SecretaryEdit extends Component
 {
@@ -50,7 +51,9 @@ class SecretaryEdit extends Component
 
     public function updatedDoctorId($value)
     {
-        $this->clinics = Clinic::where('doctor_id', $value)->get();
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'clinic')->get();
         $this->clinic_id = null;
         $this->dispatch('refresh-clinic-select2', clinics: $this->clinics->toArray());
     }
@@ -79,7 +82,7 @@ class SecretaryEdit extends Component
             'email' => 'nullable|email|unique:secretaries,email,' . $this->secretary->id,
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'clinic_id' => 'required|exists:medical_centers,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [

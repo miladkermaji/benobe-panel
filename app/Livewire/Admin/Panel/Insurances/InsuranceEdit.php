@@ -53,7 +53,7 @@ class InsuranceEdit extends Component
             'final_price' => $this->final_price,
             'photo' => $this->photo,
         ], [
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'name' => 'required|string|max:255',
             'calculation_method' => 'required|in:0,1',
             'appointment_price' => 'nullable|numeric|min:0',

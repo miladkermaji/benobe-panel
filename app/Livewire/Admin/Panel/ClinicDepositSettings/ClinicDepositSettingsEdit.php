@@ -22,7 +22,9 @@ class ClinicDepositSettingsEdit extends Component
         $this->form = $this->clinicDepositSetting->toArray();
         $this->form['no_deposit'] = $this->form['deposit_amount'] == 0;
         $this->doctors = Doctor::all();
-        $this->clinics = MedicalCenter::where('doctor_id', $this->form['doctor_id'])->get();
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) {
+            $query->where('doctor_id', $this->form['doctor_id']);
+        })->where('type', 'clinic')->get();
 
         // Dispatch initial clinics data
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {
@@ -32,7 +34,9 @@ class ClinicDepositSettingsEdit extends Component
 
     public function updatedFormDoctorId($value)
     {
-        $this->clinics = MedicalCenter::where('doctor_id', $value)->get();
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'clinic')->get();
         $this->form['clinic_id'] = '';
 
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {

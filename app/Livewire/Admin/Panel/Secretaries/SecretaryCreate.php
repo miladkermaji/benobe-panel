@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Secretary;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use App\Models\SecretaryPermission;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -33,12 +33,16 @@ class SecretaryCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = $this->doctor_id ? Clinic::where('doctor_id', $this->doctor_id)->get() : collect();
+        $this->clinics = $this->doctor_id ? MedicalCenter::whereHas('doctors', function ($query) {
+            $query->where('doctor_id', $this->doctor_id);
+        })->where('type', 'clinic')->get() : collect();
     }
 
     public function updatedDoctorId($value)
     {
-        $clinics = Clinic::where('doctor_id', $value)->get();
+        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'clinic')->get();
         Log::info('updatedDoctorId', [
             'doctor_id' => $value,
             'clinics' => $clinics->toArray(),
@@ -73,7 +77,7 @@ class SecretaryCreate extends Component
             'email' => 'nullable|email|unique:secretaries,email',
             'password' => 'nullable|min:6',
             'doctor_id' => 'nullable|exists:doctors,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'clinic_id' => 'required|exists:medical_centers,id',
             'is_active' => 'boolean',
             'profile_photo' => 'nullable|image|max:2048',
         ], [

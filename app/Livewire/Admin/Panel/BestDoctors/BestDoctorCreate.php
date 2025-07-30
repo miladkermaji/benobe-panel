@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Panel\Bestdoctors;
 
 use App\Models\BestDoctor;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
@@ -30,7 +30,9 @@ class BestDoctorCreate extends Component
         Log::info('Loading clinics for doctor_id: ' . $this->doctor_id);
 
         if ($this->doctor_id) {
-            $clinics = Clinic::where('doctor_id', $this->doctor_id)->get();
+            $clinics = MedicalCenter::whereHas('doctors', function ($query) {
+                $query->where('doctor_id', $this->doctor_id);
+            })->where('type', 'clinic')->get();
             Log::info('Found clinics:', ['count' => $clinics->count(), 'clinics' => $clinics->toArray()]);
             $this->clinics = $clinics;
 
@@ -76,7 +78,7 @@ class BestDoctorCreate extends Component
                     }
                 },
             ],
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'best_doctor' => 'boolean',
             'best_consultant' => 'boolean',
             'status' => 'boolean',

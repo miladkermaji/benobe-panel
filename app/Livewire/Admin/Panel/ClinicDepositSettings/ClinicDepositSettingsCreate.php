@@ -29,7 +29,9 @@ class ClinicDepositSettingsCreate extends Component
 
     public function updatedFormDoctorId($value)
     {
-        $this->clinics = MedicalCenter::where('doctor_id', $value)->get();
+        $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
+            $query->where('doctor_id', $value);
+        })->where('type', 'clinic')->get();
         $this->form['clinic_id'] = '';
 
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {

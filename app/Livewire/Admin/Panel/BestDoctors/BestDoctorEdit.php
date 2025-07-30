@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\Panel\Bestdoctors;
 
 use App\Models\BestDoctor;
 use App\Models\Doctor;
-use App\Models\Clinic;
+use App\Models\MedicalCenter;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 
@@ -38,7 +38,9 @@ class BestDoctorEdit extends Component
     {
 
         if ($this->doctor_id) {
-            $clinics = Clinic::where('doctor_id', $this->doctor_id)->get();
+            $clinics = MedicalCenter::whereHas('doctors', function ($query) {
+                $query->where('doctor_id', $this->doctor_id);
+            })->where('type', 'clinic')->get();
 
             $this->clinics = $clinics;
 
@@ -70,7 +72,7 @@ class BestDoctorEdit extends Component
                 'exists:doctors,id',
                 "unique:best_doctors,doctor_id,{$this->bestdoctor->id},id,clinic_id," . ($this->clinic_id ?? 'NULL'),
             ],
-            'clinic_id'       => 'nullable|exists:clinics,id',
+            'clinic_id'       => 'nullable|exists:medical_centers,id',
             'best_doctor'     => 'boolean',
             'best_consultant' => 'boolean',
             'status'          => 'boolean',

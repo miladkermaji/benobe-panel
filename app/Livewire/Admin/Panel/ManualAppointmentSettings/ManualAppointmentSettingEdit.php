@@ -32,25 +32,25 @@ class ManualAppointmentSettingEdit extends Component
         $this->loadClinics();
     }
 
-   protected function loadClinics()
-{
-    $clinics = Clinic::all()
-        ->map(function ($clinic) {
-            return [
-                'id' => $clinic->id,
-                'name' => $clinic->name
-            ];
-        })
-        ->toArray();
-    
-    // Add general settings option
-    $generalSetting = [
-        'id' => null,
-        'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
-    ];
-    
-    $this->clinics = array_merge([$generalSetting], $clinics);
-}
+    protected function loadClinics()
+    {
+        $clinics = Clinic::all()
+            ->map(function ($clinic) {
+                return [
+                    'id' => $clinic->id,
+                    'name' => $clinic->name
+                ];
+            })
+            ->toArray();
+
+        // Add general settings option
+        $generalSetting = [
+            'id' => null,
+            'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
+        ];
+
+        $this->clinics = array_merge([$generalSetting], $clinics);
+    }
 
     public function update()
     {
@@ -62,7 +62,7 @@ class ManualAppointmentSettingEdit extends Component
             'duration_confirm_link' => $this->duration_confirm_link,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'is_active' => 'required|boolean',
             'duration_send_link' => 'required|integer|min:1',
             'duration_confirm_link' => 'required|integer|min:1',

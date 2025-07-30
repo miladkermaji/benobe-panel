@@ -22,7 +22,7 @@ class DurationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'clinic_id'            => 'required|exists:clinics,id',
+            'clinic_id'            => 'required|exists:medical_centers,id',
             'doctor_id'            => 'required|exists:doctors,id',
             'appointment_duration' => 'required|integer|min:5|max:120',
             'collaboration'        => 'required|boolean',

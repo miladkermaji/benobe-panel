@@ -47,7 +47,7 @@ class ManualAppointmentCreate extends Component
         ], [
             'doctor_id' => 'required|exists:doctors,id',
             'user_id' => 'nullable|exists:users,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'appointment_date' => 'required|date_format:Y/m/d',
             'appointment_time' => 'required|date_format:H:i',
             'status' => 'required|in:scheduled,cancelled,attended,missed,pending_review',

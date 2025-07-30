@@ -38,7 +38,7 @@ class DoctorNoteEdit extends Component
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ], [
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
             'notes' => 'nullable|string|max:1000',
         ], [

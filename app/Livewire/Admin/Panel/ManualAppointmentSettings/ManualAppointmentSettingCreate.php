@@ -68,7 +68,7 @@ class ManualAppointmentSettingCreate extends Component
             'duration_confirm_link' => $this->duration_confirm_link,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'is_active' => 'required|boolean',
             'duration_send_link' => 'required|integer|min:1',
             'duration_confirm_link' => 'required|integer|min:1',

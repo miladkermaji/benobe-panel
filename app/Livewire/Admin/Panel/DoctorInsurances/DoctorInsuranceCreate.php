@@ -51,7 +51,7 @@ class DoctorInsuranceCreate extends Component
             'photo' => $this->photo,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'name' => 'required|string|max:255',
             'calculation_method' => 'required|in:0,1,2,3,4',
             'appointment_price' => 'nullable|numeric|min:0',

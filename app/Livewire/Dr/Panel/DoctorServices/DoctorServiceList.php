@@ -61,7 +61,7 @@ class DoctorServiceList extends Component
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
             $clinic = MedicalCenter::where('id', $this->selectedClinicId)
-                ->whereHas('doctors', function($query) use ($doctorId) {
+                ->whereHas('doctors', function ($query) use ($doctorId) {
                     $query->where('doctor_id', $doctorId);
                 })
                 ->first();
@@ -123,7 +123,10 @@ class DoctorServiceList extends Component
         $this->selectedClinicId = $clinicId;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         if ($this->selectedClinicId !== 'default') {
-            $clinic = MedicalCenter::where('id', $this->selectedClinicId)->where('doctor_id', $doctorId)->first();
+            $clinic = MedicalCenter::where('id', $this->selectedClinicId)
+                ->whereHas('doctors', function ($query) use ($doctorId) {
+                    $query->where('doctor_id', $doctorId);
+                })->first();
             if (!$clinic) {
                 $this->selectedClinicId = 'default';
             }

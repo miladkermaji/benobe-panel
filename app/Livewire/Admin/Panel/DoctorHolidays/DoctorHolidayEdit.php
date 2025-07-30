@@ -69,7 +69,7 @@ class DoctorHolidayEdit extends Component
             'status' => $this->status,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:clinics,id',
+            'clinic_id' => 'nullable|exists:medical_centers,id',
             'holiday_dates' => 'required|array|min:1',
             'holiday_dates.*' => 'required|date',
             'status' => 'required|in:active,inactive',

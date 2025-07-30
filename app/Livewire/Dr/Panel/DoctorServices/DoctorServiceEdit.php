@@ -200,7 +200,7 @@ class DoctorServiceEdit extends Component
 
         $validator = Validator::make($currentState, [
             'service_id' => 'required|exists:services,id',
-            'clinic_id' => 'required|exists:clinics,id',
+            'clinic_id' => 'required|exists:medical_centers,id',
             'duration' => 'required|integer|min:1',
             'description' => 'nullable|string|max:500',
             'pricing' => 'required|array|min:1',
