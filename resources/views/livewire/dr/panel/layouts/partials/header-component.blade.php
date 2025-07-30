@@ -227,6 +227,107 @@
           }, delay);
         });
       });
+
+      // عملکرد دراپ‌داون - خارج از livewire:init
+      document.addEventListener('DOMContentLoaded', function() {
+        initializeDropdown();
+      });
+
+      // همچنین بعد از هر بار ریلود Livewire
+      document.addEventListener('livewire:navigated', function() {
+        setTimeout(initializeDropdown, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
+      });
+
+      function initializeDropdown() {
+        const dropdownTrigger = document.querySelector('.dropdown-trigger');
+        const dropdownMenu = document.querySelector('.my-dropdown-menu');
+
+        if (dropdownTrigger && dropdownMenu) {
+          // حذف event listener های قبلی
+          dropdownTrigger.removeEventListener('click', handleDropdownClick);
+
+          // اضافه کردن event listener جدید
+          dropdownTrigger.addEventListener('click', handleDropdownClick);
+
+          function handleDropdownClick(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // تغییر وضعیت aria-expanded
+            const isExpanded = this.getAttribute('aria-expanded') === 'true';
+            this.setAttribute('aria-expanded', !isExpanded);
+
+            // باز/بسته کردن دراپ‌داون
+            if (isExpanded) {
+              dropdownMenu.classList.add('d-none');
+              dropdownMenu.style.display = 'none';
+              dropdownMenu.style.visibility = 'hidden';
+              dropdownMenu.style.opacity = '0';
+            } else {
+              dropdownMenu.classList.remove('d-none');
+              dropdownMenu.style.display = 'block';
+              dropdownMenu.style.visibility = 'visible';
+              dropdownMenu.style.opacity = '1';
+              dropdownMenu.style.position = 'fixed';
+              dropdownMenu.style.top = '80px';
+              dropdownMenu.style.left = '20px';
+              dropdownMenu.style.right = 'auto';
+              dropdownMenu.style.width = '400px';
+              dropdownMenu.style.maxWidth = '400px';
+              dropdownMenu.style.minHeight = '200px';
+              dropdownMenu.style.height = 'auto';
+              dropdownMenu.style.background = '#ffffff';
+              dropdownMenu.style.border = '2px solid #e5e7eb';
+              dropdownMenu.style.borderRadius = '12px';
+              dropdownMenu.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+              dropdownMenu.style.zIndex = '10000';
+              dropdownMenu.style.padding = '1rem 0';
+              dropdownMenu.style.overflow = 'visible';
+              dropdownMenu.style.transform = 'none';
+              dropdownMenu.style.maxHeight = 'none';
+
+              // اطمینان از نمایش
+              setTimeout(() => {
+                dropdownMenu.style.display = 'block';
+                dropdownMenu.style.visibility = 'visible';
+                dropdownMenu.style.opacity = '1';
+
+                // حذف border قرمز تست
+                dropdownMenu.style.border = '2px solid #e5e7eb';
+                dropdownMenu.style.background = '#ffffff';
+              }, 10);
+            }
+          }
+
+          // بستن دراپ‌داون با کلیک خارج از آن
+          document.removeEventListener('click', handleOutsideClick);
+          document.addEventListener('click', handleOutsideClick);
+
+          function handleOutsideClick(e) {
+            if (!dropdownTrigger.contains(e.target) && !dropdownMenu.contains(e.target)) {
+              dropdownMenu.classList.add('d-none');
+              dropdownMenu.style.display = 'none';
+              dropdownMenu.style.visibility = 'hidden';
+              dropdownMenu.style.opacity = '0';
+              dropdownTrigger.setAttribute('aria-expanded', 'false');
+            }
+          }
+
+          // بستن دراپ‌داون با کلیک روی ESC
+          document.removeEventListener('keydown', handleEscapeKey);
+          document.addEventListener('keydown', handleEscapeKey);
+
+          function handleEscapeKey(e) {
+            if (e.key === 'Escape') {
+              dropdownMenu.classList.add('d-none');
+              dropdownMenu.style.display = 'none';
+              dropdownMenu.style.visibility = 'hidden';
+              dropdownMenu.style.opacity = '0';
+              dropdownTrigger.setAttribute('aria-expanded', 'false');
+            }
+          }
+        }
+      }
     </script>
   </div>
 </div>
