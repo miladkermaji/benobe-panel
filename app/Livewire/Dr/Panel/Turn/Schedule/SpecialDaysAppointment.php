@@ -12,6 +12,7 @@ use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Log;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 
 class SpecialDaysAppointment extends Component
 {
@@ -63,6 +64,7 @@ class SpecialDaysAppointment extends Component
     public $selectAllCopyScheduleModal = false;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
         'openTransferModal' => 'handleOpenTransferModal',
         'refresh-work-hours' => '$refresh',
         'refresh-timepicker' => '$refresh',
@@ -115,27 +117,23 @@ class SpecialDaysAppointment extends Component
     }
     public function setCalendarDate($year, $month)
     {
-        $this->calendarYear = is_numeric($year) ? (int) $year : (int) Jalalian::now()->getYear();
-        $this->calendarMonth = is_numeric($month) ? (int) $month : (int) Jalalian::now()->getMonth();
-        $this->loadCalendarData();
-        $this->dispatch('calendarDataUpdated', [
-            'holidaysData' => $this->holidaysData,
-            'appointmentsData' => $this->appointmentsData,
-            'calendarYear' => $this->calendarYear,
-            'calendarMonth' => $this->calendarMonth,
-        ]);
+        $this->calendarYear = $year;
+        $this->calendarMonth = $month;
     }
-    public function setSelectedClinicId($clinicId)
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
     {
-        $this->selectedClinicId = $clinicId;
-        session(['selectedClinicId' => $clinicId]);
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+
+        // بروزرسانی selectedClinicId
+        $this->selectedClinicId = $medicalCenterId;
+
+        // بروزرسانی داده‌های تقویم
         $this->loadCalendarData();
-        $this->dispatch('calendarDataUpdated', [
-            'holidaysData' => $this->holidaysData,
-            'appointmentsData' => $this->appointmentsData,
-            'calendarYear' => $this->calendarYear,
-            'calendarMonth' => $this->calendarMonth,
-        ]);
+
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات روزهای خاص در حال بروزرسانی...');
     }
     private function getAuthenticatedDoctor()
     {

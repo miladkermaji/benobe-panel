@@ -116,6 +116,7 @@ class ManualNobatList extends Component
         'get-services' => 'getServices',
         'getAvailableTimesForDate' => 'getAvailableTimesForDate',
         'getAppointmentDetails' => 'getAppointmentDetails',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
     ];
     public $showNoResultsAlert = false;
     public $searchResults = [];
@@ -1533,11 +1534,40 @@ class ManualNobatList extends Component
     }
     public function setCalendarDate($year, $month)
     {
-        $this->calendarYear = (int) $year;
-        $this->calendarMonth = (int) $month;
-        $this->loadCalendarData();
-        $this->dispatch('calendarDataUpdated');
+        $this->calendarYear = $year;
+        $this->calendarMonth = $month;
     }
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
+    {
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+
+        // بروزرسانی selectedClinicId
+        $this->selectedClinicId = $medicalCenterId;
+
+        // بروزرسانی داده‌های تقویم
+        $this->loadCalendarData();
+
+        // بروزرسانی لیست نوبت‌های دستی
+        $this->loadAppointments();
+
+        // بروزرسانی کلینیک‌ها
+        $this->loadClinics();
+
+        // بروزرسانی بیمه‌ها
+        $this->loadInsurances();
+
+        // بروزرسانی خدمات
+        $this->loadServices();
+
+        // بروزرسانی کاربران مسدود شده
+        $this->loadBlockedUsers();
+
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. اطلاعات نوبت‌های دستی در حال بروزرسانی...');
+    }
+
     public function blockMultipleUsers()
     {
         try {

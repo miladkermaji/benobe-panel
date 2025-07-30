@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\CounselingDailySchedule;
 use App\Models\DoctorCounselingHoliday;
 use App\Models\DoctorCounselingWorkSchedule;
+use Livewire\Attributes\On;
 
 class CounselingSpecialDaysApoointment extends Component
 {
@@ -59,6 +60,7 @@ class CounselingSpecialDaysApoointment extends Component
     public $savePreviousRows = true;
     protected $listeners = [
         'openHolidayModal' => 'handleOpenHolidayModal',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
         'openTransferModal' => 'handleOpenTransferModal',
         'refresh-work-hours' => '$refresh',
         'refresh-timepicker' => '$refresh',
@@ -131,6 +133,24 @@ $this->getSelectedMedicalCenterId();
             'calendarYear' => $this->calendarYear,
             'calendarMonth' => $this->calendarMonth,
         ]);
+    }
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
+    {
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+        
+        // بروزرسانی selectedClinicId
+        $this->selectedClinicId = $medicalCenterId;
+        
+        // ذخیره در سشن
+        session(['selectedClinicId' => $medicalCenterId]);
+        
+        // بروزرسانی داده‌های تقویم
+        $this->loadCalendarData();
+        
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات روزهای خاص مشاوره در حال بروزرسانی...');
     }
     private function getAuthenticatedDoctor()
     {

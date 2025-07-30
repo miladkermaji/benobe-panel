@@ -20,6 +20,7 @@ use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use Livewire\Attributes\On;
 
 class Workhours extends Component
 {
@@ -124,7 +125,24 @@ class Workhours extends Component
         'selectedScheduleDays.min' => 'لطفاً حداقل یک روز را انتخاب کنید.',
     ];
     protected $listeners = [
+        'updateSelectedDate' => 'updateSelectedDate',
+        'searchAllDates' => 'searchAllDates',
+        'cancelAppointments' => 'cancelAppointments',
+        'blockUser' => 'handleBlockUser',
+        'blockMultipleUsers' => 'handleBlockMultipleUsers',
+        'confirm-partial-reschedule' => 'confirmPartialReschedule',
+        'rescheduleAppointment' => 'handleRescheduleAppointment',
         'setSelectedClinicId' => 'setSelectedClinicId',
+        'setCalendarDate' => 'setCalendarDate',
+        'confirm-search-all-dates' => 'searchAllDates',
+        'show-first-available-confirm' => 'showFirstAvailableConfirm',
+        'applyDiscount' => 'applyDiscount',
+        'get-services' => 'getServices',
+        'getAvailableTimesForDate' => 'getAvailableTimesForDate',
+        'openAddSickModal' => 'handleOpenAddSickModal',
+        'getAppointmentDetails' => 'getAppointmentDetails',
+        'testAvailableTimes' => 'testAvailableTimes',
+        'medicalCenterSelected' => 'handleMedicalCenterSelected',
     ];
     public $isActivationPage = false;
     // --- Manual Appointment Setting Properties ---
@@ -294,6 +312,31 @@ class Workhours extends Component
         } catch (\Exception $e) {
             $this->showErrorMessage('خطا در تنظیم کلینیک: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
+    }
+
+    #[On('medicalCenterSelected')]
+    public function handleMedicalCenterSelected($data)
+    {
+        $medicalCenterId = $data['medicalCenterId'] ?? null;
+        
+        // بروزرسانی selectedMedicalCenterId
+        $this->selectedMedicalCenterId = $medicalCenterId;
+        $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
+        
+        // ذخیره در سشن
+        session(['selectedMedicalCenterId' => $medicalCenterId]);
+        
+        // بازنشانی پراپرتی‌ها
+        $this->reset(['workSchedules', 'isWorking', 'slots']);
+        
+        // بارگذاری مجدد داده‌ها
+        $this->mount();
+        
+        // ارسال رویداد رفرش
+        $this->dispatch('refresh-clinic-data');
+        
+        // نمایش پیام به کاربر
+        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات ساعات کاری در حال بروزرسانی...');
     }
     public function forceRefreshSettings()
     {

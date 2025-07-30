@@ -30,7 +30,7 @@
     </div>
   </div>
   <div id="calendar-error" class="error-message">
-    خطا در بارگذاری تعداد نوبت‌ها. لطفاً دوباره تلاش کنید.
+    
   </div>
 </div>
 
