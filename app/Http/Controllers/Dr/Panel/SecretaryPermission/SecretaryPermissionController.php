@@ -14,7 +14,7 @@ class SecretaryPermissionController extends Controller
     public function index(Request $request)
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedMedicalCenterId();
+        $medicalCenterId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
             return redirect()->route('dr.auth.login-register-form');
@@ -25,11 +25,11 @@ class SecretaryPermissionController extends Controller
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->with('permissions')
-            ->when($clinicId !== null, function ($query) use ($clinicId) {
-                $query->where('clinic_id', $clinicId);
+            ->when($medicalCenterId !== null, function ($query) use ($medicalCenterId) {
+                $query->where('medical_center_id', $medicalCenterId);
             })
-            ->when($clinicId === null, function ($query) {
-                $query->whereNull('clinic_id');
+            ->when($medicalCenterId === null, function ($query) {
+                $query->whereNull('medical_center_id');
             })
             ->get();
 
