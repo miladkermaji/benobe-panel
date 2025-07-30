@@ -45,7 +45,7 @@ class MoshavereSettingController extends Controller
 
             // بررسی یا ایجاد تنظیمات مشاوره آنلاین
             $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-                ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+                ['doctor_id' => $doctorId, 'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
                 [
                     'auto_scheduling'      => true,
                     'calendar_days'        => 30,
@@ -79,7 +79,7 @@ class MoshavereSettingController extends Controller
         $selectedClinicId = $request->query('selectedClinicId', $request->input('selectedClinicId', 'default'));
 
         $appointmentConfig = DoctorCounselingConfig::firstOrCreate(
-            ['doctor_id' => $doctorId, 'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
+            ['doctor_id' => $doctorId, 'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null],
             [
                 'auto_scheduling'      => true,
                 'online_consultation'  => false,
@@ -140,7 +140,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $targetDay,
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working' => true,
@@ -269,7 +269,7 @@ class MoshavereSettingController extends Controller
                 $workSchedule = DoctorCounselingWorkSchedule::create([
                     'doctor_id' => $doctor->id,
                     'day' => $day,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     'is_working' => true,
                     'work_hours' => json_encode([$newSlot]),
                 ]);
@@ -369,7 +369,7 @@ class MoshavereSettingController extends Controller
                 [
                     'doctor_id' => $doctor->id,
                     'day'       => $validated['day'],
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 ['is_working' => true, 'work_hours' => "[]"]// مقداردهی با رشته‌ی `[]`
             );
@@ -444,7 +444,7 @@ class MoshavereSettingController extends Controller
                 [
                     'doctor_id' => $doctor->id,
                     'day'       => $validated['day'],
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
                     'is_working' => $isWorking,
@@ -479,7 +479,7 @@ class MoshavereSettingController extends Controller
             $appointmentConfig = DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 ['auto_scheduling' => $autoScheduling]
             );
@@ -582,7 +582,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $validated['day'],
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working'           => true,
@@ -690,7 +690,7 @@ class MoshavereSettingController extends Controller
             $counselingConfig = DoctorCounselingConfig::updateOrCreate(
                 [
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                    'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                 ],
                 [
                     'auto_scheduling'      => $validatedData['auto_scheduling'] ?? false,
@@ -722,7 +722,7 @@ class MoshavereSettingController extends Controller
                     [
                         'doctor_id' => $doctor->id,
                         'day'       => $day,
-                        'clinic_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
+                        'medical_center_id' => $selectedClinicId !== 'default' ? $selectedClinicId : null,
                     ],
                     [
                         'is_working'           => $dayConfig['is_working'] ?? false,

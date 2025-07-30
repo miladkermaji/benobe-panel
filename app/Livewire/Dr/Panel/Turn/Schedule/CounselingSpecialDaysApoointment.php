@@ -303,7 +303,7 @@ $this->getSelectedMedicalCenterId();
             $holiday = DoctorCounselingHoliday::firstOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                     'status' => 'active',
                 ],
                 [
@@ -606,7 +606,7 @@ $this->getSelectedMedicalCenterId();
             $specialSchedule = CounselingDailySchedule::where([
                 'doctor_id' => $doctorId,
                 'date' => $this->selectedDate,
-                'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
             ])->first();
             $consultationHours = $specialSchedule && $specialSchedule->consultation_hours ? json_decode($specialSchedule->consultation_hours, true) : [];
             $isFromDoctorWorkSchedule = empty($consultationHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
@@ -633,7 +633,7 @@ $this->getSelectedMedicalCenterId();
                     [
                         'doctor_id' => $doctorId,
                         'date' => $this->selectedDate,
-                        'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                        'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                     ],
                     [
                         'consultation_hours' => json_encode([]),
@@ -699,7 +699,7 @@ $this->getSelectedMedicalCenterId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1003,7 +1003,7 @@ $this->getSelectedMedicalCenterId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1100,7 +1100,7 @@ $this->getSelectedMedicalCenterId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1242,7 +1242,7 @@ $this->getSelectedMedicalCenterId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),
@@ -1601,7 +1601,7 @@ $this->getSelectedMedicalCenterId();
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
                 ],
                 [
                     'consultation_hours' => json_encode([]),

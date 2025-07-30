@@ -23,7 +23,7 @@ class SecretaryCreate extends Component
     public $city_id;
     public $provinces;
     public $cities;
-    public $clinic_id;
+    public $medical_center_id;
 
     public function mount()
     {
@@ -38,12 +38,12 @@ class SecretaryCreate extends Component
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
 
-        // دریافت clinic_id از doctor relationship
+        // دریافت medical_center_id از doctor relationship
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $doctor = Doctor::find($doctorId);
-        $this->clinic_id = $doctor?->selectedMedicalCenter?->medical_center_id;
+        $this->medical_center_id = $doctor?->selectedMedicalCenter?->medical_center_id;
 
-        Log::info('mount clinic_id', ['clinic_id' => $this->clinic_id]);
+        Log::info('mount medical_center_id', ['medical_center_id' => $this->medical_center_id]);
     }
 
     public function updatedProvinceId($value)
@@ -58,7 +58,7 @@ class SecretaryCreate extends Component
         // دریافت doctor_id
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
-        // دریافت doctor و clinic_id از رابطه
+        // دریافت doctor و medical_center_id از رابطه
         $doctor = Doctor::find($doctorId);
         if (!$doctor) {
             $this->addError('doctor', 'دکتر یافت نشد.');
@@ -67,9 +67,9 @@ class SecretaryCreate extends Component
 
         $clinicId = $doctor->selectedMedicalCenter?->medical_center_id;
 
-        // بررسی اینکه clinic_id null نباشد
+        // بررسی اینکه medical_center_id null نباشد
         if (!$clinicId) {
-            $this->addError('clinic_id', 'مرکز درمانی انتخاب نشده است.');
+            $this->addError('medical_center_id', 'مرکز درمانی انتخاب نشده است.');
             return;
         }
 
@@ -85,11 +85,11 @@ class SecretaryCreate extends Component
         ]);
 
         // اضافه کردن لاگ برای دیباگ
-        Log::info('store method clinic_id', [
-            'clinic_id_property' => $this->clinic_id,
-            'clinic_id_from_doctor' => $clinicId,
-            'clinic_id_property_type' => gettype($this->clinic_id),
-            'clinic_id_from_doctor_type' => gettype($clinicId),
+        Log::info('store method medical_center_id', [
+            'medical_center_id_property' => $this->medical_center_id,
+            'medical_center_id_from_doctor' => $clinicId,
+            'medical_center_id_property_type' => gettype($this->medical_center_id),
+            'medical_center_id_from_doctor_type' => gettype($clinicId),
             'doctor_id' => $doctorId
         ]);
 

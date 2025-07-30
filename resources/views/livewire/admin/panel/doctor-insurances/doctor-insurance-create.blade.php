@@ -35,13 +35,13 @@
               <label for="doctor_id" class="form-label">دکتر</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.live="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
+              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
             </div>
             <div class="col-6 col-md-6 position-relative mt-5">
               <input type="text" wire:model="name" class="form-control" id="name" placeholder=" " required>
@@ -97,7 +97,7 @@
         placeholder: 'انتخاب کنید',
         width: '100%'
       });
-      $('#clinic_id').select2({
+      $('#medical_center_id').select2({
         dir: 'rtl',
         placeholder: 'انتخاب کنید',
         width: '100%'
@@ -105,8 +105,8 @@
       $('#doctor_id').on('change', function() {
         @this.set('doctor_id', $(this).val());
       });
-      $('#clinic_id').on('change', function() {
-        @this.set('clinic_id', $(this).val());
+      $('#medical_center_id').on('change', function() {
+        @this.set('medical_center_id', $(this).val());
       });
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);

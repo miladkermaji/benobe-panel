@@ -112,15 +112,15 @@
               @enderror
             </div>
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-           
-              <select wire:model="clinic_id" class="form-select select2" id="clinic_id">
+
+              <select wire:model="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
-              @error('clinic_id')
+              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
+              @error('medical_center_id')
                 <span class="text-danger">{{ $message }}</span>
               @enderror
             </div>
@@ -160,7 +160,7 @@
           placeholder: 'انتخاب کنید',
           width: '100%'
         });
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -172,9 +172,9 @@
         console.log('Doctor selected:', $(this).val());
         @this.set('doctor_id', $(this).val());
       });
-      $('#clinic_id').on('change', function() {
+      $('#medical_center_id').on('change', function() {
         console.log('Clinic selected:', $(this).val());
-        @this.set('clinic_id', $(this).val());
+        @this.set('medical_center_id', $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {
@@ -182,8 +182,8 @@
       });
 
       Livewire.hook('message.processed', (message, component) => {
-        $('#clinic_id').select2('destroy');
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2('destroy');
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -192,8 +192,8 @@
 
       Livewire.on('refresh-clinic-select2', (event) => {
         const clinics = event.clinics || [];
-        $('#clinic_id').select2('destroy');
-        $('#clinic_id').empty().select2({
+        $('#medical_center_id').select2('destroy');
+        $('#medical_center_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%',

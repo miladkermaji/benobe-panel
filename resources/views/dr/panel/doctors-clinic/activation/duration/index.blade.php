@@ -109,7 +109,7 @@
             </div>
             <form id="workingHoursForm">
               @csrf
-              <input type="hidden" name="clinic_id" value="{{ $clinicId }}">
+              <input type="hidden" name="medical_center_id" value="{{ $clinicId }}">
               <input type="hidden" name="doctor_id" value="{{ $doctorId }}">
               <input type="hidden" id="appointment_duration" name="appointment_duration" value="">
 

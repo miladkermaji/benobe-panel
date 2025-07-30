@@ -1361,7 +1361,7 @@ $this->getSelectedMedicalCenterId();
                 $blockingUser = UserBlocking::create([
                     'user_id' => $user->id,
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
+                    'medical_center_id' => $clinicId,
                     'blocked_at' => $blockedAt,
                     'unblocked_at' => $unblockedAt,
                     'reason' => $this->blockReason,
@@ -1436,7 +1436,7 @@ $this->getSelectedMedicalCenterId();
             }
         } elseif ($this->recipientType === 'blocked') {
             $recipients = UserBlocking::where('user_blockings.doctor_id', $doctorId)
-                ->where('user_blockings.clinic_id', $clinicId)
+                ->where('user_blockings.medical_center_id', $clinicId)
                 ->where('user_blockings.status', 1)
                 ->join('users', 'user_blockings.user_id', '=', 'users.id')
                 ->pluck('users.mobile')
@@ -1699,7 +1699,7 @@ $this->getSelectedMedicalCenterId();
         }
         $holidayRecord = $holidayRecordQuery->firstOrCreate([
             'doctor_id' => $doctorId,
-            'clinic_id' => ($this->selectedClinicId !== 'default' ? $this->selectedClinicId : null),
+            'medical_center_id' => ($this->selectedClinicId !== 'default' ? $this->selectedClinicId : null),
         ], [
             'holiday_dates' => json_encode([])
         ]);

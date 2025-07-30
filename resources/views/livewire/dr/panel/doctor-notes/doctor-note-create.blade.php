@@ -33,13 +33,13 @@
               <label for="appointment_type" class="form-label">نوع نوبت</label>
             </div>
             <div class="col-12 position-relative mt-4" wire:ignore>
-              <select wire:model="clinic_id" class="form-select select2-clinic" id="clinic_id">
+              <select wire:model="medical_center_id" class="form-select select2-clinic" id="medical_center_id">
                 <option value="">بدون کلینیک</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
+              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
             </div>
             <div class="col-12 position-relative mt-4">
               <textarea wire:model="notes" class="form-control" id="notes" rows="3" placeholder=" "></textarea>
@@ -65,7 +65,7 @@
           toastr[event.type](event.message);
         });
 
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کلینیک',
           allowClear: true,
@@ -78,15 +78,15 @@
           width: '100%',
         });
 
-        $('#clinic_id').on('change', function() {
-          @this.set('clinic_id', this.value);
+        $('#medical_center_id').on('change', function() {
+          @this.set('medical_center_id', this.value);
         });
         $('#appointment_type').on('change', function() {
           @this.set('appointment_type', this.value);
         });
 
         Livewire.on('update-clinic-id', (event) => {
-          $('#clinic_id').val(event.value).trigger('change');
+          $('#medical_center_id').val(event.value).trigger('change');
         });
       });
     </script>

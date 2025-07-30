@@ -521,7 +521,8 @@
     }
 
     function addDepositItem(deposit) {
-      const clinicName = deposit.clinic_id ? clinics[deposit.clinic_id] || 'نامشخص' : 'ویزیت آنلاین';
+      const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
+      'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Desktop table row
@@ -587,7 +588,8 @@
     }
 
     function updateDepositItem(deposit) {
-      const clinicName = deposit.clinic_id ? clinics[deposit.clinic_id] || 'نامشخص' : 'ویزیت آنلاین';
+      const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
+      'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Update desktop table row

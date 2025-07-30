@@ -175,10 +175,10 @@ class InsuranceComponent extends Component
             return;
         }
 
-        $data['clinic_id'] = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        $data['medical_center_id'] = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
         $insurance = Insurance::create([
-            'clinic_id' => $data['clinic_id'],
+            'medical_center_id' => $data['medical_center_id'],
             'name' => $data['name'],
             'calculation_method' => $data['calculation_method'],
             'appointment_price' => $data['appointment_price'],

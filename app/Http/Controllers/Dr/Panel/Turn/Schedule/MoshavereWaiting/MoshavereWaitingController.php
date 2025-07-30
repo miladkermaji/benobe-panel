@@ -295,7 +295,7 @@ class MoshavereWaitingController extends Controller
         // دریافت تعطیلی‌های پزشک با توجه به کلینیک
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
-                // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (clinic_id = NULL)
+                // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (medical_center_id = NULL)
                 $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
@@ -328,7 +328,7 @@ class MoshavereWaitingController extends Controller
             $appointmentQuery = CounselingAppointment::where('doctor_id', $doctorId)
                 ->where('appointment_date', $date)
                 ->when($selectedClinicId === 'default', function ($query) {
-                    // فقط نوبت‌های بدون کلینیک (clinic_id = NULL) بازگردانده شود
+                    // فقط نوبت‌های بدون کلینیک (medical_center_id = NULL) بازگردانده شود
                     $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
@@ -399,7 +399,7 @@ class MoshavereWaitingController extends Controller
                     'message' => 'ساعات کاری پزشک برای تاریخ جدید یافت نشد.',
                     'debug'   => [
                         'doctor_id' => $doctorId,
-                        'clinic_id' => $selectedClinicId,
+                        'medical_center_id' => $selectedClinicId,
                         'day'       => $dayOfWeek,
                     ],
                 ], 400);
@@ -640,10 +640,10 @@ class MoshavereWaitingController extends Controller
             ->with(['patient', 'insurance']);
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
+            // اگر selectedClinicId برابر با 'default' باشد، medical_center_id باید NULL یا خالی باشد
             $query->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
+            // اگر selectedClinicId مقدار داشت، medical_center_id باید با آن مطابقت داشته باشد
             $query->where('medical_center_id', $selectedClinicId);
         }
 
@@ -682,10 +682,10 @@ class MoshavereWaitingController extends Controller
 
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
-            // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
+            // اگر selectedClinicId برابر با 'default' باشد، medical_center_id باید NULL یا خالی باشد
             $appointmentsQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
+            // اگر selectedClinicId مقدار داشت، medical_center_id باید با آن مطابقت داشته باشد
             $appointmentsQuery->where('medical_center_id', $selectedClinicId);
         }
 
@@ -820,7 +820,7 @@ class MoshavereWaitingController extends Controller
                 'doctor_id'  => auth()->guard('doctor')->user()->id,
                 'date'       => $date,
                 'work_hours' => json_encode($workHours),
-                'clinic_id'  => $selectedClinicId, // اضافه کردن clinic_id به رکورد جدید
+                'medical_center_id'  => $selectedClinicId, // اضافه کردن medical_center_id به رکورد جدید
             ]);
         }
 

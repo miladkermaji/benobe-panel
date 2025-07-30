@@ -17,7 +17,7 @@ class DoctorInsuranceEdit extends Component
 
     public $insurance;
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $name;
     public $calculation_method;
     public $appointment_price;
@@ -32,7 +32,7 @@ class DoctorInsuranceEdit extends Component
     {
         $this->insurance = Insurance::findOrFail($id);
         $this->doctor_id = $this->insurance->doctors->first()->id ?? null;
-        $this->clinic_id = $this->insurance->clinic_id;
+        $this->medical_center_id = $this->insurance->medical_center_id;
         $this->name = $this->insurance->name;
         $this->calculation_method = $this->insurance->calculation_method;
         $this->appointment_price = $this->insurance->appointment_price;
@@ -52,7 +52,7 @@ class DoctorInsuranceEdit extends Component
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,
@@ -61,7 +61,7 @@ class DoctorInsuranceEdit extends Component
             'photo' => $this->photo,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:medical_centers,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'name' => 'required|string|max:255',
             'calculation_method' => 'required|in:0,1,2,3,4',
             'appointment_price' => 'nullable|numeric|min:0',
@@ -71,7 +71,7 @@ class DoctorInsuranceEdit extends Component
         ], [
             'doctor_id.required' => 'انتخاب دکتر الزامی است.',
             'doctor_id.exists' => 'دکتر انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'name.required' => 'نام بیمه الزامی است.',
             'name.string' => 'نام بیمه باید رشته باشد.',
             'name.max' => 'نام بیمه نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
@@ -94,7 +94,7 @@ class DoctorInsuranceEdit extends Component
         }
 
         $data = [
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'name' => $this->name,
             'calculation_method' => $this->calculation_method,
             'appointment_price' => $this->appointment_price,

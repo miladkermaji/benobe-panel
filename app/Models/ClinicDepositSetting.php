@@ -25,7 +25,7 @@ class ClinicDepositSetting extends Model
         'is_active' => 'boolean',
     ];
 
-    // برای سازگاری با کد قدیمی که از clinic_id استفاده می‌کرد
+    // برای سازگاری با کد قدیمی که از medical_center_id استفاده می‌کرد
     public function getClinicIdAttribute()
     {
         return $this->medical_center_id;

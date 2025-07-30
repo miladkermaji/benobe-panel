@@ -22,7 +22,7 @@ class DurationController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'clinic_id'            => 'required|exists:medical_centers,id',
+            'medical_center_id'            => 'required|exists:medical_centers,id',
             'doctor_id'            => 'required|exists:doctors,id',
             'appointment_duration' => 'required|integer|min:5|max:120',
             'collaboration'        => 'required|boolean',
@@ -30,7 +30,7 @@ class DurationController extends Controller
 
         // بررسی وجود رکورد
         $config = DoctorAppointmentConfig::firstOrNew([
-            'clinic_id' => $request->clinic_id,
+            'medical_center_id' => $request->medical_center_id,
             'doctor_id' => $request->doctor_id,
         ]);
 

@@ -16,7 +16,7 @@ class DoctorServiceEdit extends Component
     public $doctorService;
     public $selected_service;
     public $service_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $duration;
     public $description;
     public $pricing = [];
@@ -33,7 +33,7 @@ class DoctorServiceEdit extends Component
         $this->doctorService = DoctorService::findOrFail($id);
         $this->selected_service = 'doctor_service_' . $this->doctorService->id;
         $this->service_id = $this->doctorService->service_id;
-        $this->clinic_id = $this->doctorService->clinic_id;
+        $this->medical_center_id = $this->doctorService->medical_center_id;
         $this->duration = $this->doctorService->duration;
         $this->description = $this->doctorService->description;
         $this->pricing = [[
@@ -45,7 +45,7 @@ class DoctorServiceEdit extends Component
         ]];
         $this->previousState = [
             'service_id' => $this->service_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -128,14 +128,14 @@ class DoctorServiceEdit extends Component
 
     public function updatedSelectedService($value)
     {
-        $this->reset(['service_id', 'clinic_id', 'duration', 'description', 'pricing']);
+        $this->reset(['service_id', 'medical_center_id', 'duration', 'description', 'pricing']);
         if ($value) {
             if (str_starts_with($value, 'doctor_service_')) {
                 $doctorServiceId = str_replace('doctor_service_', '', $value);
                 $doctorService = DoctorService::find($doctorServiceId);
                 if ($doctorService) {
                     $this->service_id = $doctorService->service_id;
-                    $this->clinic_id = $doctorService->clinic_id;
+                    $this->medical_center_id = $doctorService->medical_center_id;
                     $this->duration = $doctorService->duration;
                     $this->description = $doctorService->description;
                     $this->pricing = [[
@@ -186,7 +186,7 @@ class DoctorServiceEdit extends Component
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $currentState = [
             'service_id' => $this->service_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -200,7 +200,7 @@ class DoctorServiceEdit extends Component
 
         $validator = Validator::make($currentState, [
             'service_id' => 'required|exists:services,id',
-            'clinic_id' => 'required|exists:medical_centers,id',
+            'medical_center_id' => 'required|exists:medical_centers,id',
             'duration' => 'required|integer|min:1',
             'description' => 'nullable|string|max:500',
             'pricing' => 'required|array|min:1',
@@ -210,8 +210,8 @@ class DoctorServiceEdit extends Component
         ], [
             'service_id.required' => 'انتخاب خدمت الزامی است.',
             'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
-            'clinic_id.required' => 'انتخاب کلینیک الزامی است.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.required' => 'انتخاب کلینیک الزامی است.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'duration.required' => 'مدت زمان الزامی است.',
             'duration.integer' => 'مدت زمان باید عدد صحیح باشد.',
             'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
@@ -238,7 +238,7 @@ class DoctorServiceEdit extends Component
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
                 ->where('insurance_id', $pricing['insurance_id'])
-                ->where('medical_center_id', $this->clinic_id)
+                ->where('medical_center_id', $this->medical_center_id)
                 ->when(isset($pricing['id']), function ($query) use ($pricing) {
                     $query->where('id', '!=', $pricing['id']);
                 })
@@ -257,7 +257,7 @@ class DoctorServiceEdit extends Component
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([
                     'service_id' => $this->service_id,
-                    'medical_center_id' => $this->clinic_id,
+                    'medical_center_id' => $this->medical_center_id,
                     'insurance_id' => $pricing['insurance_id'],
                     'name' => $service->name,
                     'description' => $this->description,

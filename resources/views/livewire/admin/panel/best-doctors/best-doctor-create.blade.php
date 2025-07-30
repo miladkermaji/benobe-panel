@@ -39,14 +39,14 @@
 
             <!-- کلینیک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.live="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
-              @error('clinic_id')
+              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
+              @error('medical_center_id')
                 <span class="text-danger small">{{ $message }}</span>
               @enderror
             </div>
@@ -249,7 +249,7 @@
       });
 
       // Initialize clinic select2
-      $('#clinic_id').select2({
+      $('#medical_center_id').select2({
         theme: 'bootstrap-5',
         width: '100%',
         placeholder: 'انتخاب کلینیک',
@@ -267,18 +267,18 @@
       });
 
       // Handle clinic selection
-      $('#clinic_id').on('select2:select', function(e) {
-        @this.set('clinic_id', e.target.value);
+      $('#medical_center_id').on('select2:select', function(e) {
+        @this.set('medical_center_id', e.target.value);
       });
 
       // Handle clinic clearing
-      $('#clinic_id').on('select2:clear', function() {
-        @this.set('clinic_id', null);
+      $('#medical_center_id').on('select2:clear', function() {
+        @this.set('medical_center_id', null);
       });
 
       // Listen for clinics update
       Livewire.on('clinics-updated', (data) => {
-        const clinicSelect = $('#clinic_id');
+        const clinicSelect = $('#medical_center_id');
         clinicSelect.empty();
 
         // Add placeholder option
@@ -296,7 +296,7 @@
 
     // Re-initialize Select2 after Livewire updates
     document.addEventListener('livewire:update', () => {
-      $('#doctor_id, #clinic_id').select2({
+      $('#doctor_id, #medical_center_id').select2({
         theme: 'bootstrap-5',
         width: '100%',
         placeholder: 'انتخاب پزشک',

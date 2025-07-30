@@ -12,7 +12,7 @@ use Morilog\Jalali\Jalalian;
 class DoctorHolidayCreate extends Component
 {
     public $doctor_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $holiday_dates = [];
     public $status = 'active';
     public $doctors = [];
@@ -28,19 +28,19 @@ class DoctorHolidayCreate extends Component
     {
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'holiday_dates' => $this->holiday_dates,
             'status' => $this->status,
         ], [
             'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:medical_centers,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'holiday_dates' => 'required|array|min:1',
             'holiday_dates.*' => 'required|date',
             'status' => 'required|in:active,inactive',
         ], [
             'doctor_id.required' => 'لطفاً پزشک را انتخاب کنید.',
             'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'holiday_dates.required' => 'لطفاً حداقل یک تاریخ تعطیل انتخاب کنید.',
             'holiday_dates.array' => 'تاریخ‌های تعطیل باید به‌صورت آرایه باشند.',
             'holiday_dates.*.required' => 'هر تاریخ تعطیل باید معتبر باشد.',
@@ -59,7 +59,7 @@ class DoctorHolidayCreate extends Component
         })->toArray();
 
         $existingHoliday = DoctorHoliday::where('doctor_id', $this->doctor_id)
-            ->where('medical_center_id', $this->clinic_id)
+            ->where('medical_center_id', $this->medical_center_id)
             ->first();
 
         if ($existingHoliday) {
@@ -71,7 +71,7 @@ class DoctorHolidayCreate extends Component
         } else {
             DoctorHoliday::create([
                 'doctor_id' => $this->doctor_id,
-                'medical_center_id' => $this->clinic_id,
+                'medical_center_id' => $this->medical_center_id,
                 'holiday_dates' => $gregorianDates,
                 'status' => $this->status,
             ]);

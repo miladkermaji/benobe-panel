@@ -1646,7 +1646,7 @@ class ManualNobatList extends Component
                 $blockingUser = UserBlocking::create([
                     'user_id' => $user->id,
                     'doctor_id' => $doctorId,
-                    'clinic_id' => $clinicId,
+                    'medical_center_id' => $clinicId,
                     'blocked_at' => $blockedAt,
                     'unblocked_at' => $unblockedAt,
                     'reason' => $this->blockReason,
@@ -1717,7 +1717,7 @@ class ManualNobatList extends Component
             }
         } elseif ($this->recipientType === 'blocked') {
             $recipients = UserBlocking::where('user_blockings.doctor_id', $doctorId)
-                ->where('user_blockings.clinic_id', $clinicId)
+                ->where('user_blockings.medical_center_id', $clinicId)
                 ->where('user_blockings.status', 1)
                 ->join('users', 'user_blockings.user_id', '=', 'users.id')
                 ->pluck('users.mobile')
@@ -2016,7 +2016,7 @@ class ManualNobatList extends Component
         }
         $holidayRecord = $holidayRecordQuery->firstOrCreate([
             'doctor_id' => $doctorId,
-            'clinic_id' => ($this->selectedClinicId !== 'default' ? $this->selectedClinicId : null),
+            'medical_center_id' => ($this->selectedClinicId !== 'default' ? $this->selectedClinicId : null),
         ], [
             'holiday_dates' => json_encode([])
         ]);
@@ -2154,7 +2154,7 @@ class ManualNobatList extends Component
                 'patientable_id' => $user->id,
                 'patientable_type' => 'App\\Models\\User',
                 'doctor_id' => $doctor->id,
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $clinicId,
                 'appointment_date' => $gregorianDate,
                 'appointment_time' => $this->appointmentTime,
                 'status' => 'scheduled',

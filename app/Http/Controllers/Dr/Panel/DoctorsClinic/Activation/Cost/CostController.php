@@ -44,7 +44,7 @@ class CostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'clinic_id'       => 'required|exists:medical_centers,id',
+            'medical_center_id'       => 'required|exists:medical_centers,id',
             'doctor_id'       => 'required|exists:doctors,id',
             'deposit_amount'  => 'nullable|numeric|min:0',
             'is_custom_price' => 'required|boolean',
@@ -55,7 +55,7 @@ class CostController extends Controller
         $depositAmount = $request->no_deposit || !$request->deposit_amount ? 0 : $request->deposit_amount;
 
         // بررسی وجود بیعانه برای کلینیک و دکتر
-        $existingDeposit = ClinicDepositSetting::where('medical_center_id', $request->clinic_id)
+        $existingDeposit = ClinicDepositSetting::where('medical_center_id', $request->medical_center_id)
             ->where('doctor_id', $request->doctor_id)
             ->first();
 
@@ -68,7 +68,7 @@ class CostController extends Controller
         } else {
             // ایجاد بیعانه جدید
             ClinicDepositSetting::create([
-                'medical_center_id' => $request->clinic_id,
+                'medical_center_id' => $request->medical_center_id,
                 'doctor_id'         => $request->doctor_id,
                 'deposit_amount'    => $depositAmount,
                 'is_custom_price'   => $request->is_custom_price && $depositAmount > 0,

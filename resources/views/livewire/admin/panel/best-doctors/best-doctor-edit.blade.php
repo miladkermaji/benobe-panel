@@ -46,14 +46,14 @@
 
             <!-- کلینیک -->
             <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.live="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.live="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="">انتخاب کنید</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک (اختیاری)</label>
-              @error('clinic_id')
+              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
+              @error('medical_center_id')
                 <span class="text-danger small">{{ $message }}</span>
               @enderror
             </div>
@@ -244,8 +244,8 @@
         if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
           $('#doctor_id').select2('destroy');
         }
-        if ($('#clinic_id').hasClass('select2-hidden-accessible')) {
-          $('#clinic_id').select2('destroy');
+        if ($('#medical_center_id').hasClass('select2-hidden-accessible')) {
+          $('#medical_center_id').select2('destroy');
         }
 
         // Initialize Select2 for doctor
@@ -256,7 +256,7 @@
         });
 
         // Initialize Select2 for clinic
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%'
@@ -265,14 +265,14 @@
         // Set initial values after initialization
         setTimeout(() => {
           const doctorId = @json($doctor_id);
-          const clinicId = @json($clinic_id);
+          const clinicId = @json($medical_center_id);
 
           if (doctorId) {
             $('#doctor_id').val(doctorId).trigger('change');
           }
 
           if (clinicId) {
-            $('#clinic_id').val(clinicId).trigger('change');
+            $('#medical_center_id').val(clinicId).trigger('change');
           }
         }, 100);
       }
@@ -291,13 +291,13 @@
       });
 
       // Handle clinic selection change
-      $('#clinic_id').on('select2:select', function(e) {
+      $('#medical_center_id').on('select2:select', function(e) {
         const value = e.target.value === '' ? null : e.target.value;
-        @this.set('clinic_id', value);
+        @this.set('medical_center_id', value);
       });
 
-      $('#clinic_id').on('select2:clear', function() {
-        @this.set('clinic_id', null);
+      $('#medical_center_id').on('select2:clear', function() {
+        @this.set('medical_center_id', null);
       });
 
       // Listen for clinics update event
@@ -311,11 +311,11 @@
         ];
 
         // Destroy and reinitialize clinic Select2 with new data
-        if ($('#clinic_id').hasClass('select2-hidden-accessible')) {
-          $('#clinic_id').select2('destroy');
+        if ($('#medical_center_id').hasClass('select2-hidden-accessible')) {
+          $('#medical_center_id').select2('destroy');
         }
 
-        $('#clinic_id').empty().select2({
+        $('#medical_center_id').empty().select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
           width: '100%',
@@ -324,9 +324,9 @@
 
         // Set the selected value if provided
         if (data.selectedClinicId) {
-          $('#clinic_id').val(data.selectedClinicId).trigger('change');
+          $('#medical_center_id').val(data.selectedClinicId).trigger('change');
         } else {
-          $('#clinic_id').val('').trigger('change');
+          $('#medical_center_id').val('').trigger('change');
         }
       });
 

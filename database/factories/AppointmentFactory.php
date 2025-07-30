@@ -34,7 +34,7 @@ class AppointmentFactory extends Factory
             'patientable_id' => $patient ? $patient->id : null, // انتخاب تصادفی بیمار
             'patientable_type' => $patient ? get_class($patient) : null, // نوع بیمار
             'insurance_id' => $faker->optional(0.7)->numberBetween(1, 10), // فرض بر وجود 10 بیمه (70% احتمال)
-            'clinic_id' => $clinic ? $clinic->id : null, // انتخاب تصادفی مطب
+            'medical_center_id' => $clinic ? $clinic->id : null, // انتخاب تصادفی مطب
             'consultation_type' => $faker->randomElement(['general', 'specialized', 'emergency']),
             'priority' => $faker->randomElement(['low', 'medium', 'high']),
             'payment_status' => $faker->randomElement(['pending', 'paid', 'unpaid']),

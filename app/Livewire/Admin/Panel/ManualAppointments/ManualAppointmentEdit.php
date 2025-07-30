@@ -16,7 +16,7 @@ class ManualAppointmentEdit extends Component
     public $manualAppointment;
     public $doctor_id;
     public $user_id;
-    public $clinic_id;
+    public $medical_center_id;
     public $appointment_date; // تاریخ جلالی برای نمایش
     public $appointment_time;
     public $status;
@@ -32,7 +32,7 @@ class ManualAppointmentEdit extends Component
         $this->manualAppointment = ManualAppointment::findOrFail($id);
         $this->doctor_id = $this->manualAppointment->doctor_id;
         $this->user_id = $this->manualAppointment->user_id;
-        $this->clinic_id = $this->manualAppointment->clinic_id;
+        $this->medical_center_id = $this->manualAppointment->medical_center_id;
         // تبدیل تاریخ میلادی از دیتابیس به شیء Carbon و سپس به جلالی
         $this->appointment_date = Jalalian::fromCarbon(Carbon::parse($this->manualAppointment->appointment_date))->format('Y/m/d');
         $this->appointment_time = $this->manualAppointment->appointment_time;
@@ -50,7 +50,7 @@ class ManualAppointmentEdit extends Component
         $validator = Validator::make([
             'doctor_id' => $this->doctor_id,
             'user_id' => $this->user_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_date' => $this->appointment_date,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,
@@ -61,7 +61,7 @@ class ManualAppointmentEdit extends Component
         ], [
             'doctor_id' => 'required|exists:doctors,id',
             'user_id' => 'nullable|exists:users,id',
-            'clinic_id' => 'nullable|exists:medical_centers,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'appointment_date' => 'required|date_format:Y/m/d',
             'appointment_time' => 'required|date_format:H:i',
             'status' => 'required|in:scheduled,cancelled,attended,missed,pending_review',
@@ -73,7 +73,7 @@ class ManualAppointmentEdit extends Component
             'doctor_id.required' => 'انتخاب پزشک الزامی است.',
             'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
             'user_id.exists' => 'بیمار انتخاب‌شده معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'appointment_date.required' => 'تاریخ نوبت الزامی است.',
             'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به صورت YYYY/MM/DD باشد.',
             'appointment_time.required' => 'ساعت نوبت الزامی است.',
@@ -99,7 +99,7 @@ class ManualAppointmentEdit extends Component
         $this->manualAppointment->update([
             'doctor_id' => $this->doctor_id,
             'user_id' => $this->user_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_date' => $miladiDate,
             'appointment_time' => $this->appointment_time,
             'status' => $this->status,

@@ -51,8 +51,8 @@ class DoctorServicesController extends Controller
 
         // دریافت کلینیک انتخاب شده از درخواست (با مقدار پیش‌فرض "default")
         $selectedClinicId = $request->get('selectedClinicId', 'default');
-        // اگر کلینیک انتخاب شده غیر از دیفالت بود، clinic_id رو ست می‌کنیم؛ در غیر این صورت null
-        $data['clinic_id'] = $selectedClinicId !== 'default' ? $selectedClinicId : null;
+        // اگر کلینیک انتخاب شده غیر از دیفالت بود، medical_center_id رو ست می‌کنیم؛ در غیر این صورت null
+        $data['medical_center_id'] = $selectedClinicId !== 'default' ? $selectedClinicId : null;
 
         DoctorService::create($data);
         return redirect()->route('dr-services.index')->with('success', 'خدمت با موفقیت ایجاد شد.');

@@ -19,7 +19,7 @@ class UserBlockingEdit extends Component
     public $blocked_at;
     public $unblocked_at;
     public $reason;
-    public $clinic_id;
+    public $medical_center_id;
     public $status;
     public $clinics;
 
@@ -33,7 +33,7 @@ class UserBlockingEdit extends Component
             ? Jalalian::fromCarbon($this->userBlocking->unblocked_at)->format('Y/m/d')
             : null;
         $this->reason = $this->userBlocking->reason;
-        $this->clinic_id = $this->userBlocking->clinic_id;
+        $this->medical_center_id = $this->userBlocking->medical_center_id;
         $this->status = $this->userBlocking->status;
         $this->clinics = Clinic::select('id', 'name')->get();
     }

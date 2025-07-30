@@ -33,10 +33,10 @@
               <label for="doctor_id" class="form-label">پزشک</label>
             </div>
             <div class="col-12 position-relative mt-5" wire:ignore>
-              <select wire:model.live="form.clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.live="form.medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="">بدون مطب (ویزیت آنلاین)</option>
               </select>
-              <label for="clinic_id" class="form-label">مطب</label>
+              <label for="medical_center_id" class="form-label">مطب</label>
             </div>
             <div class="col-12 position-relative mt-5">
               <input type="number" wire:model.live="form.deposit_amount" class="form-control" id="deposit_amount"
@@ -80,8 +80,8 @@
         if ($('#doctor_id').hasClass('select2-hidden-accessible')) {
           $('#doctor_id').select2('destroy');
         }
-        if ($('#clinic_id').hasClass('select2-hidden-accessible')) {
-          $('#clinic_id').select2('destroy');
+        if ($('#medical_center_id').hasClass('select2-hidden-accessible')) {
+          $('#medical_center_id').select2('destroy');
         }
 
         // Initialize Select2 for doctor
@@ -92,7 +92,7 @@
         });
 
         // Initialize Select2 for clinic
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'بدون مطب (ویزیت آنلاین)',
           width: '100%'
@@ -109,9 +109,9 @@
       });
 
       // Handle clinic selection change
-      $('#clinic_id').on('change', function(e) {
+      $('#medical_center_id').on('change', function(e) {
         console.log('Clinic selected:', e.target.value);
-        @this.set('form.clinic_id', e.target.value);
+        @this.set('form.medical_center_id', e.target.value);
       });
 
       // Listen for clinics update event
@@ -127,8 +127,8 @@
         ];
 
         // Destroy and reinitialize clinic Select2 with new data
-        $('#clinic_id').select2('destroy');
-        $('#clinic_id').empty().select2({
+        $('#medical_center_id').select2('destroy');
+        $('#medical_center_id').empty().select2({
           dir: 'rtl',
           placeholder: 'بدون مطب (ویزیت آنلاین)',
           width: '100%',
@@ -136,7 +136,7 @@
         });
 
         // Reset the selected value
-        $('#clinic_id').val('').trigger('change');
+        $('#medical_center_id').val('').trigger('change');
       });
 
       // Reinitialize Select2 after Livewire updates to prevent reverting
@@ -145,9 +145,9 @@
 
         // Restore the current values after reinitialization
         const doctorId = @json($form['doctor_id']);
-        const clinicId = @json($form['clinic_id']);
+        const clinicId = @json($form['medical_center_id']);
         $('#doctor_id').val(doctorId || '').trigger('change');
-        $('#clinic_id').val(clinicId || '').trigger('change');
+        $('#medical_center_id').val(clinicId || '').trigger('change');
       });
 
       // Handle alerts

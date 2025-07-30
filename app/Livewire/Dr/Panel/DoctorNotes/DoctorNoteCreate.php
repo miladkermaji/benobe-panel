@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class DoctorNoteCreate extends Component
 {
-    public $clinic_id;
+    public $medical_center_id;
     public $appointment_type = 'in_person';
     public $notes;
     public $clinics;
@@ -52,15 +52,15 @@ class DoctorNoteCreate extends Component
     public function store()
     {
         $validator = Validator::make([
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ], [
-            'clinic_id' => 'nullable|exists:medical_centers,id',
+            'medical_center_id' => 'nullable|exists:medical_centers,id',
             'appointment_type' => 'required|in:in_person,online_phone,online_text,online_video',
             'notes' => 'nullable|string|max:1000',
         ], [
-            'clinic_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
             'appointment_type.required' => 'نوع نوبت الزامی است.',
             'appointment_type.in' => 'نوع نوبت باید یکی از گزینه‌های حضوری، تلفنی ویدیویی یا متنی باشد.',
             'notes.max' => 'یادداشت نمی‌تواند بیشتر از ۱۰۰۰ کاراکتر باشد.',
@@ -73,7 +73,7 @@ class DoctorNoteCreate extends Component
 
         DoctorNote::create([
             'doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id,
-            'medical_center_id' => $this->clinic_id,
+            'medical_center_id' => $this->medical_center_id,
             'appointment_type' => $this->appointment_type,
             'notes' => $this->notes,
         ]);

@@ -19,7 +19,7 @@ return new class () extends Migration {
             $table->enum('status', ['pending', 'paid', 'rejected', 'completed'])->default('pending');
             $table->unsignedBigInteger('prescription_insurance_id')->nullable();
             $table->unsignedInteger('price')->nullable();
-            $table->unsignedBigInteger('clinic_id')->nullable();
+            $table->unsignedBigInteger('medical_center_id')->nullable();
             $table->unsignedBigInteger('transaction_id')->nullable();
             $table->enum('payment_status', ['pending', 'paid', 'failed'])->default('pending');
             $table->tinyInteger('request_enabled')->default(0);
@@ -29,7 +29,7 @@ return new class () extends Migration {
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('set null');
             $table->foreign('patient_id')->references('id')->on('users')->onDelete('set null');
             $table->foreign('prescription_insurance_id')->references('id')->on('prescription_insurances')->onDelete('set null');
-            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('set null');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('set null');
             $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('set null');
         });
     }

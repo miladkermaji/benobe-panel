@@ -24,14 +24,14 @@ class DoctorClinicEdit extends Component
     public $description;
     public $provinces;
     public $cities;
-    public $clinic_id;
+    public $medical_center_id;
     public $prescription_tariff = null;
     public $type = 'policlinic';
 
     public function mount($id)
     {
         $this->clinic = \App\Models\MedicalCenter::findOrFail($id);
-        $this->clinic_id = $id;
+        $this->medical_center_id = $id;
         $this->name = $this->clinic->name;
         $this->title = $this->clinic->title;
 

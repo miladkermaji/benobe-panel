@@ -124,7 +124,7 @@ class SpecialWorkhours extends Component
 
             // تلاش برای دریافت از کش
             $cachedSchedule = Cache::remember($cacheKey, now()->addHours(24), function () use ($doctorId, $gregorianDate, $dayOfWeek) {
-                Log::info("Fetching work schedule from DB for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+                Log::info("Fetching work schedule from DB for date: {$gregorianDate}, day: {$dayOfWeek}, doctor_id: {$doctorId}, medical_center_id: {$this->clinicId}");
 
                 $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                     ->where('date', $gregorianDate)
@@ -163,7 +163,7 @@ class SpecialWorkhours extends Component
                     ->first();
 
                 if (!$schedule) {
-                    Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, clinic_id: {$this->clinicId}");
+                    Log::info("No work schedule found for {$dayOfWeek} with doctor_id: {$doctorId}, medical_center_id: {$this->clinicId}");
                     return ['status' => false, 'data' => []];
                 }
 
@@ -295,7 +295,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $parsedDate->toDateString(),
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -439,7 +439,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -521,7 +521,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -560,7 +560,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),
@@ -741,7 +741,7 @@ class SpecialWorkhours extends Component
                 [
                     'doctor_id' => $doctorId,
                     'date' => $this->selectedDate,
-                    'clinic_id' => $this->clinicId === 'default' ? null : $this->clinicId,
+                    'medical_center_id' => $this->clinicId === 'default' ? null : $this->clinicId,
                 ],
                 [
                     'work_hours' => json_encode([]),

@@ -25,7 +25,7 @@ class SecretaryEdit extends Component
     public $provinces;
     public $cities;
     public $secretary_id;
-    public $clinic_id;
+    public $medical_center_id;
 
     public function mount($id)
     {
@@ -49,12 +49,12 @@ class SecretaryEdit extends Component
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
 
-        // دریافت clinic_id از doctor relationship
+        // دریافت medical_center_id از doctor relationship
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $doctor = Doctor::find($doctorId);
-        $this->clinic_id = $doctor?->selectedMedicalCenter?->medical_center_id;
+        $this->medical_center_id = $doctor?->selectedMedicalCenter?->medical_center_id;
 
-        Log::info('edit mount clinic_id', ['clinic_id' => $this->clinic_id]);
+        Log::info('edit mount medical_center_id', ['medical_center_id' => $this->medical_center_id]);
     }
 
     public function updatedProvinceId($value)
@@ -66,7 +66,7 @@ class SecretaryEdit extends Component
 
     public function update()
     {
-        // دریافت doctor_id و clinic_id
+        // دریافت doctor_id و medical_center_id
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         $doctor = Doctor::find($doctorId);
         if (!$doctor) {
@@ -76,9 +76,9 @@ class SecretaryEdit extends Component
 
         $clinicId = $doctor->selectedMedicalCenter?->medical_center_id;
 
-        // بررسی اینکه clinic_id null نباشد
+        // بررسی اینکه medical_center_id null نباشد
         if (!$clinicId) {
-            $this->addError('clinic_id', 'مرکز درمانی انتخاب نشده است.');
+            $this->addError('medical_center_id', 'مرکز درمانی انتخاب نشده است.');
             return;
         }
 
@@ -94,9 +94,9 @@ class SecretaryEdit extends Component
         ]);
 
         // اضافه کردن لاگ برای دیباگ
-        Log::info('edit update clinic_id', [
-            'clinic_id_property' => $this->clinic_id,
-            'clinic_id_from_doctor' => $clinicId,
+        Log::info('edit update medical_center_id', [
+            'medical_center_id_property' => $this->medical_center_id,
+            'medical_center_id_from_doctor' => $clinicId,
             'doctor_id' => $doctorId,
             'secretary_id' => $this->secretary_id
         ]);

@@ -58,13 +58,13 @@
             </div>
             <!-- کلینیک -->
             <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.debounce.500ms="clinic_id" class="form-select select2" id="clinic_id">
+              <select wire:model.debounce.500ms="medical_center_id" class="form-select select2" id="medical_center_id">
                 <option value="" selected>انتخاب کلینیک</option>
                 @foreach ($clinics as $clinic)
                   <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
                 @endforeach
               </select>
-              <label for="clinic_id" class="form-label">کلینیک</label>
+              <label for="medical_center_id" class="form-label">کلینیک</label>
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
@@ -168,7 +168,7 @@
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
         // تخریب Select2های قبلی برای جلوگیری از تداخل
-        $('#selected_service, #clinic_id, [id^="insurance_id_"]').each(function() {
+        $('#selected_service, #medical_center_id, [id^="insurance_id_"]').each(function() {
           if ($(this).hasClass('select2-hidden-accessible')) {
             $(this).select2('destroy');
           }
@@ -185,14 +185,14 @@
         }).val(@json($selected_service) || '').trigger('change');
 
         // مقداردهی اولیه برای کلینیک
-        $('#clinic_id').select2({
+        $('#medical_center_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کلینیک',
           allowClear: true,
           width: '100%',
           dropdownAutoWidth: true,
           minimumResultsForSearch: 5
-        }).val(@json($clinic_id) || '').trigger('change');
+        }).val(@json($medical_center_id) || '').trigger('change');
 
         // مقداردهی اولیه برای بیمه‌ها
         $('[id^="insurance_id_"]').each(function() {
@@ -224,13 +224,13 @@
       });
 
       // رویداد تغییر کلینیک
-      $('#clinic_id').on('select2:select', function(e) {
+      $('#medical_center_id').on('select2:select', function(e) {
         const value = e.target.value === '' ? null : e.target.value;
-        @this.set('clinic_id', value);
+        @this.set('medical_center_id', value);
       });
 
-      $('#clinic_id').on('select2:clear', function() {
-        @this.set('clinic_id', null);
+      $('#medical_center_id').on('select2:clear', function() {
+        @this.set('medical_center_id', null);
       });
 
       // رویداد تغییر بیمه
@@ -250,7 +250,7 @@
         clinicId
       }) => {
         if (clinicId) {
-          $('#clinic_id').val(clinicId).trigger('change');
+          $('#medical_center_id').val(clinicId).trigger('change');
         }
       });
 
