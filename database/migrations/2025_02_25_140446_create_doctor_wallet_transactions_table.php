@@ -10,7 +10,7 @@ return new class () extends Migration {
         Schema::create('doctor_wallet_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('doctor_id')->constrained('doctors')->cascadeOnDelete();
-            $table->foreignId('clinic_id')->nullable()->constrained('medical_centers')->nullOnDelete();
+            $table->foreignId('medical_center_id')->nullable()->constrained('medical_centers')->nullOnDelete();
             $table->unsignedInteger('amount')->default(0);
             $table->enum('status', ['pending', 'available', 'requested', 'paid'])->default('pending');
             $table->enum('type', ['online', 'in_person', 'charge', 'wallet_charge', 'settlement', 'settlement_reversal'])->default('online');
@@ -22,7 +22,7 @@ return new class () extends Migration {
 
             $table->index(['doctor_id', 'registered_at']);
             $table->index(['type', 'status']);
-            $table->index('clinic_id');
+            $table->index('medical_center_id');
             $table->index('amount');
         });
     }

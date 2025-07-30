@@ -11,7 +11,7 @@ class CreateBestDoctorsTable extends Migration
         Schema::create('best_doctors', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id');
-            $table->unsignedBigInteger('clinic_id')->nullable();
+            $table->unsignedBigInteger('medical_center_id')->nullable();
             $table->boolean('best_doctor')->default(false);
             $table->boolean('best_consultant')->default(false);
             $table->decimal('star_rating', 2, 1)->default(0.0)->comment('امتیاز ستاره (0.0 تا 5.0)');
@@ -20,7 +20,7 @@ class CreateBestDoctorsTable extends Migration
 
             // کلیدهای خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('set null');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('set null');
         });
     }
 

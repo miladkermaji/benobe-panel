@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('secretaries', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id')->nullable();
-            $table->unsignedBigInteger('clinic_id')->nullable();
+            $table->unsignedBigInteger('medical_center_id')->nullable();
 
             $table->string('first_name')->nullable();
             $table->string('last_name')->nullable();
@@ -53,16 +53,16 @@ return new class () extends Migration {
             $table->foreign('province_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('city_id')->references('id')->on('zone')->onDelete('set null');
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
         });
 
         // اضافه کردن ایندکس‌های ترکیبی برای شماره موبایل و کد ملی با توجه به شرط‌های اختصاصی
         Schema::table('secretaries', function (Blueprint $table) {
-            // موبایل یکتا برای هر دکتر با کلینیک خاص
-            $table->unique(['doctor_id', 'clinic_id', 'mobile'], 'unique_mobile_per_doctor_clinic');
+            // موبایل یکتا برای هر دکتر با مرکز درمانی خاص
+            $table->unique(['doctor_id', 'medical_center_id', 'mobile'], 'unique_mobile_per_doctor_medical_center');
 
-            // کد ملی یکتا برای هر دکتر با کلینیک خاص
-            $table->unique(['doctor_id', 'clinic_id', 'national_code'], 'unique_national_code_per_doctor_clinic');
+            // کد ملی یکتا برای هر دکتر با مرکز درمانی خاص
+            $table->unique(['doctor_id', 'medical_center_id', 'national_code'], 'unique_national_code_per_doctor_medical_center');
         });
     }
 

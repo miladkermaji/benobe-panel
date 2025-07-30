@@ -38,6 +38,11 @@ return new class () extends Migration {
             // انواع مشاوره در فرمت JSON
             // مثال: ["general", "specialized", "emergency"]
 
+            // Manual appointment settings fields
+            $table->boolean('is_active')->default(1)->comment('فعال بودن تایید دو مرحله‌ای (1 = بلی, 0 = خیر)');
+            $table->unsignedInteger('duration_send_link')->default(3)->comment('زمان ارسال لینک تایید به ساعت');
+            $table->unsignedInteger('duration_confirm_link')->default(1)->comment('مدت اعتبار لینک تایید به ساعت');
+
             $table->timestamps(); // زمان ایجاد و آخرین بروزرسانی
 
             // تعریف کلیدهای خارجی

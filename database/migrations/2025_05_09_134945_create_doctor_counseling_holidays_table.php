@@ -14,13 +14,13 @@ return new class () extends Migration {
 
             $table->id();
             $table->unsignedBigInteger('doctor_id'); // ارتباط با جدول پزشکان
-            $table->unsignedBigInteger('clinic_id')->nullable(); // ارتباط با جدول پزشکان
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // ارتباط با جدول مراکز درمانی
             $table->json('holiday_dates')->nullable(); // ذخیره تاریخ‌های تعطیلات در قالب JSON
             $table->string('status')->default('active'); // فیلد کمکی برای وضعیت
             $table->timestamps();
 
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
 
         });
     }

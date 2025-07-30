@@ -9,7 +9,8 @@ return new class () extends Migration {
     {
         Schema::create('user_wallet_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->unsignedBigInteger('walletable_id')->nullable();
+            $table->string('walletable_type')->nullable();
             $table->unsignedInteger('amount')->default(0);
             $table->enum('status', ['pending', 'available', 'requested', 'paid'])->default('pending');
             $table->enum('type', ['deposit', 'withdrawal', 'payment'])->default('payment');
@@ -23,7 +24,7 @@ return new class () extends Migration {
             $table->index('type');
             $table->index('registered_at');
             $table->index('paid_at');
-            $table->index(['user_id', 'status']);
+            $table->index(['walletable_id', 'walletable_type']);
             $table->index(['type', 'status']);
         });
     }

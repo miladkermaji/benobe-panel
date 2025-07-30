@@ -13,14 +13,14 @@ return new class () extends Migration {
         Schema::create('counseling_holidays', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('doctor_id'); // ارتباط با پزشک
-            $table->unsignedBigInteger('clinic_id')->nullable(); // ارتباط با کلینیک
+            $table->unsignedBigInteger('medical_center_id')->nullable(); // ارتباط با مرکز درمانی
             $table->json('holiday_dates')->nullable(); // تاریخ‌های تعطیلات مشاوره به‌صورت JSON
             $table->string('status')->default('active'); // وضعیت تعطیلات
             $table->timestamps();
 
             // کلیدهای خارجی
             $table->foreign('doctor_id')->references('id')->on('doctors')->onDelete('cascade');
-            $table->foreign('clinic_id')->references('id')->on('medical_centers')->onDelete('cascade');
+            $table->foreign('medical_center_id')->references('id')->on('medical_centers')->onDelete('cascade');
         });
     }
 

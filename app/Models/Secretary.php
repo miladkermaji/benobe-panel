@@ -25,7 +25,7 @@ class Secretary extends Authenticatable implements JWTSubject
         'city_id',
         'province_id',
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
     ];
 
     /**
@@ -68,7 +68,7 @@ class Secretary extends Authenticatable implements JWTSubject
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     public function permissions()
