@@ -22,7 +22,7 @@ return new class () extends Migration {
             $table->timestamps();
 
             // کلید‌های منحصربه‌فرد برای جلوگیری از تکرار
-            $table->unique(['doctor_id', 'secretary_id', 'medical_center_id']);
+            $table->unique(['doctor_id', 'secretary_id', 'medical_center_id'], 'sec_perm_unique');
 
             // بهبود کارایی جستجو
             $table->index(['secretary_id', 'medical_center_id']);

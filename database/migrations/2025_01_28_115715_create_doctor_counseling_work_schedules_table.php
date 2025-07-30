@@ -52,7 +52,7 @@ return new class () extends Migration {
                 ->on('medical_centers')
                 ->onDelete('cascade');
             // محدودیت یکتایی برای جلوگیری از تکرار رکوردها
-            $table->unique(['doctor_id', 'day', 'medical_center_id']);
+            $table->unique(['doctor_id', 'day', 'medical_center_id'], 'dcws_unique_schedule');
         });
     }
 
