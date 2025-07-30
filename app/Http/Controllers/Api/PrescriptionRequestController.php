@@ -158,7 +158,7 @@ class PrescriptionRequestController extends Controller
         $clinic = null;
         $prescription_fee = null;
         if (!empty($validated['clinic_id'])) {
-            $clinic = MedicalCenter::where('type', 'clinic')->find($validated['clinic_id']);
+            $clinic = MedicalCenter::where('type', 'policlinic')->find($validated['clinic_id']);
             $prescription_fee = $clinic?->prescription_fee;
         }
         $price = $prescription_fee > 0 ? (int)$prescription_fee : null;

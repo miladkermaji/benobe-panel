@@ -22,7 +22,7 @@ class VacationController extends Controller
         // Get doctor's medical centers (clinics)
         $clinics = \App\Models\MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
-        })->where('type', 'clinic')->get();
+        })->where('type', 'policlinic')->get();
 
         try {
             $year = $request->input('year', Jalalian::now()->getYear());

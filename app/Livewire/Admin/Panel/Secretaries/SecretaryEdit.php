@@ -52,7 +52,7 @@ class SecretaryEdit extends Component
     {
         $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
             $query->where('doctor_id', $value);
-        })->where('type', 'clinic')->get();
+        })->where('type', 'policlinic')->get();
         $this->clinic_id = null;
         $this->dispatch('refresh-clinic-select2', clinics: $this->clinics->toArray());
     }

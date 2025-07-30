@@ -98,10 +98,10 @@ class AppointmentBookingController extends Controller
             // اطلاعات کلینیک
             $mainClinic = $doctor->medicalCenters()
                 ->where('is_active', true)
-                ->where('type', 'clinic')
+                ->where('type', 'policlinic')
                 ->where('is_main_center', true)
                 ->first()
-                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
+                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'policlinic')->first();
             $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
 
             // تبدیل تاریخ به شمسی
@@ -367,7 +367,7 @@ class AppointmentBookingController extends Controller
                 $mainClinic = null;
                 if ($clinicId) {
                     // اگر clinic_id در درخواست ارسال شده، کلینیک مربوطه را پیدا کن
-                    $mainClinic = $doctor->medicalCenters()->where('id', $clinicId)->where('is_active', true)->where('type', 'clinic')->first();
+                    $mainClinic = $doctor->medicalCenters()->where('id', $clinicId)->where('is_active', true)->where('type', 'policlinic')->first();
                     if (!$mainClinic) {
                         return response()->json([
                             'status' => 'error',
@@ -379,10 +379,10 @@ class AppointmentBookingController extends Controller
                     // اگر clinic_id ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
                     $mainClinic = $doctor->medicalCenters()
                         ->where('is_active', true)
-                        ->where('type', 'clinic')
+                        ->where('type', 'policlinic')
                         ->where('is_main_center', true)
                         ->first()
-                        ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
+                        ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'policlinic')->first();
                 }
 
                 // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن
@@ -793,10 +793,10 @@ class AppointmentBookingController extends Controller
 
             $mainClinic = $doctor->medicalCenters()
                 ->where('is_active', true)
-                ->where('type', 'clinic')
+                ->where('type', 'policlinic')
                 ->where('is_main_center', true)
                 ->first()
-                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
+                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'policlinic')->first();
             if (!$mainClinic) {
                 return response()->json([
                     'status' => 'error',

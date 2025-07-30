@@ -25,7 +25,7 @@ class InsuranceCreate extends Component
     public function mount()
     {
         $this->photoPreview = asset('default-avatar.png');
-        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedPhoto()

@@ -28,7 +28,7 @@ class DoctorProfileController extends Controller
              'specialty' => fn ($q) => $q->select('id', 'name'),
              'province'  => fn ($q) => $q->select('id', 'name'),
              'city'      => fn ($q) => $q->select('id', 'name'),
-             'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'clinic')
+             'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'policlinic')
               ->select('id', 'doctor_id', 'name', 'address', 'province_id', 'city_id', 'phone_number', 'is_main_center'),
              'reviews'   => fn ($q) => $q->where('is_approved', true)
               ->with(['reviewable' => fn ($q) => $q->select('id', 'first_name', 'last_name')])

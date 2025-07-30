@@ -405,7 +405,7 @@ class AppointmentsList extends Component
         $doctor = $this->getAuthenticatedDoctor();
         if ($doctor) {
             $this->clinics = $doctor->medicalCenters()
-                ->where('type', 'clinic')
+                ->where('type', 'policlinic')
                 ->where('is_active', 1)
                 ->get()
                 ->toArray();

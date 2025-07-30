@@ -40,7 +40,7 @@ class BestDoctorEdit extends Component
         if ($this->doctor_id) {
             $clinics = MedicalCenter::whereHas('doctors', function ($query) {
                 $query->where('doctor_id', $this->doctor_id);
-            })->where('type', 'clinic')->get();
+            })->where('type', 'policlinic')->get();
 
             $this->clinics = $clinics;
 

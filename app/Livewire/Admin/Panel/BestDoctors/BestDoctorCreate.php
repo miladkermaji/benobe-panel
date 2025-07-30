@@ -32,7 +32,7 @@ class BestDoctorCreate extends Component
         if ($this->doctor_id) {
             $clinics = MedicalCenter::whereHas('doctors', function ($query) {
                 $query->where('doctor_id', $this->doctor_id);
-            })->where('type', 'clinic')->get();
+            })->where('type', 'policlinic')->get();
             Log::info('Found clinics:', ['count' => $clinics->count(), 'clinics' => $clinics->toArray()]);
             $this->clinics = $clinics;
 

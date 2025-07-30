@@ -40,7 +40,7 @@ class ManualAppointmentSettingCreate extends Component
             : [];
 
         $clinics = MedicalCenter::whereNotIn('id', $existingClinics)
-            ->where('type', 'clinic')
+            ->where('type', 'policlinic')
             ->get()
             ->map(function ($clinic) {
                 return [

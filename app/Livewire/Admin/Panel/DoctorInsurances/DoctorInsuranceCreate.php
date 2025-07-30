@@ -30,7 +30,7 @@ class DoctorInsuranceCreate extends Component
     {
         $this->photoPreview = asset('default-avatar.png');
         $this->doctors = Doctor::all();
-        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
     }
 
     public function updatedPhoto()

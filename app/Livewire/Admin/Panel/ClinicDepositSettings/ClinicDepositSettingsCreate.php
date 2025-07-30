@@ -31,7 +31,7 @@ class ClinicDepositSettingsCreate extends Component
     {
         $this->clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
             $query->where('doctor_id', $value);
-        })->where('type', 'clinic')->get();
+        })->where('type', 'policlinic')->get();
         $this->form['clinic_id'] = '';
 
         $this->dispatch('clinics-updated', clinics: $this->clinics->map(function ($clinic) {

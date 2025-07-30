@@ -32,7 +32,7 @@ class DoctorServiceCreate extends Component
     public function mount()
     {
         $this->doctors = Doctor::all();
-        $this->clinics = MedicalCenter::where('type', 'clinic')->get();
+        $this->clinics = MedicalCenter::where('type', 'policlinic')->get();
         $this->insurances = Insurance::all();
         $this->services = Service::all();
         $this->parentServices = DoctorService::whereNull('parent_id')->get();

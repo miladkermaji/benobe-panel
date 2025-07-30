@@ -35,14 +35,14 @@ class SecretaryCreate extends Component
         $this->doctors = Doctor::all();
         $this->clinics = $this->doctor_id ? MedicalCenter::whereHas('doctors', function ($query) {
             $query->where('doctor_id', $this->doctor_id);
-        })->where('type', 'clinic')->get() : collect();
+        })->where('type', 'policlinic')->get() : collect();
     }
 
     public function updatedDoctorId($value)
     {
         $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($value) {
             $query->where('doctor_id', $value);
-        })->where('type', 'clinic')->get();
+        })->where('type', 'policlinic')->get();
         Log::info('updatedDoctorId', [
             'doctor_id' => $value,
             'clinics' => $clinics->toArray(),
