@@ -34,7 +34,7 @@ class ManualAppointmentSettingCreate extends Component
     {
         $existingClinics = $this->doctor_id
             ? ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
-                ->whereNotNull('clinic_id')
+                ->whereNotNull('medical_center_id')
                 ->pluck('clinic_id')
                 ->toArray()
             : [];

@@ -222,7 +222,7 @@ class AppointmentController extends Controller
         $appointments = Appointment::with('patientable')
             ->where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) {
-                return $query->whereNull('clinic_id');
+                return $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 return $query->where('clinic_id', $selectedClinicId);

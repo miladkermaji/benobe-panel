@@ -256,7 +256,7 @@ class CounselingWorkHours extends Component
                 if ($this->activeClinicId !== 'default') {
                     $query->where('clinic_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -355,7 +355,7 @@ class CounselingWorkHours extends Component
                         if ($this->activeClinicId !== 'default') {
                             $query->where('clinic_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -388,7 +388,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -460,7 +460,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -516,7 +516,7 @@ class CounselingWorkHours extends Component
                 if ($this->activeClinicId !== 'default') {
                     $query->where('clinic_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get()
@@ -560,7 +560,7 @@ class CounselingWorkHours extends Component
                 if ($this->activeClinicId !== 'default') {
                     $query->where('clinic_id', $this->activeClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -769,7 +769,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -826,7 +826,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1046,7 +1046,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1117,7 +1117,7 @@ class CounselingWorkHours extends Component
                         if ($this->activeClinicId !== 'default') {
                             $query->where('clinic_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1220,7 +1220,7 @@ class CounselingWorkHours extends Component
                         if ($this->activeClinicId !== 'default') {
                             $query->where('clinic_id', $this->activeClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -1333,7 +1333,7 @@ class CounselingWorkHours extends Component
                     if ($this->activeClinicId !== 'default') {
                         $query->where('clinic_id', $this->activeClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();

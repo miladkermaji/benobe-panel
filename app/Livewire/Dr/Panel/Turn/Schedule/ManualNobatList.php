@@ -258,7 +258,7 @@ class ManualNobatList extends Component
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -269,7 +269,7 @@ class ManualNobatList extends Component
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->pluck('day')
@@ -286,7 +286,7 @@ class ManualNobatList extends Component
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->pluck('date')
@@ -300,7 +300,7 @@ class ManualNobatList extends Component
                 ->where('status', '!=', 'cancelled')
                 ->whereNull('deleted_at');
             if ($selectedClinicId === 'default') {
-                $appointmentsQuery->whereNull('clinic_id');
+                $appointmentsQuery->whereNull('medical_center_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $appointmentsQuery->where('clinic_id', $selectedClinicId);
             }
@@ -320,7 +320,7 @@ class ManualNobatList extends Component
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->select('day', 'appointment_settings')
@@ -704,12 +704,12 @@ class ManualNobatList extends Component
         $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $dayOfWeek)
             ->where('is_working', true)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $workSchedule = $workScheduleQuery->first();
         $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctorId)
             ->where('date', $date)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $specialSchedule = $specialScheduleQuery->first();
         if (!$workSchedule && !$specialSchedule) {
@@ -780,7 +780,7 @@ class ManualNobatList extends Component
             return ['success' => false, 'canReschedule' => false, 'message' => 'تاریخ مقصد خارج از بازه تقویم مجاز است.'];
         }
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
@@ -791,7 +791,7 @@ class ManualNobatList extends Component
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
             ->where('is_working', true)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
         if (!$workSchedule) {
@@ -799,7 +799,7 @@ class ManualNobatList extends Component
         }
         $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $newDate)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
@@ -841,7 +841,7 @@ class ManualNobatList extends Component
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->pluck('appointment_time')
             ->map(fn ($time) => Carbon::parse($time)->format('H:i'))
@@ -955,7 +955,7 @@ class ManualNobatList extends Component
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
             ->where('is_working', true)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
         if (!$workSchedule) {
@@ -963,7 +963,7 @@ class ManualNobatList extends Component
         }
         $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctor->id)
             ->where('date', $date)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->first();
         $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
@@ -978,7 +978,7 @@ class ManualNobatList extends Component
         $calendarDays = DoctorAppointmentConfig::where('doctor_id', $doctorId)->value('calendar_days') ?? 30;
         $maxDate = $today->copy()->addDays($calendarDays);
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
@@ -999,7 +999,7 @@ class ManualNobatList extends Component
             $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
                 ->where('is_working', true)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
             if (!$workSchedule) {
@@ -1008,7 +1008,7 @@ class ManualNobatList extends Component
             }
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $dateStr)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
             $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
@@ -1191,7 +1191,7 @@ class ManualNobatList extends Component
             $query = DoctorService::where('doctor_id', $doctorId)
                 ->where('insurance_id', $this->selectedInsuranceId);
             if ($this->selectedClinicId === 'default') {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             } else {
                 $query->where('clinic_id', $this->selectedClinicId);
             }
@@ -1781,7 +1781,7 @@ class ManualNobatList extends Component
     {
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId));
         $holidays = $holidaysQuery->first();
         $holidayDates = json_decode($holidays->holiday_dates ?? '[]', true);
@@ -1801,7 +1801,7 @@ class ManualNobatList extends Component
             $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
                 ->where('is_working', true)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
             if (!$workSchedule) {
@@ -1809,7 +1809,7 @@ class ManualNobatList extends Component
             }
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $date)
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
                 ->first();
             $workHours = $specialSchedule ? json_decode($specialSchedule->work_hours, true) : json_decode($workSchedule->work_hours, true);
@@ -1938,7 +1938,7 @@ class ManualNobatList extends Component
             ->where('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->select('id', 'appointment_date')
             ->get();
@@ -1956,7 +1956,7 @@ class ManualNobatList extends Component
             ->whereBetween('appointment_date', [$startDate, $endDate])
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
             ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->selectedClinicId))
             ->select('appointment_date')
             ->groupBy('appointment_date')
@@ -1979,7 +1979,7 @@ class ManualNobatList extends Component
             $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
                 ->where('status', 'active');
             if ($this->selectedClinicId === 'default') {
-                $holidaysQuery->whereNull('clinic_id');
+                $holidaysQuery->whereNull('medical_center_id');
             } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
                 $holidaysQuery->where('clinic_id', $this->selectedClinicId);
             }
@@ -2010,7 +2010,7 @@ class ManualNobatList extends Component
         $doctorId = $this->getAuthenticatedDoctor()->id;
         $holidayRecordQuery = DoctorHoliday::where('doctor_id', $doctorId);
         if ($this->selectedClinicId === 'default') {
-            $holidayRecordQuery->whereNull('clinic_id');
+            $holidayRecordQuery->whereNull('medical_center_id');
         } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
             $holidayRecordQuery->where('clinic_id', $this->selectedClinicId);
         }
@@ -2240,7 +2240,7 @@ class ManualNobatList extends Component
         $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) use ($clinicId) {
                 if ($clinicId === null) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } else {
                     $query->where('clinic_id', $clinicId);
                 }
@@ -2252,7 +2252,7 @@ class ManualNobatList extends Component
         // Check for special schedule
         $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
             ->where('date', $gregorianDate)
-            ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+            ->when($clinicId === null, fn ($q) => $q->whereNull('medical_center_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->first();
 
@@ -2271,7 +2271,7 @@ class ManualNobatList extends Component
             ->where('appointment_date', $gregorianDate)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+            ->when($clinicId === null, fn ($q) => $q->whereNull('medical_center_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->pluck('appointment_time')
             ->map(fn ($time) => Carbon::parse($time)->format('H:i'))
@@ -2499,7 +2499,7 @@ class ManualNobatList extends Component
             ->whereDate('appointment_date', $date)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
-            ->when($clinicId === null, fn ($q) => $q->whereNull('clinic_id'))
+            ->when($clinicId === null, fn ($q) => $q->whereNull('medical_center_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('clinic_id', $clinicId))
             ->get()
             ->map(function ($appointment) {

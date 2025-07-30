@@ -86,7 +86,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -152,7 +152,7 @@ class ScheduleSettingController extends Controller
                         if ($selectedClinicId !== 'default') {
                             $query->where('clinic_id', $selectedClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->get(),
@@ -200,7 +200,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -230,7 +230,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -260,7 +260,7 @@ class ScheduleSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -315,7 +315,7 @@ class ScheduleSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -344,7 +344,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -412,7 +412,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -567,7 +567,7 @@ class ScheduleSettingController extends Controller
                         if ($selectedClinicId !== 'default') {
                             $query->where('clinic_id', $selectedClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -661,7 +661,7 @@ class ScheduleSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -777,7 +777,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->get();
@@ -844,7 +844,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -922,7 +922,7 @@ class ScheduleSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -1057,7 +1057,7 @@ class ScheduleSettingController extends Controller
         $holidayRecordQuery = DoctorHoliday::where('doctor_id', $doctorId);
 
         if ($selectedClinicId === 'default') {
-            $holidayRecordQuery->whereNull('clinic_id');
+            $holidayRecordQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
             $holidayRecordQuery->where('clinic_id', $selectedClinicId);
         }
@@ -1091,7 +1091,7 @@ class ScheduleSettingController extends Controller
             $specialDayQuery = SpecialDailySchedule::where('date', $validated['date']);
 
             if ($selectedClinicId === 'default') {
-                $specialDayQuery->whereNull('clinic_id');
+                $specialDayQuery->whereNull('medical_center_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $specialDayQuery->where('clinic_id', $selectedClinicId);
             }
@@ -1122,7 +1122,7 @@ class ScheduleSettingController extends Controller
         $holidayQuery = DoctorHoliday::where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
                 // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (clinic_id = NULL) بازگردانده شود
-                $query->whereNull('clinic_id')->where('doctor_id', $doctorId);
+                $query->whereNull('medical_center_id')->where('doctor_id', $doctorId);
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // در صورت ارسال کلینیک خاص
@@ -1158,7 +1158,7 @@ class ScheduleSettingController extends Controller
         $holidayRecord = DoctorHoliday::where('doctor_id', $doctorId)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 }
@@ -1175,7 +1175,7 @@ class ScheduleSettingController extends Controller
             ->whereNull('deleted_at') // فقط نوبت‌های فعال
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 }
@@ -1188,7 +1188,7 @@ class ScheduleSettingController extends Controller
             ->where('day', $dayOfWeek)
             ->where(function ($query) use ($selectedClinicId) {
                 if ($selectedClinicId === 'default') {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 }
@@ -1235,7 +1235,7 @@ class ScheduleSettingController extends Controller
             ->where('appointment_date', $gregorianDate);
 
         if ($selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $query->whereNull('medical_center_id');
         } else {
             $query->where('clinic_id', $selectedClinicId);
         }
@@ -1349,7 +1349,7 @@ class ScheduleSettingController extends Controller
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 });
 
             $appointments = $appointmentsQuery->get();
@@ -1363,7 +1363,7 @@ class ScheduleSettingController extends Controller
             $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', strtolower(Carbon::parse($newDateGregorian)->format('l')))
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }, function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
                 })
@@ -1436,7 +1436,7 @@ class ScheduleSettingController extends Controller
                 ->where('appointment_date', $validated['old_date'])
                 ->when($selectedClinicId === 'default', function ($query) {
                     // اگر selectedClinicId برابر با 'default' باشد، فقط نوبت‌های بدون کلینیک را در نظر بگیرد
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // در غیر این صورت، نوبت‌های مربوط به کلینیک مشخص‌شده را بررسی کند
@@ -1459,7 +1459,7 @@ class ScheduleSettingController extends Controller
             $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('day', $dayOfWeek)
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
@@ -1539,7 +1539,7 @@ class ScheduleSettingController extends Controller
         $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
             ->when($selectedClinicId === 'default', function ($query) use ($doctorId) {
                 // در صورت 'default' فقط تعطیلی‌های بدون کلینیک (clinic_id = NULL)
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // اگر کلینیک خاص ارسال شود
@@ -1572,7 +1572,7 @@ class ScheduleSettingController extends Controller
                 ->where('appointment_date', $date)
                 ->when($selectedClinicId === 'default', function ($query) {
                     // فقط نوبت‌های بدون کلینیک (clinic_id = NULL) بازگردانده شود
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // نوبت‌های کلینیک مشخص‌شده بازگردانده شود
@@ -1599,7 +1599,7 @@ class ScheduleSettingController extends Controller
         // اعمال فیلتر selectedClinicId
         if ($selectedClinicId === 'default') {
             // اگر selectedClinicId برابر با 'default' باشد، clinic_id باید NULL یا خالی باشد
-            $appointments->whereNull('clinic_id');
+            $appointments->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
             // اگر selectedClinicId مقدار داشت، clinic_id باید با آن مطابقت داشته باشد
             $appointments->where('clinic_id', $selectedClinicId);
@@ -1629,7 +1629,7 @@ class ScheduleSettingController extends Controller
                 ->whereJsonContains('holiday_dates', $validated['date']);
 
             if ($selectedClinicId === 'default') {
-                $existingHolidayQuery->whereNull('clinic_id');
+                $existingHolidayQuery->whereNull('medical_center_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $existingHolidayQuery->where('clinic_id', $selectedClinicId);
             }
@@ -1677,7 +1677,7 @@ class ScheduleSettingController extends Controller
         $holidayRecordQuery = DoctorHoliday::where('doctor_id', $doctorId);
 
         if ($selectedClinicId === 'default') {
-            $holidayRecordQuery->whereNull('clinic_id');
+            $holidayRecordQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
             $holidayRecordQuery->where('clinic_id', $selectedClinicId);
         }
@@ -1727,7 +1727,7 @@ class ScheduleSettingController extends Controller
             ->where('status', '!=', 'cancelled') // فقط نوبت‌های فعال
             ->whereNull('deleted_at')
             ->when($selectedClinicId === 'default', function ($query) {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 $query->where('clinic_id', $selectedClinicId);
@@ -1756,7 +1756,7 @@ class ScheduleSettingController extends Controller
             $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId);
 
             if ($selectedClinicId === 'default') {
-                $holidaysQuery->whereNull('clinic_id');
+                $holidaysQuery->whereNull('medical_center_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
                 $holidaysQuery->where('clinic_id', $selectedClinicId);
             }
@@ -1796,7 +1796,7 @@ class ScheduleSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();

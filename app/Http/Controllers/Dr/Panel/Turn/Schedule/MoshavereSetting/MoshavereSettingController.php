@@ -38,7 +38,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->get();
@@ -92,7 +92,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -123,7 +123,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -230,7 +230,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -260,7 +260,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -290,7 +290,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -343,7 +343,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -541,7 +541,7 @@ class MoshavereSettingController extends Controller
                         if ($selectedClinicId !== 'default') {
                             $query->where('clinic_id', $selectedClinicId);
                         } else {
-                            $query->whereNull('clinic_id');
+                            $query->whereNull('medical_center_id');
                         }
                     })
                     ->first();
@@ -635,7 +635,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();
@@ -778,7 +778,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->get();
@@ -843,7 +843,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -921,7 +921,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->get();
@@ -952,7 +952,7 @@ class MoshavereSettingController extends Controller
                     if ($selectedClinicId !== 'default') {
                         $query->where('clinic_id', $selectedClinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->first();
@@ -1034,7 +1034,7 @@ class MoshavereSettingController extends Controller
                 if ($selectedClinicId !== 'default') {
                     $query->where('clinic_id', $selectedClinicId);
                 } else {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 }
             })
             ->first();

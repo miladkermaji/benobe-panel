@@ -128,7 +128,7 @@ class SpecialWorkhours extends Component
 
                 $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                     ->where('date', $gregorianDate)
-                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                     ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                     ->first();
 
@@ -158,7 +158,7 @@ class SpecialWorkhours extends Component
                 $schedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
                     ->where('day', $dayOfWeek)
                     ->where('is_working', true)
-                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                    ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                     ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                     ->first();
 
@@ -203,7 +203,7 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                 ->first();
 
@@ -277,7 +277,7 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                 ->first();
 
@@ -346,7 +346,7 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                 ->first();
 
@@ -613,7 +613,7 @@ class SpecialWorkhours extends Component
             $doctorId = $this->getAuthenticatedDoctor()->id;
             $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
                 ->where('date', $this->selectedDate)
-                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('clinic_id'))
+                ->when($this->clinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
                 ->when($this->clinicId && $this->clinicId !== 'default', fn ($q) => $q->where('clinic_id', $this->clinicId))
                 ->first();
 

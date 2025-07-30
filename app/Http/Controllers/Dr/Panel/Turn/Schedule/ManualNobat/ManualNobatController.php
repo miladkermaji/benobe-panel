@@ -30,7 +30,7 @@ class ManualNobatController extends Controller
             $appointments = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
                     // نوبت‌هایی که کلینیک ندارند (clinic_id = NULL)
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // نوبت‌های مربوط به کلینیک مشخص‌شده
@@ -315,7 +315,7 @@ class ManualNobatController extends Controller
 
             $appointment = ManualAppointment::with('user')
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     $query->where('clinic_id', $selectedClinicId);
@@ -367,7 +367,7 @@ class ManualNobatController extends Controller
             $data['appointment_date'] = CalendarUtils::createDatetimeFromFormat('Y/m/d', $request->appointment_date)->format('Y-m-d');
             $appointment = ManualAppointment::when(
                 $data['selectedClinicId'] === 'default',
-                fn ($query) => $query->whereNull('clinic_id'),
+                fn ($query) => $query->whereNull('medical_center_id'),
                 fn ($query) => $query->where('clinic_id', $data['selectedClinicId'])
             )->findOrFail($id);
 
@@ -404,7 +404,7 @@ class ManualNobatController extends Controller
             // جستجوی نوبت بر اساس کلینیک
             $appointment = ManualAppointment::when(
                 $selectedClinicId === 'default',
-                fn ($query) => $query->whereNull('clinic_id'),
+                fn ($query) => $query->whereNull('medical_center_id'),
                 fn ($query) => $query->where('clinic_id', $selectedClinicId)
             )
                 ->findOrFail($id);
@@ -464,7 +464,7 @@ class ManualNobatController extends Controller
                     $query->where('clinic_id', $selectedClinicId);
                 })
                 ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->select('id', 'name', 'price')
                 ->get();
