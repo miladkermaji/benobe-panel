@@ -10,7 +10,7 @@ class UserGroupCreate extends Component
 {
     public $name;
     public $description;
-    public $is_active = true;
+    public $is_active = false;
 
     public function store()
     {

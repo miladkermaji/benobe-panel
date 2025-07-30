@@ -12,7 +12,7 @@ class ManualAppointmentSettingCreate extends Component
 {
     public $doctor_id;
     public $clinic_id;
-    public $is_active = true;
+    public $is_active = false;
     public $duration_send_link = 3;
     public $duration_confirm_link = 1;
     public $doctors;
@@ -30,33 +30,33 @@ class ManualAppointmentSettingCreate extends Component
         $this->loadClinics();
     }
 
-protected function loadClinics()
-{
-    $existingClinics = $this->doctor_id 
-        ? ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
-            ->whereNotNull('clinic_id')
-            ->pluck('clinic_id')
-            ->toArray()
-        : [];
+    protected function loadClinics()
+    {
+        $existingClinics = $this->doctor_id
+            ? ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
+                ->whereNotNull('clinic_id')
+                ->pluck('clinic_id')
+                ->toArray()
+            : [];
 
-    $clinics = Clinic::whereNotIn('id', $existingClinics)
-        ->get()
-        ->map(function ($clinic) {
-            return [
-                'id' => $clinic->id,
-                'name' => $clinic->name
-            ];
-        })
-        ->toArray();
-    
-    // Add general settings option
-    $generalSetting = [
-        'id' => null,
-        'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
-    ];
-    
-    $this->clinics = array_merge([$generalSetting], $clinics);
-}
+        $clinics = Clinic::whereNotIn('id', $existingClinics)
+            ->get()
+            ->map(function ($clinic) {
+                return [
+                    'id' => $clinic->id,
+                    'name' => $clinic->name
+                ];
+            })
+            ->toArray();
+
+        // Add general settings option
+        $generalSetting = [
+            'id' => null,
+            'name' => 'تنظیمات عمومی (برای همه کلینیک‌ها)'
+        ];
+
+        $this->clinics = array_merge([$generalSetting], $clinics);
+    }
 
     public function store()
     {

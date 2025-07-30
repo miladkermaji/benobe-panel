@@ -24,7 +24,7 @@ class SecretaryCreate extends Component
     public $password;
     public $doctor_id;
     public $clinic_id;
-    public $is_active = true;
+    public $is_active = false;
     public $profile_photo;
 
     public $doctors = [];
