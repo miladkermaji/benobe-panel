@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class DoctorCounselingHoliday extends Model
 {
-   use HasFactory;
+    use HasFactory;
 
     protected $table = 'doctor_counseling_holidays';
-    protected $fillable = ['doctor_id', 'clinic_id', 'holiday_dates', 'status'];
+    protected $fillable = ['doctor_id', 'medical_center_id', 'holiday_dates', 'status'];
     protected $casts = [
         'holiday_dates' => 'array',
     ];
@@ -22,7 +22,7 @@ class DoctorCounselingHoliday extends Model
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
     public function getHolidayDatesAttribute($value)
     {

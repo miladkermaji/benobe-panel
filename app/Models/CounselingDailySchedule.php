@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Doctor;
@@ -14,7 +15,7 @@ class CounselingDailySchedule extends Model
     // فیلدهای قابل پر کردن
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'date',
         'consultation_hours',
         'appointment_settings',
@@ -46,7 +47,7 @@ class CounselingDailySchedule extends Model
      */
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     /**

@@ -173,6 +173,7 @@ class DoctorsClinicManagementController extends Controller
      */
     public function deposit(Request $request)
     {
+        
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedMedicalCenterId();

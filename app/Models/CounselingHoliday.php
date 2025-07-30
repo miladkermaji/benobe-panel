@@ -14,7 +14,7 @@ class CounselingHoliday extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'holiday_dates',
         'status',
     ];
@@ -37,7 +37,7 @@ class CounselingHoliday extends Model
      */
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     /**

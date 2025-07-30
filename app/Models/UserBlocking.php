@@ -11,7 +11,7 @@ class UserBlocking extends Model
         'user_id',
         'doctor_id',
         'manager_id',
-        'clinic_id',
+        'medical_center_id',
         'blocked_at',
         'unblocked_at',
         'reason',
@@ -50,6 +50,6 @@ class UserBlocking extends Model
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

@@ -12,6 +12,7 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت بیعانه')
+
 <div class="doctor-clinics-container">
   <div class="container py-2 mt-3" dir="rtl">
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">

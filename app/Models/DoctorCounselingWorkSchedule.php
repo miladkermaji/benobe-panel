@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,7 +13,7 @@ class DoctorCounselingWorkSchedule extends Model
 
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'day',
         'is_working',
         'work_hours',
@@ -32,6 +33,6 @@ class DoctorCounselingWorkSchedule extends Model
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 }

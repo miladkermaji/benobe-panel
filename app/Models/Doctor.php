@@ -472,6 +472,14 @@ class Doctor extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Compatibility: legacy code expects $doctor->clinics or $doctor->clinics()
+     */
+    public function clinics()
+    {
+        return $this->medicalCenters();
+    }
+
+    /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed

@@ -12,7 +12,7 @@ class Insurance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'clinic_id',
+        'medical_center_id',
         'name',
         'calculation_method',
         'appointment_price',
@@ -27,7 +27,7 @@ class Insurance extends Model
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
 
     public function appointments()

@@ -10,7 +10,7 @@ class DoctorService extends Model
     use HasFactory;
     protected $fillable = [
         'doctor_id',
-        'clinic_id',
+        'medical_center_id',
         'insurance_id',
         'service_id',
         'name',
@@ -33,7 +33,7 @@ class DoctorService extends Model
 
     public function medicalCenter()
     {
-        return $this->belongsTo(MedicalCenter::class, 'clinic_id');
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
     public function doctor()
     {
