@@ -103,7 +103,7 @@ class DoctorClinicCreate extends Component
             'description' => $this->description,
             'prescription_tariff' => $this->prescription_tariff,
             'type' => $this->type,
-            'is_active' => true,
+            'is_active' => false,
         ]);
 
         // Attach the doctor to the medical center
