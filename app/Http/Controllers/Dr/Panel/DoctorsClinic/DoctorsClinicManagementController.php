@@ -173,21 +173,31 @@ class DoctorsClinicManagementController extends Controller
      */
     public function deposit(Request $request)
     {
-        
         try {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
-            $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
-                $query->where('doctor_id', $doctorId);
-            })->where('type', 'policlinic')->get();
-            $deposits = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
-                ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
-                }, function ($query) {
-                    $query->whereNull('clinic_id');
-                })
-                ->get();
+            // Get clinics with error handling
+            try {
+                $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+                    $query->where('doctor_id', $doctorId);
+                })->where('type', 'policlinic')->get();
+            } catch (\Exception $e) {
+                $clinics = collect([]);
+            }
+
+            // Get deposits with error handling
+            try {
+                $deposits = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
+                    ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
+                        $query->where('medical_center_id', $selectedClinicId);
+                    }, function ($query) {
+                        $query->whereNull('medical_center_id');
+                    })
+                    ->get();
+            } catch (\Exception $e) {
+                $deposits = collect([]);
+            }
 
             return view('dr.panel.doctors-clinic.deposit', compact('clinics', 'deposits', 'selectedClinicId', 'doctorId'));
         } catch (\Exception $e) {
@@ -247,9 +257,9 @@ class DoctorsClinicManagementController extends Controller
             $existingDeposit = MedicalCenterDepositSetting::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($clinicId) {
                     if ($clinicId) {
-                        $query->where('clinic_id', $clinicId);
+                        $query->where('medical_center_id', $clinicId);
                     } else {
-                        $query->whereNull('clinic_id');
+                        $query->whereNull('medical_center_id');
                     }
                 })
                 ->exists();
@@ -273,7 +283,7 @@ class DoctorsClinicManagementController extends Controller
             }
 
             $deposit = MedicalCenterDepositSetting::create([
-                'clinic_id' => $clinicId,
+                'medical_center_id' => $clinicId,
                 'doctor_id' => $doctorId,
                 'deposit_amount' => $depositAmount,
                 'is_custom_price' => $validated['is_custom_price'],
@@ -341,9 +351,9 @@ class DoctorsClinicManagementController extends Controller
             $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->first();
 
@@ -398,9 +408,9 @@ class DoctorsClinicManagementController extends Controller
             $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }, function ($query) {
-                    $query->whereNull('clinic_id');
+                    $query->whereNull('medical_center_id');
                 })
                 ->first();
 
