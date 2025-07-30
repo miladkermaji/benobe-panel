@@ -94,7 +94,7 @@ class ManualAppointmentSettingCreate extends Component
 
         // بررسی یکتایی تنظیمات
         $exists = ManualAppointmentSetting::where('doctor_id', $this->doctor_id)
-            ->where('clinic_id', $this->clinic_id)
+            ->where('medical_center_id', $this->clinic_id)
             ->exists();
 
         if ($exists) {

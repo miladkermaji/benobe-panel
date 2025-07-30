@@ -254,7 +254,7 @@ class CounselingWorkHours extends Component
             ->where('day', $day)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
                     $query->whereNull('medical_center_id');
                 }
@@ -353,7 +353,7 @@ class CounselingWorkHours extends Component
                     ->where('day', $day)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
                             $query->whereNull('medical_center_id');
                         }
@@ -386,7 +386,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $this->scheduleModalDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -458,7 +458,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -514,7 +514,7 @@ class CounselingWorkHours extends Component
         $this->workSchedules = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
                     $query->whereNull('medical_center_id');
                 }
@@ -558,7 +558,7 @@ class CounselingWorkHours extends Component
             ->where('day', $this->emergencyModalDay)
             ->where(function ($query) {
                 if ($this->activeClinicId !== 'default') {
-                    $query->where('clinic_id', $this->activeClinicId);
+                    $query->where('medical_center_id', $this->activeClinicId);
                 } else {
                     $query->whereNull('medical_center_id');
                 }
@@ -767,7 +767,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $targetDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -824,7 +824,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $targetDay)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -1044,7 +1044,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -1115,7 +1115,7 @@ class CounselingWorkHours extends Component
                     ->where('day', $weekDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
                             $query->whereNull('medical_center_id');
                         }
@@ -1218,7 +1218,7 @@ class CounselingWorkHours extends Component
                     ->where('day', $this->selectedDay)
                     ->where(function ($query) {
                         if ($this->activeClinicId !== 'default') {
-                            $query->where('clinic_id', $this->activeClinicId);
+                            $query->where('medical_center_id', $this->activeClinicId);
                         } else {
                             $query->whereNull('medical_center_id');
                         }
@@ -1331,7 +1331,7 @@ class CounselingWorkHours extends Component
                 ->where('day', $day)
                 ->where(function ($query) {
                     if ($this->activeClinicId !== 'default') {
-                        $query->where('clinic_id', $this->activeClinicId);
+                        $query->where('medical_center_id', $this->activeClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }

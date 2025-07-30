@@ -238,7 +238,7 @@ class DoctorServiceEdit extends Component
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
                 ->where('insurance_id', $pricing['insurance_id'])
-                ->where('clinic_id', $this->clinic_id)
+                ->where('medical_center_id', $this->clinic_id)
                 ->when(isset($pricing['id']), function ($query) use ($pricing) {
                     $query->where('id', '!=', $pricing['id']);
                 })

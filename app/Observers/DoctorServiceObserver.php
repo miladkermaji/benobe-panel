@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Observers;
 
 use App\Models\DoctorService;
@@ -26,7 +25,7 @@ class DoctorServiceObserver
     protected function invalidateCache(DoctorService $service)
     {
         $doctorId = $service->doctor_id;
-        $clinicId = $service->clinic_id ?? 'default';
+        $clinicId = $service->medical_center_id ?? 'default';
         Cache::forget("insurances_doctor_{$doctorId}_clinic_{$clinicId}");
         Cache::forget("services_doctor_{$doctorId}_clinic_{$clinicId}_*");
     }

@@ -87,7 +87,7 @@ class InsuranceComponent extends Component
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('medical_center_id');
         } else {
-            $query->where('clinic_id', $this->selectedClinicId);
+            $query->where('medical_center_id', $this->selectedClinicId);
         }
 
         $query->where('calculation_method', $this->calculation_method);
@@ -240,7 +240,7 @@ class InsuranceComponent extends Component
         if ($this->selectedClinicId === 'default') {
             $query->whereNull('medical_center_id');
         } else {
-            $query->where('clinic_id', $this->selectedClinicId);
+            $query->where('medical_center_id', $this->selectedClinicId);
         }
 
         $insurance = $query->firstOrFail();

@@ -62,7 +62,7 @@ class DoctorServicesController extends Controller
     {
         $selectedClinicId = request()->get('selectedClinicId', 'default');
         // اگر کلینیک انتخاب شده غیر از "default" باشد و خدمت متعلق به آن کلینیک نباشد، دسترسی رد شود
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return abort(403, 'Access denied');
         }
         $parentServices = DoctorService::where('id', '!=', $service->id)->get();
@@ -99,7 +99,7 @@ class DoctorServicesController extends Controller
         ]);
 
         $selectedClinicId = $request->get('selectedClinicId', 'default');
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return abort(403, 'Access denied');
         }
 
@@ -110,7 +110,7 @@ class DoctorServicesController extends Controller
     public function destroy(DoctorService $service)
     {
         $selectedClinicId = request()->get('selectedClinicId', 'default');
-        if ($selectedClinicId !== 'default' && $service->clinic_id != $selectedClinicId) {
+        if ($selectedClinicId !== 'default' && $service->medical_center_id != $selectedClinicId) {
             return response()->json(['error' => 'Access denied'], 403);
         }
 

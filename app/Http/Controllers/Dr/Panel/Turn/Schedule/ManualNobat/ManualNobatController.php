@@ -34,7 +34,7 @@ class ManualNobatController extends Controller
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // نوبت‌های مربوط به کلینیک مشخص‌شده
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->get();
 
@@ -133,7 +133,7 @@ class ManualNobatController extends Controller
                     'is_active'             => $settings->is_active ? 'بلی' : 'خیر',
                     'duration_send_link'    => $settings->duration_send_link . ' ساعت',
                     'duration_confirm_link' => $settings->duration_confirm_link . ' ساعت',
-                    'clinic_id'             => $settings->clinic_id ?? 'پیش‌فرض',
+                    'clinic_id'             => $settings->medical_center_id ?? 'پیش‌فرض',
                 ],
             ], 200);
         } catch (\Exception $e) {
@@ -216,7 +216,7 @@ class ManualNobatController extends Controller
             if (ManualAppointment::where('user_id', $data['user_id'])
                 ->where('appointment_date', $data['appointment_date'])
                 ->where('appointment_time', $data['appointment_time'])
-                ->where('clinic_id', $data['clinic_id'])
+                ->where('medical_center_id', $data['clinic_id'])
                 ->exists()) {
                 return response()->json(['success' => false, 'message' => 'این نوبت قبلاً ثبت شده است!'], 400);
             }
@@ -318,7 +318,7 @@ class ManualNobatController extends Controller
                     $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->findOrFail($id);
 
@@ -368,7 +368,7 @@ class ManualNobatController extends Controller
             $appointment = ManualAppointment::when(
                 $data['selectedClinicId'] === 'default',
                 fn ($query) => $query->whereNull('medical_center_id'),
-                fn ($query) => $query->where('clinic_id', $data['selectedClinicId'])
+                fn ($query) => $query->where('medical_center_id', $data['selectedClinicId'])
             )->findOrFail($id);
 
             $appointment->user->update([
@@ -405,7 +405,7 @@ class ManualNobatController extends Controller
             $appointment = ManualAppointment::when(
                 $selectedClinicId === 'default',
                 fn ($query) => $query->whereNull('medical_center_id'),
-                fn ($query) => $query->where('clinic_id', $selectedClinicId)
+                fn ($query) => $query->where('medical_center_id', $selectedClinicId)
             )
                 ->findOrFail($id);
 
@@ -461,7 +461,7 @@ class ManualNobatController extends Controller
                 ->where('insurance_id', $insuranceId)
                 ->where('status', true)
                 ->when($selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->when($selectedClinicId === 'default', function ($query) {
                     $query->whereNull('medical_center_id');
@@ -656,9 +656,9 @@ class ManualNobatController extends Controller
                 ], 403);
             }
 
-            if ($selectedClinicId !== 'default' && $appointment->clinic_id != $selectedClinicId) {
+            if ($selectedClinicId !== 'default' && $appointment->medical_center_id != $selectedClinicId) {
                 Log::warning('Clinic ID mismatch', [
-                    'appointment_clinic_id' => $appointment->clinic_id,
+                    'appointment_clinic_id' => $appointment->medical_center_id,
                     'selectedClinicId' => $selectedClinicId,
                 ]);
                 return response()->json([
@@ -667,9 +667,9 @@ class ManualNobatController extends Controller
                 ], 422);
             }
 
-            if ($selectedClinicId === 'default' && !is_null($appointment->clinic_id)) {
+            if ($selectedClinicId === 'default' && !is_null($appointment->medical_center_id)) {
                 Log::warning('Clinic ID expected to be null', [
-                    'appointment_clinic_id' => $appointment->clinic_id,
+                    'appointment_clinic_id' => $appointment->medical_center_id,
                 ]);
                 return response()->json([
                     'success' => false,

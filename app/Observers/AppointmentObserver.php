@@ -53,7 +53,7 @@ class AppointmentObserver
     protected function invalidateCache(Appointment $appointment)
     {
         $doctorId = $appointment->doctor_id;
-        $clinicId = $appointment->clinic_id ?? 'default';
+        $clinicId = $appointment->medical_center_id ?? 'default';
         // به جای تگ‌ها، کلیدهای مرتبط رو پاک می‌کنیم
         Cache::forget("appointments_doctor_{$doctorId}_clinic_{$clinicId}_*");
     }

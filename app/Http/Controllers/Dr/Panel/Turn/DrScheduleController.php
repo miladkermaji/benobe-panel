@@ -51,16 +51,16 @@ class DrScheduleController extends Controller
         }
 
         if ($selectedClinicId === 'default') {
-            $appointments->whereNull('clinic_id');
+            $appointments->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            $appointments->where('clinic_id', $selectedClinicId);
+            $appointments->where('medical_center_id', $selectedClinicId);
         }
 
         if ($filterType) {
             if ($filterType === "in_person") {
-                $appointments->where('clinic_id', $selectedClinicId);
+                $appointments->where('medical_center_id', $selectedClinicId);
             } elseif ($filterType === "online") {
-                $appointments->whereNull('clinic_id');
+                $appointments->whereNull('medical_center_id');
             }
         }
 
@@ -129,9 +129,9 @@ class DrScheduleController extends Controller
             ->with(['patientable', 'insurance']);
 
         if ($selectedClinicId === 'default') {
-            $query->whereNull('clinic_id');
+            $query->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            $query->where('clinic_id', $selectedClinicId);
+            $query->where('medical_center_id', $selectedClinicId);
         }
 
         $appointments = $query->paginate(10);
@@ -217,9 +217,9 @@ class DrScheduleController extends Controller
             );
 
         if ($selectedClinicId === 'default') {
-            $appointmentsQuery->whereNull('clinic_id');
+            $appointmentsQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId) {
-            $appointmentsQuery->where('clinic_id', $selectedClinicId);
+            $appointmentsQuery->where('medical_center_id', $selectedClinicId);
         }
 
         $patients = $appointmentsQuery->paginate(10);
@@ -291,7 +291,7 @@ class DrScheduleController extends Controller
         $query = Appointment::withTrashed();
 
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $query->where('clinic_id', $selectedClinicId);
+            $query->where('medical_center_id', $selectedClinicId);
         }
 
         if (!empty($status)) {

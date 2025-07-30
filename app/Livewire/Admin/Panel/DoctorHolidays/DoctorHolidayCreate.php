@@ -59,7 +59,7 @@ class DoctorHolidayCreate extends Component
         })->toArray();
 
         $existingHoliday = DoctorHoliday::where('doctor_id', $this->doctor_id)
-            ->where('clinic_id', $this->clinic_id)
+            ->where('medical_center_id', $this->clinic_id)
             ->first();
 
         if ($existingHoliday) {

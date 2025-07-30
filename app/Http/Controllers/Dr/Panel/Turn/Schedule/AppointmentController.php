@@ -225,7 +225,7 @@ class AppointmentController extends Controller
                 return $query->whereNull('medical_center_id');
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                return $query->where('clinic_id', $selectedClinicId);
+                return $query->where('medical_center_id', $selectedClinicId);
             })
             ->when($gregorianDate, function ($query) use ($gregorianDate) {
                 return $query->where('appointment_date', $gregorianDate);
@@ -270,7 +270,7 @@ class AppointmentController extends Controller
 
         $selectedClinicId = $request->input('selectedClinicId');
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            if ($appointment->clinic_id != $selectedClinicId) {
+            if ($appointment->medical_center_id != $selectedClinicId) {
                 return response()->json([
                     'error' => 'این نوبت متعلق به کلینیک انتخاب شده نیست.',
                 ], 403);

@@ -40,7 +40,7 @@ class MySpecialDaysCounselingController extends Controller
 
         // اگر selectedClinicId وجود دارد و برابر 'default' نیست، فیلتر را اعمال کنید
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $specialWorkHoursQuery->where('clinic_id', $selectedClinicId);
+            $specialWorkHoursQuery->where('medical_center_id', $selectedClinicId);
         }
 
         $specialWorkHours = $specialWorkHoursQuery->first();
@@ -83,7 +83,7 @@ class MySpecialDaysCounselingController extends Controller
                 if ($selectedClinicId === 'default') {
                     $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }
             })
             ->first();
@@ -100,7 +100,7 @@ class MySpecialDaysCounselingController extends Controller
                 if ($selectedClinicId === 'default') {
                     $query->whereNull('medical_center_id');
                 } elseif ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 }
             })
             ->get();
@@ -132,7 +132,7 @@ class MySpecialDaysCounselingController extends Controller
             $appointments = CounselingAppointment::where('doctor_id', $doctorId)
                 ->where('appointment_date', $validated['old_date'])
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->get();
 
@@ -153,7 +153,7 @@ class MySpecialDaysCounselingController extends Controller
                     $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->first();
 
@@ -228,7 +228,7 @@ class MySpecialDaysCounselingController extends Controller
             $appointmentConfig = DoctorCounselingConfig::where('doctor_id', $doctorId)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -242,7 +242,7 @@ class MySpecialDaysCounselingController extends Controller
                 ->where('is_working', true)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -260,7 +260,7 @@ class MySpecialDaysCounselingController extends Controller
                     $query->whereNull('medical_center_id')->where('doctor_id', $doctorId);
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->groupBy('appointment_date')
                 ->get();
@@ -277,7 +277,7 @@ class MySpecialDaysCounselingController extends Controller
                 ->where('is_working', true)
                 ->where(function ($query) use ($selectedClinicId) {
                     if ($selectedClinicId !== 'default') {
-                        $query->where('clinic_id', $selectedClinicId);
+                        $query->where('medical_center_id', $selectedClinicId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -322,7 +322,7 @@ class MySpecialDaysCounselingController extends Controller
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // در صورت ارسال کلینیک خاص
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             });
 
         $holidayRecord = $holidayQuery->first();
@@ -355,7 +355,7 @@ class MySpecialDaysCounselingController extends Controller
         if ($selectedClinicId === 'default') {
             $holidayRecordQuery->whereNull('medical_center_id');
         } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
-            $holidayRecordQuery->where('clinic_id', $selectedClinicId);
+            $holidayRecordQuery->where('medical_center_id', $selectedClinicId);
         }
 
         $holidayRecord = $holidayRecordQuery->firstOrCreate([
@@ -389,7 +389,7 @@ class MySpecialDaysCounselingController extends Controller
             if ($selectedClinicId === 'default') {
                 $specialDayQuery->whereNull('medical_center_id');
             } elseif ($selectedClinicId && $selectedClinicId !== 'default') {
-                $specialDayQuery->where('clinic_id', $selectedClinicId);
+                $specialDayQuery->where('medical_center_id', $selectedClinicId);
             }
 
             $specialDayQuery->delete();
@@ -421,7 +421,7 @@ class MySpecialDaysCounselingController extends Controller
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // اگر کلینیک خاص ارسال شود
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             });
 
         $holidays     = $holidaysQuery->first();
@@ -454,7 +454,7 @@ class MySpecialDaysCounselingController extends Controller
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // نوبت‌های کلینیک مشخص‌شده بازگردانده شود
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 });
 
             return ! $appointmentQuery->exists();
@@ -487,7 +487,7 @@ class MySpecialDaysCounselingController extends Controller
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                     // در غیر این صورت، نوبت‌های مربوط به کلینیک مشخص‌شده را بررسی کند
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 });
 
             $appointments = $appointmentsQuery->get();
@@ -509,7 +509,7 @@ class MySpecialDaysCounselingController extends Controller
                     $query->whereNull('medical_center_id');
                 })
                 ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('clinic_id', $selectedClinicId);
+                    $query->where('medical_center_id', $selectedClinicId);
                 })
                 ->first();
 
@@ -586,7 +586,7 @@ class MySpecialDaysCounselingController extends Controller
         // Check for special schedule
         $specialScheduleQuery = CounselingDailySchedule::where('date', $date);
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $specialScheduleQuery->where('clinic_id', $selectedClinicId);
+            $specialScheduleQuery->where('medical_center_id', $selectedClinicId);
         }
         $specialSchedule = $specialScheduleQuery->first();
 
@@ -602,7 +602,7 @@ class MySpecialDaysCounselingController extends Controller
         $workScheduleQuery = DoctorCounselingWorkSchedule::where('doctor_id', $doctorId)
             ->where('day', $dayOfWeek);
         if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $workScheduleQuery->where('clinic_id', $selectedClinicId);
+            $workScheduleQuery->where('medical_center_id', $selectedClinicId);
         }
         $workSchedule = $workScheduleQuery->first();
 
@@ -636,7 +636,7 @@ class MySpecialDaysCounselingController extends Controller
             })
             ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
                 // اگر selectedClinicId مشخص شده باشد و برابر 'default' نباشد
-                $query->where('clinic_id', $selectedClinicId);
+                $query->where('medical_center_id', $selectedClinicId);
             });
 
         $appointments = $appointmentsQuery->get();
