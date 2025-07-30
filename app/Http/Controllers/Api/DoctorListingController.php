@@ -276,7 +276,7 @@ class DoctorListingController extends Controller
                 ],
             ], 200);
         } catch (\Exception $e) {
-            
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',

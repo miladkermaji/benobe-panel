@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Jobs\SendSmsNotificationJob;
+use App\Models\MedicalCenter;
 
 class AppointmentBookingController extends Controller
 {
@@ -95,8 +96,12 @@ class AppointmentBookingController extends Controller
             }
 
             // اطلاعات کلینیک
-            $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
-                ?? $doctor->clinics()->where('is_active', true)->first();
+            $mainClinic = $doctor->medicalCenters()
+                ->where('is_active', true)
+                ->where('type', 'clinic')
+                ->where('is_main_center', true)
+                ->first()
+                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
             $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
 
             // تبدیل تاریخ به شمسی
@@ -105,7 +110,7 @@ class AppointmentBookingController extends Controller
 
             // محاسبه هزینه‌ها
             $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
-                ->where('clinic_id', $mainClinic->id)
+                ->where('medical_center_id', $mainClinic->id)
                 ->where('is_active', true)
                 ->first();
             $depositAmount     = $depositSetting ? $depositSetting->deposit_amount : 0;
@@ -115,7 +120,7 @@ class AppointmentBookingController extends Controller
 
             // بررسی وجود رزرو موقت فعال برای همین اسلات
             $existingAppointment = Appointment::where('doctor_id', $doctor->id)
-                ->where('clinic_id', $mainClinic ? $mainClinic->id : null)
+                ->where('medical_center_id', $mainClinic ? $mainClinic->id : null)
                 ->where('appointment_date', $appointmentDate)
                 ->whereRaw("TIME_FORMAT(appointment_time, '%H:%i') = ?", [$appointmentTime])
                 ->where('status', 'scheduled')
@@ -143,7 +148,7 @@ class AppointmentBookingController extends Controller
                 // ثبت رزرو موقت
                 $appointment = Appointment::create([
                     'doctor_id' => $doctor->id,
-                    'clinic_id' => $mainClinic ? $mainClinic->id : null,
+                    'medical_center_id' => $mainClinic ? $mainClinic->id : null,
                     'appointment_date' => $appointmentDate,
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
                     'fee' => $depositAmount + $infrastructureFee,
@@ -362,7 +367,7 @@ class AppointmentBookingController extends Controller
                 $mainClinic = null;
                 if ($clinicId) {
                     // اگر clinic_id در درخواست ارسال شده، کلینیک مربوطه را پیدا کن
-                    $mainClinic = $doctor->clinics()->where('id', $clinicId)->where('is_active', true)->first();
+                    $mainClinic = $doctor->medicalCenters()->where('id', $clinicId)->where('is_active', true)->where('type', 'clinic')->first();
                     if (!$mainClinic) {
                         return response()->json([
                             'status' => 'error',
@@ -372,8 +377,12 @@ class AppointmentBookingController extends Controller
                     }
                 } else {
                     // اگر clinic_id ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
-                    $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
-                        ?? $doctor->clinics()->where('is_active', true)->first();
+                    $mainClinic = $doctor->medicalCenters()
+                        ->where('is_active', true)
+                        ->where('type', 'clinic')
+                        ->where('is_main_center', true)
+                        ->first()
+                        ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
                 }
 
                 // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن
@@ -383,11 +392,11 @@ class AppointmentBookingController extends Controller
                 $config = null;
                 if ($serviceType === 'in_person') {
                     $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $clinicId)
+                        ->where('medical_center_id', $clinicId)
                         ->first();
                 } else {
                     $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $clinicId)
+                        ->where('medical_center_id', $clinicId)
                         ->first();
                 }
 
@@ -415,7 +424,7 @@ class AppointmentBookingController extends Controller
 
                 if ($mainClinic) {
                     $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
-                        ->where('clinic_id', $mainClinic->id)
+                        ->where('medical_center_id', $mainClinic->id)
                         ->where('is_active', true)
                         ->first();
                     $depositAmount = $depositSetting ? $depositSetting->deposit_amount : 0;
@@ -442,7 +451,7 @@ class AppointmentBookingController extends Controller
                     'doctor_id' => $doctor->id,
                     'patientable_id' => $patient->id,
                     'patientable_type' => get_class($patient),
-                    'clinic_id' => $clinicId,
+                    'medical_center_id' => $clinicId,
                     'appointment_date' => $appointmentDate,
                     'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
                     'fee' => $totalFee,
@@ -530,9 +539,9 @@ class AppointmentBookingController extends Controller
                 ->where('status', 'scheduled');
 
             if ($clinicId) {
-                $query->where('clinic_id', $clinicId);
+                $query->where('medical_center_id', $clinicId);
             } else {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             }
 
             $query->update([
@@ -547,9 +556,9 @@ class AppointmentBookingController extends Controller
                 ->where('status', 'scheduled');
 
             if ($clinicId) {
-                $query->where('clinic_id', $clinicId);
+                $query->where('medical_center_id', $clinicId);
             } else {
-                $query->whereNull('clinic_id');
+                $query->whereNull('medical_center_id');
             }
 
             $query->update([
@@ -782,8 +791,12 @@ class AppointmentBookingController extends Controller
             $serviceType = $request->input('service_type', 'in_person');
             $date = $request->input('date', now()->format('Y-m-d'));
 
-            $mainClinic = $doctor->clinics()->where('is_active', true)->where('is_main_clinic', true)->first()
-                ?? $doctor->clinics()->where('is_active', true)->first();
+            $mainClinic = $doctor->medicalCenters()
+                ->where('is_active', true)
+                ->where('type', 'clinic')
+                ->where('is_main_center', true)
+                ->first()
+                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'clinic')->first();
             if (!$mainClinic) {
                 return response()->json([
                     'status' => 'error',
@@ -797,11 +810,11 @@ class AppointmentBookingController extends Controller
             // دریافت برنامه کاری
             $workSchedule = $serviceType === 'in_person'
                 ? DoctorWorkSchedule::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->where('day', $dayOfWeek)
                     ->first()
                 : DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->where('day', $dayOfWeek)
                     ->first();
 
@@ -831,7 +844,7 @@ class AppointmentBookingController extends Controller
             // دریافت زمان‌های رزروشده (اصلاح شده)
             $reservedTimes = $serviceType === 'in_person'
                 ? Appointment::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->where('appointment_date', $date)
                     ->whereIn('status', ['scheduled', 'pending_review'])
                     ->where(function ($query) {
@@ -844,7 +857,7 @@ class AppointmentBookingController extends Controller
                     ->pluck('appointment_time')
                     ->toArray()
                 : CounselingAppointment::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->where('appointment_date', $date)
                     ->whereIn('status', ['scheduled', 'pending_review'])
                     ->where(function ($query) {
@@ -863,14 +876,14 @@ class AppointmentBookingController extends Controller
             $autoScheduling = 1;
             if ($serviceType === 'in_person') {
                 $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->first();
                 if ($config && !$config->auto_scheduling) {
                     $autoScheduling = 0;
                 }
             } else {
                 $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
-                    ->where('clinic_id', $mainClinic->id)
+                    ->where('medical_center_id', $mainClinic->id)
                     ->first();
                 if ($config && !$config->auto_scheduling) {
                     $autoScheduling = 0;
@@ -927,8 +940,8 @@ class AppointmentBookingController extends Controller
         }
 
         // پیدا کردن کلینیک اصلی پزشک اگر clinic_id ارسال نشده باشد
-        $mainClinic = $clinicId ? $doctor->clinics->where('id', $clinicId)->first() :
-            ($doctor->clinics->where('is_main_clinic', true)->first() ?? $doctor->clinics->first());
+        $mainClinic = $clinicId ? $doctor->medicalCenters->where('id', $clinicId)->first() :
+            ($doctor->medicalCenters->where('is_main_center', true)->first() ?? $doctor->medicalCenters->first());
         $clinicId = $mainClinic ? $mainClinic->id : $clinicId;
 
         // دریافت زمان‌های مجاز از getAppointmentOptions
@@ -963,7 +976,7 @@ class AppointmentBookingController extends Controller
             $holidaysQuery = DoctorHoliday::where('doctor_id', $doctor->id)
                 ->where('status', 'active');
             if ($clinicId) {
-                $holidaysQuery->where('clinic_id', $clinicId);
+                $holidaysQuery->where('medical_center_id', $clinicId);
             }
             $holidays = $holidaysQuery->first();
             if ($holidays && $holidays->holiday_dates) {
@@ -977,7 +990,7 @@ class AppointmentBookingController extends Controller
             $holidaysQuery = DoctorCounselingHoliday::where('doctor_id', $doctor->id)
                 ->where('status', 'active');
             if ($clinicId) {
-                $holidaysQuery->where('clinic_id', $clinicId);
+                $holidaysQuery->where('medical_center_id', $clinicId);
             }
             $holidays = $holidaysQuery->first();
             if ($holidays && $holidays->holiday_dates) {
@@ -995,14 +1008,14 @@ class AppointmentBookingController extends Controller
             $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
                 ->where('date', $appointmentDate);
             if ($clinicId) {
-                $specialScheduleQuery->where('clinic_id', $clinicId);
+                $specialScheduleQuery->where('medical_center_id', $clinicId);
             }
             $specialSchedule = $specialScheduleQuery->first();
         } else {
             $specialScheduleQuery = CounselingDailySchedule::where('doctor_id', $doctor->id)
                 ->where('date', $appointmentDate);
             if ($clinicId) {
-                $specialScheduleQuery->where('clinic_id', $clinicId);
+                $specialScheduleQuery->where('medical_center_id', $clinicId);
             }
             $specialSchedule = $specialScheduleQuery->first();
         }
@@ -1021,18 +1034,18 @@ class AppointmentBookingController extends Controller
                 $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctor->id)
                     ->where('day', $dayOfWeek);
                 if ($clinicId) {
-                    $workScheduleQuery->where('clinic_id', $clinicId);
+                    $workScheduleQuery->where('medical_center_id', $clinicId);
                 } else {
-                    $workScheduleQuery->whereNull('clinic_id');
+                    $workScheduleQuery->whereNull('medical_center_id');
                 }
                 $workSchedule = $workScheduleQuery->first();
             } else {
                 $workScheduleQuery = DoctorCounselingWorkSchedule::where('doctor_id', $doctor->id)
                     ->where('day', $dayOfWeek);
                 if ($clinicId) {
-                    $workScheduleQuery->where('clinic_id', $clinicId);
+                    $workScheduleQuery->where('medical_center_id', $clinicId);
                 } else {
-                    $workScheduleQuery->whereNull('clinic_id');
+                    $workScheduleQuery->whereNull('medical_center_id');
                 }
                 $workSchedule = $workScheduleQuery->first();
             }
@@ -1149,13 +1162,13 @@ class AppointmentBookingController extends Controller
         if ($serviceType === 'in_person') {
             $configQuery = DoctorAppointmentConfig::where('doctor_id', $doctor->id);
             if ($clinicId) {
-                $configQuery->where('clinic_id', $clinicId);
+                $configQuery->where('medical_center_id', $clinicId);
             }
             $config = $configQuery->first();
         } elseif (in_array($serviceType, ['phone', 'text', 'video'])) {
             $configQuery = DoctorCounselingConfig::where('doctor_id', $doctor->id);
             if ($clinicId) {
-                $configQuery->where('clinic_id', $clinicId);
+                $configQuery->where('medical_center_id', $clinicId);
             }
             $config = $configQuery->first();
         }
