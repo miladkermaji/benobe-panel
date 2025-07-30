@@ -22,6 +22,8 @@ class PrescriptionRequest extends Model
         'referral_code',
         'request_enabled',
         'enabled_types',
+        'requestable_type',
+        'requestable_id',
     ];
 
     protected $casts = [
