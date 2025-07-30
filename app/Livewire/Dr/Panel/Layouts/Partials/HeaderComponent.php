@@ -100,13 +100,19 @@ class HeaderComponent extends Component
     {
         if ($doctor) {
             // اگر دکتر مرکز درمانی انتخاب‌شده‌ای دارد، از آن استفاده کن
-            if ($doctor->selectedMedicalCenter && $doctor->selectedMedicalCenter->medical_center_id) {
-                $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
-                $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+            if ($doctor->selectedMedicalCenter) {
+                if ($doctor->selectedMedicalCenter->medical_center_id) {
+                    $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
+                    $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+                } else {
+                    // مشاوره آنلاین انتخاب شده
+                    $this->selectedMedicalCenterId = null;
+                    $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+                }
                 return;
             }
 
-            // اگر مرکز درمانی انتخاب‌شده‌ای ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
+            // اگر رکوردی وجود ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
             $activeMedicalCenters = $doctor->medicalCenters()
                 ->where('medical_centers.type', 'policlinic')
                 ->get();
@@ -118,21 +124,14 @@ class HeaderComponent extends Component
                 $doctor->setSelectedMedicalCenter($firstActiveMedicalCenter->id);
                 $doctor->refresh();
 
-                // بررسی مجدد که آیا رکورد ایجاد شده است
-                if ($doctor->selectedMedicalCenter) {
-                    $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
-                    $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
-                } else {
-                    // اگر رکورد ایجاد نشده، از مقادیر محلی استفاده کن
-                    $this->selectedMedicalCenterId = $firstActiveMedicalCenter->id;
-                    $this->selectedMedicalCenterName = $firstActiveMedicalCenter->name;
-                }
+                $this->selectedMedicalCenterId = $firstActiveMedicalCenter->id;
+                $this->selectedMedicalCenterName = $firstActiveMedicalCenter->name;
             } else {
                 // هیچ مرکز درمانی فعالی ندارد، روی مشاوره آنلاین بگذار
                 $this->selectedMedicalCenterId = null;
                 $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
 
-                // در دیتابیس هم null ذخیره کن
+                // در دیتابیس رکورد با medical_center_id = null ایجاد کن
                 $doctor->setSelectedMedicalCenter(null);
             }
         }

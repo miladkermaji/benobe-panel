@@ -209,16 +209,11 @@ class Doctor extends Authenticatable implements JWTSubject
      */
     public function setSelectedMedicalCenter($medicalCenterId = null)
     {
-        if ($medicalCenterId === null) {
-            // اگر medical_center_id null باشد، رکورد موجود را حذف کن
-            $this->selectedMedicalCenter()->delete();
-        } else {
-            // در غیر این صورت، رکورد را ایجاد یا به‌روزرسانی کن
-            $this->selectedMedicalCenter()->updateOrCreate(
-                ['doctor_id' => $this->id],
-                ['medical_center_id' => $medicalCenterId]
-            );
-        }
+        // همیشه رکورد را ایجاد یا به‌روزرسانی کن، حتی اگر medical_center_id null باشد
+        $this->selectedMedicalCenter()->updateOrCreate(
+            ['doctor_id' => $this->id],
+            ['medical_center_id' => $medicalCenterId]
+        );
     }
     public function getJalaliCreatedAtAttribute()
     {
