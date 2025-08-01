@@ -1,0 +1,226 @@
+:root {
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+}
+
+.my-sm-badge {
+    border-radius: var(--radius-button);
+    background-color: var(--background-light);
+    color: var(--text-secondary);
+    padding: 4px 15px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.drop-side-details-content {
+    background-color: var(--background-card);
+    box-shadow: 0 4px 16px var(--shadow);
+    border-radius: var(--radius-button-large);
+    position: absolute;
+    z-index: 10;
+    right: 0;
+    top: 100%;
+    min-width: 160px;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.drop-side-details-content:not(.d-none) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border-radius: var(--radius-button);
+}
+
+.dropdown-item:hover {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    transform: translateX(-5px);
+}
+
+.share-options {
+    background-color: var(--background-card);
+    border-radius: var(--radius-button-large);
+    box-shadow: 0 6px 20px var(--shadow);
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 11;
+    min-width: 200px;
+    padding: 1rem;
+    transform: translateY(10px);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.share-options:not(.d-none) {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.share-option {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 15px;
+    border-radius: var(--radius-button);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.share-option:hover {
+    background-color: var(--background-light);
+    transform: translateX(-5px);
+}
+
+.share-option img {
+    width: 24px;
+    height: 24px;
+}
+
+.myPanelOption {
+    display: none;
+}
+
+.font-medium {
+    font-size: 15px !important;
+}
+
+.appointments-content {
+    padding: 20px;
+}
+
+.appointments-content-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background-color: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.top-appointment {
+    border-bottom: 1px solid var(--border-neutral);
+}
+
+.prof-img {
+    object-fit: cover;
+}
+
+.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    color: var(--background-card);
+}
+
+.btn-outline-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.pagination-links .page-link {
+    color: var(--primary);
+    border-radius: var(--radius-button);
+}
+
+.pagination-links .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--background-card);
+}
+
+@media only screen and (max-width: 991px) {
+    .appointments-content {
+        padding: 15px;
+    }
+    .appointments-content-wrapper {
+        max-width: 100%;
+    }
+    .prof-img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .font-size-13 {
+        font-size: 12px !important;
+    }
+    .text-sm {
+        font-size: 13px !important;
+    }
+    .drop-side-details-content {
+        min-width: 140px;
+    }
+    .share-options {
+        min-width: 180px;
+    }
+}
+
+@media only screen and (max-width: 425px) {
+    .appointments-content {
+        padding: 10px;
+    }
+    .appointments-content-wrapper {
+        max-width: 100%;
+    }
+    .mx-2 h6 {
+        font-size: 14px !important;
+    }
+    .my-sm-badge {
+        font-size: 11px !important;
+        padding: 3px 10px;
+    }
+    .text-sm {
+        font-size: 12px !important;
+    }
+    .btn {
+        font-size: 13px !important;
+    }
+    .p-3 {
+        padding: 0.8rem !important;
+    }
+    .p-4 {
+        padding: 1rem !important;
+    }
+    .prof-img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+    .font-size-13 {
+        font-size: 11px !important;
+    }
+    .drop-side-details-content {
+        min-width: 120px;
+    }
+    .share-options {
+        min-width: 160px;
+    }
+}

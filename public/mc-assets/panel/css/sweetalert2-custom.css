@@ -1,0 +1,91 @@
+:root {
+    /* SweetAlert2 Custom Variables */
+    --swal-bg: var(--background-card);
+    --swal-text: var(--text-primary);
+    --swal-border-radius: var(--radius-card);
+    --swal-shadow: 0 4px 20px var(--shadow);
+    --swal-success: var(--secondary);
+    --swal-error: var(--text-original);
+    --swal-warning: #ffa500;
+    --swal-info: var(--primary);
+    --swal-question: var(--text-secondary);
+    --swal-button-bg: var(--primary);
+    --swal-button-hover: var(--primary-light);
+    --swal-transition: all 0.3s ease;
+}
+
+/* Override SweetAlert2 styles */
+.swal2-popup {
+    background: var(--swal-bg) !important;
+    border-radius: var(--swal-border-radius) !important;
+    box-shadow: var(--swal-shadow) !important;
+}
+
+.swal2-title {
+    color: var(--swal-text) !important;
+}
+
+.swal2-content {
+    color: var(--swal-text) !important;
+}
+
+.swal2-styled.swal2-confirm {
+    background-color: var(--swal-button-bg) !important;
+}
+
+.swal2-styled.swal2-confirm:hover {
+    background-color: var(--swal-button-hover) !important;
+}
+
+.swal2-styled.swal2-deny {
+    background-color: var(--swal-error) !important;
+}
+
+.swal2-styled.swal2-cancel {
+    background-color: var(--text-secondary) !important;
+}
+
+.swal2-icon.swal2-success {
+    border-color: var(--swal-success) !important;
+    color: var(--swal-success) !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: var(--swal-error) !important;
+    color: var(--swal-error) !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: var(--swal-warning) !important;
+    color: var(--swal-warning) !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: var(--swal-info) !important;
+    color: var(--swal-info) !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: var(--swal-question) !important;
+    color: var(--swal-question) !important;
+}
+
+.swal2-input:focus,
+.swal2-textarea:focus {
+    border-color: var(--swal-button-bg) !important;
+    box-shadow: 0 0 0 2px rgba(46, 134, 193, 0.2) !important;
+}
+
+.swal2-validation-message {
+    background: rgba(255, 0, 0, 0.1) !important;
+    color: var(--swal-error) !important;
+}
+
+.swal2-loader {
+    border-color: var(--swal-button-bg) transparent var(--swal-button-bg)
+        transparent !important;
+}
+
+.swal2-close:hover {
+    color: var(--swal-error) !important;
+}

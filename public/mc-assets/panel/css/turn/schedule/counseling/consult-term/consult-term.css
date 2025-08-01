@@ -1,0 +1,182 @@
+body {
+  direction: rtl;
+  background-color: #f9fafb;
+  font-family: 'Vazir', sans-serif;
+  overflow-x: hidden;
+}
+.myPanelOption{
+  display: none;
+}
+/* استایل کلی صفحه */
+.consult-term-content {
+  max-width: 1100px; /* عرض بهینه‌تر */
+  margin: 0 auto;
+}
+
+.consult-term-content-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  padding: 30px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* لوگو */
+.top-logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.top-logo img {
+  max-width: 120px; /* کمی بزرگ‌تر برای وضوح */
+  transition: transform 0.3s ease;
+}
+
+.top-logo img:hover {
+  transform: scale(1.05); /* افکت ملایم در هاور */
+}
+
+/* متن مقدمه */
+.intro-text {
+  font-size: 16px;
+  color: #4b5563;
+  line-height: 1.8;
+  margin-bottom: 40px;
+  font-weight: 600;
+  text-align: justify;
+  background: #f1f5f9;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border-right: 4px solid #2b6cb0;
+}
+
+/* عناوین بخش‌ها */
+.section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 25px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #2b6cb0; /* رنگ هماهنگ با تم */
+  position: relative;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: 0;
+  width: 50px;
+  height: 2px;
+  background: #2b6cb0;
+  transition: width 0.3s ease;
+}
+
+.section-title:hover::after {
+  width: 100px; /* افکت کشیده شدن خط */
+}
+
+/* آیتم‌های قوانین */
+.rule-item {
+  margin-bottom: 25px;
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.rule-item:hover {
+  border-color: #2b6cb0;
+  box-shadow: 0 4px 12px rgba(43, 108, 176, 0.1);
+  transform: translateY(-2px);
+}
+
+.rule-item strong {
+  font-size: 17px;
+  font-weight: 700;
+  color: #2d3748;
+  display: block;
+  margin-bottom: 8px;
+  position: relative;
+  padding-right: 20px;
+}
+
+.rule-item strong::before {
+  content: '•';
+  color: #2b6cb0;
+  font-size: 20px;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.rule-item p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.8;
+  margin: 0;
+  text-align: justify;
+}
+
+/* ریسپانسیو */
+@media only screen and (max-width: 768px) {
+
+  .consult-term-content-wrapper {
+    padding: 20px;
+    margin: 0 10px;
+  }
+  .intro-text {
+    font-size: 15px;
+    padding: 12px 15px;
+  }
+  .section-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  .rule-item {
+    padding: 12px;
+    margin-bottom: 20px;
+  }
+  .rule-item strong {
+    font-size: 16px;
+  }
+  .rule-item p {
+    font-size: 13px;
+  }
+  .top-logo img {
+    max-width: 100px;
+  }
+}
+
+@media only screen and (max-width: 576px) {
+  .consult-term-content-wrapper {
+    padding: 15px;
+  }
+  .intro-text {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+  .section-title {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+  .rule-item {
+    padding: 10px;
+    margin-bottom: 15px;
+  }
+  .rule-item strong {
+    font-size: 15px;
+  }
+  .rule-item p {
+    font-size: 12px;
+  }
+  .top-logo img {
+    max-width: 90px;
+  }
+}

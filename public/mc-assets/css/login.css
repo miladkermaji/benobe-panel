@@ -1,0 +1,144 @@
+.login-dr-content {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+    padding: 1rem;
+}
+a {
+    text-decoration: none;
+}
+.my-invalid-feedback {
+    color: red;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: bold;
+}
+.my-invalid-feedback-otp {
+    color: red;
+    font-size: 13px;
+    margin-top: 8px;
+    font-weight: bold;
+}
+/* main{
+    background: url('./../../app-assets/images/beams-home@95.jpg');
+    height: 90vh;
+} */
+.login-wrapper {
+    border-radius: 1rem;
+    background-color: #ffffff;
+    padding: 3rem 2rem;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.login-wrapper:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+}
+
+.login-logo {
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+}
+
+.login-logo img {
+    width: 85px;
+    transition: transform 0.3s ease;
+}
+
+.login-logo img:hover {
+    transform: scale(1.05);
+}
+
+.login-title {
+    margin-bottom: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1976d2;
+    text-align: center;
+}
+
+.login-info {
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    color: #333333;
+}
+
+.login-input-text {
+    margin-bottom: 1rem;
+}
+
+.login-input-text input {
+    outline: none;
+    border: 1px solid #efefef;
+    display: block;
+    width: 100%;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    line-height: 2rem;
+    /*background-color: #f7f7f7;*/
+    text-align: left;
+    direction: ltr;
+}
+
+.login-btn {
+    margin-bottom: 1rem;
+}
+
+.login-terms-and-conditions {
+    font-size: 0.8rem;
+}
+
+.form-control {
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+    border-color: #1976d2;
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.2);
+}
+
+@media (max-width: 768px) {
+    .login-wrapper {
+        padding: 2rem 1.5rem;
+        border-radius: 0.75rem;
+    }
+
+    .login-logo img {
+        width: 70px;
+    }
+
+    .login-title {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-wrapper {
+        padding: 1.5rem 1rem;
+        border-radius: 0.5rem;
+    }
+
+    .login-logo img {
+        width: 60px;
+    }
+
+    .login-title {
+        font-size: 1rem;
+    }
+}

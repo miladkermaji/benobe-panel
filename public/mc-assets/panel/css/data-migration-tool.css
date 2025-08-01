@@ -1,0 +1,346 @@
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+}
+
+/* استایل‌های عمومی */
+.glass-header {
+    background: var(--gradient-primary);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 25px var(--shadow);
+    transition: all 0.4s ease;
+}
+
+.glass-header:hover {
+    box-shadow: 0 12px 35px var(--shadow);
+    transform: translateY(-3px);
+}
+
+.bg-white.p-4.rounded-2xl.mb-5 {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    box-shadow: 0 4px 15px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+/* استایل‌های فرم */
+.input-modern {
+    border: none;
+    border-radius: var(--radius-button);
+    background: var(--background-light);
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    color: var(--text-primary);
+}
+
+.input-modern:hover {
+    background: var(--background-footer);
+}
+
+.input-modern:focus {
+    background: var(--background-card);
+    box-shadow: 0 0 0 4px var(--primary-light);
+    outline: none;
+}
+
+/* استایل‌های دکمه */
+.btn-gradient {
+    background: var(--gradient-primary);
+    border: none;
+    color: white;
+    font-weight: 600;
+    border-radius: var(--radius-button);
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: var(--primary);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px var(--shadow);
+}
+
+.btn-outline-secondary {
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-button);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-secondary:hover {
+    background: var(--text-secondary);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px var(--shadow);
+}
+
+/* استایل‌های پروگرس بار */
+.upload-progress,
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background: var(--border-neutral);
+    border-radius: var(--radius-circle);
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+.progress-bar {
+    background: var(--gradient-primary);
+    height: 100%;
+    transition: width 0.3s ease-in-out;
+}
+
+/* استایل‌های کارت */
+.card {
+    border: none;
+    border-radius: var(--radius-card);
+    box-shadow: 0 4px 15px var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 25px var(--shadow);
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background: var(--gradient-primary);
+    color: white;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+}
+
+/* استایل‌های لیست */
+.list-group-item {
+    border: 1px solid var(--border-neutral);
+    transition: all 0.3s ease;
+}
+
+.list-group-item:hover {
+    background: var(--background-light);
+}
+
+/* استایل‌های موبایل */
+@media (max-width: 767px) {
+    .glass-header {
+        padding: 1rem;
+        box-shadow: 0 6px 20px var(--shadow);
+    }
+
+    .bg-white {
+        padding: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .btn-gradient,
+    .btn-outline-secondary {
+        width: 100%;
+        padding: 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    .input-modern {
+        font-size: 0.875rem;
+        padding: 10px 12px;
+    }
+
+    .list-group-item {
+        font-size: 0.875rem;
+        padding: 10px 0;
+    }
+
+    .form-select.w-50 {
+        width: 100% !important;
+        margin-top: 0.5rem;
+    }
+
+    .form-label {
+        font-size: 0.875rem;
+    }
+}
+
+/* استایل‌های لودینگ */
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-width: 0.2rem;
+    color: var(--primary);
+}
+
+/* استایل‌های Select2 */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container--default .select2-selection--single {
+    border: none !important;
+    border-radius: var(--radius-button) !important;
+    background: var(--background-light) !important;
+    padding: 8px 12px !important;
+    font-size: 0.95rem !important;
+    height: auto !important;
+    min-height: 42px !important;
+}
+
+.select2-container--default .select2-selection--single:hover {
+    background: var(--background-footer) !important;
+}
+
+.select2-container--default.select2-container--focus
+    .select2-selection--single {
+    background: var(--background-card) !important;
+    outline: none !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+    color: var(--text-primary) !important;
+    line-height: normal !important;
+    padding: 0 30px 0 0 !important;
+    text-align: right !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow {
+    height: 100% !important;
+    left: 10px !important;
+    right: auto !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__arrow
+    b {
+    border-color: var(--text-secondary) transparent transparent transparent !important;
+}
+
+.select2-container--default.select2-container--open
+    .select2-selection--single
+    .select2-selection__arrow
+    b {
+    border-color: transparent transparent var(--text-secondary) transparent !important;
+}
+
+.select2-dropdown {
+    border: none !important;
+    border-radius: var(--radius-button) !important;
+    box-shadow: 0 4px 15px var(--shadow) !important;
+    background: var(--background-card) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid var(--border-neutral) !important;
+    border-radius: var(--radius-button) !important;
+    padding: 8px 12px !important;
+    font-size: 0.95rem !important;
+}
+
+.select2-container--default
+    .select2-search--dropdown
+    .select2-search__field:focus {
+    border-color: var(--primary) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px var(--primary-light) !important;
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 12px !important;
+    font-size: 0.95rem !important;
+    color: var(--text-primary) !important;
+}
+
+.select2-container--default
+    .select2-results__option--highlighted[aria-selected] {
+    background-color: var(--background-light) !important;
+    color: var(--primary) !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected="true"] {
+    background-color: var(--primary-light) !important;
+    color: white !important;
+}
+
+.select2-container--default .select2-results__option .select2-results__option {
+    padding-right: 20px !important;
+}
+
+.select2-container--default .select2-results__group {
+    padding: 8px 12px !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary) !important;
+}
+
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__placeholder {
+    color: var(--text-secondary) !important;
+}
+
+.select2-container--default .select2-selection--single[aria-disabled="true"] {
+    background-color: var(--border-neutral) !important;
+    cursor: not-allowed !important;
+}
+
+/* RTL Support */
+.select2-container--default
+    .select2-selection--single
+    .select2-selection__rendered {
+    text-align: right !important;
+}
+
+.select2-container--default .select2-results__option {
+    text-align: right !important;
+}
+
+.select2-container--default .select2-results__group {
+    text-align: right !important;
+}
+
+/* Mobile Styles */
+@media (max-width: 767px) {
+    .select2-container--default .select2-selection--single {
+        font-size: 0.875rem !important;
+        padding: 6px 10px !important;
+        min-height: 38px !important;
+    }
+
+    .select2-container--default .select2-results__option {
+        font-size: 0.875rem !important;
+        padding: 6px 10px !important;
+    }
+}

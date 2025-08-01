@@ -1,0 +1,1471 @@
+/* متغیرهای پالت رنگی */
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --gradient-instagram-from: #f92ca7;
+    --gradient-instagram-to: #6b1a93;
+    --button-mobile: #4f9acd;
+    --button-mobile-light: #a2cdeb;
+    --support-section: #2e86c1;
+    --support-text: #084d7c;
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    /* متغیرهای جدید برای خطا و هشدار */
+    --error: #ef4444;
+    --warning: #f59e0b;
+
+    /* شعاع گوشه‌ها */
+    --radius-button: 0.5rem;
+    --radius-card: 0.75rem;
+    --radius-circle: 9999px;
+
+    /* سایزهای فونت */
+
+
+}
+/* استایل‌های عمومی */
+*,
+::after,
+::before {
+    box-sizing: border-box !important;
+}
+.my-btn {
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  height: 30px;
+  width: 30px;
+}
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.7); /* اختیاری برای محو کردن پس‌زمینه */
+}
+body {
+    background-color: var(--background-light);
+    font-family: "IRANSans", sans-serif;
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+}
+
+/* انیمیشن‌ها */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* لودر */
+.loader {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid #fff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+    display: none;
+}
+
+/* بخش اصلی */
+.workhours-wrapper-content {
+    background: var(--background-card);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-neutral);
+    box-shadow: 0 2px 8px var(--shadow);
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease-in-out;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.workhours-wrapper-content:hover {
+    box-shadow: 0 4px 12px var(--shadow);
+    transform: translateY(-2px);
+}
+
+/* ورودی‌ها */
+.form-control {
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-button);
+    padding: 0.75rem;
+    font-size: var(--font-size-base);
+    background: var(--background-card);
+    transition: all 0.2s ease;
+    height: 50px;
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 134, 193, 0.2);
+    outline: none;
+}
+
+.form-control[readonly] {
+    background: var(--background-light) !important;
+    cursor: default;
+}
+
+.max-appointments,
+[data-bs-target="#CalculatorModal"] {
+    width: 80px !important;
+    text-align: center;
+}
+
+/* لیبل‌های شناور */
+.label-top-input-special-takhasos {
+    position: absolute;
+    top: -0.625rem;
+    bottom: inherit;
+    background: var(--background-card);
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 0 0.25rem;
+    transition: all 0.2s ease;
+    text-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.form-group:hover .label-top-input-special-takhasos {
+    color: var(--primary);
+    transform: translateY(-1px);
+}
+
+/* چک‌باکس‌ها */
+.checkbox-wrapper-1 [type="checkbox"].substituted + label:before {
+    content: "";
+    display: inline-block;
+    vertical-align: middle;
+    height: 1.25rem;
+    width: 1.25rem;
+    margin-left: 0.5rem;
+    border: 2px solid var(--border-neutral);
+    border-radius: 0.25rem;
+    background: var(--background-card);
+    transition: all 0.2s ease;
+}
+
+.checkbox-wrapper-1 [type="checkbox"].substituted:checked + label:before {
+    background: var(--primary)
+        url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 9 9"><path d="M3.5 6.5L1.5 4.5L0.5 5.5L3.5 8.5L8.5 3.5L7.5 2.5L3.5 6.5Z"/></svg>')
+        no-repeat center;
+    background-size: 0.875rem;
+    border-color: var(--primary);
+}
+
+.checkbox-wrapper-1 [type="checkbox"].substituted:focus + label:before {
+    box-shadow: 0 0 6px rgba(46, 134, 193, 0.3);
+}
+
+.checkbox-wrapper-1 [type="checkbox"].substituted + label {
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+}
+
+/* دکمه‌ها */
+.btn {
+    border-radius: var(--radius-button);
+    font-size: var(--font-size-base);
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    height: 40px;
+}
+
+.my-btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    color: var(--background-card);
+    font-weight: 600;
+}
+
+.my-btn-primary:hover {
+    background: linear-gradient(
+        90deg,
+        var(--primary) 0%,
+        var(--primary-light) 100%
+    );
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px var(--shadow);
+}
+
+.btn-light {
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+}
+
+.btn-light:hover {
+    background: var(--background-light);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+#scheduleModal .copy-schedule-setting {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 0.375rem;
+  background: var(--background-card, #fff);
+  border: 1px solid var(--border-neutral, #dee2e6);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#scheduleModal .copy-schedule-setting:hover{
+     background: var(--background-light);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+.copy-single-slot-btn,
+.remove-row-btn,
+.emergency-slot-btn,
+.schedule-btn,
+.add-row-btn,.edit-schedule-setting {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: var(--radius-button);
+    background: var(--background-light);
+    border: 1px solid var(--border-neutral);
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.copy-single-slot-btn:hover,
+.emergency-slot-btn:hover,
+.schedule-btn:hover,
+.add-row-btn:hover,.edit-schedule-setting:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    transform: scale(1.05);
+}
+
+.remove-row-btn:hover,
+.delete-schedule-setting:hover {
+    background: #fee2e2;
+    border-color: var(--error);
+    transform: scale(1.05);
+}
+
+.add-row-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    width: auto;
+    height: 32px;
+    font-size: 0.8125rem;
+}
+
+.add-row-btn img {
+    width: 14px;
+    height: 14px;
+}
+
+/* تولتیپ برای دکمه‌ها */
+.add-row-btn:after {
+    content: "افزودن ردیف";
+    visibility: hidden;
+    font-family: Vazir !important;
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: var(--background-card);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-button);
+    font-size: var(--font-size-small);
+    white-space: nowrap;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.add-row-btn:hover:after {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+}
+
+/* روزهای کاری */
+.day-contents {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    gap: 0.75rem;
+    padding: 0.5rem;
+    background: var(--background-light);
+    border-radius: var(--radius-card);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light) var(--background-light);
+}
+
+.day-contents::-webkit-scrollbar {
+    height: 6px;
+}
+
+.day-contents::-webkit-scrollbar-track {
+    background: var(--background-light);
+}
+
+.day-contents::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: var(--radius-button);
+}
+
+.day-contents .btn {
+    flex: 0 0 auto;
+    background: var(--background-card);
+    border: 1px solid var(--border-neutral);
+    color: var(--text-primary);
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.day-contents .btn.active {
+    background: var(--primary);
+    color: var(--background-card);
+    border-color: var(--primary);
+    box-shadow: 0 2px 6px var(--shadow);
+}
+
+.day-contents .btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    transform: translateY(-1px);
+}
+
+.h-55 {
+    height: 55px !important;
+}
+
+/* ردیف‌های اسلات */
+.bg-active-slot {
+    background: #f9fafb;
+    border-radius: var(--radius-card);
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    margin-bottom: 0.5rem;
+}
+
+.bg-active-slot:hover {
+    background: #e6f0fa;
+    box-shadow: 0 2px 6px var(--shadow);
+    transform: translateY(-1px);
+}
+
+.bg-active-slot.active {
+    background: #e6f0fa;
+    border: 2px solid var(--primary);
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: nowrap;
+}
+
+/* تایم‌پیکر */
+.timepicker-ui-input {
+    width: 140px;
+    border-radius: var(--radius-button);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    text-align: center;
+    transition: all 0.2s ease;
+    height: 50px;
+}
+
+.timepicker-ui-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 134, 193, 0.2);
+}
+
+/* بخش‌های کاری */
+.border-333 {
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-card);
+    padding: 1rem;
+    background: #f8fbff;
+    transition: all 0.2s ease;
+}
+
+.border-333:hover {
+    box-shadow: 0 2px 8px var(--shadow);
+}
+
+/* مودال‌ها */
+.modal-content {
+    border-radius: var(--radius-card);
+    border: none;
+    box-shadow: 0 6px 20px var(--shadow);
+    background: var(--background-card);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+.modal-header {
+    background: var(--background-light);
+    border-bottom: 1px solid var(--border-neutral);
+    padding: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.close {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.close:hover {
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+/* مودال schedule */
+.schedule-modal .modal-dialog {
+    max-width: 700px;
+    width: 95%;
+    margin: 1.5rem auto;
+}
+
+.schedule-modal .modal-content {
+    border-radius: var(--radius-card);
+}
+
+.schedule-modal .modal-body {
+    padding: 1.5rem;
+    gap: 1.5rem;
+}
+
+.schedule-modal .timepicker-ui-input {
+    width: 160px;
+    max-width: 100%;
+}
+
+.schedule-modal .checkbox-wrapper-1 [type="checkbox"].substituted + label {
+    font-size: var(--font-size-base);
+}
+
+.schedule-modal
+    .checkbox-wrapper-1
+    [type="checkbox"].substituted
+    + label:before {
+    height: 1.25rem;
+    width: 1.25rem;
+}
+
+/* مودال copy */
+.copy-modal .modal-dialog {
+    max-width: 600px;
+    width: 95%;
+}
+
+.copy-modal .modal-body {
+    padding: 1.25rem;
+    gap: 1rem;
+}
+
+/* زمان‌های اورژانسی */
+.emergency-times-container {
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.75rem;
+    border: 1px solid var(--border-neutral);
+    border-radius: var(--radius-card);
+    background: var(--background-light);
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light) var(--background-light);
+}
+
+.emergency-times-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.emergency-times-container::-webkit-scrollbar-track {
+    background: var(--background-light);
+}
+
+.emergency-times-container::-webkit-scrollbar-thumb {
+    background: var(--primary-light);
+    border-radius: var(--radius-button);
+}
+
+.time-slot-btn {
+    font-size: var(--font-size-small);
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: var(--radius-button);
+    transition: all 0.2s ease;
+}
+
+.time-slot-btn.btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.time-slot-btn.btn-outline-primary {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.time-slot-btn:hover {
+    transform: scale(1.05);
+}
+
+
+
+
+
+/* سایر استایل‌ها */
+h6 {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.alert {
+    border-radius: var(--radius-button);
+    font-size: var(--font-size-base);
+    padding: 0.75rem 1rem;
+}
+.border-radius-0 {
+    border-radius: 0 !important;
+}
+/* تنظیمات ریسپانسیو */
+@media (max-width: 992px) {
+    .workhours-wrapper-content {
+        max-width: 95vw;
+        padding: 1rem;
+    }
+
+    /* روزهای هفته */
+    .day-contents {
+        flex-wrap: nowrap;
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scroll-behavior: smooth;
+        gap: 0.5rem;
+        padding: 0.5rem 0;
+    }
+
+    .day-contents .btn {
+        min-width: 70px;
+        padding: 0.5rem;
+        font-size: var(--font-size-small);
+    }
+
+    /* دکمه افزودن ردیف */
+    .add-row-btn {
+        width: 40px;
+        height: 40px;
+        padding: 0;
+    }
+
+    .add-row-btn span {
+        display: none;
+    }
+
+    .add-row-btn img {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* ردیف‌های اسلات */
+    .bg-active-slot {
+        min-width: 280px;
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-row {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--primary-light) var(--background-light);
+    }
+
+    .form-row::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .form-row::-webkit-scrollbar-track {
+        background: var(--background-light);
+    }
+
+    .form-row::-webkit-scrollbar-thumb {
+        background: var(--primary-light);
+        border-radius: var(--radius-button);
+    }
+
+    .timepicker-ui-input {
+        width: 120px;
+    }
+
+    .max-appointments,
+    [data-bs-target="#CalculatorModal"] {
+        width: 80px !important;
+    }
+
+    .copy-single-slot-btn,
+    .remove-row-btn,
+    .emergency-slot-btn,
+    .schedule-btn,.edit-schedule-setting {
+        width: 36px;
+        height: 36px;
+    }
+
+    .copy-single-slot-btn img,
+    .remove-row-btn img,
+    .emergency-slot-btn img,
+    .schedule-btn img,.edit-schedule-setting img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .schedule-modal .modal-dialog {
+        max-width: 90vw;
+    }
+
+    .schedule-modal .timepicker-ui-input {
+        width: 140px;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --radius-button: 0.375rem;
+        --radius-card: 0.5rem;
+    }
+    .counseling-types-wrapper {
+        width: 100% !important;
+        overflow-y: hidden !important;
+        overflow-x: scroll !important;
+        flex-wrap: nowrap !important;
+        text-wrap: nowrap !important;
+        white-space: nowrap !important;
+    }
+    .workhours-wrapper-content {
+        max-width: 98vw;
+        padding: 0.75rem;
+    }
+
+    .day-contents {
+        gap: 0.5rem;
+        padding: 0.25rem 0;
+    }
+
+    .day-contents .btn {
+        min-width: 65px;
+        padding: 0.5rem;
+    }
+
+    .form-control,
+    .timepicker-ui-input,
+    .btn {
+        height: 44px;
+        font-size: var(--font-size-small);
+    }
+    .sixty-min-768,
+    .therty-min-768 {
+        margin-top: 15px;
+    }
+
+    .max-appointments,
+    [data-bs-target="#CalculatorModal"] {
+        width: 80px !important;
+    }
+
+    .add-row-btn {
+        padding: 0.25rem 0.5rem;
+        height: 30px;
+        font-size: 0.75rem;
+    }
+
+    .add-row-btn img {
+        width: 12px;
+        height: 12px;
+    }
+
+    .bg-active-slot {
+        min-width: 260px;
+        padding: 0.75rem;
+    }
+
+    .schedule-modal .modal-dialog {
+        max-width: 95vw;
+        margin: 0.5rem auto;
+    }
+
+    .schedule-modal .modal-body {
+        padding: 1rem;
+        gap: 1rem;
+    }
+
+    .schedule-modal .timepicker-ui-input {
+        width: 120px;
+    }
+
+    .modal-header {
+        padding: 0.75rem;
+    }
+
+    .modal-body {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 544px) {
+    .workhours-wrapper-content {
+        max-width: 98vw;
+        padding: 0.3rem !important;
+    }
+    .col-md-6 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .day-contents .btn {
+        min-width: 60px;
+        padding: 0.25rem;
+        font-size: 0.6875rem;
+    }
+
+    .bg-active-slot {
+        min-width: 220px;
+        padding: 0.5rem;
+    }
+
+    .timepicker-ui-input {
+        width: 100px;
+    }
+
+    .max-appointments,
+    [data-bs-target="#CalculatorModal"] {
+        width: 80px !important;
+    }
+
+    .copy-single-slot-btn,
+    .remove-row-btn,
+    .emergency-slot-btn,
+    .schedule-btn,
+    .add-row-btn,.edit-schedule-setting {
+        width: 32px;
+        height: 32px;
+    }
+
+    .add-row-btn img,
+    .copy-single-slot-btn img,
+    .remove-row-btn img,
+    .emergency-slot-btn img,
+    .schedule-btn img,.edit-schedule-setting img {
+        width: 16px;
+        height: 16px;
+    }
+
+    .schedule-modal .modal-dialog {
+        max-width: 98vw;
+        margin: 0.25rem auto;
+    }
+
+    .schedule-modal .timepicker-ui-input {
+        width: 100px;
+    }
+}
+
+@media (max-width: 425px) {
+    .workhours-wrapper-content {
+        max-width: 100vw;
+        padding: 0.375rem;
+    }
+    .row.border.border-radius-11.p-3 {
+        padding: 0.1rem !important;
+        border: none !important;
+        margin-top: 5px !important;
+    }
+
+    .day-contents {
+        gap: 0.25rem;
+    }
+
+    .day-contents .btn {
+        min-width: 55px;
+        padding: 0.25rem;
+    }
+
+    .form-control,
+    .timepicker-ui-input,
+    .btn {
+        font-size: 0.6875rem;
+    }
+
+    .bg-active-slot {
+        min-width: 200px;
+        padding: 0.5rem;
+    }
+
+    .timepicker-ui-input {
+        width: 90px !important;
+    }
+
+    .max-appointments,
+    [data-bs-target="#CalculatorModal"] {
+        width: 70px !important;
+    }
+
+    .schedule-modal .modal-dialog {
+        max-width: 100vw;
+        margin: 0;
+    }
+
+    .schedule-modal .modal-content {
+        border-radius: 0.25rem;
+    }
+
+    .schedule-modal .timepicker-ui-input {
+        width: 90px;
+    }
+
+    .modal-header {
+        padding: 0.5rem;
+    }
+
+    .modal-body {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+
+    .checkbox-wrapper-1 [type="checkbox"].substituted + label {
+        font-size: 0.6875rem;
+    }
+
+    .checkbox-wrapper-1 [type="checkbox"].substituted + label:before {
+        height: 1rem;
+        width: 1rem;
+        background-size: 0.625rem;
+    }
+
+    .add-row-btn {
+        padding: 0.25rem 0.5rem;
+        height: 28px;
+        font-size: 0.6875rem;
+    }
+
+    .add-row-btn img {
+        width: 10px;
+        height: 10px;
+    }
+}
+/*   schedule modal styles */
+/* متغیرهای پالت رنگی */
+
+/* انیمیشن‌ها */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* استایل مودال */
+/* استایل‌های مودال scheduleModal */
+#scheduleModal .modal-dialog {
+    max-width: 600px;
+    width: 95%;
+    margin: 1.5rem auto;
+}
+
+#scheduleModal .modal-content {
+    border-radius: 0.75rem;
+    border: none;
+    background: var(--background-card, #fff);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    animation: modalFadeIn 0.3s ease-in-out;
+}
+
+#scheduleModal .modal-header {
+    background: var(--background-light, #f8f9fa);
+    border-bottom: 1px solid var(--border-neutral, #dee2e6);
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem 0.75rem 0 0;
+}
+
+#scheduleModal .modal-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary, #212529);
+}
+
+#scheduleModal .close {
+    font-size: 1.125rem;
+    color: var(--text-secondary, #6c757d);
+    transition: all 0.2s ease;
+}
+
+#scheduleModal .close:hover {
+    color: var(--primary, #2e86c1);
+    transform: scale(1.1);
+}
+
+#scheduleModal .modal-body {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: relative;
+}
+
+
+
+/* محتوای مودال */
+#scheduleModal .modal-content-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* بخش‌های دارای بوردر */
+#scheduleModal .border-section {
+    border: 1px solid var(--border-neutral, #dee2e6);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    background: var(--background-light, #f8f9fa);
+}
+
+/* عناوین بخش‌ها */
+#scheduleModal .section-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--text-primary, #212529);
+    margin-bottom: 0.5rem;
+}
+
+/* بخش انتخاب روزها */
+#scheduleModal .day-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr)); /* ستون‌های یکنواخت */
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#scheduleModal .form-check {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+}
+
+#scheduleModal .form-check-input {
+    width: 0.9375rem;
+    height: 0.9375rem;
+    margin-top: 0;
+    margin-left: 0.5rem;
+    border: 2px solid var(--text-secondary, #6c757d);
+    border-radius: 0.2rem;
+    background-color: var(--background-card, #fff);
+    transition: all 0.2s ease;
+}
+
+#scheduleModal .form-check-input:checked {
+    background-color: var(--primary, #2e86c1);
+    border-color: var(--primary, #2e86c1);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+
+#scheduleModal .form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(46, 134, 193, 0.25);
+    border-color: var(--primary, #2e86c1);
+}
+
+#scheduleModal .form-check-label {
+    font-size: 0.8125rem;
+    color: var(--text-primary, #212529);
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap; /* جلوگیری از شکستگی متن */
+}
+
+#scheduleModal .select-all-checkbox .form-check-label {
+    font-size: 0.875rem; /* فونت کمی بزرگتر برای "انتخاب همه" */
+    font-weight: 600;
+    min-width: 80px; /* عرض کافی برای جلوگیری از شکستگی */
+}
+
+#scheduleModal .day-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+/* بخش تایم‌پیکرها و دکمه ذخیره */
+#scheduleModal .timepicker-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 0.5rem;
+    align-items: center; /* تراز عمودی بهتر */
+}
+
+#scheduleModal .form-group {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#scheduleModal .label-top-input-special-takhasos {
+    top: -0.625rem;
+    background: var(--background-light, #f8f9fa);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary, #6c757d);
+    padding: 0 0.25rem;
+    transition: all 0.2s ease;
+}
+
+#scheduleModal .form-group:hover .label-top-input-special-takhasos {
+    color: var(--primary, #2e86c1);
+}
+
+#scheduleModal .timepicker-ui-input {
+    width: 100%;
+    height: 50px; /* ارتفاع 50px */
+    border: 1px solid var(--border-neutral, #dee2e6);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-align: center;
+    background: var(--background-card, #fff);
+    transition: all 0.2s ease;
+}
+
+#scheduleModal .timepicker-ui-input:focus {
+    border-color: var(--primary, #2e86c1);
+    box-shadow: 0 0 6px rgba(46, 134, 193, 0.25);
+}
+
+/* دکمه ذخیره */
+#scheduleModal .save-schedule-btn {
+    background: var(
+        --gradient-primary,
+        linear-gradient(90deg, #2e86c1 0%, #5dade2 100%)
+    );
+    border: none;
+    border-radius: 0.375rem;
+    color: var(--background-card, #fff);
+    font-size: 0.875rem;
+    font-weight: 600;
+    padding: 0.75rem 1.25rem;
+    height: 50px; /* ارتفاع 50px */
+    line-height: 1.5;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scheduleModal .save-schedule-btn:hover {
+    background: linear-gradient(90deg, #2e86c1 0%, #3498db 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+#scheduleModal .save-schedule-btn .loader {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2px solid #fff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 0.5rem;
+}
+
+/* بخش تنظیمات ذخیره‌شده */
+#scheduleModal .schedule-settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 160px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-light, #5dade2)
+        var(--background-light, #f8f9fa);
+}
+
+#scheduleModal .schedule-settings-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+#scheduleModal .schedule-settings-list::-webkit-scrollbar-track {
+    background: var(--background-light, #f8f9fa);
+}
+
+#scheduleModal .schedule-settings-list::-webkit-scrollbar-thumb {
+    background: var(--primary-light, #5dade2);
+    border-radius: 0.375rem;
+}
+
+#scheduleModal .schedule-setting-item {
+    background: var(--background-card, #fff);
+    border: 1px solid var(--border-neutral, #dee2e6);
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+#scheduleModal .schedule-setting-item:hover {
+    background: var(--primary-light, #e6f0fa);
+    border-color: var(--primary, #2e86c1);
+}
+
+#scheduleModal .setting-text {
+    font-size: 0.8125rem;
+    color: var(--text-primary, #212529);
+    font-weight: 500;
+    flex-grow: 1;
+}
+
+#scheduleModal .delete-schedule-setting {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 0.375rem;
+    background: var(--background-card, #fff);
+    border: 1px solid var(--border-neutral, #dee2e6);
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#scheduleModal .delete-schedule-setting:hover {
+    background: var(--error, #dc3545);
+    border-color: var(--error, #dc3545);
+}
+
+#scheduleModal .delete-schedule-setting img {
+    width: 16px;
+    height: 16px;
+}
+
+/* هشدار */
+#scheduleModal .alert {
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    padding: 0.5rem;
+    font-weight: 500;
+    text-align: center;
+    background: var(--background-light, #f8f9fa);
+    border: 1px solid var(--primary, #2e86c1);
+    color: var(--text-primary, #212529);
+}
+
+/* تنظیمات ریسپانسیو */
+@media (max-width: 768px) {
+    #scheduleModal .modal-dialog {
+        max-width: 95vw;
+        margin: 1rem auto;
+    }
+
+    #scheduleModal .modal-body {
+        padding: 0.75rem;
+        gap: 0.75rem;
+    }
+
+    #scheduleModal .section-title {
+        font-size: 0.875rem;
+    }
+
+    #scheduleModal .day-schedule-grid {
+        grid-template-columns: repeat(
+            2,
+            minmax(0, 1fr)
+        ); /* دو ستون در موبایل */
+        gap: 0.375rem;
+    }
+
+    #scheduleModal .timepicker-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    #scheduleModal .timepicker-ui-input,
+    #scheduleModal .save-schedule-btn {
+        height: 48px; /* کمی کوچکتر در موبایل */
+        font-size: 0.8125rem;
+    }
+
+    #scheduleModal .form-check-label {
+        font-size: 0.75rem;
+    }
+
+    #scheduleModal .select-all-checkbox .form-check-label {
+        font-size: 0.8125rem;
+        min-width: 70px;
+    }
+
+    #scheduleModal .form-check-input {
+        width: 0.875rem;
+        height: 0.875rem;
+    }
+
+    #scheduleModal .setting-text {
+        font-size: 0.75rem;
+    }
+
+    #scheduleModal .border-section {
+        padding: 0.5rem;
+    }
+}
+
+@media (max-width: 425px) {
+    #scheduleModal .modal-dialog {
+        max-width: 100vw;
+        margin: 0;
+    }
+    .workhours-wrapper-content{
+        border-radius: 0 !important;
+    }
+    .border-radius-11{
+        border-radius: 0 !important;
+    }
+
+    #scheduleModal .modal-content {
+        border-radius: 0.5rem;
+    }
+
+    #scheduleModal .modal-body {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+
+    #scheduleModal .day-schedule-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.25rem;
+    }
+
+    #scheduleModal .form-check-label {
+        font-size: 0.6875rem;
+    }
+
+    #scheduleModal .select-all-checkbox .form-check-label {
+        font-size: 0.75rem;
+        min-width: 60px;
+    }
+
+    #scheduleModal .form-check-input {
+        width: 0.8125rem;
+        height: 0.8125rem;
+    }
+
+    #scheduleModal .timepicker-ui-input {
+        height: 46px;
+        font-size: 0.75rem;
+    }
+
+    #scheduleModal .save-schedule-btn {
+        height: 46px;
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    #scheduleModal .delete-schedule-setting {
+        width: 24px;
+        height: 24px;
+    }
+
+    #scheduleModal .delete-schedule-setting img {
+        width: 14px;
+        height: 14px;
+    }
+
+    #scheduleModal .section-title {
+        font-size: 0.8125rem;
+    }
+
+    #scheduleModal .border-section {
+        padding: 0.375rem;
+    }
+}
+/* استایل‌های مودال تنظیم زمان‌بندی */
+.schedule-modal .modal-content {
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.schedule-days-section, .timepicker-save-section, .schedule-settings-section {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.day-schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+}
+
+.day-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.day-checkbox input {
+    margin-left: 8px;
+}
+
+.timepicker-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.timepicker-ui-input {
+    border-radius: 6px !important;
+    border: 1px solid #ced4da;
+    transition: border-color 0.3s ease;
+}
+
+.timepicker-ui-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
+}
+
+.save-schedule-btn {
+    border-radius: 6px;
+    padding: 10px 20px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+}
+
+.save-schedule-btn:hover {
+    transform: translateY(-2px);
+}
+
+.schedule-setting-item {
+    transition: background-color 0.3s ease;
+}
+
+.schedule-setting-item:hover {
+    background-color: #e9ecef !important;
+}
+
+.edit-schedule-setting img {
+    transition: transform 0.3s ease;
+}
+
+.edit-schedule-setting:hover img {
+    transform: scale(1.2);
+}
+
+/* انیمیشن برای نمایش/مخفی کردن بخش تنظیم بازه زمانی */
+.timepicker-save-section {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.timepicker-save-section:not(.d-none) {
+    max-height: 200px;
+    opacity: 1;
+}
+
+
