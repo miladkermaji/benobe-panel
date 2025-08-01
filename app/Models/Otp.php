@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Models\Admin\Manager;
@@ -30,5 +31,9 @@ class Otp extends Model
     public function secretary()
     {
         return $this->belongsTo(Secretary::class);
+    }
+    public function medicalCenter()
+    {
+        return $this->belongsTo(MedicalCenter::class);
     }
 }

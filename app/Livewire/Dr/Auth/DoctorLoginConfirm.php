@@ -8,6 +8,7 @@ use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\LoginLog;
 use App\Models\Secretary;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Support\Facades\Log;
@@ -41,7 +42,7 @@ class DoctorLoginConfirm extends Component
 
         $otp = Otp::where('token', $token)->first();
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp?->medicalCenter?->phone_number ?? $otp->login_id ?? 'unknown';
 
         if ($otp) {
             $this->countDownDate = $otp->created_at->addMinutes(2)->timestamp * 1000;
@@ -100,7 +101,7 @@ class DoctorLoginConfirm extends Component
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp?->medicalCenter?->phone_number ?? $otp->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
@@ -114,43 +115,51 @@ class DoctorLoginConfirm extends Component
         }
 
         if ($otp->otp_code !== $otpCode) {
-            $userId = $otp->doctor_id ?? $otp->secretary_id ?? null;
+            $userId = $otp->doctor_id ?? $otp->secretary_id ?? $otp->medical_center_id ?? null;
             $loginAttempts->incrementLoginAttempt(
                 $userId,
                 $mobile,
                 $otp->doctor_id,
                 $otp->secretary_id,
-                null
+                null,
+                $otp->medical_center_id
             );
             $this->addError('otpCode', 'کد تأیید وارد شده صحیح نیست.');
             return;
         }
 
         $otp->update(['used' => 1]);
-        $user = $otp->doctor ?? $otp->secretary;
+        $user = $otp->doctor ?? $otp->secretary ?? $otp->medicalCenter;
 
         if (empty($user->mobile_verified_at)) {
             $user->update(['mobile_verified_at' => Carbon::now()]);
         }
 
+        // ورود با گارد مناسب و تعیین مسیر هدایت
         if ($user instanceof Doctor) {
             Auth::guard('doctor')->login($user);
             $redirectRoute = route('dr-panel');
             $userType = 'doctor';
-        } else {
+        } elseif ($user instanceof Secretary) {
             Auth::guard('secretary')->login($user);
             $redirectRoute = route('dr-panel');
             $userType = 'secretary';
+        } else {
+            // Medical Center - redirect to MC panel
+            Auth::guard('medical_center')->login($user);
+            $redirectRoute = route('mc-panel');
+            $userType = 'medical_center';
         }
 
         Log::info("Resetting login attempts for mobile: $mobile");
-        $loginAttempts->resetLoginAttempts($user->mobile);
+        $loginAttempts->resetLoginAttempts($user->mobile ?? $user->phone_number);
         session()->forget(['step1_completed', 'current_step', 'otp_token']);
         LoginSession::where('token', $this->token)->delete();
 
         LoginLog::create([
             'doctor_id' => $user instanceof Doctor ? $user->id : null,
             'secretary_id' => $user instanceof Secretary ? $user->id : null,
+            'medical_center_id' => $user instanceof MedicalCenter ? $user->id : null,
             'user_type' => $userType,
             'login_at' => now(),
             'ip_address' => request()->ip(),
@@ -182,7 +191,7 @@ class DoctorLoginConfirm extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp->doctor?->mobile ?? $otp->secretary?->mobile ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp->doctor?->mobile ?? $otp->secretary?->mobile ?? $otp->medicalCenter?->phone_number ?? $otp->login_id ?? 'unknown';
 
         // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($mobile)) {
@@ -200,6 +209,7 @@ class DoctorLoginConfirm extends Component
             'token' => $newToken,
             'doctor_id' => $otp->doctor_id,
             'secretary_id' => $otp->secretary_id,
+            'medical_center_id' => $otp->medical_center_id,
             'otp_code' => $otpCode,
             'login_id' => $mobile,
             'type' => 0,
@@ -210,13 +220,14 @@ class DoctorLoginConfirm extends Component
             'token' => $newToken,
             'doctor_id' => $otp->doctor_id,
             'secretary_id' => $otp->secretary_id,
+            'medical_center_id' => $otp->medical_center_id,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $user = $otp->doctor ?? $otp->secretary;
+        $user = $otp->doctor ?? $otp->secretary ?? $otp->medicalCenter;
         $messagesService = new MessageService(
-            SmsService::create(100286, $user->mobile, [$otpCode])
+            SmsService::create(100286, $user->mobile ?? $user->phone_number, [$otpCode])
         );
         $messagesService->send();
 

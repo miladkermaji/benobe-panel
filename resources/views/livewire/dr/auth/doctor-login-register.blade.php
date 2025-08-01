@@ -7,7 +7,7 @@
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
       <div class="text-center mb-4">
-        <h2 class="text-primary fw-bold mb-2 text-center">پنل پزشکان و مراکز درمانی به نوبه</h2>
+        <h2 class="text-primary fw-bold mb-2 text-center">ورود پزشکان و مراکز درمانی</h2>
         {{-- <p class="text-muted fw-bold">به پنل مدیریت پزشکان و مراکز درمانی به نوبه خوش آمدید</p> --}}
       </div>
       <div class="d-flex justify-content-between align-items-center mb-3">

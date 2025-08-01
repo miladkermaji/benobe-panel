@@ -14,7 +14,7 @@ class LoginAttemptsService
     private const CACHE_PREFIX = 'login_attempts_';
     private const CACHE_DURATION = 86400; // 24 hours
 
-    public function incrementLoginAttempt($userId, $mobile, $doctorId = null, $secretaryId = null, $managerId = null)
+    public function incrementLoginAttempt($userId, $mobile, $doctorId = null, $secretaryId = null, $managerId = null, $medicalCenterId = null)
     {
         // بررسی محدودیت روزانه
         if ($this->isDailyLimitExceeded($mobile)) {
@@ -28,6 +28,7 @@ class LoginAttemptsService
                 'doctor_id' => $doctorId ?: null,
                 'secratary_id' => $secretaryId ?: null,
                 'manager_id' => $managerId ?: null,
+                'medical_center_id' => $medicalCenterId ?: null,
                 'attempts' => 0,
                 'last_attempt_at' => null,
                 'lockout_until' => null
@@ -48,6 +49,7 @@ class LoginAttemptsService
         $attempt->doctor_id = $doctorId ?: null;
         $attempt->secratary_id = $secretaryId ?: null;
         $attempt->manager_id = $managerId ?: null;
+        $attempt->medical_center_id = $medicalCenterId ?: null;
 
         $attempt->attempts++;
         $attempt->last_attempt_at = now();

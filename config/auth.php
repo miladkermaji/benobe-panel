@@ -74,6 +74,10 @@ return [
             'driver' => 'session',
             'provider' => 'secretaries',
         ],
+        'medical_center' => [
+            'driver' => 'session',
+            'provider' => 'medical_centers',
+        ],
         'user' => [
             'driver' => 'session',
             'provider' => 'users',
@@ -120,6 +124,11 @@ return [
             'model' => App\Models\Secretary::class,
 
         ],
+        'medical_centers' => [
+            'driver' => 'eloquent',
+            'table' => 'medical_centers',
+            'model' => App\Models\MedicalCenter::class,
+        ],
     ],
 
     /*
@@ -162,6 +171,12 @@ return [
         ],
         'secretaries' => [
             'provider' => 'secretaries',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+        'medical_centers' => [
+            'provider' => 'medical_centers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

@@ -16,8 +16,8 @@ class Secretary
             return $next($request); // اجازه ورود به مدیر
         }
 
-        // چک کردن گارد دکتر یا منشی
-        if (!Auth::guard('doctor')->check() && !Auth::guard('secretary')->check()) {
+        // چک کردن گارد دکتر، منشی یا مرکز درمانی
+        if (!Auth::guard('doctor')->check() && !Auth::guard('secretary')->check() && !Auth::guard('medical_center')->check()) {
             return redirect()->to(route('dr.auth.login-register-form'));
         }
 
@@ -33,6 +33,14 @@ class Secretary
         if (Auth::guard('secretary')->check()) {
             $secretary = Auth::guard('secretary')->user();
             if ($secretary->status === 0) {
+                return redirect()->to(route('dr.auth.login-register-form'));
+            }
+        }
+
+        // بررسی وضعیت فعال بودن برای مرکز درمانی
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            if (!$medicalCenter->is_active) {
                 return redirect()->to(route('dr.auth.login-register-form'));
             }
         }

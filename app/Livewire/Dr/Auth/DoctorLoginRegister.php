@@ -6,6 +6,7 @@ use App\Models\Otp;
 use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\Secretary;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Support\Facades\Log;
@@ -72,18 +73,19 @@ class DoctorLoginRegister extends Component
 
         $doctor = Doctor::where('mobile', $formattedMobile)->first();
         $secretary = Secretary::where('mobile', $formattedMobile)->first();
+        $medicalCenter = MedicalCenter::where('phone_number', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
         // بررسی وجود کاربر
-        if (!$doctor && !$secretary) {
+        if (!$doctor && !$secretary && !$medicalCenter) {
             $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $doctor ?? $secretary;
+        $user = $doctor ?? $secretary ?? $medicalCenter;
 
         // بررسی وضعیت کاربر
-        if ($user->status === 0) {
+        if ($user->status === 0 || ($user instanceof MedicalCenter && !$user->is_active)) {
             $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
         }
@@ -112,8 +114,9 @@ class DoctorLoginRegister extends Component
             'token' => $token,
             'doctor_id' => $doctor ? $doctor->id : null,
             'secretary_id' => $secretary ? $secretary->id : null,
+            'medical_center_id' => $medicalCenter ? $medicalCenter->id : null,
             'otp_code' => $otpCode,
-            'login_id' => $user->mobile,
+            'login_id' => $user->mobile ?? $user->phone_number,
             'type' => 0,
         ]);
 
@@ -121,19 +124,20 @@ class DoctorLoginRegister extends Component
             'token' => $token,
             'doctor_id' => $doctor ? $doctor->id : null,
             'secretary_id' => $secretary ? $secretary->id : null,
+            'medical_center_id' => $medicalCenter ? $medicalCenter->id : null,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
         // ارسال پیامک
         $messagesService = new MessageService(
-            SmsService::create(100286, $user->mobile, [$otpCode])
+            SmsService::create(100286, $user->mobile ?? $user->phone_number, [$otpCode])
         );
         $response = $messagesService->send();
         Log::info('SMS send response', ['response' => $response]);
 
         // ارسال اعلان
-        $this->notificationService->sendOtpNotification($user->mobile, $otpCode);
+        $this->notificationService->sendOtpNotification($user->mobile ?? $user->phone_number, $otpCode);
 
         session(['current_step' => 2, 'otp_token' => $token]);
         $this->dispatch('otpSent', token: $token, otpCode: $otpCode);

@@ -1,4 +1,5 @@
 <?php
+
 use App\Livewire\Admin\Auth\Logout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,9 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+
+// MC panel route
+Route::get('mc/panel', [DrPanelController::class, 'index'])->name('mc-panel')->middleware(['doctor']);
 
 // dr routes
 Route::prefix('mc')

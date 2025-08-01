@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class MedicalCenter extends Model
+class MedicalCenter extends Authenticatable
 {
     use SoftDeletes;
     use Sluggable;
+    use Notifiable;
+    use HasApiTokens;
 
     protected $fillable = [
         'name', 'title', 'address', 'secretary_phone', 'phone_number', 'postal_code',
@@ -19,7 +24,12 @@ class MedicalCenter extends Model
         'is_active', 'working_days', 'avatar', 'documents', 'phone_numbers',
         'location_confirmed', 'type', 'galleries', 'specialty_ids', 'insurance_ids',
         'service_ids', 'Center_tariff_type', 'Daycare_centers', 'slug', 'average_rating',
-        'reviews_count', 'recommendation_percentage',
+        'reviews_count', 'recommendation_percentage', 'password', 'static_password_enabled', 'two_factor_secret_enabled',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -39,6 +49,8 @@ class MedicalCenter extends Model
         'longitude' => 'decimal:7',
         'average_rating' => 'decimal:1',
         'recommendation_percentage' => 'integer',
+        'static_password_enabled' => 'boolean',
+        'two_factor_secret_enabled' => 'boolean',
     ];
 
     public function doctors()

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,6 +13,7 @@ class LoginAttempt extends Model
         'doctor_id',
         'secretary_id',
         'manager_id',
+        'medical_center_id',
         'mobile',
         'attempts',
         'last_attempt_at',

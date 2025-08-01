@@ -7,6 +7,7 @@ use App\Models\Doctor;
 use Livewire\Component;
 use App\Models\LoginLog;
 use App\Models\Secretary;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Support\Facades\Log;
@@ -89,13 +90,14 @@ class DoctorLoginUserPass extends Component
 
         $doctor = Doctor::where('mobile', $formattedMobile)->first();
         $secretary = Secretary::where('mobile', $formattedMobile)->first();
+        $medicalCenter = MedicalCenter::where('phone_number', $formattedMobile)->first();
 
-        if (!$doctor && !$secretary) {
+        if (!$doctor && !$secretary && !$medicalCenter) {
             $this->addError('password', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $doctor ?? $secretary;
+        $user = $doctor ?? $secretary ?? $medicalCenter;
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
         if (($user->static_password_enabled ?? 0) !== 1) {
@@ -104,14 +106,14 @@ class DoctorLoginUserPass extends Component
         }
 
         // بررسی وضعیت حساب
-        if ($user->status !== 1) {
+        if ($user->status !== 1 || ($user instanceof MedicalCenter && !$user->is_active)) {
             $this->addError('password', 'حساب کاربری شما غیرفعال است.');
             return;
         }
 
         // بررسی رمز عبور
         if (!Hash::check($this->password, $user->password)) {
-            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, $doctor ? $doctor->id : null, $secretary ? $secretary->id : null, null);
+            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, $doctor ? $doctor->id : null, $secretary ? $secretary->id : null, null, $medicalCenter ? $medicalCenter->id : null);
             $this->addError('password', 'رمز عبور نادرست است.');
             $this->dispatch('password-error');
             return;
@@ -127,6 +129,7 @@ class DoctorLoginUserPass extends Component
                 'token' => $token,
                 'doctor_id' => $doctor ? $user->id : null,
                 'secretary_id' => $secretary ? $user->id : null,
+                'medical_center_id' => $medicalCenter ? $user->id : null,
                 'step' => 2,
                 'expires_at' => now()->addMinutes(10),
             ]);
@@ -136,12 +139,13 @@ class DoctorLoginUserPass extends Component
                 'token' => $token,
                 'doctor_id' => $doctor ? $user->id : null,
                 'secretary_id' => $secretary ? $user->id : null,
+                'medical_center_id' => $medicalCenter ? $user->id : null,
                 'otp_code' => $otpCode,
-                'login_id' => $user->mobile,
+                'login_id' => $user->mobile ?? $user->phone_number,
                 'type' => 0,
             ]);
 
-            $messagesService = new MessageService(SmsService::create(100286, $user->mobile, [$otpCode]));
+            $messagesService = new MessageService(SmsService::create(100286, $user->mobile ?? $user->phone_number, [$otpCode]));
             $response = $messagesService->send();
             Log::info('SMS send response', ['response' => $response]);
 
@@ -157,25 +161,32 @@ class DoctorLoginUserPass extends Component
             'token' => $token,
             'doctor_id' => $doctor ? $user->id : null,
             'secretary_id' => $secretary ? $user->id : null,
+            'medical_center_id' => $medicalCenter ? $user->id : null,
             'step' => 3,
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        // ورود با گارد مناسب
+        // ورود با گارد مناسب و تعیین مسیر هدایت
         if ($user instanceof Doctor) {
             Auth::guard('doctor')->login($user);
             $redirectRoute = route('dr-panel');
             $userType = 'doctor';
-        } else {
+        } elseif ($user instanceof Secretary) {
             Auth::guard('secretary')->login($user);
             $redirectRoute = route('dr-panel');
             $userType = 'secretary';
+        } else {
+            // Medical Center - redirect to MC panel
+            Auth::guard('medical_center')->login($user);
+            $redirectRoute = route('mc-panel');
+            $userType = 'medical_center';
         }
 
         // ثبت لاگ ورود
         LoginLog::create([
             'doctor_id' => $user instanceof Doctor ? $user->id : null,
             'secretary_id' => $user instanceof Secretary ? $user->id : null,
+            'medical_center_id' => $user instanceof MedicalCenter ? $user->id : null,
             'user_type' => $userType,
             'login_at' => now(),
             'ip_address' => request()->ip(),
