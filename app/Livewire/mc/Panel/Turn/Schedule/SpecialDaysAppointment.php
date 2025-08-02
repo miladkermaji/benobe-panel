@@ -7,7 +7,7 @@ use App\Models\Doctor;
 use Livewire\Component;
 use Morilog\Jalali\Jalalian;
 use App\Models\DoctorHoliday;
-use App\Traits\HasSelectedClinic;
+use App\Traits\HasSelectedDoctor;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Log;
 use App\Models\SpecialDailySchedule;
@@ -16,7 +16,7 @@ use Livewire\Attributes\On;
 
 class SpecialDaysAppointment extends Component
 {
-    use HasSelectedClinic;
+    use HasSelectedDoctor;
     public $time;
     public $editingSettingIndex = null;
     public $calendarYear;
@@ -82,7 +82,22 @@ class SpecialDaysAppointment extends Component
     {
         $this->calendarYear = is_numeric($this->calendarYear) ? (int) $this->calendarYear : (int) Jalalian::now()->getYear();
         $this->calendarMonth = is_numeric($this->calendarMonth) ? (int) $this->calendarMonth : (int) Jalalian::now()->getMonth();
-        $this->selectedClinicId = $this->getSelectedMedicalCenterId();
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            $this->selectedClinicId = $medicalCenter->id;
+        } else {
+            // Handle doctor/secretary authentication (existing logic)
+            $this->selectedClinicId = $this->getSelectedMedicalCenterId();
+        }
 
         $this->loadCalendarData();
         $this->selectedScheduleDays = [
@@ -124,19 +139,45 @@ class SpecialDaysAppointment extends Component
     #[On('medicalCenterSelected')]
     public function handleMedicalCenterSelected($data)
     {
-        $medicalCenterId = $data['medicalCenterId'] ?? null;
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
 
-        // بروزرسانی selectedClinicId
-        $this->selectedClinicId = $medicalCenterId;
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-toastr', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            // بروزرسانی selectedClinicId
+            $this->selectedClinicId = $medicalCenter->id;
+        } else {
+            // Handle doctor/secretary authentication (existing logic)
+            $medicalCenterId = $data['medicalCenterId'] ?? null;
+            $this->selectedClinicId = $medicalCenterId;
+        }
 
         // بروزرسانی داده‌های تقویم
         $this->loadCalendarData();
 
         // نمایش پیام به کاربر
-        $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. تنظیمات روزهای خاص در حال بروزرسانی...');
+        $this->dispatch('show-toastr', type: 'info', message: 'پزشک تغییر کرد. تنظیمات روزهای خاص در حال بروزرسانی...');
     }
     private function getAuthenticatedDoctor()
     {
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                return null;
+            }
+
+            return Doctor::find($selectedDoctorId);
+        }
+
+        // Handle doctor/secretary authentication (existing logic)
         $doctor = Auth::guard('doctor')->user();
         if (!$doctor) {
             $secretary = Auth::guard('secretary')->user();
@@ -149,13 +190,27 @@ class SpecialDaysAppointment extends Component
     public function getHolidays()
     {
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)->where('status', 'active');
-            if ($this->selectedClinicId === 'default') {
-                $holidaysQuery->whereNull('medical_center_id');
-            } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
-                $holidaysQuery->where('medical_center_id', $this->selectedClinicId);
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                return [];
             }
+
+            $doctorId = $doctor->id;
+            $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)->where('status', 'active');
+
+            // Handle medical center authentication
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $holidaysQuery->where('medical_center_id', $medicalCenter->id);
+            } else {
+                // Handle doctor/secretary authentication (existing logic)
+                if ($this->selectedClinicId === 'default') {
+                    $holidaysQuery->whereNull('medical_center_id');
+                } elseif ($this->selectedClinicId && $this->selectedClinicId !== 'default') {
+                    $holidaysQuery->where('medical_center_id', $this->selectedClinicId);
+                }
+            }
+
             $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
                 $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
                 if (json_last_error() !== JSON_ERROR_NONE) {
@@ -180,7 +235,15 @@ class SpecialDaysAppointment extends Component
     public function getAppointmentsInMonth($year, $month)
     {
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                return [
+                    'status' => false,
+                    'data' => [],
+                ];
+            }
+
+            $doctorId = $doctor->id;
             if (!is_numeric($year) || !is_numeric($month)) {
                 $year = (int) Jalalian::now()->getYear();
                 $month = (int) Jalalian::now()->getMonth();
@@ -189,24 +252,44 @@ class SpecialDaysAppointment extends Component
             $jalaliDate = Jalalian::fromFormat('Y/m/d', $jalaliDateString);
             $startDate = $jalaliDate->toCarbon()->startOfDay();
             $endDate = Jalalian::fromCarbon($startDate)->addMonths(1)->subDays(1)->toCarbon()->endOfDay();
-            $appointments = \App\Models\Appointment::where('doctor_id', $doctorId)
+
+            $appointmentsQuery = \App\Models\Appointment::where('doctor_id', $doctorId)
                 ->whereBetween('appointment_date', [$startDate, $endDate])
                 ->where('status', 'scheduled')
-                ->whereNull('deleted_at')
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-                ->select('appointment_date')
+                ->whereNull('deleted_at');
+
+            // Handle medical center authentication
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $appointmentsQuery->where('medical_center_id', $medicalCenter->id);
+            } else {
+                // Handle doctor/secretary authentication (existing logic)
+                $appointmentsQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+            }
+
+            $appointments = $appointmentsQuery->select('appointment_date')
                 ->groupBy('appointment_date')
                 ->get()
                 ->map(function ($appointment) {
                     $date = Carbon::parse($appointment->appointment_date)->format('Y-m-d');
-                    $count = \App\Models\Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
+
+                    $countQuery = \App\Models\Appointment::where('doctor_id', $this->getAuthenticatedDoctor()->id)
                         ->where('appointment_date', $appointment->appointment_date)
                         ->where('status', 'scheduled')
-                        ->whereNull('deleted_at')
-                        ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-                        ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-                        ->count();
+                        ->whereNull('deleted_at');
+
+                    // Handle medical center authentication for count query
+                    if (Auth::guard('medical_center')->check()) {
+                        $medicalCenter = Auth::guard('medical_center')->user();
+                        $countQuery->where('medical_center_id', $medicalCenter->id);
+                    } else {
+                        $countQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+                    }
+
+                    $count = $countQuery->count();
+
                     return [
                         'date' => $date,
                         'count' => $count,
@@ -271,7 +354,13 @@ class SpecialDaysAppointment extends Component
                 $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را تعطیل کنید.');
                 return;
             }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                $this->dispatch('show-toastr', type: 'error', message: 'پزشک معتبری یافت نشد.');
+                return;
+            }
+
+            $doctorId = $doctor->id;
             $hasAppointments = isset($this->appointmentsData['data']) && collect($this->appointmentsData['data'])->contains('date', $this->selectedDate);
             if ($hasAppointments) {
                 $this->dispatch('openTransferModal', [
@@ -280,10 +369,20 @@ class SpecialDaysAppointment extends Component
                 ]);
                 return;
             }
+
+            // Handle medical center authentication
+            $medicalCenterId = null;
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $medicalCenterId = $medicalCenter->id;
+            } else {
+                $medicalCenterId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+            }
+
             $holiday = DoctorHoliday::firstOrCreate(
                 [
                     'doctor_id' => $doctorId,
-                    'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                    'medical_center_id' => $medicalCenterId,
                     'status' => 'active',
                 ],
                 [
@@ -299,8 +398,14 @@ class SpecialDaysAppointment extends Component
                 $holiday->save();
                 SpecialDailySchedule::where('doctor_id', $doctorId)
                     ->where('date', $this->selectedDate)
-                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
+                    ->when(Auth::guard('medical_center')->check(), function ($q) {
+                        $medicalCenter = Auth::guard('medical_center')->user();
+                        $q->where('medical_center_id', $medicalCenter->id);
+                    })
+                    ->when(!Auth::guard('medical_center')->check(), function ($q) {
+                        $q->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                          ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+                    })
                     ->delete();
                 $this->holidaysData = [
                     'status' => true,
@@ -337,12 +442,26 @@ class SpecialDaysAppointment extends Component
                 $this->dispatch('show-toastr', type: 'warning', message: 'نمی‌توانید روزهای گذشته را از تعطیلی خارج کنید.');
                 return;
             }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $holiday = DoctorHoliday::where('doctor_id', $doctorId)
-                ->where('status', 'active')
-                ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-                ->first();
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                $this->dispatch('show-toastr', type: 'error', message: 'پزشک معتبری یافت نشد.');
+                return;
+            }
+
+            $doctorId = $doctor->id;
+            $holidayQuery = DoctorHoliday::where('doctor_id', $doctorId)
+                ->where('status', 'active');
+
+            // Handle medical center authentication
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $holidayQuery->where('medical_center_id', $medicalCenter->id);
+            } else {
+                $holidayQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+            }
+
+            $holiday = $holidayQuery->first();
             if ($holiday) {
                 $holidayDates = is_string($holiday->holiday_dates)
                     ? json_decode($holiday->holiday_dates, true) ?? []
@@ -385,13 +504,39 @@ class SpecialDaysAppointment extends Component
     }
     public function getWorkScheduleForDate($date)
     {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            return [
+                'status' => false,
+                'data' => [
+                    'day' => strtolower(Carbon::parse($date)->englishDayOfWeek),
+                    'work_hours' => [[
+                        'start' => '',
+                        'end' => '',
+                        'max_appointments' => '',
+                    ]],
+                    'appointment_settings' => [],
+                    'emergency_times' => [[]],
+                ],
+                'message' => 'پزشک معتبری یافت نشد.',
+            ];
+        }
+
+        $doctorId = $doctor->id;
         // ابتدا بررسی SpecialDailySchedule
-        $specialSchedule = SpecialDailySchedule::where('doctor_id', $doctorId)
-            ->where('date', $date)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-            ->first();
+        $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctorId)
+            ->where('date', $date);
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $specialScheduleQuery->where('medical_center_id', $medicalCenter->id);
+        } else {
+            $specialScheduleQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+        }
+
+        $specialSchedule = $specialScheduleQuery->first();
         if ($specialSchedule && !empty($specialSchedule->work_hours)) {
             $workHours = json_decode($specialSchedule->work_hours, true);
             $appointmentSettings = json_decode($specialSchedule->appointment_settings, true) ?? [];
@@ -410,11 +555,19 @@ class SpecialDaysAppointment extends Component
         }
         // اگر SpecialDailySchedule خالی بود، از DoctorWorkSchedule بخوان
         $dayOfWeek = strtolower(Carbon::parse($date)->englishDayOfWeek);
-        $workSchedule = DoctorWorkSchedule::where('doctor_id', $doctorId)
-            ->where('day', $dayOfWeek)
-            ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-            ->first();
+        $workScheduleQuery = DoctorWorkSchedule::where('doctor_id', $doctorId)
+            ->where('day', $dayOfWeek);
+
+        // Handle medical center authentication for DoctorWorkSchedule
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $workScheduleQuery->where('medical_center_id', $medicalCenter->id);
+        } else {
+            $workScheduleQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+        }
+
+        $workSchedule = $workScheduleQuery->first();
         // تنظیم متغیر برای نشان دادن منبع داده
         $this->isFromSpecialDailySchedule = false;
         if ($workSchedule && !empty($workSchedule->work_hours)) {
@@ -470,12 +623,23 @@ class SpecialDaysAppointment extends Component
             if ($workSchedule) {
                 $this->workSchedule = $workSchedule;
                 // بررسی منبع داده‌ها برای تنظیم isFromSpecialDailySchedule
-                $specialSchedule = SpecialDailySchedule::where('doctor_id', $this->getAuthenticatedDoctor()->id)
-                    ->where('date', $this->selectedDate)
-                    ->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
-                    ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId))
-                    ->first();
-                $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->work_hours);
+                $doctor = $this->getAuthenticatedDoctor();
+                if ($doctor) {
+                    $specialScheduleQuery = SpecialDailySchedule::where('doctor_id', $doctor->id)
+                        ->where('date', $this->selectedDate);
+
+                    // Handle medical center authentication
+                    if (Auth::guard('medical_center')->check()) {
+                        $medicalCenter = Auth::guard('medical_center')->user();
+                        $specialScheduleQuery->where('medical_center_id', $medicalCenter->id);
+                    } else {
+                        $specialScheduleQuery->when($this->selectedClinicId === 'default', fn ($q) => $q->whereNull('medical_center_id'))
+                            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', fn ($q) => $q->where('medical_center_id', $this->selectedClinicId));
+                    }
+
+                    $specialSchedule = $specialScheduleQuery->first();
+                    $this->isFromSpecialDailySchedule = $specialSchedule && !empty($specialSchedule->work_hours);
+                }
             } else {
                 $this->workSchedule = $this->getWorkScheduleForDate($this->selectedDate);
             }
@@ -494,7 +658,15 @@ class SpecialDaysAppointment extends Component
     public function getEmergencyTimes()
     {
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                return [
+                    'possible' => [],
+                    'selected' => [],
+                ];
+            }
+
+            $doctorId = $doctor->id;
             // دریافت همه زمان‌های اورژانسی از workSchedule
             $allEmergencyTimes = $this->workSchedule['data']['emergency_times'] ?? [[]];
             // اگر از DoctorWorkSchedule است، emergency_times یک آرایه تخت درون یک آرایه است
@@ -583,13 +755,28 @@ class SpecialDaysAppointment extends Component
         }
         $this->isProcessing = true;
         try {
-            $doctorId = $this->getAuthenticatedDoctor()->id;
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                $this->dispatch('show-toastr', type: 'error', message: 'پزشک معتبری یافت نشد.');
+                return;
+            }
+
+            $doctorId = $doctor->id;
             // بررسی منبع داده‌ها
-            $specialSchedule = SpecialDailySchedule::where([
+            $specialScheduleQuery = SpecialDailySchedule::where([
                 'doctor_id' => $doctorId,
                 'date' => $this->selectedDate,
-                'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
-            ])->first();
+            ]);
+
+            // Handle medical center authentication
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $specialScheduleQuery->where('medical_center_id', $medicalCenter->id);
+            } else {
+                $specialScheduleQuery->where('medical_center_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId);
+            }
+
+            $specialSchedule = $specialScheduleQuery->first();
             $workHours = $specialSchedule && $specialSchedule->work_hours ? json_decode($specialSchedule->work_hours, true) : [];
             $isFromDoctorWorkSchedule = empty($workHours) && $this->workSchedule['status'] && !empty($this->workSchedule['data']['work_hours']);
             if ($isFromDoctorWorkSchedule) {
@@ -619,7 +806,7 @@ class SpecialDaysAppointment extends Component
                     [
                         'doctor_id' => $doctorId,
                         'date' => $this->selectedDate,
-                        'medical_center_id' => $this->selectedClinicId === 'default' ? null : $this->selectedClinicId,
+                        'medical_center_id' => Auth::guard('medical_center')->check() ? Auth::guard('medical_center')->user()->id : ($this->selectedClinicId === 'default' ? null : $this->selectedClinicId),
                     ],
                     [
                         'work_hours' => json_encode([]),
