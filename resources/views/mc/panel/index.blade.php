@@ -4,10 +4,10 @@
   <link type="text/css" href="{{ asset('mc-assets/panel/css/dashboard.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
-  {{ 'به نوبه | پنل دکتر' }}
+  {{ 'به نوبه | پنل مرکز درمانی' }}
 @endsection
 @section('content')
-@section('bread-crumb-title', 'لیست بیماران')
+@section('bread-crumb-title', 'داشبورد')
 <div class="d-flex flex-column justify-content-center p-3 top-panel-bg">
   <div class="top-details-sicks-cards">
     <div class="top-s-a-wrapper">
@@ -16,7 +16,13 @@
           <img src="{{ asset('mc-assets/icons/count.svg') }}" alt="تعداد بیماران امروز">
         </div>
         <div class="stat-info">
-          <div class="stat-label">تعداد بیماران امروز</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              تعداد بیماران امروز (پزشک انتخاب‌شده)
+            @else
+              تعداد بیماران امروز (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ $totalPatientsToday }} بیمار</div>
         </div>
       </div>
@@ -25,7 +31,13 @@
           <img src="{{ asset('mc-assets/icons/dashboard-tick.svg') }}" alt="بیماران ویزیت شده">
         </div>
         <div class="stat-info">
-          <div class="stat-label">بیماران ویزیت شده</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              بیماران ویزیت شده (پزشک انتخاب‌شده)
+            @else
+              بیماران ویزیت شده (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ $visitedPatients }} بیمار</div>
         </div>
       </div>
@@ -34,7 +46,13 @@
           <img src="{{ asset('mc-assets/icons/dashboard-timer.svg') }}" alt="بیماران باقی مانده">
         </div>
         <div class="stat-info">
-          <div class="stat-label">بیماران باقی مانده</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              بیماران باقی مانده (پزشک انتخاب‌شده)
+            @else
+              بیماران باقی مانده (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ $remainingPatients }} بیمار</div>
         </div>
       </div>
@@ -43,7 +61,13 @@
           <img src="{{ asset('mc-assets/icons/money.svg') }}" alt="درآمد این هفته">
         </div>
         <div class="stat-info">
-          <div class="stat-label">درآمد این هفته</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              درآمد این هفته (پزشک انتخاب‌شده)
+            @else
+              درآمد این هفته (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ number_format($weeklyIncome) }} تومان</div>
         </div>
       </div>
@@ -52,7 +76,13 @@
           <img src="{{ asset('mc-assets/icons/money.svg') }}" alt="درآمد این ماه">
         </div>
         <div class="stat-info">
-          <div class="stat-label">درآمد این ماه</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              درآمد این ماه (پزشک انتخاب‌شده)
+            @else
+              درآمد این ماه (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ number_format($monthlyIncome) }} تومان</div>
         </div>
       </div>
@@ -61,13 +91,28 @@
           <img src="{{ asset('mc-assets/icons/money.svg') }}" alt="درآمد کلی">
         </div>
         <div class="stat-info">
-          <div class="stat-label">درآمد کلی</div>
+          <div class="stat-label">
+            @if ($selectedDoctorId)
+              درآمد کلی (پزشک انتخاب‌شده)
+            @else
+              درآمد کلی (کل مرکز)
+            @endif
+          </div>
           <div class="stat-value">{{ number_format($totalIncome) }} تومان</div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+@if ($selectedDoctorId)
+  <div class="alert alert-info m-3" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    <strong>نکته:</strong> در حال نمایش اطلاعات برای پزشک انتخاب‌شده هستید. برای مشاهده اطلاعات کل مرکز درمانی، پزشک را
+    از هدر انتخاب نکنید.
+  </div>
+@endif
+
 <div class="chart-content">
   <div class="row">
     <!-- نمودار ۱: تعداد ویزیت‌ها -->
@@ -179,7 +224,8 @@
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var chartUrl = "{{ route('mc-my-performance-chart-data') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
-  window.selectedClinicId = @json($selectedClinicId ?? 'default');
+  window.selectedClinicId = @json($selectedMedicalCenterId ?? 'default');
+  window.selectedDoctorId = @json($selectedDoctorId ?? null);
 </script>
 <script>
   (function() {

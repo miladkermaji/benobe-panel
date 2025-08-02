@@ -5,6 +5,8 @@ namespace App\Livewire\Mc\Panel\Layouts\Partials;
 use Livewire\Component;
 use App\Models\DoctorWallet;
 use App\Models\Notification;
+use App\Models\MedicalCenter;
+use App\Models\Doctor;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\NotificationRecipient;
@@ -28,6 +30,7 @@ class HeaderComponent extends Component
         $this->doctors = new Collection(); // Initialize doctors
 
         if (Auth::guard('medical_center')->check()) {
+            /** @var MedicalCenter $medicalCenter */
             $medicalCenter = Auth::guard('medical_center')->user();
 
             // بارگذاری پزشکان مرکز درمانی
@@ -54,60 +57,66 @@ class HeaderComponent extends Component
         $this->unreadCount = $this->notifications->count();
     }
 
-    protected function loadDoctors($medicalCenter)
+    /**
+     * بارگذاری پزشکان مرکز درمانی
+     */
+    protected function loadDoctors(MedicalCenter $medicalCenter)
     {
-        if ($medicalCenter) {
-            $this->doctors = $medicalCenter->doctors()
-                ->select('doctors.*')
-                ->where('doctors.is_active', true)
-                ->with(['specialties'])
-                ->get();
-        }
+        $this->doctors = $medicalCenter->doctors()
+            ->select('doctors.*')
+            ->where('doctors.is_active', true)
+            ->with(['specialties'])
+            ->get();
     }
 
-    protected function setSelectedDoctorFromDatabase($medicalCenter)
+    /**
+     * تنظیم پزشک انتخاب‌شده از دیتابیس
+     */
+    protected function setSelectedDoctorFromDatabase(MedicalCenter $medicalCenter)
     {
-        if ($medicalCenter) {
-            // اگر مرکز درمانی پزشک انتخاب‌شده‌ای دارد، از آن استفاده کن
-            if ($medicalCenter->selectedDoctor) {
-                if ($medicalCenter->selectedDoctor->doctor_id) {
-                    $this->selectedDoctorId = $medicalCenter->selectedDoctor->doctor_id;
-                    $this->selectedDoctorName = $medicalCenter->selectedDoctor->doctor->first_name . ' ' . $medicalCenter->selectedDoctor->doctor->last_name;
-                } else {
-                    // هیچ پزشکی انتخاب نشده
-                    $this->selectedDoctorId = null;
-                    $this->selectedDoctorName = 'انتخاب پزشک';
-                }
-                return;
-            }
-
-            // اگر رکوردی وجود ندارد، بررسی کن که آیا پزشک فعالی دارد یا نه
-            $activeDoctors = $medicalCenter->doctors()
-                ->where('doctors.is_active', true)
-                ->get();
-
-            if ($activeDoctors->count() > 0) {
-                // اولین پزشک فعال را انتخاب کن
-                $firstActiveDoctor = $activeDoctors->first();
-                // پزشک انتخاب‌شده را در دیتابیس ذخیره کن
-                $medicalCenter->setSelectedDoctor($firstActiveDoctor->id);
-                $medicalCenter->refresh();
-
-                $this->selectedDoctorId = $firstActiveDoctor->id;
-                $this->selectedDoctorName = $firstActiveDoctor->first_name . ' ' . $firstActiveDoctor->last_name;
+        // اگر مرکز درمانی پزشک انتخاب‌شده‌ای دارد، از آن استفاده کن
+        if ($medicalCenter->selectedDoctor) {
+            if ($medicalCenter->selectedDoctor->doctor_id) {
+                $this->selectedDoctorId = $medicalCenter->selectedDoctor->doctor_id;
+                $this->selectedDoctorName = $medicalCenter->selectedDoctor->doctor->first_name . ' ' . $medicalCenter->selectedDoctor->doctor->last_name;
             } else {
-                // هیچ پزشک فعالی ندارد
+                // هیچ پزشکی انتخاب نشده
                 $this->selectedDoctorId = null;
                 $this->selectedDoctorName = 'انتخاب پزشک';
-
-                // در دیتابیس رکورد با doctor_id = null ایجاد کن
-                $medicalCenter->setSelectedDoctor(null);
             }
+            return;
+        }
+
+        // اگر رکوردی وجود ندارد، بررسی کن که آیا پزشک فعالی دارد یا نه
+        $activeDoctors = $medicalCenter->doctors()
+            ->where('doctors.is_active', true)
+            ->get();
+
+        if ($activeDoctors->count() > 0) {
+            // اولین پزشک فعال را انتخاب کن
+            $firstActiveDoctor = $activeDoctors->first();
+            // پزشک انتخاب‌شده را در دیتابیس ذخیره کن
+            $medicalCenter->setSelectedDoctor($firstActiveDoctor->id);
+            $medicalCenter->refresh();
+
+            $this->selectedDoctorId = $firstActiveDoctor->id;
+            $this->selectedDoctorName = $firstActiveDoctor->first_name . ' ' . $firstActiveDoctor->last_name;
+        } else {
+            // هیچ پزشک فعالی ندارد
+            $this->selectedDoctorId = null;
+            $this->selectedDoctorName = 'انتخاب پزشک';
+
+            // در دیتابیس رکورد با doctor_id = null ایجاد کن
+            $medicalCenter->setSelectedDoctor(null);
         }
     }
 
+    /**
+     * انتخاب پزشک
+     */
     public function selectDoctor($doctorId = null)
     {
+        /** @var MedicalCenter $medicalCenter */
         $medicalCenter = Auth::guard('medical_center')->user();
 
         if ($medicalCenter) {
@@ -122,9 +131,14 @@ class HeaderComponent extends Component
 
             // به‌روزرسانی مقادیر
             $this->selectedDoctorId = $doctorId;
-            $this->selectedDoctorName = $doctorId
-                ? $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId)->first_name . ' ' . $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId)->last_name
-                : 'انتخاب پزشک';
+
+            if ($doctorId) {
+                /** @var Doctor $doctor */
+                $doctor = $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId);
+                $this->selectedDoctorName = $doctor->first_name . ' ' . $doctor->last_name;
+            } else {
+                $this->selectedDoctorName = 'انتخاب پزشک';
+            }
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها
             $this->dispatch('doctorSelected', ['doctorId' => $doctorId]);
