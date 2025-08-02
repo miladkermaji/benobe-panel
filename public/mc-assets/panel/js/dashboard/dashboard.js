@@ -4,8 +4,10 @@ function initializeDashboard() {
         $("#activation-modal").modal("show");
     }
 
-    // متغیر جهانی برای medical_center_id، مقدار اولیه از Livewire
+    // متغیر جهانی برای medical_center_id و doctor_id، مقدار اولیه از Livewire
     let selectedClinicId = window.selectedClinicId || "default";
+    let selectedDoctorId = window.selectedDoctorId || null;
+
     // Ensure the value is always a string
     if (selectedClinicId === null || selectedClinicId === undefined) {
         selectedClinicId = "default";
@@ -13,6 +15,7 @@ function initializeDashboard() {
         selectedClinicId = String(selectedClinicId);
     }
     console.log("Initial selectedClinicId:", selectedClinicId);
+    console.log("Initial selectedDoctorId:", selectedDoctorId);
 
     // گوش دادن به رویداد تغییر کلینیک از Livewire
     window.addEventListener("clinicSelected", function (event) {
@@ -44,24 +47,51 @@ function initializeDashboard() {
         }
     });
 
+    // گوش دادن به رویداد تغییر پزشک از Livewire
+    window.addEventListener("doctorSelected", function (event) {
+        const detail = event.detail || {};
+        let newDoctorId = detail.doctorId;
+
+        console.log("Dashboard received doctorId:", newDoctorId);
+
+        // Only proceed if the doctor ID has actually changed
+        if (newDoctorId !== selectedDoctorId) {
+            selectedDoctorId = newDoctorId;
+            console.log("Doctor changed to:", selectedDoctorId);
+
+            // Load charts with the new doctor ID
+            loadCharts();
+        } else {
+            console.log("Doctor selection unchanged, skipping chart reload");
+        }
+    });
+
     // تابع بارگذاری نمودارها
     function loadCharts() {
         $("#chart-container").html(
             '<div class="loader">در حال بارگذاری...</div>'
         );
+
+        const requestData = {
+            medical_center_id: selectedClinicId,
+            _t: new Date().getTime(),
+        };
+
+        // اضافه کردن doctor_id اگر وجود داشته باشد
+        if (selectedDoctorId) {
+            requestData.doctor_id = selectedDoctorId;
+        }
+
         $.ajax({
             url: chartUrl,
             method: "GET",
-            data: {
-                medical_center_id: selectedClinicId, // Always send the value as is
-                _t: new Date().getTime(),
-            },
+            data: requestData,
             success: function (response) {
                 $("#chart-container .loader").remove();
                 // تبدیل هفته‌ها به فارسی
                 const persianWeeks =
                     response.appointments?.map((item) => {
-                        const [year, week] = item.month.split("-");
+                        const [year, week] = item.week.split("-");
                         const date = moment()
                             .year(year)
                             .week(week)
@@ -71,7 +101,7 @@ function initializeDashboard() {
                 // داده‌های پیش‌فرض
                 const defaultData = [
                     {
-                        month: persianWeeks[0] || "هفته قبل",
+                        week: persianWeeks[0] || "هفته قبل",
                         scheduled: 0,
                         attended: 0,
                         missed: 0,
@@ -85,100 +115,81 @@ function initializeDashboard() {
                 // تبدیل داده‌ها به فرمت مناسب
                 const appointments =
                     response.appointments?.map((item) => ({
-                        month: moment()
-                            .year(item.month.split("-")[0])
-                            .week(item.month.split("-")[1])
+                        week: moment()
+                            .year(item.week.split("-")[0])
+                            .week(item.week.split("-")[1])
                             .startOf("week")
                             .locale("fa")
                             .format("jYYYY/jMM/jDD"),
-                        scheduled: item.scheduled || 0,
-                        attended: item.attended || 0,
-                        missed: item.missed || 0,
-                        cancelled: item.cancelled || 0,
+                        scheduled: parseInt(item.scheduled_count) || 0,
+                        attended: parseInt(item.attended_count) || 0,
+                        missed: parseInt(item.missed_count) || 0,
+                        cancelled: parseInt(item.cancelled_count) || 0,
                     })) || defaultData;
                 const monthlyIncome =
-                    response.monthlyIncome?.map((item) => ({
-                        month: moment(item.month + "-01")
+                    response.monthly_income?.map((item) => ({
+                        month: moment(item.month, "YYYY-MM")
                             .locale("fa")
                             .format("jYYYY/jMM"),
-                        paid: item.paid || 0,
-                        unpaid: item.unpaid || 0,
-                    })) || defaultData;
+                        paid: parseFloat(item.total_paid_income) || 0,
+                        unpaid: parseFloat(item.total_unpaid_income) || 0,
+                    })) || [];
                 const newPatients =
-                    response.newPatients?.map((item) => ({
-                        month: moment()
-                            .year(item.month.split("-")[0])
-                            .week(item.month.split("-")[1])
+                    response.new_patients?.map((item) => ({
+                        week: moment()
+                            .year(item.week.split("-")[0])
+                            .week(item.week.split("-")[1])
                             .startOf("week")
                             .locale("fa")
                             .format("jYYYY/jMM/jDD"),
-                        count: item.count || 0,
-                    })) || defaultData;
-                const appointmentTypes =
-                    response.appointmentTypes?.map((item) => ({
-                        month: moment()
-                            .year(item.month.split("-")[0])
-                            .week(item.month.split("-")[1])
-                            .startOf("week")
-                            .locale("fa")
-                            .format("jYYYY/jMM/jDD"),
-                        in_person: item.in_person || 0,
-                        online: item.online || 0,
-                        phone: item.phone || 0,
-                        video: item.video || 0,
-                        text: item.text || 0,
-                    })) || defaultData;
+                        count: parseInt(item.total_patients) || 0,
+                    })) || [];
                 const counselingAppointments =
-                    response.counselingAppointments?.map((item) => ({
-                        month: moment()
-                            .year(item.month.split("-")[0])
-                            .week(item.month.split("-")[1])
+                    response.counseling_appointments?.map((item) => ({
+                        week: moment()
+                            .year(item.week.split("-")[0])
+                            .week(item.week.split("-")[1])
                             .startOf("week")
                             .locale("fa")
                             .format("jYYYY/jMM/jDD"),
-                        scheduled: item.scheduled || 0,
-                        attended: item.attended || 0,
-                        missed: item.missed || 0,
-                        cancelled: item.cancelled || 0,
-                    })) || defaultData;
+                        scheduled: parseInt(item.scheduled_count) || 0,
+                        attended: parseInt(item.attended_count) || 0,
+                        missed: parseInt(item.missed_count) || 0,
+                        cancelled: parseInt(item.cancelled_count) || 0,
+                    })) || [];
                 const manualAppointments =
-                    response.manualAppointments?.map((item) => ({
-                        month: moment()
-                            .year(item.month.split("-")[0])
-                            .week(item.month.split("-")[1])
+                    response.manual_appointments?.map((item) => ({
+                        week: moment()
+                            .year(item.week.split("-")[0])
+                            .week(item.week.split("-")[1])
                             .startOf("week")
                             .locale("fa")
                             .format("jYYYY/jMM/jDD"),
-                        scheduled: item.scheduled || 0,
-                        confirmed: item.confirmed || 0,
-                    })) || defaultData;
+                        scheduled: parseInt(item.scheduled_count) || 0,
+                        confirmed: parseInt(item.confirmed_count) || 0,
+                    })) || [];
                 const totalIncome =
-                    response.totalIncome?.map((item) => ({
-                        month: moment(item.month + "-01")
+                    response.total_income?.map((item) => ({
+                        month: moment(item.month, "YYYY-MM")
                             .locale("fa")
                             .format("jYYYY/jMM"),
-                        total: item.total || 0,
-                    })) || defaultData;
-                // Wait for the next tick to ensure DOM is ready
-                setTimeout(() => {
-                    // رندر نمودارها
-                    renderPerformanceChart(appointments);
-                    renderIncomeChart(monthlyIncome);
-                    renderPatientChart(newPatients);
-                    renderAppointmentTypesChart(appointmentTypes);
-                    renderStatusPieChart(appointments);
-                    renderPatientTrendChart(newPatients);
-                    renderCounselingChart(counselingAppointments);
-                    renderManualChart(manualAppointments);
-                    renderTotalIncomeChart(totalIncome);
-                    $("#chart-container").hide().show();
-                }, 100);
+                        total: parseFloat(item.total_income) || 0,
+                    })) || [];
+
+                // رندر نمودارها
+                renderPerformanceChart(appointments);
+                renderIncomeChart(monthlyIncome);
+                renderPatientChart(newPatients);
+                renderCounselingChart(counselingAppointments);
+                renderManualChart(manualAppointments);
+                renderTotalIncomeChart(totalIncome);
             },
             error: function (xhr, status, error) {
                 console.error("AJAX error:", status, error);
                 $("#chart-container .loader").remove();
-                $("#chart-container").html("<p>خطا در دریافت اطلاعات</p>");
-                toastr.error("خطا در دریافت اطلاعات نمودارها");
+                $("#chart-container").html(
+                    '<div class="alert alert-danger">خطا در بارگذاری نمودارها</div>'
+                );
             },
         });
     }
@@ -204,7 +215,7 @@ function initializeDashboard() {
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
-        let labels = data.map((item) => item.month);
+        let labels = data.map((item) => item.week);
         window.performanceChart = new Chart(ctx, {
             type: "bar",
             data: {
@@ -365,7 +376,7 @@ function initializeDashboard() {
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
-        let labels = data.map((item) => item.month);
+        let labels = data.map((item) => item.week);
         window.patientChart = new Chart(ctx, {
             type: "line",
             data: {
@@ -662,7 +673,7 @@ function initializeDashboard() {
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
-        let labels = data.map((item) => item.month);
+        let labels = data.map((item) => item.week);
         window.counselingChart = new Chart(ctx, {
             type: "bar",
             data: {
@@ -746,7 +757,7 @@ function initializeDashboard() {
                 "<p>داده‌ای برای نمایش وجود ندارد</p>";
             return;
         }
-        let labels = data.map((item) => item.month);
+        let labels = data.map((item) => item.week);
         window.manualChart = new Chart(ctx, {
             type: "bar",
             data: {

@@ -17,11 +17,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              تعداد بیماران امروز (پزشک انتخاب‌شده)
-            @else
-              تعداد بیماران امروز (کل مرکز)
-            @endif
+            تعداد بیماران امروز
           </div>
           <div class="stat-value">{{ $totalPatientsToday }} بیمار</div>
         </div>
@@ -32,11 +28,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              بیماران ویزیت شده (پزشک انتخاب‌شده)
-            @else
-              بیماران ویزیت شده (کل مرکز)
-            @endif
+            بیماران ویزیت شده
           </div>
           <div class="stat-value">{{ $visitedPatients }} بیمار</div>
         </div>
@@ -47,11 +39,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              بیماران باقی مانده (پزشک انتخاب‌شده)
-            @else
-              بیماران باقی مانده (کل مرکز)
-            @endif
+            بیماران باقی مانده
           </div>
           <div class="stat-value">{{ $remainingPatients }} بیمار</div>
         </div>
@@ -62,11 +50,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              درآمد این هفته (پزشک انتخاب‌شده)
-            @else
-              درآمد این هفته (کل مرکز)
-            @endif
+            درآمد این هفته
           </div>
           <div class="stat-value">{{ number_format($weeklyIncome) }} تومان</div>
         </div>
@@ -77,11 +61,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              درآمد این ماه (پزشک انتخاب‌شده)
-            @else
-              درآمد این ماه (کل مرکز)
-            @endif
+            درآمد این ماه
           </div>
           <div class="stat-value">{{ number_format($monthlyIncome) }} تومان</div>
         </div>
@@ -92,11 +72,7 @@
         </div>
         <div class="stat-info">
           <div class="stat-label">
-            @if ($selectedDoctorId)
-              درآمد کلی (پزشک انتخاب‌شده)
-            @else
-              درآمد کلی (کل مرکز)
-            @endif
+            درآمد کلی
           </div>
           <div class="stat-value">{{ number_format($totalIncome) }} تومان</div>
         </div>

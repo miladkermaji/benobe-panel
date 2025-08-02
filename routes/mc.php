@@ -35,7 +35,7 @@ use App\Http\Controllers\Dr\Panel\Profile\DrUpgradeProfileController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentController;
 use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
 use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
-use App\Http\Controllers\Dr\Panel\MyPerformance\MyPerformanceController;
+use App\Http\Controllers\Mc\Panel\MyPerformance\MyPerformanceController;
 use App\Http\Controllers\Dr\Panel\DoctorServices\DoctorServicesController;
 use App\Http\Controllers\Dr\Panel\PatientRecords\PatientRecordsController;
 use App\Http\Controllers\Dr\Panel\Secretary\SecretaryManagementController;
