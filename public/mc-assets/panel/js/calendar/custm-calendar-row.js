@@ -150,12 +150,27 @@ $(document).ready(function () {
         calendar.hide();
         ensureLoadingHidden();
 
+        // تنظیم پارامترهای مناسب برای هر گارد
+        let requestData = {};
+        const guardType = window.guardType || "doctor";
+
+        if (guardType === "medical_center") {
+            // برای مراکز درمانی، نیازی به selectedClinicId نیست
+            requestData = {
+                guard_type: "medical_center",
+            };
+        } else {
+            // برای پزشک و منشی، از selectedClinicId استفاده کن
+            requestData = {
+                selectedClinicId: localStorage.getItem("selectedClinicId") || "default",
+                guard_type: guardType,
+            };
+        }
+
         $.ajax({
             url: appointmentsCountUrl,
             method: "GET",
-            data: {
-                selectedClinicId: localStorage.getItem("selectedClinicId"),
-            },
+            data: requestData,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
@@ -165,6 +180,15 @@ $(document).ready(function () {
                     workingDays = response.working_days || [];
                     calendarDays = response.calendar_days || 60;
                     appointmentSettings = response.appointment_settings || [];
+                    
+                    // ذخیره تعطیلات از پاسخ API
+                    if (response.holidays && Array.isArray(response.holidays)) {
+                        window.holidaysData = {
+                            status: true,
+                            holidays: response.holidays
+                        };
+                    }
+                    
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {

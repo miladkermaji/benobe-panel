@@ -1007,6 +1007,35 @@ class ScheduleSettingController extends Controller
                 ->pluck('day')
                 ->toArray();
 
+            // دریافت تعطیلات
+            $holidaysQuery = DoctorHoliday::where('doctor_id', $doctorId)
+                ->where('status', 'active');
+
+            if ($guardType === 'medical_center') {
+                $holidaysQuery->where('medical_center_id', $medicalCenterId);
+            } elseif ($medicalCenterId === 'default') {
+                $holidaysQuery->whereNull('medical_center_id');
+            } elseif ($medicalCenterId && $medicalCenterId !== 'default') {
+                $holidaysQuery->where('medical_center_id', $medicalCenterId);
+            }
+
+            $holidays = $holidaysQuery->get()->pluck('holiday_dates')->map(function ($holiday) {
+                $dates = is_string($holiday) ? json_decode($holiday, true) : $holiday;
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return [];
+                }
+                return is_array($dates) ? $dates : [];
+            })->flatten()->filter()->map(function ($date) {
+                try {
+                    if (preg_match('/^14\d{2}[-\/]\d{2}[-\/]\d{2}$/', $date)) {
+                        return Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                    }
+                    return Carbon::parse($date)->format('Y-m-d');
+                } catch (\Exception $e) {
+                    return null;
+                }
+            })->filter()->unique()->values()->toArray();
+
             // دریافت تعداد نوبت‌ها
             $appointmentsQuery = DB::table('appointments')
                 ->select(DB::raw('appointment_date, COUNT(*) as appointment_count'))
@@ -1066,6 +1095,7 @@ class ScheduleSettingController extends Controller
                 'working_days' => $workSchedules,
                 'calendar_days' => $calendarDays,
                 'appointment_settings' => $appointmentSettings,
+                'holidays' => $holidays, // اضافه کردن تعطیلات به پاسخ
             ]);
         } catch (\Exception $e) {
             return response()->json([

@@ -195,10 +195,14 @@ function initializeRescheduleCalendar(appointmentId = null) {
 
             if (response.status) {
                 const appointments = response.data || [];
-                const holidays =
-                    window.holidaysData && window.holidaysData.status
-                        ? window.holidaysData.holidays
-                        : [];
+                
+                // استفاده از تعطیلات از پاسخ API
+                let holidays = [];
+                if (response.holidays && Array.isArray(response.holidays)) {
+                    holidays = response.holidays;
+                } else if (window.holidaysData && window.holidaysData.status) {
+                    holidays = window.holidaysData.holidays;
+                }
 
                 const data = { holidays, appointments };
                 calendarDataCache.set(cacheKey, data);
