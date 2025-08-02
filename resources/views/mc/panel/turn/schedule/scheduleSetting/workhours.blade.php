@@ -13,7 +13,7 @@
 
 @section('content')
 @section('bread-crumb-title', ' ساعت کاری من')
-@livewire('mc.panel.work-hours')
+@livewire('mc.panel.workhours')
 @endsection
 
 @section('scripts')
