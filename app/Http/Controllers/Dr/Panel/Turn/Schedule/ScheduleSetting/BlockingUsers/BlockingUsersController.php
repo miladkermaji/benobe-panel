@@ -675,4 +675,3 @@ class BlockingUsersController extends Controller
         }
     }
 }
-

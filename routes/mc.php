@@ -58,6 +58,7 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\VacationControll
 use App\Http\Controllers\Dr\Panel\SecretaryPermission\SecretaryPermissionController;
 use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
 use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service\ServiceController;
+use App\Http\Controllers\mc\Panel\Turn\DrScheduleController as McDrScheduleController;
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration\DurationController;
 use App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription\PrescriptionController;
 use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
@@ -68,10 +69,9 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm\ConsultTe
 use App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates\FavoriteTemplatesController;
 use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
-use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
-use App\Http\Controllers\mc\Panel\Turn\DrScheduleController as McDrScheduleController;
+use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
 
 // dr routes
 Route::prefix('mc')

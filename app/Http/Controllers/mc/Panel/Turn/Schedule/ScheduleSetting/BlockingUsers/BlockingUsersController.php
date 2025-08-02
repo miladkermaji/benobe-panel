@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Mc\Controller;
+use App\Http\Controllers\Dr\Controller;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -23,11 +23,27 @@ class BlockingUsersController extends Controller
 {
     public function index(Request $request)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (!$doctor) {
-            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            if (!$doctor) {
+                return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            }
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         }
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
         $search = $request->input('search');
 
@@ -52,7 +68,12 @@ class BlockingUsersController extends Controller
             return response()->json(['blockedUsers' => $blockedUsers]);
         }
 
-        return view('mc.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages'));
+        // Use different view based on guard
+        $viewPath = Auth::guard('medical_center')->check()
+            ? 'mc.panel.turn.schedule.scheduleSetting.blocking_users.index'
+            : 'dr.panel.turn.schedule.scheduleSetting.blocking_users.index';
+
+        return view($viewPath, compact('blockedUsers', 'messages'));
     }
 
     private function processDate($date, $fieldName)
@@ -85,7 +106,22 @@ class BlockingUsersController extends Controller
 
     public function store(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
 
         $messages = [
             'mobile.required' => 'لطفاً شماره موبایل را وارد کنید.',
@@ -164,7 +200,23 @@ class BlockingUsersController extends Controller
 
     public function storeMultiple(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
         $messages = [
@@ -327,7 +379,23 @@ class BlockingUsersController extends Controller
 
     public function sendMessage(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
         // تعریف پیام‌های خطای فارسی
@@ -494,7 +562,23 @@ class BlockingUsersController extends Controller
 
     public function destroy($id, Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
         try {
@@ -563,7 +647,23 @@ class BlockingUsersController extends Controller
                 'selectedClinicId' => 'nullable|string',
             ]);
 
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            // Get doctor_id based on guard
+            $doctorId = null;
+            if (Auth::guard('medical_center')->check()) {
+                // For medical_center guard, get the selected doctor
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $selectedDoctor = DB::table('medical_center_selected_doctors')
+                    ->where('medical_center_id', $medicalCenter->id)
+                    ->first();
+                $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
+
+            if (!$doctorId) {
+                return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+            }
+
             $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
             $userIds = $request->input('user_ids');
             $action = $request->input('action');
