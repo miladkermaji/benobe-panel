@@ -612,6 +612,7 @@ async function handleDayClick(dayElement) {
 
             // Get the original appointment details using dispatchTo
             const appointmentDetails = await new Promise((resolve, reject) => {
+                let handler; // Declare handler variable first
                 const timeoutId = setTimeout(() => {
                     window.removeEventListener(
                         "appointment-details-received",
@@ -622,7 +623,7 @@ async function handleDayClick(dayElement) {
                     );
                 }, 10000);
 
-                const handler = (event) => {
+                handler = (event) => {
                     console.log("Received appointment details:", event.detail);
                     clearTimeout(timeoutId);
                     window.removeEventListener(
@@ -637,7 +638,7 @@ async function handleDayClick(dayElement) {
                     handler
                 );
                 Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.appointments-list",
+                    "mc.panel.turn.schedule.appointments-list",
                     "getAppointmentDetails",
                     {
                         appointmentId: selectedIds[0],
@@ -658,6 +659,7 @@ async function handleDayClick(dayElement) {
 
             // Get available times
             const availableTimes = await new Promise((resolve, reject) => {
+                let handler; // Declare handler variable first
                 const timeoutId = setTimeout(() => {
                     window.removeEventListener(
                         "available-times-updated",
@@ -666,7 +668,7 @@ async function handleDayClick(dayElement) {
                     reject(new Error("Timeout waiting for available times"));
                 }, 10000);
 
-                const handler = (event) => {
+                handler = (event) => {
                     console.log("Received times update:", event.detail);
                     clearTimeout(timeoutId);
                     window.removeEventListener(
@@ -678,7 +680,7 @@ async function handleDayClick(dayElement) {
 
                 window.addEventListener("available-times-updated", handler);
                 Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.appointments-list",
+                    "mc.panel.turn.schedule.appointments-list",
                     "getAvailableTimesForDate",
                     { date }
                 );
@@ -756,7 +758,7 @@ async function handleDayClick(dayElement) {
                             });
 
                             Livewire.dispatchTo(
-                                "dr.panel.turn.schedule.appointments-list",
+                                "mc.panel.turn.schedule.appointments-list",
                                 "rescheduleAppointment",
                                 {
                                     appointmentIds: selectedIds,
@@ -782,6 +784,7 @@ async function handleDayClick(dayElement) {
         try {
             // Get original appointment details for multiple appointments
             const appointments = await new Promise((resolve, reject) => {
+                let handler; // Declare handler variable first
                 const timeoutId = setTimeout(() => {
                     window.removeEventListener(
                         "appointment-details-received",
@@ -792,7 +795,7 @@ async function handleDayClick(dayElement) {
                     );
                 }, 10000);
 
-                const handler = (event) => {
+                handler = (event) => {
                     console.log("Received appointment details:", event.detail);
                     clearTimeout(timeoutId);
                     window.removeEventListener(
@@ -807,7 +810,7 @@ async function handleDayClick(dayElement) {
                     handler
                 );
                 Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.appointments-list",
+                    "mc.panel.turn.schedule.appointments-list",
                     "getAppointmentDetails",
                     {
                         appointmentIds: selectedIds,
@@ -817,6 +820,7 @@ async function handleDayClick(dayElement) {
 
             // Get available times for the selected date
             const availableTimes = await new Promise((resolve, reject) => {
+                let handler; // Declare handler variable first
                 const timeoutId = setTimeout(() => {
                     window.removeEventListener(
                         "available-times-updated",
@@ -825,7 +829,7 @@ async function handleDayClick(dayElement) {
                     reject(new Error("Timeout waiting for available times"));
                 }, 10000);
 
-                const handler = (event) => {
+                handler = (event) => {
                     console.log("Received times update:", event.detail);
                     clearTimeout(timeoutId);
                     window.removeEventListener(
@@ -837,7 +841,7 @@ async function handleDayClick(dayElement) {
 
                 window.addEventListener("available-times-updated", handler);
                 Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.appointments-list",
+                    "mc.panel.turn.schedule.appointments-list",
                     "getAvailableTimesForDate",
                     { date }
                 );
@@ -929,12 +933,12 @@ async function handleDayClick(dayElement) {
 
                 // Send reschedule request with mapped times
                 Livewire.dispatchTo(
-                    "dr.panel.turn.schedule.appointments-list",
+                    "mc.panel.turn.schedule.appointments-list",
                     "rescheduleAppointment",
                     {
                         appointmentIds: selectedIds,
                         newDate: date,
-                        selectedTimes: appointmentTimeMap,
+                        selectedTime: sortedTimes[0], // Assuming the first selected time is the new one for multiple
                         isMultiple: true, // Add flag to indicate multiple appointments
                     }
                 );
