@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{ asset('dr-assets/panel/css/calendar/custom-calendar-row.css') }}">
+<link rel="stylesheet" href="{{ asset('mc-assets/panel/css/calendar/custom-calendar-row.css') }}">
 <div class="w-100 d-flex justify-content-around align-items-center" style="margin: 0; padding: 0; position: relative;">
   <div class="w-100 d-flex align-items-center gap-2">
     <div>
@@ -33,8 +33,8 @@
   </div>
 </div>
 
-<script src="{{ asset('dr-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar-row.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/jquery-easing/1.4.1/jquery.easing.min.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/calendar/custm-calendar-row.js') }}"></script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
 

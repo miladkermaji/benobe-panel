@@ -133,7 +133,7 @@ $(document).ready(function () {
             // بروزرسانی selectedClinicId در localStorage
             const medicalCenterId = event.detail?.medicalCenterId || null;
             localStorage.setItem("selectedClinicId", medicalCenterId);
-            
+
             // بروزرسانی تقویم
             fetchAppointmentsCount();
         }, 1000)
@@ -162,7 +162,8 @@ $(document).ready(function () {
         } else {
             // برای پزشک و منشی، از selectedClinicId استفاده کن
             requestData = {
-                selectedClinicId: localStorage.getItem("selectedClinicId") || "default",
+                selectedClinicId:
+                    localStorage.getItem("selectedClinicId") || "default",
                 guard_type: guardType,
             };
         }
@@ -180,7 +181,7 @@ $(document).ready(function () {
                     workingDays = response.working_days || [];
                     calendarDays = response.calendar_days || 60;
                     appointmentSettings = response.appointment_settings || [];
-                    
+
                     // ذخیره تعطیلات از پاسخ API
                     if (response.holidays && Array.isArray(response.holidays)) {
                         window.holidaysData = {
@@ -188,7 +189,7 @@ $(document).ready(function () {
                             holidays: response.holidays
                         };
                     }
-                    
+
                     $("#calendar-error").hide();
                     loadCalendar();
                 } else {
@@ -249,7 +250,7 @@ $(document).ready(function () {
                     : false;
             const isSpecialDay = specialDays.includes(appointmentDate);
 
-            if (isWorkingDay || isToday || isSpecialDay) {
+            if (isWorkingDay || isToday || isSpecialDay || isHoliday) {
                 const persianDate = moment(current).locale("fa").format("dddd");
                 const persianFormattedDate = moment(current)
                     .locale("fa")
