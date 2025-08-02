@@ -15,6 +15,11 @@ class CheckSecretaryPermission
             return $next($request);
         }
 
+        // اگر مرکز درمانی وارد شده باشد، بدون بررسی دیگر، درخواست را عبور بدهد
+        if (Auth::guard('medical_center')->check()) {
+            return $next($request);
+        }
+
         // بررسی ورود منشی
         $user = Auth::guard('secretary')->user();
         if (!$user) {

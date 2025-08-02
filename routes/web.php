@@ -1,9 +1,18 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Modules\SendOtp\App\Http\Controllers\SendOtpController;
+use App\Http\Controllers\Dr\Panel\DrPanelController;
+
 require __DIR__.'/admin.php';
 require __DIR__.'/dr.php';
 require __DIR__.'/mc.php';
+
+// MC panel route
+
+
+// Test route
+
 Route::post('/send-message', [SendOtpController::class, 'sendMessage'])->name('send.message');
 //  manager  routes
 // end manager  routes

@@ -71,6 +71,13 @@ class DoctorLoginConfirm extends Component
 
     public function loginConfirm()
     {
+        Log::info("=== LOGIN CONFIRM STARTED ===");
+
+        Log::info("Login confirm started", [
+            'token' => $this->token,
+            'otp_code' => $this->otpCode
+        ]);
+
         $otpCode = strrev(implode('', $this->otpCode));
 
         if (empty(trim($otpCode))) {
@@ -146,11 +153,38 @@ class DoctorLoginConfirm extends Component
             $userType = 'secretary';
         } else {
             // Medical Center - redirect to MC panel
+            Log::info("Attempting to login medical center", [
+                'user_id' => $user->id,
+                'phone_number' => $user->phone_number,
+                'is_active' => $user->is_active
+            ]);
+
+            // تنظيف الـ session قبل تسجيل الدخول
+            session()->flush();
+
             Auth::guard('medical_center')->login($user);
-            $redirectRoute = route('mc-panel');
+
+            // حفظ بيانات المستخدم في الـ session
+            session()->put('medical_center_user', $user);
+
+            // تجديد الـ session بعد تسجيل الدخول
+            session()->regenerate();
+
+            // حفظ الـ session بعد تجديدها
+            session()->save();
+
+            // مقدار مسیر ریدایرکت را به صورت دستی ست می‌کنم تا مشکل حل شود
+            $redirectRoute = '/mc/panel';
             $userType = 'medical_center';
         }
 
+        Log::info("Login successful", [
+            'user_type' => $userType,
+            'user_id' => $user->id,
+            'redirect_route' => $redirectRoute,
+            'guard_check' => Auth::guard('medical_center')->check(),
+            'session_id' => session()->getId()
+        ]);
         Log::info("Resetting login attempts for mobile: $mobile");
         $loginAttempts->resetLoginAttempts($user->mobile ?? $user->phone_number);
         session()->forget(['step1_completed', 'current_step', 'otp_token']);
@@ -167,7 +201,17 @@ class DoctorLoginConfirm extends Component
         ]);
 
         $this->dispatch('loginSuccess');
-        $this->redirect($redirectRoute);
+
+        Log::info("About to redirect", [
+            'redirect_route' => $redirectRoute,
+            'user_type' => $userType,
+            'session_id' => session()->getId()
+        ]);
+
+        // حفظ الـ session قبل إعادة التوجيه
+        session()->save();
+
+        $this->redirect($redirectRoute, navigate: true);
     }
 
     public function resendOtp()

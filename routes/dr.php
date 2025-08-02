@@ -1,4 +1,5 @@
 <?php
+
 use App\Livewire\Admin\Auth\Logout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,7 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+
 Route::prefix('dr/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', DoctorLoginRegister::class)->name('dr.auth.login-register-form');
     Route::get('login-user-pass', DoctorLoginUserPass::class)->name('dr.auth.login-user-pass-form');
@@ -76,6 +78,7 @@ Route::prefix('dr/')->middleware('throttle:10,1')->group(function () {
     Route::get('login-resend-otp/{token}', DoctorLoginConfirm::class)->name('dr.auth.login-resend-otp');
     Route::get('logout', DoctorLogout::class)->name('dr.auth.logout');
 });
+
 // dr routes
 Route::prefix('dr')
     ->namespace('Dr')

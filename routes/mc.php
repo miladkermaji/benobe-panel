@@ -13,7 +13,7 @@ use App\Livewire\Admin\Auth\LoginUserPass;
 use App\Livewire\Dr\Auth\DoctorLoginConfirm;
 use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
-use App\Http\Controllers\Dr\Panel\DrPanelController;
+use App\Http\Controllers\Mc\Panel\McPanelController;
 use App\Http\Controllers\Dr\Panel\Bime\DRBimeController;
 use App\Livewire\Dr\Panel\Payment\WalletChargeComponent;
 use App\Http\Controllers\Admin\Panel\Users\UserController;
@@ -71,9 +71,6 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCo
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
 
-// MC panel route
-Route::get('mc/panel', [DrPanelController::class, 'index'])->name('mc-panel')->middleware(['doctor']);
-
 // dr routes
 Route::prefix('mc')
     ->namespace('Mc')
@@ -81,8 +78,12 @@ Route::prefix('mc')
         Route::prefix('doctor-comments')->group(function () {
             Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorComments\DoctorCommentController::class, 'index'])->name('mc.panel.doctor-comments.index');
         });
-        Route::prefix('panel')->middleware(['doctor', 'secretary', 'complete-profile'])->group(function () {
-            Route::get('/', [DrPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');
+        Route::prefix('panel')->middleware(['medical_center'])->group(function () {
+
+            Route::get('mc/panel', [McPanelController::class, 'index'])->name('mc-panel');
+
+            Route::get('/', [McPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('dr-panel');
+
             Route::prefix('doctor-services')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('mc.panel.doctor-services.index');
                 Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('mc.panel.doctor-services.create');

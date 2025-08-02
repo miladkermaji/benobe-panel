@@ -78,6 +78,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'manager' => \App\Http\Middleware\manager::class,
             'doctor' => \App\Http\Middleware\doctor::class,
             'secretary' => \App\Http\Middleware\secretary::class,
+            'medical_center' => \App\Http\Middleware\MedicalCenter::class,
             'secretary.permission' => \App\Http\Middleware\Dr\CheckSecretaryPermission::class,
             'doctor.permission' => \App\Http\Middleware\Dr\CheckDoctorPermission::class,
             'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
