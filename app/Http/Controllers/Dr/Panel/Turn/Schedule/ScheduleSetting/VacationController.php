@@ -63,7 +63,12 @@ class VacationController extends Controller
                 return response()->json(['success' => true, 'vacations' => $vacations, 'year' => $year, 'month' => $month]);
             }
 
-            return view("dr.panel.turn.schedule.scheduleSetting.vacation", compact('vacations', 'clinics'));
+            // Use different view based on guard
+            $viewPath = Auth::guard('medical_center')->check()
+                ? "mc.panel.turn.schedule.scheduleSetting.vacation"
+                : "dr.panel.turn.schedule.scheduleSetting.vacation";
+
+            return view($viewPath, compact('vacations', 'clinics'));
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'خطا در پردازش تاریخ‌ها: ' . $e->getMessage()], 500);
         }
