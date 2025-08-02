@@ -187,7 +187,7 @@
           </div>
         </div>
         <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
-        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('mc.auth.logout') }}' })"
+        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
           class="logout ms-2" title="خروج"></a>
       </div>
     </div>

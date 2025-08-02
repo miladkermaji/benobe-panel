@@ -5,31 +5,26 @@
       <div class="profile__info border cursor-pointer text-center">
         <div class="avatar__img cursor-pointer">
           <img id="profile-photo-img"
-            src="{{ $user->avatar ? Storage::url($user->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
+            src="{{ $medical_center->avatar ? Storage::url($medical_center->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
             class="avatar___img cursor-pointer">
           <input type="file" accept="image/*" class="avatar-img__input" id="profile-photo-input">
           <div class="v-dialog__container" style="display: block;"></div>
           <div class="box__camera default__avatar"></div>
         </div>
         <span class="profile__name sidebar-full-name">
-          {{ optional($user)->first_name }} {{ optional($user)->last_name }}
+          {{ optional($medical_center)->name }}
         </span>
-        <span class="fs-11 fw-bold" id="takhasos-txt">{{ $specialtyName }}</span>
+        <span class="fs-11 fw-bold" id="takhasos-txt"></span>
       </div>
     </div>
     <div class="sidebar__scrollable">
       <ul class="" id="">
-        @if ($this->hasPermission('dashboard'))
           <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
             <a href="{{ route('mc-panel') }}">داشبورد</a>
           </li>
-        @endif
-        @if ($this->hasPermission('mc-workhours'))
           <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
             <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
           </li>
-        @endif
-        @if ($this->hasPermission('appointments'))
           <li
             class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -44,45 +39,31 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-appointments'))
                 <li class="item-li {{ Request::routeIs('mc-appointments') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-appointments') }}"> لیست نوبت ها</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc.panel.doctornotes.index'))
                 <li class="item-li {{ Request::routeIs('mc.panel.doctornotes.index') ? 'is-active' : '' }}">
                   <a href="{{ route('mc.panel.doctornotes.index') }}"> توضیحات نوبت</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-mySpecialDays'))
                 <li class="item-li {{ Request::routeIs('mc-mySpecialDays') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
                 </li>
-              @endif
               {{--    @if ($this->hasPermission('mc-manual_nobat'))
               <li class="item-li {{ Request::routeIs('mc-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('mc-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
-            @endif --}}
-              @if ($this->hasPermission('mc-scheduleSetting'))
+             --}}
                 <li class="item-li {{ Request::routeIs('mc-scheduleSetting') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-vacation'))
                 <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-vacation') }}">تعطیلات</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('doctor-blocking-users.index'))
                 <li class="item-li {{ Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
                   <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('my-prescriptions'))
           <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
@@ -108,8 +89,6 @@
               </li>
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('consult'))
           <li
             class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -127,43 +106,31 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-moshavere_setting'))
                 <li class="item-li i-courses {{ Request::routeIs('mc-moshavere_setting') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-moshavere_waiting'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-moshavere_waiting') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-mySpecialDays-counseling'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('consult-term.index'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('insurance'))
           <li
             class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
             <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
-        @endif
-        @if ($this->hasPermission('prescription'))
           <li
             class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -184,37 +151,26 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-patient-records'))
                 <li class="item-li" style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('prescription.index'))
                 <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('providers.index'))
                 <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('favorite.templates.index'))
                 <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('templates.favorite.service.index'))
                 <li
                   class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('patient_records'))
                 <li
                   class="item-li i-checkout__request {{ Request::routeIs('mc-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
                   id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
@@ -223,11 +179,8 @@
                     پرونده الکترونیک
                   </a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('financial_reports'))
           <li
             class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
@@ -243,27 +196,19 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc.panel.financial-reports.index'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.financial-reports.index') ? 'is-active' : '' }}">
                   <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-payment-setting'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-payment-setting') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-wallet-charge'))
                 <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-wallet-charge') }}">شارژ کیف‌پول</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('patient_communication'))
           <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               ارتباط با بیماران
@@ -277,13 +222,9 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc.panel.send-message'))
                 <li class="item-li"><a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a></li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('secretary_management'))
           <li
             class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
@@ -299,22 +240,16 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('secretary_management'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('permissions'))
                 <li
                   class="item-li i-checkout__request {{ Request::routeIs('mc-secretary-permissions') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('clinic_management'))
           <li
             class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
@@ -330,28 +265,20 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-clinic-management'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-clinic-management') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.clinics.medical-documents') ? 'is-active' : '' }}">
                   <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('doctors.clinic.deposit'))
                 <li
                   class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
                   <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('profile'))
           <li
             class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="hesab-karbari">
@@ -367,18 +294,13 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-edit-profile'))
                 <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-edit-profile-security'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-edit-profile-upgrade'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-upgrade') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
@@ -389,39 +311,26 @@
                       زودی</span>
                   </a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-my-performance'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc-subuser'))
                 <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('my-mc-appointments'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
                   <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
                 <li
                   class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
                   <a href="{{ route('mc.panel.doctor-faqs.index') }}"> سوالات متداول</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
-        @if ($this->hasPermission('statistics'))
           <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
             <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
           </li>
-        @endif
-        @if ($this->hasPermission('messages'))
           <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               پیام
@@ -435,19 +344,14 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('mc-panel-tickets'))
                 <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
                   <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
                 </li>
-              @endif
-              @if ($this->hasPermission('#'))
                 <li class="item-li i-user__inforamtion">
                   <a href="#">صفحه گفتگو</a>
                 </li>
-              @endif
             </ul>
           </li>
-        @endif
       </ul>
     </div>
     <script>
@@ -477,7 +381,6 @@
             photoInput.click();
           });
         }
-
         function uploadPhoto(file) {
           const formData = new FormData();
           formData.append('photo', file);
@@ -519,15 +422,12 @@
           font-size: 9px !important;
         }
       }
-
       @media (max-width: 768px) {
-
         .sidebar__nav,
         .sidebar__fixed,
         .bars {
           display: none !important;
         }
-
         .mobile-bottom-nav {
           display: flex;
           position: fixed;
@@ -546,7 +446,6 @@
           border-top: 1px solid rgba(224, 224, 224, 0.8);
           backdrop-filter: blur(10px);
         }
-
         .mobile-bottom-nav__item {
           position: relative;
           flex: 1 1 0px;
@@ -559,18 +458,15 @@
           margin: 0 2px;
           overflow: hidden;
         }
-
         @media (max-width: 400px) {
           .mobile-bottom-nav__label {
             font-size: 10px;
           }
-
           .mobile-bottom-nav__item svg {
             width: 22px;
             height: 22px;
           }
         }
-
         .mobile-bottom-nav__item svg {
           display: block;
           margin: 0 auto 2px auto;
@@ -580,14 +476,12 @@
           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
         }
-
         .mobile-bottom-nav__item.active svg,
         .mobile-bottom-nav__item:active svg,
         .mobile-bottom-nav__item.open svg {
           fill: #1976d2;
           transform: scale(1.15);
         }
-
         .mobile-bottom-nav__label {
           font-size: 11px;
           color: #444;
@@ -597,13 +491,11 @@
           opacity: 0.92;
           transition: all 0.3s ease;
         }
-
         .mobile-bottom-nav__item:active,
         .mobile-bottom-nav__item.open {
           background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
           box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
         }
-
         .mobile-bottom-nav__dropdown {
           position: absolute;
           bottom: 68px;
@@ -620,11 +512,9 @@
           animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: none;
         }
-
         .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
           display: block !important;
         }
-
         .mobile-bottom-nav__dropdown a {
           display: block;
           padding: 12px 20px;
@@ -637,35 +527,29 @@
           margin: 4px 8px;
           font-weight: 500;
         }
-
         .mobile-bottom-nav__dropdown a:last-child {
           border-bottom: none;
         }
-
         .mobile-bottom-nav__dropdown a:hover {
           background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
           color: #1976d2;
           transform: translateX(3px);
           box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
         }
-
         @keyframes dropdownIn {
           0% {
             opacity: 0;
             transform: translateX(-50%) translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateX(-50%) translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
           }
         }
-
         /* Fix for dashboard dropdown (first item, right edge) */
         .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
           left: auto;
@@ -673,24 +557,20 @@
           transform: none;
           animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         @keyframes dropdownInRight {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
-
         /* Fix for other dropdown (last item, left edge) */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
           left: 2.5vw;
@@ -698,31 +578,26 @@
           transform: none;
           animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         @keyframes dropdownInLeft {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
       }
-
       @media (min-width: 769px) {
         .mobile-bottom-nav {
           display: none !important;
         }
       }
-
       .soon-label {
         font-size: 10px;
         color: #d32f2f;
@@ -734,14 +609,12 @@
       (function() {
         let navItems;
         let lastOpen = null;
-
         function closeAllDropdowns(e) {
           if (!e.target.closest('.mobile-bottom-nav')) {
             navItems.forEach(i => i.classList.remove('open'));
             lastOpen = null;
           }
         }
-
         function setupMobileNavDropdowns() {
           navItems = document.querySelectorAll('.mobile-bottom-nav__item');
           navItems.forEach(item => {
@@ -779,7 +652,6 @@
   </div>
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
-    @if ($this->hasPermission('dashboard'))
       <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
         <a href="{{ route('mc-panel') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
@@ -793,9 +665,7 @@
           </div>
         </a>
       </div>
-    @endif
     <!-- نوبت‌ها -->
-    @if ($this->hasPermission('appointments'))
       <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
@@ -807,32 +677,16 @@
           <div class="mobile-bottom-nav__label">نوبت‌ها</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('mc-appointments'))
             <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
-          @endif
-          @if ($this->hasPermission('mc.panel.doctornotes.index'))
             <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
-          @endif
-          @if ($this->hasPermission('mc-mySpecialDays'))
             <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
-          @endif
-          @if ($this->hasPermission('mc-scheduleSetting'))
             <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
-          @endif
-          @if ($this->hasPermission('mc-vacation'))
             <a href="{{ route('mc-vacation') }}">تعطیلات</a>
-          @endif
-          @if ($this->hasPermission('doctor-blocking-users.index'))
             <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
-          @endif
-          @if ($this->hasPermission('my-prescriptions'))
             <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
-          @endif
         </div>
       </div>
-    @endif
     <!-- مشاوره -->
-    @if ($this->hasPermission('consult'))
       <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
@@ -844,27 +698,17 @@
           <div class="mobile-bottom-nav__label">مشاوره</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('mc-moshavere_setting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
                 class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('mc-moshavere_waiting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
                 class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('mc-mySpecialDays-counseling'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
                 class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('consult-term.index'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین <span
                 class="soon-label">به زودی</span></a>
-          @endif
         </div>
       </div>
-    @endif
     <!-- پروفایل -->
-    @if ($this->hasPermission('profile'))
       <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
@@ -876,33 +720,17 @@
           <div class="mobile-bottom-nav__label">پروفایل</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('mc-edit-profile'))
             <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
-          @endif
-          @if ($this->hasPermission('mc-edit-profile-security'))
             <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
-          @endif
-          @if ($this->hasPermission('mc-my-performance'))
             <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
-          @endif
-          @if ($this->hasPermission('mc-subuser'))
             <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
-          @endif
-          @if ($this->hasPermission('my-mc-appointments'))
             <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
-          @endif
-          @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
             <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
-          @endif
-          @if ($this->hasPermission('mc-edit-profile-upgrade'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
                 class="soon-label">به زودی</span></a>
-          @endif
         </div>
       </div>
-    @endif
     <!-- ساعت کاری -->
-    @if ($this->hasPermission('mc-workhours'))
       <div class="mobile-bottom-nav__item" data-group="workhours">
         <a href="{{ route('mc-workhours') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
@@ -917,7 +745,6 @@
           </div>
         </a>
       </div>
-    @endif
     <!-- سایر -->
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
       <div class="mobile-bottom-nav__activebox">
@@ -930,68 +757,33 @@
         <div class="mobile-bottom-nav__label">سایر</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
-        @if ($this->hasPermission('statistics'))
           <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
-        @endif
-        @if ($this->hasPermission('messages'))
           <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
-        @endif
-        @if ($this->hasPermission('patient_communication'))
           <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
-        @endif
-        @if ($this->hasPermission('#'))
           <a href="#">صفحه گفتگو</a>
-        @endif
-        @if ($this->hasPermission('financial_reports'))
           <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
           <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
           <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
-        @endif
-        @if ($this->hasPermission('insurance'))
           <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
-        @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-        @if ($this->hasPermission('mc-patient-records'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
               class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('prescription.index'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
             <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('providers.index'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
               class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('favorite.templates.index'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
               class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('templates.favorite.service.index'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
             <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('patient_records'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
             <span class="soon-label">به زودی</span></a>
-        @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        @if ($this->hasPermission('clinic_management'))
-          <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
-          @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
             <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
-          @endif
-          @if ($this->hasPermission('doctors.clinic.deposit'))
             <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-          @endif
-        @endif
-        @if ($this->hasPermission('secretary_management'))
           <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
-          @if ($this->hasPermission('permissions'))
             <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
-          @endif
-        @endif
       </div>
     </div>
   </div>
@@ -1026,29 +818,24 @@
       align-items: stretch;
       overflow-y: auto;
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(10px);
     }
-
     .mobile-submenu-overlay.active {
       display: flex;
       opacity: 1;
       animation: overlayFadeIn 0.3s ease-out;
     }
-
     @keyframes overlayFadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
     .mobile-submenu-header {
       display: flex;
       justify-content: flex-end;
@@ -1059,7 +846,6 @@
       top: 0;
       z-index: 1;
     }
-
     .close-mobile-submenu-btn {
       background: rgba(240, 240, 240, 0.8);
       border: none;
@@ -1073,12 +859,10 @@
       align-items: center;
       justify-content: center;
     }
-
     .close-mobile-submenu-btn:hover {
       background: rgba(220, 220, 220, 0.9);
       transform: scale(1.05);
     }
-
     .mobile-submenu-list {
       width: 100%;
       margin-top: 20px;
@@ -1091,7 +875,6 @@
       max-height: calc(100vh - 68px - 64px);
       /* 64px تقریبی هدر */
     }
-
     .mobile-submenu-list a {
       display: block;
       background: #f7f7fa;
@@ -1106,18 +889,15 @@
       font-weight: 500;
       text-align: right;
     }
-
     .mobile-submenu-list a:hover {
       background: #e3f2fd;
       color: #1976d2;
     }
-
     @media (min-width: 769px) {
       .mobile-submenu-overlay {
         display: none !important;
       }
     }
-
     .mobile-bottom-nav__activebox {
       display: flex;
       flex-direction: column;
@@ -1126,20 +906,17 @@
       padding: 0;
       transition: background 0.2s, box-shadow 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
       background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
       box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
       border-radius: 16px;
       padding: 6px 8px 4px 8px;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
       fill: #1976d2;
       transform: scale(1.12);
       transition: fill 0.2s, transform 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
       color: #1976d2;
       font-weight: bold;
@@ -1152,7 +929,6 @@
       let overlay = document.getElementById('mobile-submenu-overlay');
       let closeBtn = document.getElementById('close-mobile-submenu');
       let submenuList = document.getElementById('mobile-submenu-list');
-
       function closeOverlay() {
         overlay.classList.remove('active');
         submenuList.innerHTML = '';
@@ -1160,7 +936,6 @@
         // حذف کلاس active از همه آیتم‌ها
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
       }
-
       function openOverlayWithSubmenu(submenuHtml, parentItem) {
         submenuList.innerHTML = submenuHtml;
         overlay.classList.add('active');
@@ -1169,7 +944,6 @@
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
         if (parentItem) parentItem.classList.add('active');
       }
-
       function setupMobileNavOverlay() {
         navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
         navItems.forEach(item => {
