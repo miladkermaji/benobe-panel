@@ -66,7 +66,7 @@ class HeaderComponent extends Component
             ->select('doctors.*')
             ->where('doctors.is_active', true)
             ->with(['specialties'])
-            ->get();
+                ->get();
     }
 
     /**
@@ -90,7 +90,7 @@ class HeaderComponent extends Component
         // اگر رکوردی وجود ندارد، بررسی کن که آیا پزشک فعالی دارد یا نه
         $activeDoctors = $medicalCenter->doctors()
             ->where('doctors.is_active', true)
-            ->get();
+                ->get();
 
         if ($activeDoctors->count() > 0) {
             // اولین پزشک فعال را انتخاب کن

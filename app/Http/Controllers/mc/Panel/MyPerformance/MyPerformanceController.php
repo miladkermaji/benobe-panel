@@ -303,10 +303,10 @@ class MyPerformanceController extends Controller
 
             $appointments = $appointmentsQuery
                 ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
-                             COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
-                             COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
-                             COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
-                             COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
+                         COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
+                         COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
                 ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->get();
@@ -317,8 +317,8 @@ class MyPerformanceController extends Controller
 
             $monthlyIncome = $monthlyIncomeQuery
                 ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
-                             COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN final_price ELSE 0 END), 0) as total_paid_income,
-                             COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN final_price ELSE 0 END), 0) as total_unpaid_income")
+                         COALESCE(SUM(CASE WHEN payment_status = 'paid' THEN final_price ELSE 0 END), 0) as total_paid_income,
+                         COALESCE(SUM(CASE WHEN payment_status = 'unpaid' THEN final_price ELSE 0 END), 0) as total_unpaid_income")
                 ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
                 ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
                 ->get();
@@ -331,7 +331,7 @@ class MyPerformanceController extends Controller
 
             $newPatients = $newPatientsQuery
                 ->selectRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u') as week,
-                             COUNT(DISTINCT appointments.patientable_id) as total_patients")
+                         COUNT(DISTINCT appointments.patientable_id) as total_patients")
                 ->groupByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u')")
                 ->orderByRaw("DATE_FORMAT(appointments.appointment_date, '%Y-%u')")
                 ->get();
@@ -342,10 +342,10 @@ class MyPerformanceController extends Controller
 
             $counselingAppointments = $counselingQuery
                 ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
-                             COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
-                             COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
-                             COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
-                             COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'attended' THEN 1 END) as attended_count,
+                         COUNT(CASE WHEN status = 'missed' THEN 1 END) as missed_count,
+                         COUNT(CASE WHEN status = 'cancelled' THEN 1 END) as cancelled_count")
                 ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->get();
@@ -357,8 +357,8 @@ class MyPerformanceController extends Controller
 
             $manualAppointments = $manualQuery
                 ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%u') as week,
-                             COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
-                             COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_count")
+                         COUNT(CASE WHEN status = 'scheduled' THEN 1 END) as scheduled_count,
+                         COUNT(CASE WHEN status = 'confirmed' THEN 1 END) as confirmed_count")
                 ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%u')")
                 ->get();
@@ -371,9 +371,9 @@ class MyPerformanceController extends Controller
 
             $totalIncome = $totalIncomeQuery
                 ->selectRaw("DATE_FORMAT(appointment_date, '%Y-%m') as month,
-                             COALESCE(SUM(final_price), 0) as total_income")
+                         COALESCE(SUM(final_price), 0) as total_income")
                 ->groupByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
-                ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
+                    ->orderByRaw("DATE_FORMAT(appointment_date, '%Y-%m')")
                 ->get();
 
             return response()->json([
