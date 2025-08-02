@@ -6,10 +6,13 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\DoctorNote;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorNoteList extends Component
 {
     use WithPagination;
+    use HasSelectedDoctor;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -21,6 +24,7 @@ class DoctorNoteList extends Component
     public $selectedDoctorNotes = [];
     public $selectAll = false;
     public $groupAction = '';
+    public $refreshKey = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -43,7 +47,26 @@ class DoctorNoteList extends Component
 
     public function deleteDoctorNote($id)
     {
-        $item = DoctorNote::findOrFail($id);
+        $query = DoctorNote::where('id', $id);
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            $query->where('doctor_id', $selectedDoctorId)
+                  ->where('medical_center_id', $medicalCenter->id);
+        } else {
+            // Handle doctor/secretary authentication
+            $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
+        }
+
+        $item = $query->firstOrFail();
         $item->delete();
         $this->dispatch('show-alert', type: 'success', message: 'یادداشت پزشک حذف شد!');
     }
@@ -94,8 +117,26 @@ class DoctorNoteList extends Component
 
     private function updateStatus($status)
     {
-        DoctorNote::whereIn('id', $this->selectedDoctorNotes)
-            ->update(['status' => $status]);
+        $query = DoctorNote::whereIn('id', $this->selectedDoctorNotes);
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            $query->where('doctor_id', $selectedDoctorId)
+                  ->where('medical_center_id', $medicalCenter->id);
+        } else {
+            // Handle doctor/secretary authentication
+            $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
+        }
+
+        $query->update(['status' => $status]);
 
         $this->selectedDoctorNotes = [];
         $this->selectAll = false;
@@ -109,7 +150,26 @@ class DoctorNoteList extends Component
             return;
         }
 
-        DoctorNote::whereIn('id', $this->selectedDoctorNotes)->delete();
+        $query = DoctorNote::whereIn('id', $this->selectedDoctorNotes);
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            $query->where('doctor_id', $selectedDoctorId)
+                  ->where('medical_center_id', $medicalCenter->id);
+        } else {
+            // Handle doctor/secretary authentication
+            $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
+        }
+
+        $query->delete();
         $this->selectedDoctorNotes = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'یادداشت‌های انتخاب‌شده حذف شدند!');
@@ -117,7 +177,26 @@ class DoctorNoteList extends Component
 
     public function toggleStatus($id)
     {
-        $note = DoctorNote::findOrFail($id);
+        $query = DoctorNote::where('id', $id);
+
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+                return;
+            }
+
+            $query->where('doctor_id', $selectedDoctorId)
+                  ->where('medical_center_id', $medicalCenter->id);
+        } else {
+            // Handle doctor/secretary authentication
+            $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
+        }
+
+        $note = $query->firstOrFail();
         $note->status = $note->status === 'active' ? 'inactive' : 'active';
         $note->save();
 
@@ -126,12 +205,33 @@ class DoctorNoteList extends Component
 
     private function getDoctorNotesQuery()
     {
+        // Handle medical center authentication
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$selectedDoctorId) {
+                // If no doctor is selected, return empty result
+                return DoctorNote::where('id', 0)->paginate($this->perPage);
+            }
+
+            return DoctorNote::where('doctor_id', $selectedDoctorId)
+                ->where('medical_center_id', $medicalCenter->id)
+                ->where(function ($query) {
+                    $query->where('notes', 'like', '%' . $this->search . '%')
+                        ->orWhere('appointment_type', 'like', '%' . $this->search . '%');
+                })
+                ->with(['medicalCenter'])
+                ->paginate($this->perPage);
+        }
+
+        // Handle doctor/secretary authentication (existing logic)
         return DoctorNote::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->where(function ($query) {
                 $query->where('notes', 'like', '%' . $this->search . '%')
                     ->orWhere('appointment_type', 'like', '%' . $this->search . '%');
             })
-            ->with(['clinic'])
+            ->with(['medicalCenter'])
             ->paginate($this->perPage);
     }
 
@@ -142,5 +242,23 @@ class DoctorNoteList extends Component
         return view('livewire.mc.panel.doctor-notes.doctor-note-list', [
             'doctorNotes' => $items,
         ]);
+    }
+
+    #[On('doctorSelected')]
+    public function handleDoctorSelected($data)
+    {
+        // Refresh the component when a new doctor is selected
+        $this->readyToLoad = false;
+        $this->selectedDoctorNotes = [];
+        $this->selectAll = false;
+        $this->search = '';
+        $this->resetPage();
+        $this->refreshKey++; // Increment refreshKey to force re-render
+
+        // Force a fresh load of doctor notes
+        $this->loadDoctorNotes();
+
+        // Dispatch an event to show that the data has been refreshed
+        $this->dispatch('doctor-notes-refreshed');
     }
 }

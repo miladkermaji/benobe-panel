@@ -1,4 +1,4 @@
-<div class="doctor-notes-container">
+<div class="doctor-notes-container" wire:key="doctor-notes-{{ $refreshKey }}">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadDoctorNotes">
     <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
@@ -65,7 +65,7 @@
                   </th>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
                   <th class="align-middle">نوع نوبت</th>
-                  <th class="align-middle">کلینیک</th>
+                  <th class="align-middle">مرکز درمانی</th>
                   <th class="align-middle">یادداشت</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 120px;">عملیات</th>
@@ -103,7 +103,7 @@
                           @endswitch
                         </span>
                       </td>
-                      <td>{{ $item->clinic ? $item->clinic->name : 'ندارد' }}</td>
+                      <td>{{ $item->medicalCenter ? $item->medicalCenter->name : 'ندارد' }}</td>
                       <td>
                         <div class="text-truncate" style="max-width: 300px;"
                           title="{{ e($item->notes) ?? 'بدون یادداشت' }}">
@@ -141,7 +141,7 @@
                     </tr>
                     @empty
                       <tr>
-                        <td colspan="6" class="text-center py-4">
+                        <td colspan="12" class="text-center py-4">
                           <div class="d-flex justify-content-center align-items-center flex-column">
                             <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                               stroke="currentColor" stroke-width="2" class="text-muted mb-2">
@@ -154,7 +154,7 @@
                     @endforelse
                   @else
                     <tr>
-                      <td colspan="6" class="text-center py-4">
+                      <td colspan="12" class="text-center py-4">
                         <div class="spinner-border text-primary" role="status">
                           <span class="visually-hidden">در حال بارگذاری...</span>
                         </div>
@@ -213,8 +213,9 @@
                     </div>
                     <div class="note-card-body">
                       <div class="note-card-item">
-                        <span class="note-card-label">کلینیک:</span>
-                        <span class="note-card-value">{{ $item->clinic ? $item->clinic->name : 'ندارد' }}</span>
+                        <span class="note-card-label">مرکز درمانی:</span>
+                        <span
+                          class="note-card-value">{{ $item->medicalCenter ? $item->medicalCenter->name : 'ندارد' }}</span>
                       </div>
                       <div class="note-card-item">
                         <span class="note-card-label">یادداشت:</span>

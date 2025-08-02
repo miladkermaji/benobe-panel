@@ -32,16 +32,6 @@
               </select>
               <label for="appointment_type" class="form-label">نوع نوبت</label>
             </div>
-            <div class="col-12 position-relative mt-4" wire:ignore>
-              <select wire:model="medical_center_id" class="form-select select2-clinic" id="medical_center_id">
-                <option value="">بدون کلینیک</option>
-                @foreach ($clinics as $clinic)
-                  <option value="{{ $clinic->id }}" {{ $clinic->id == $medical_center_id ? 'selected' : '' }}>
-                    {{ $clinic->name }}</option>
-                @endforeach
-              </select>
-              <label for="medical_center_id" class="form-label">کلینیک (اختیاری)</label>
-            </div>
             <div class="col-12 position-relative mt-4">
               <textarea wire:model="notes" class="form-control" id="notes" rows="3" placeholder=" "></textarea>
               <label for="notes" class="form-label">یادداشت (اختیاری)</label>
@@ -69,12 +59,6 @@
         });
 
         function initializeSelect2() {
-          $('#medical_center_id').select2({
-            dir: 'rtl',
-            placeholder: 'انتخاب کلینیک',
-            allowClear: true,
-            width: '100%',
-          });
           $('#appointment_type').select2({
             dir: 'rtl',
             placeholder: 'نوع نوبت',
@@ -82,9 +66,6 @@
             width: '100%',
           });
 
-          $('#medical_center_id').on('change.select2', function() {
-            @this.set('medical_center_id', this.value);
-          });
           $('#appointment_type').on('change.select2', function() {
             @this.set('appointment_type', this.value);
           });
@@ -93,7 +74,7 @@
         initializeSelect2();
 
         Livewire.hook('element.updated', (el, component) => {
-          if (el.id === 'medical_center_id') {
+          if (el.id === 'appointment_type') {
             initializeSelect2();
           }
         });

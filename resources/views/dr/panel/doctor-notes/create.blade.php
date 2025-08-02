@@ -1,4 +1,4 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet" />
@@ -15,7 +15,7 @@
 
 @section('content')
 @section('bread-crumb-title', 'افزودن توضیحات جدید')
-@livewire('dr.panel.doctor-notes.doctor-note-create')
+@livewire('mc.panel.doctor-notes.doctor-note-create')
 @section('scripts')
 
 
