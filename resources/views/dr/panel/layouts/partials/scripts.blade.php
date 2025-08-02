@@ -1,7 +1,6 @@
 <script src="{{ asset('dr-assets/panel/js/js.js') }}"></script>
 
-
-
+<script src="{{ asset('dr-assets/panel/js/bootstrap.bundle.min.js') }}"></script>
 
 <script src="{{ asset('dr-assets/panel/js/popper.min.js') }}"></script>
 

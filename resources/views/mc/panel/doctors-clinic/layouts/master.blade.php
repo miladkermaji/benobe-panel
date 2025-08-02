@@ -6,11 +6,8 @@
   @yield('styles')
   <title>
     @if (Auth::guard('doctor')->check())
-      پنل دکتر | به نوبه
-    @elseif (Auth::guard('secretary')->check())
-      پنل منشی | به نوبه
-    @else
-      به نوبه
+      پنل مراکز درمانی | به نوبه
+   
     @endif
   </title>
 
@@ -31,8 +28,8 @@
   <script>
     // ثبت رویداد show-toastr
     Livewire.on('show-toastr', (data) => {
-    console.log('hi');
-    
+      console.log('hi');
+
       // اگر data یک آرایه است، از اولین عنصر استفاده کنید
       const toastrData = Array.isArray(data) ? data[0] : data;
 
@@ -44,7 +41,6 @@
         toastr.error(toastrData.message);
       }
     });
-
   </script>
 
   @include('mc.panel.doctors-clinic.layouts.partials.scripts')

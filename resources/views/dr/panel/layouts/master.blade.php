@@ -48,7 +48,7 @@
 
   @include('dr.panel.layouts.partials.scripts')
   @yield('scripts')
-   {{-- @networkStatus --}}
+  {{-- @networkStatus --}}
   <!-- سایر اسکریپت‌ها -->
   <script>
     Livewire.on('navigateTo', (event) => {
@@ -83,22 +83,26 @@
     });
   </script>
   <script>
-    jalaliDatepicker.startWatch({
-      minDate: "attr",
-      maxDate: "attr",
-      showTodayBtn: true,
-      showEmptyBtn: true,
-      time: false,
-      dateFormatter: function(unix) {
-        return new Date(unix).toLocaleDateString('fa-IR', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof jalaliDatepicker !== 'undefined') {
+        jalaliDatepicker.startWatch({
+          minDate: "attr",
+          maxDate: "attr",
+          showTodayBtn: true,
+          showEmptyBtn: true,
+          time: false,
+          dateFormatter: function(unix) {
+            return new Date(unix).toLocaleDateString('fa-IR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            });
+          }
         });
       }
     });
   </script>
-<script src="{{ asset('dr-assets/panel/js/clinic-selector.js') }}"></script>
+  <script src="{{ asset('dr-assets/panel/js/clinic-selector.js') }}"></script>
 
 </body>
 

@@ -1,7 +1,6 @@
 <script src="{{ asset('mc-assets/panel/js/js.js') }}"></script>
 
-
-
+<script src="{{ asset('mc-assets/panel/js/bootstrap.bundle.min.js') }}"></script>
 
 <script src="{{ asset('mc-assets/panel/js/popper.min.js') }}"></script>
 

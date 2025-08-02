@@ -85,17 +85,21 @@
     });
   </script>
   <script>
-    jalaliDatepicker.startWatch({
-      minDate: "attr",
-      maxDate: "attr",
-      showTodayBtn: true,
-      showEmptyBtn: true,
-      time: false,
-      dateFormatter: function(unix) {
-        return new Date(unix).toLocaleDateString('fa-IR', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof jalaliDatepicker !== 'undefined') {
+        jalaliDatepicker.startWatch({
+          minDate: "attr",
+          maxDate: "attr",
+          showTodayBtn: true,
+          showEmptyBtn: true,
+          time: false,
+          dateFormatter: function(unix) {
+            return new Date(unix).toLocaleDateString('fa-IR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            });
+          }
         });
       }
     });

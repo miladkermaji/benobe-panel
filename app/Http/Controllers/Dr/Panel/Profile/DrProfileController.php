@@ -32,7 +32,9 @@ class DrProfileController extends Controller
 
     protected function getAuthenticatedDoctor(): Doctor
     {
-        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+        $user = Auth::guard('doctor')->user() ??
+                Auth::guard('secretary')->user() ??
+                Auth::guard('medical_center')->user();
 
         if ($user instanceof Doctor) {
             return $user;
@@ -40,6 +42,15 @@ class DrProfileController extends Controller
 
         if ($user instanceof Secretary) {
             return $user->doctor;
+        }
+
+        if ($user instanceof \App\Models\MedicalCenter) {
+            // برای مراکز درمانی، اولین پزشک فعال را برمی‌گردانیم
+            $firstDoctor = $user->doctors()->where('is_active', true)->first();
+            if ($firstDoctor) {
+                return $firstDoctor;
+            }
+            throw new \Exception('هیچ پزشک فعالی در این مرکز درمانی وجود ندارد.');
         }
 
         throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');

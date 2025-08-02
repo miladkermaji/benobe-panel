@@ -345,7 +345,7 @@ Route::prefix('mc')
             });
             Route::prefix('profile')->group(function () {
                 Route::get('edit-profile', [DrProfileController::class, 'edit'])->middleware('secretary.permission:profile')->name('mc-edit-profile');
-                Route::post('/upload-profile-photo', [DrProfileController::class, 'uploadPhoto'])->name('mc.upload-photo')->middleware('auth:doctor');
+                Route::post('/upload-profile-photo', [DrProfileController::class, 'uploadPhoto'])->name('mc.upload-photo')->middleware('auth:medical_center');
                 Route::post('update-profile', [DrProfileController::class, 'update_profile'])->middleware('secretary.permission:profile')->name('mc-update-profile');
                 Route::get('/mc-check-profile-completeness', [DrProfileController::class, 'checkProfileCompleteness'])->middleware('secretary.permission:profile')->name('mc-check-profile-completeness');
                 Route::post('/send-mobile-otp', [DrProfileController::class, 'sendMobileOtp'])->middleware('secretary.permission:profile')->name('mc-send-mobile-otp');

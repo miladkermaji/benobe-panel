@@ -31,8 +31,8 @@
   <script>
     // ثبت رویداد show-toastr
     Livewire.on('show-toastr', (data) => {
-    console.log('hi');
-    
+      console.log('hi');
+
       // اگر data یک آرایه است، از اولین عنصر استفاده کنید
       const toastrData = Array.isArray(data) ? data[0] : data;
 
@@ -44,7 +44,6 @@
         toastr.error(toastrData.message);
       }
     });
-
   </script>
 
   @include('dr.panel.doctors-clinic.layouts.partials.scripts')
@@ -84,17 +83,21 @@
     });
   </script>
   <script>
-    jalaliDatepicker.startWatch({
-      minDate: "attr",
-      maxDate: "attr",
-      showTodayBtn: true,
-      showEmptyBtn: true,
-      time: false,
-      dateFormatter: function(unix) {
-        return new Date(unix).toLocaleDateString('fa-IR', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric'
+    document.addEventListener("DOMContentLoaded", function() {
+      if (typeof jalaliDatepicker !== 'undefined') {
+        jalaliDatepicker.startWatch({
+          minDate: "attr",
+          maxDate: "attr",
+          showTodayBtn: true,
+          showEmptyBtn: true,
+          time: false,
+          dateFormatter: function(unix) {
+            return new Date(unix).toLocaleDateString('fa-IR', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric'
+            });
+          }
         });
       }
     });
