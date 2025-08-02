@@ -172,13 +172,16 @@ class AppointmentsList extends Component
                 try {
                     // استفاده از رابطه doctors به جای متد مستقیم
                     $activeDoctor = $this->medicalCenter->doctors()
-                        ->where('doctors.is_active', true)
+                        ->wherePivot('is_active', true)
                         ->first();
 
                     if ($activeDoctor) {
                         $this->selectedDoctorId = $activeDoctor->id;
                         // ذخیره پزشک انتخاب‌شده در دیتابیس
-                        $this->medicalCenter->setSelectedDoctor($activeDoctor->id);
+                        DB::table('medical_center_selected_doctors')->updateOrInsert(
+                            ['medical_center_id' => $this->activeMedicalCenterId],
+                            ['doctor_id' => $activeDoctor->id, 'updated_at' => now()]
+                        );
                     } else {
                         // اگر هیچ پزشک فعالی وجود ندارد، پیام مناسب نمایش بده
                         session()->flash('warning', 'هیچ پزشک فعالی در این مرکز درمانی وجود ندارد. لطفاً ابتدا یک پزشک اضافه کنید.');
@@ -2457,12 +2460,20 @@ class AppointmentsList extends Component
 
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
 
+            // For medical_center guard, use activeMedicalCenterId
+            $medicalCenterId = null;
+            if (Auth::guard('medical_center')->check()) {
+                $medicalCenterId = $this->activeMedicalCenterId;
+            } else {
+                $medicalCenterId = $clinicId;
+            }
+
             // Create the appointment
             $appointment = Appointment::create([
                 'patientable_id' => $user->id,
                 'patientable_type' => 'App\\Models\\User',
                 'doctor_id' => $doctor->id,
-                'medical_center_id' => $clinicId,
+                'medical_center_id' => $medicalCenterId,
                 'appointment_date' => $gregorianDate,
                 'appointment_time' => $this->appointmentTime,
                 'status' => 'scheduled',
