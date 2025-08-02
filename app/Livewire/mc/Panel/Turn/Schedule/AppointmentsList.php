@@ -2697,6 +2697,7 @@ class AppointmentsList extends Component
             // Debug logging
             Log::info('GetAvailableTimesForDate Debug', [
                 'date' => $date,
+                'gregorianDate' => $this->convertToGregorian($date),
                 'workSchedule' => $workSchedule,
                 'reservedAppointments' => $reservedAppointments,
                 'availableTimes' => $availableTimes
@@ -2812,10 +2813,13 @@ class AppointmentsList extends Component
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
         }
 
+        // Convert Jalali date to Gregorian if needed
+        $gregorianDate = $this->convertToGregorian($date);
+
         // First check for special schedule
         $specialSchedule = DB::table('special_daily_schedules')
             ->where('doctor_id', $doctor->id)
-            ->where('date', $date)
+            ->where('date', $gregorianDate)
             ->when($clinicId === null, fn ($q) => $q->whereNull('medical_center_id'))
             ->when($clinicId !== null, fn ($q) => $q->where('medical_center_id', $clinicId))
             ->first();
@@ -2828,12 +2832,12 @@ class AppointmentsList extends Component
             return [
                 'work_hours' => $workHours,
                 'is_special' => true,
-                'schedule_date' => $date
+                'schedule_date' => $gregorianDate
             ];
         }
 
         // If no special schedule, use regular schedule
-        $dayOfWeek = strtolower(Carbon::parse($date)->format('l'));
+        $dayOfWeek = strtolower(Carbon::parse($gregorianDate)->format('l'));
         $regularSchedule = DB::table('doctor_work_schedules')
             ->where('doctor_id', $doctor->id)
             ->where('day', $dayOfWeek)
@@ -2850,7 +2854,7 @@ class AppointmentsList extends Component
             return [
                 'work_hours' => $workHours,
                 'is_special' => false,
-                'schedule_date' => $date
+                'schedule_date' => $gregorianDate
             ];
         }
         return null;
@@ -2870,8 +2874,11 @@ class AppointmentsList extends Component
             $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
         }
 
+        // Convert Jalali date to Gregorian if needed
+        $gregorianDate = $this->convertToGregorian($date);
+
         return Appointment::where('doctor_id', $doctor->id)
-            ->whereDate('appointment_date', $date)
+            ->whereDate('appointment_date', $gregorianDate)
             ->where('status', '!=', 'cancelled')
             ->whereNull('deleted_at')
             ->where('patientable_type', 'App\\Models\\User')
