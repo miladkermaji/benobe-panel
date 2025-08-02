@@ -1570,7 +1570,7 @@
               console.log('Creating button for time:', time, 'index:', index);
               const button = document.createElement('button');
               button.type = 'button';
-              button.className = 'btn btn-sm time-slot-btn btn-outline-primary m-1';
+              button.className = 'btn btn-sm time-slot-btn btn-outline-primary m-1 h-50';
               button.setAttribute('data-time', time);
               button.textContent = time;
 
@@ -1602,7 +1602,7 @@
             });
 
             console.log('Final container HTML:', container.innerHTML);
-          }, 100); // 100ms delay
+          }, 50); // 50ms delay
         });
         // Handle modal close
         Livewire.on('close-modal', (event) => {
