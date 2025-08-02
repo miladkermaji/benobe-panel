@@ -71,6 +71,7 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCo
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
 use App\Http\Controllers\mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
+use App\Http\Controllers\mc\Panel\Turn\DrScheduleController as McDrScheduleController;
 
 // dr routes
 Route::prefix('mc')
@@ -95,28 +96,28 @@ Route::prefix('mc')
             });
             Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
             Route::get('/search-appointments-counseling', [MoshavereWaitingController::class, 'searchAppointments'])->middleware('secretary.permission:appointments')->name('search.appointments.counseling');
-            Route::post('appointments/{id}/end-visit', [DrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
-            Route::get('/doctor/appointments/by-date', [DrScheduleController::class, 'getAppointmentsByDate'])
+            Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
+            Route::get('/doctor/appointments/by-date', [McDrScheduleController::class, 'getAppointmentsByDate'])
                 ->name('doctor.appointments.by-date');
-            Route::get('/search/patients', [DrScheduleController::class, 'searchPatients'])->name('search.patients');
+            Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('search.patients');
             Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('search.patients-counseling');
-            Route::post('/appointments/update-date/{id}', [DrScheduleController::class, 'updateAppointmentDate'])
+            Route::post('/appointments/update-date/{id}', [McDrScheduleController::class, 'updateAppointmentDate'])
                 ->name('updateAppointmentDate');
             Route::prefix('doctor-notes')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'index'])->name('mc.panel.doctornotes.index');
                 Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('mc.panel.doctornotes.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorNote\DoctorNoteController::class, 'edit'])->name('mc.panel.doctornotes.edit');
             });
-            Route::get('/doctor/appointments/filter', [DrScheduleController::class, 'filterAppointments'])->name('doctor.appointments.filter');
+            Route::get('/doctor/appointments/filter', [McDrScheduleController::class, 'filterAppointments'])->name('doctor.appointments.filter');
             Route::get('/doctor/appointments/filter-counseling', [MoshavereWaitingController::class, 'filterAppointments'])->name('doctor.appointments.filter.counseling');
             Route::prefix('turn')->middleware('secretary.permission:appointments')->group(function () {
                 Route::prefix('schedule')->group(function () {
-                    Route::get('/appointments', [DrScheduleController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-appointments');
-                    Route::get('search-appointments', [DrScheduleController::class, 'searchAppointments'])->name('mc.search.appointments');
-                    Route::post('end-visit/{id}', [DrScheduleController::class, 'endVisit'])->name('end.visit');
-                    Route::get('/my-appointments', [DrScheduleController::class, 'myAppointments'])->middleware('secretary.permission:my-appointments')->name('my-mc-appointments');
-                    Route::get('/my-appointments/by-date', [DrScheduleController::class, 'showByDateAppointments'])->name('mc.turn.my-appointments.by-date');
-                    Route::get('filter-appointments', [DrScheduleController::class, 'filterAppointments'])->name('mc.turn.filter-appointments');
+                    Route::get('/appointments', [McDrScheduleController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-appointments');
+                    Route::get('search-appointments', [McDrScheduleController::class, 'searchAppointments'])->name('mc.search.appointments');
+                    Route::post('end-visit/{id}', [McDrScheduleController::class, 'endVisit'])->name('end.visit');
+                    Route::get('/my-appointments', [McDrScheduleController::class, 'myAppointments'])->middleware('secretary.permission:my-appointments')->name('my-mc-appointments');
+                    Route::get('/my-appointments/by-date', [McDrScheduleController::class, 'showByDateAppointments'])->name('mc.turn.my-appointments.by-date');
+                    Route::get('filter-appointments', [McDrScheduleController::class, 'filterAppointments'])->name('mc.turn.filter-appointments');
                     Route::get('/moshavere_setting', [DrMoshavereSettingController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-moshavere_setting');
                     Route::post('/copy-work-hours-counseling', [DrMoshavereSettingController::class, 'copyWorkHours'])->middleware('secretary.permission:appointments')->name('copy-work-hours-counseling');
                     Route::get('get-work-schedule-counseling', [DrMoshavereSettingController::class, 'getWorkSchedule'])->middleware('secretary.permission:appointments')->name('mc-get-work-schedule-counseling');
@@ -240,11 +241,11 @@ Route::prefix('mc')
                 Route::prefix('Counseling')->group(function () {
                     Route::get('/consult-term', [ConsultTermController::class, 'index'])->middleware('secretary.permission:appointments')->name('consult-term.index');
                 });
-                Route::post('/update-auto-schedule', [DrScheduleController::class, 'updateAutoSchedule'])->middleware('secretary.permission:appointments')->name('update-auto-schedule');
-                Route::get('/check-auto-schedule', [DrScheduleController::class, 'checkAutoSchedule'])->middleware('secretary.permission:appointments')->name('check-auto-schedule');
-                Route::get('get-available-times', [DrScheduleController::class, 'getAvailableTimes'])->middleware('secretary.permission:appointments')->name('getAvailableTimes');
-                Route::post('update-day-status', [DrScheduleController::class, 'updateDayStatus'])->middleware('secretary.permission:appointments')->name('updateDayStatus');
-                Route::get('disabled-days', [DrScheduleController::class, 'disabledDays'])->middleware('secretary.permission:appointments')->name('disabledDays');
+                Route::post('/update-auto-schedule', [McDrScheduleController::class, 'updateAutoSchedule'])->middleware('secretary.permission:appointments')->name('update-auto-schedule');
+                Route::get('/check-auto-schedule', [McDrScheduleController::class, 'checkAutoSchedule'])->middleware('secretary.permission:appointments')->name('check-auto-schedule');
+                Route::get('get-available-times', [McDrScheduleController::class, 'getAvailableTimes'])->middleware('secretary.permission:appointments')->name('getAvailableTimes');
+                Route::post('update-day-status', [McDrScheduleController::class, 'updateDayStatus'])->middleware('secretary.permission:appointments')->name('updateDayStatus');
+                Route::get('disabled-days', [McDrScheduleController::class, 'disabledDays'])->middleware('secretary.permission:appointments')->name('disabledDays');
                 Route::post('/convert-to-gregorian', [AppointmentController::class, 'convertToGregorian'])->middleware('secretary.permission:appointments')->name('convert-to-gregorian');
                 Route::get('/search-appointments', [AppointmentController::class, 'searchAppointments'])->middleware('secretary.permission:appointments')->name('search.appointments');
                 Route::get('/turnsCatByDays', [TurnsCatByDaysController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-turnsCatByDays');

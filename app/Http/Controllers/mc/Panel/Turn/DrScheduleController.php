@@ -19,14 +19,20 @@ class DrScheduleController extends Controller
 {
     public function getAuthenticatedDoctor()
     {
-        if (Auth::guard('doctor')->check()) {
-            return Auth::guard('doctor')->user();
-        } elseif (Auth::guard('secretary')->check()) {
-            $secretary = Auth::guard('secretary')->user();
-            if (!$secretary->doctor) {
-                throw new \Exception('منشی به هیچ دکتری متصل نیست.');
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $medicalCenter->selectedDoctor?->doctor_id;
+
+            if (!$selectedDoctorId) {
+                throw new \Exception('هیچ پزشکی انتخاب نشده است. لطفاً ابتدا یک پزشک انتخاب کنید.');
             }
-            return $secretary->doctor;
+
+            $doctor = \App\Models\Doctor::find($selectedDoctorId);
+            if (!$doctor) {
+                throw new \Exception('پزشک انتخاب‌شده یافت نشد.');
+            }
+
+            return $doctor;
         }
         throw new \Exception('کاربر احراز هویت نشده است.');
     }
@@ -38,27 +44,23 @@ class DrScheduleController extends Controller
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
-        $selectedClinicId = $request->query('selectedClinicId');
+        $medicalCenter = Auth::guard('medical_center')->user();
+        $medicalCenterId = $medicalCenter->id;
         $filterType = $request->input('type');
         $now = Carbon::now()->format('Y-m-d');
 
-        $appointments = Appointment::with(['doctor', 'patientable', 'insurance', 'clinic'])
+        $appointments = Appointment::with(['doctor', 'patientable', 'insurance', 'medicalCenter'])
             ->where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $medicalCenterId)
             ->where('appointment_date', $now);
 
         if (empty($filterType)) {
             $appointments->withTrashed();
         }
 
-        if ($selectedClinicId === 'default') {
-            $appointments->whereNull('medical_center_id');
-        } elseif ($selectedClinicId) {
-            $appointments->where('medical_center_id', $selectedClinicId);
-        }
-
         if ($filterType) {
             if ($filterType === "in_person") {
-                $appointments->where('medical_center_id', $selectedClinicId);
+                $appointments->where('medical_center_id', $medicalCenterId);
             } elseif ($filterType === "online") {
                 $appointments->whereNull('medical_center_id');
             }
@@ -71,7 +73,6 @@ class DrScheduleController extends Controller
 
     public function getAppointmentsByDate(Request $request)
     {
-        $selectedClinicId = $request->selectedClinicId;
         $jalaliDate = $request->input('date');
 
         // اعتبارسنجی اولیه
@@ -122,17 +123,13 @@ class DrScheduleController extends Controller
             ], 400);
         }
 
-        $doctorId = Auth::guard('doctor')->user()->id;
+        $doctor = $this->getAuthenticatedDoctor();
+        $medicalCenter = Auth::guard('medical_center')->user();
 
-        $query = Appointment::where('doctor_id', $doctorId)
+        $query = Appointment::where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $medicalCenter->id)
             ->whereDate('appointment_date', $gregorianDate)
-            ->with(['patientable', 'insurance']);
-
-        if ($selectedClinicId === 'default') {
-            $query->whereNull('medical_center_id');
-        } elseif ($selectedClinicId) {
-            $query->where('medical_center_id', $selectedClinicId);
-        }
+            ->with(['patientable', 'insurance', 'medicalCenter']);
 
         $appointments = $query->paginate(10);
 
@@ -152,7 +149,6 @@ class DrScheduleController extends Controller
     {
         $query = $request->query('query');
         $date = $request->query('date');
-        $selectedClinicId = $request->query('selectedClinicId');
 
         if (empty($date)) {
             return response()->json([
@@ -202,7 +198,12 @@ class DrScheduleController extends Controller
             ], 500);
         }
 
-        $appointmentsQuery = Appointment::with('patientable', 'insurance')
+        $doctor = $this->getAuthenticatedDoctor();
+        $medicalCenter = Auth::guard('medical_center')->user();
+
+        $appointmentsQuery = Appointment::with('patientable', 'insurance', 'medicalCenter')
+            ->where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $medicalCenter->id)
             ->whereDate('appointment_date', $gregorianDate)
             ->whereHasMorph(
                 'patientable',
@@ -215,12 +216,6 @@ class DrScheduleController extends Controller
                         ->orWhere('national_code', 'like', "%$query%");
                 }
             );
-
-        if ($selectedClinicId === 'default') {
-            $appointmentsQuery->whereNull('medical_center_id');
-        } elseif ($selectedClinicId) {
-            $appointmentsQuery->where('medical_center_id', $selectedClinicId);
-        }
 
         $patients = $appointmentsQuery->paginate(10);
 
@@ -286,13 +281,12 @@ class DrScheduleController extends Controller
     {
         $status = $request->query('status');
         $attendanceStatus = $request->query('attendance_status');
-        $selectedClinicId = $request->input('selectedClinicId');
 
-        $query = Appointment::withTrashed();
+        $medicalCenter = Auth::guard('medical_center')->user();
+        $medicalCenterId = $medicalCenter->id;
 
-        if ($selectedClinicId && $selectedClinicId !== 'default') {
-            $query->where('medical_center_id', $selectedClinicId);
-        }
+        $query = Appointment::withTrashed()
+            ->where('medical_center_id', $medicalCenterId);
 
         if (!empty($status)) {
             $query->where('status', $status);
@@ -302,7 +296,7 @@ class DrScheduleController extends Controller
             $query->where('attendance_status', $attendanceStatus);
         }
 
-        $appointments = $query->with(['patientable', 'doctor', 'clinic', 'insurance'])->paginate(10);
+        $appointments = $query->with(['patientable', 'doctor', 'medicalCenter', 'insurance'])->paginate(10);
 
         return response()->json([
             'success' => true,
@@ -319,7 +313,13 @@ class DrScheduleController extends Controller
     public function endVisit(Request $request, $id)
     {
         try {
-            $appointment = Appointment::findOrFail($id);
+            $doctor = $this->getAuthenticatedDoctor();
+            $medicalCenter = Auth::guard('medical_center')->user();
+
+            $appointment = Appointment::where('id', $id)
+                ->where('doctor_id', $doctor->id)
+                ->where('medical_center_id', $medicalCenter->id)
+                ->firstOrFail();
 
             $request->validate([
                 'description' => 'nullable|string|max:1000',
@@ -350,15 +350,19 @@ class DrScheduleController extends Controller
             abort(403, 'شما به این بخش دسترسی ندارید.');
         }
 
+        $medicalCenter = Auth::guard('medical_center')->user();
+        $medicalCenterId = $medicalCenter->id;
+
         $subUserIds = SubUser::where('owner_id', $doctor->id)
             ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_type', \App\Models\User::class)
             ->pluck('subuserable_id')
             ->toArray();
 
-        $appointments = Appointment::with(['patientable'])
+        $appointments = Appointment::with(['patientable', 'medicalCenter'])
             ->whereIn('patientable_id', $subUserIds)
             ->where('patientable_type', User::class)
+            ->where('medical_center_id', $medicalCenterId)
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
 

@@ -28,11 +28,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\HasSelectedDoctor;
 
 class AppointmentsList extends Component
 {
     use WithPagination;
-    use HasSelectedClinic;
+    use HasSelectedDoctor;
 
     public $isLoadingServices = false;
     public $isLoadingFinalPrice = false;
@@ -81,6 +82,9 @@ class AppointmentsList extends Component
     public $discountInputType = 'percentage';
     public $discountInputValue;
     public $showReport = false;
+    public $medicalCenter;
+    public $selectedDoctorId;
+    public $activeMedicalCenterId;
     #[Validate('required', message: 'لطفاً تاریخ شروع مسدودیت را وارد کنید.')]
     #[Validate('regex:/^(\d{4}-\d{2}-\d{2}|14\d{2}[-\/]\d{2}[-\/]\d{2})$/', message: 'تاریخ شروع مسدودیت باید به فرمت YYYY-MM-DD یا YYYY/MM/DD باشد.')]
     public $blockedAt;
@@ -122,6 +126,7 @@ class AppointmentsList extends Component
         'getAppointmentDetails' => 'getAppointmentDetails',
         'testAvailableTimes' => 'testAvailableTimes',
         'medicalCenterSelected' => 'handleMedicalCenterSelected',
+        'doctorSelected' => 'handleDoctorSelected',
     ];
     public $showNoResultsAlert = false;
     public $searchResults = [];
@@ -150,6 +155,39 @@ class AppointmentsList extends Component
         $this->dispatch('toggle-loading', isLoading: true);
 
         try {
+            // دریافت مرکز درمانی احراز هویت شده
+            $this->medicalCenter = Auth::guard('medical_center')->user();
+            if (!$this->medicalCenter) {
+                abort(403, 'دسترسی غیرمجاز');
+            }
+
+            $this->activeMedicalCenterId = $this->medicalCenter->id;
+
+            // دریافت پزشک انتخاب‌شده
+            $this->selectedDoctorId = $this->getSelectedDoctorId();
+
+            if (!$this->selectedDoctorId) {
+                // اگر پزشکی انتخاب نشده، اولین پزشک فعال را انتخاب کن
+                try {
+                    $activeDoctor = $this->medicalCenter->doctors()
+                        ->where('doctors.is_active', true)
+                        ->first();
+
+                    if ($activeDoctor) {
+                        $this->selectedDoctorId = $activeDoctor->id;
+                        // ذخیره پزشک انتخاب‌شده در دیتابیس
+                        $this->medicalCenter->setSelectedDoctor($activeDoctor->id);
+                    } else {
+                        // اگر هیچ پزشک فعالی وجود ندارد، پیام مناسب نمایش بده
+                        session()->flash('warning', 'هیچ پزشک فعالی در این مرکز درمانی وجود ندارد. لطفاً ابتدا یک پزشک اضافه کنید.');
+                        return;
+                    }
+                } catch (\Exception $e) {
+                    session()->flash('error', 'خطا در دریافت اطلاعات پزشکان: ' . $e->getMessage());
+                    return;
+                }
+            }
+
             // مقداردهی اولیه pagination با مقادیر پیش‌فرض
             $this->pagination = [
                 'current_page' => 1,
@@ -195,10 +233,6 @@ class AppointmentsList extends Component
             // لود داده‌های اولیه
             $doctor = $this->getAuthenticatedDoctor();
             if ($doctor) {
-                $this->selectedClinicId =
-               $this->getSelectedMedicalCenterId();
-
-
                 // پاک کردن کش‌های قبلی
                 Cache::forget("appointments_doctor_{$doctor->id}_*");
 
@@ -391,25 +425,23 @@ class AppointmentsList extends Component
     }
     private function getAuthenticatedDoctor()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
-            }
+        if (!$this->selectedDoctorId) {
+            return null;
         }
-        return $doctor;
+
+        return Doctor::find($this->selectedDoctorId);
     }
     private function loadClinics()
     {
-        $doctor = $this->getAuthenticatedDoctor();
-        if ($doctor) {
-            $this->clinics = $doctor->medicalCenters()
-                ->where('type', 'policlinic')
-                ->where('is_active', 1)
-                ->get()
-                ->toArray();
-        }
+        // در مراکز درمانی، کلینیک‌ها همان مرکز درمانی هستند
+        $this->clinics = [
+            [
+                'id' => $this->activeMedicalCenterId,
+                'name' => $this->medicalCenter->name,
+                'type' => 'policlinic',
+                'is_active' => 1
+            ]
+        ];
     }
 
     /**
@@ -422,11 +454,9 @@ class AppointmentsList extends Component
             return;
         }
 
-        $query = Appointment::with('patientable')
+        $query = Appointment::with('patientable', 'medicalCenter')
             ->where('doctor_id', $doctor->id)
-            ->when($this->selectedClinicId && $this->selectedClinicId !== 'default', function ($query) {
-                return $query->where('medical_center_id', $this->selectedClinicId);
-            });
+            ->where('medical_center_id', $this->activeMedicalCenterId);
 
         // بهینه‌سازی فیلتر تاریخ
         if ($this->filterStatus === 'manual') {
@@ -1284,12 +1314,17 @@ class AppointmentsList extends Component
     }
     public function loadInsurances()
     {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $cacheKey = "insurances_doctor_{$doctorId}_clinic_{$this->selectedClinicId}";
-        $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            $this->insurances = [];
+            return;
+        }
+
+        $cacheKey = "insurances_doctor_{$doctor->id}_medical_center_{$this->activeMedicalCenterId}";
+        $this->insurances = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctor) {
             return DoctorService::select('insurance_id')
-                ->where('doctor_id', $doctorId)
-                ->where('medical_center_id', $this->selectedClinicId === 'default' ? null : $this->selectedClinicId)
+                ->where('doctor_id', $doctor->id)
+                ->where('medical_center_id', $this->activeMedicalCenterId)
                 ->distinct()
                 ->with('insurance')
                 ->cursor() // استفاده از Lazy Loading با cursor
@@ -1313,17 +1348,20 @@ class AppointmentsList extends Component
             $this->dispatch('services-updated');
             return;
         }
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $cacheKey = "services_doctor_{$doctorId}_clinic_{$this->selectedClinicId}_insurance_{$this->selectedInsuranceId}";
-        $this->services = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctorId) {
-            $query = DoctorService::where('doctor_id', $doctorId)
-                ->where('insurance_id', $this->selectedInsuranceId);
-            if ($this->selectedClinicId === 'default') {
-                $query->whereNull('medical_center_id');
-            } else {
-                $query->where('medical_center_id', $this->selectedClinicId);
-            }
-            return $query->cursor()->toArray(); // استفاده از Lazy Loading با cursor
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            $this->services = [];
+            $this->isLoadingServices = false;
+            $this->dispatch('services-updated');
+            return;
+        }
+
+        $cacheKey = "services_doctor_{$doctor->id}_medical_center_{$this->activeMedicalCenterId}_insurance_{$this->selectedInsuranceId}";
+        $this->services = Cache::remember($cacheKey, now()->addMinutes(20), function () use ($doctor) {
+            return DoctorService::where('doctor_id', $doctor->id)
+                ->where('medical_center_id', $this->activeMedicalCenterId)
+                ->where('insurance_id', $this->selectedInsuranceId)
+                ->cursor()->toArray(); // استفاده از Lazy Loading با cursor
         });
         $this->isLoadingServices = false;
         $this->dispatch('services-updated');
@@ -1708,11 +1746,15 @@ class AppointmentsList extends Component
     }
     private function loadBlockedUsers()
     {
-        $doctorId = $this->getAuthenticatedDoctor()->id;
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            $this->blockedUsers = [];
+            return;
+        }
+
         $this->blockedUsers = UserBlocking::with('user')
-            ->where('doctor_id', $doctorId)
-            ->where('medical_center_id', $clinicId)
+            ->where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $this->activeMedicalCenterId)
             ->get()->toArray();
     }
     private function loadMessages()
@@ -1782,6 +1824,38 @@ class AppointmentsList extends Component
         // نمایش پیام به کاربر
         $this->dispatch('show-toastr', type: 'info', message: 'مرکز درمانی تغییر کرد. اطلاعات در حال بروزرسانی...');
     }
+
+    #[On('doctorSelected')]
+    public function handleDoctorSelected($data)
+    {
+        $doctorId = $data['doctorId'] ?? null;
+
+        // بروزرسانی پزشک انتخاب‌شده
+        $this->selectedDoctorId = $doctorId;
+
+        if ($doctorId) {
+            // پاک کردن کش‌های قبلی
+            Cache::forget("appointments_doctor_{$doctorId}_*");
+
+            // بارگذاری مجدد داده‌ها
+            $this->loadClinics();
+            $this->loadBlockedUsers();
+            $this->loadMessages();
+            $this->loadInsurances();
+            $this->loadAppointments();
+            $this->loadCalendarData();
+        } else {
+            // اگر پزشکی انتخاب نشده، داده‌ها را پاک کن
+            $this->appointments = [];
+            $this->clinics = [];
+            $this->blockedUsers = [];
+            $this->messages = [];
+            $this->insurances = [];
+        }
+
+        // ارسال رویداد رفرش
+        $this->dispatch('refresh-clinic-data');
+    }
     public function blockMultipleUsers()
     {
         try {
@@ -1837,8 +1911,15 @@ class AppointmentsList extends Component
                 $this->dispatch('showModal', 'block-user-modal');
                 return;
             }
-            $doctorId = $this->getAuthenticatedDoctor()->id;
-            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+            $doctor = $this->getAuthenticatedDoctor();
+            if (!$doctor) {
+                $this->dispatch('show-toastr', [
+                    'type' => 'error',
+                    'message' => 'پزشک انتخاب‌شده یافت نشد.',
+                ]);
+                return;
+            }
+
             $blockedAt = $this->processDate($this->blockedAt, 'شروع مسدودیت');
             $unblockedAt = $this->unblockedAt ? $this->processDate($this->unblockedAt, 'پایان مسدودیت') : null;
             $blockedUsers = [];
@@ -1849,8 +1930,8 @@ class AppointmentsList extends Component
                     continue;
                 }
                 $isBlocked = UserBlocking::where('user_id', $user->id)
-                    ->where('doctor_id', $doctorId)
-                    ->where('medical_center_id', $clinicId)
+                    ->where('doctor_id', $doctor->id)
+                    ->where('medical_center_id', $this->activeMedicalCenterId)
                     ->where('status', 1)
                     ->exists();
                 if ($isBlocked) {
@@ -1859,8 +1940,8 @@ class AppointmentsList extends Component
                 }
                 $blockingUser = UserBlocking::create([
                     'user_id' => $user->id,
-                    'doctor_id' => $doctorId,
-                    'medical_center_id' => $clinicId,
+                    'doctor_id' => $doctor->id,
+                    'medical_center_id' => $this->activeMedicalCenterId,
                     'blocked_at' => $blockedAt,
                     'unblocked_at' => $unblockedAt,
                     'reason' => $this->blockReason,
