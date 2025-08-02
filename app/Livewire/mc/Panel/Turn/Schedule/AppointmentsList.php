@@ -2792,7 +2792,14 @@ class AppointmentsList extends Component
     private function getWorkSchedule($date)
     {
         $doctor = $this->getAuthenticatedDoctor();
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+        // For medical_center guard, use activeMedicalCenterId
+        $clinicId = null;
+        if (Auth::guard('medical_center')->check()) {
+            $clinicId = $this->activeMedicalCenterId;
+        } else {
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        }
 
         // First check for special schedule
         $specialSchedule = DB::table('special_daily_schedules')
@@ -2843,7 +2850,15 @@ class AppointmentsList extends Component
         if (!$doctor) {
             return [];
         }
-        $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+
+        // For medical_center guard, use activeMedicalCenterId
+        $clinicId = null;
+        if (Auth::guard('medical_center')->check()) {
+            $clinicId = $this->activeMedicalCenterId;
+        } else {
+            $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
+        }
+
         return Appointment::where('doctor_id', $doctor->id)
             ->whereDate('appointment_date', $date)
             ->where('status', '!=', 'cancelled')

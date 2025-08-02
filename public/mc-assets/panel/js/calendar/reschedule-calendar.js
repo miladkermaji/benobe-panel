@@ -195,7 +195,7 @@ function initializeRescheduleCalendar(appointmentId = null) {
 
             if (response.status) {
                 const appointments = response.data || [];
-                
+
                 // استفاده از تعطیلات از پاسخ API
                 let holidays = [];
                 if (response.holidays && Array.isArray(response.holidays)) {
@@ -1013,10 +1013,7 @@ document.addEventListener("livewire:initialized", () => {
     });
 
     // Add Livewire event listeners
-    Livewire.on("available-times-updated", (event) => {
-        const times = event.times || [];
-        updateAvailableTimes(times);
-    });
+    // Removed available-times-updated listener to avoid conflicts with appointments-list
 
     Livewire.on("appointment-details-received", (event) => {
         console.log("Received appointment details:", event);
