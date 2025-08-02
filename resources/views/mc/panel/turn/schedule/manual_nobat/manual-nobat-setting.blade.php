@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/turn/schedule/manual_nobat/manual_nobat_setting.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/turn/schedule/manual_nobat/manual_nobat_setting.css') }}"
     rel="stylesheet" />
 
 @endsection
@@ -10,7 +10,7 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', ' تنظیمات نوبت دستی')
-@include('dr.panel.my-tools.loader-btn')
+@include('mc.panel.my-tools.loader-btn')
 <div class="manual-nobat-content w-100 d-flex justify-content-center mt-3">
   <div class="manual-nobat-content-wrapper">
     <div class="main-content">
@@ -92,9 +92,9 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl =

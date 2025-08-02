@@ -1,11 +1,5 @@
-{{-- resources\views\dr\panel\my-tools\workhours.blade.php --}}
+{{-- resources\views\mc\panel\my-tools\workhours.blade.php --}}
 <script>
-
-
-
-
-
-
   (function() {
     let supportsPassive = false;
     try {
@@ -257,7 +251,7 @@
 
   function reloadDayData(day) {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule') }}",
+      url: "{{ route('mc-get-work-schedule') }}",
       method: 'GET',
       data: {
 
@@ -368,7 +362,7 @@
   // تابع بارگذاری برنامه کاری‌ها
   function loadDaySlots(day, callback) {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule') }}",
+      url: "{{ route('mc-get-work-schedule') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -729,7 +723,7 @@
   // استفاده از کش
   $(document).ready(function() {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule') }}",
+      url: "{{ route('mc-get-work-schedule') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -1050,7 +1044,7 @@
     });
 
     return $.ajax({ // Return the promise
-      url: "{{ route('dr-save-work-schedule') }}",
+      url: "{{ route('mc-save-work-schedule') }}",
       method: 'POST',
       data: JSON.stringify(data),
       contentType: 'application/json',
@@ -1243,7 +1237,7 @@
 
   function loadAllWorkhours() {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule') }}",
+      url: "{{ route('mc-get-work-schedule') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')

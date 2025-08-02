@@ -1,7 +1,7 @@
-@extends('dr.panel.doctors-clinic.layouts.master')
+@extends('mc.panel.doctors-clinic.layouts.master')
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/clinic/cost/cost.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clininc/activation/index.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clininc/clinic/cost/cost.css') }}">
 @endsection
 
 
@@ -183,7 +183,7 @@
                         <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
                             <span>${displayText}</span>
                             <button type="button" class="btn btn-light btn-sm" onclick="deleteDeposit(${item.id})">
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                             </button>
                         </div>
                     `;

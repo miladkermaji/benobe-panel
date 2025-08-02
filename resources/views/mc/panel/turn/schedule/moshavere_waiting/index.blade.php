@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
 
 
 @endsection
@@ -10,18 +10,18 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', 'لیست نوبت های مشاوره')
-@livewire('dr.panel.turn.schedule.counseling-appointments-list')
+@livewire('mc.panel.turn.schedule.counseling-appointments-list')
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 @once
-  <script src="{{ asset('dr-assets/panel/js/calendar/counseling-reschedule-calendar.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/calendar/counseling-reschedule-calendar.js') }}"></script>
 
 @endonce
 @once
-<script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar-row-counseling.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/calendar/custm-calendar-row-counseling.js') }}"></script>
 
-  <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/calendar/custm-calendar.js') }}"></script>
 @endonce
 
 <script>

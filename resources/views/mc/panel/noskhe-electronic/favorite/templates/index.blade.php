@@ -1,11 +1,11 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/noskhe-electronic/prescription/prescription.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/noskhe-electronic/prescription/prescription.css') }}"
     rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/noskhe-electronic/providers/providers.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/noskhe-electronic/providers/providers.css') }}"
     rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/noskhe-electronic/favorite/templates/index.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/noskhe-electronic/favorite/templates/index.css') }}"
     rel="stylesheet" />
 @endsection
 @section('site-header')
@@ -60,11 +60,11 @@
   </div>
 @endsection
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/noskhe-electronic/prescription/prescription.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/noskhe-electronic/providers/providers.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/noskhe-electronic/favorite/templates/index.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/noskhe-electronic/prescription/prescription.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/noskhe-electronic/providers/providers.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/noskhe-electronic/favorite/templates/index.js') }}"></script>
   <script>
     var appointmentsSearchUrl = "{{ route('search.appointments') }}";
     var updateStatusAppointmentUrl =

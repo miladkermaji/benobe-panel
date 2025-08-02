@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
 
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/vacation.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/scheduleSetting/vacation.css') }}"
     rel="stylesheet" />
 @endsection
 @section('site-header')
@@ -10,7 +10,7 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', ' اعلام مرخصی')
-@include('dr.panel.my-tools.loader-btn')
+@include('mc.panel.my-tools.loader-btn')
 <div class="vacation-content w-100 d-flex justify-content-center mt-4">
   <div class="vacation-wrapper-content p-3">
     <div class="">
@@ -147,13 +147,13 @@
           <div class="d-flex justify-content-between gap-4 mt-3">
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">از ساعت:</label>
-              <input data-timepicker id="edit-start-time" type="text" name="start_time" class="form-control w-100 h-50"
-                style="width: 100% !important">
+              <input data-timepicker id="edit-start-time" type="text" name="start_time"
+                class="form-control w-100 h-50" style="width: 100% !important">
             </div>
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">تا ساعت:</label>
-              <input data-timepicker id="edit-end-time" type="text" name="end_time" class="form-control w-100 h-50"
-                style="width: 100% !important">
+              <input data-timepicker id="edit-end-time" type="text" name="end_time"
+                class="form-control w-100 h-50" style="width: 100% !important">
             </div>
           </div>
           <div class="form-check mt-3">
@@ -175,17 +175,17 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
   $(document).ready(function() {
-   
+
 
     const now = new Date();
     const jalaliMoment = moment(now).locale('fa');
@@ -212,7 +212,7 @@
     };
 
     $.ajax({
-      url: "{{ route('dr-vacation') }}",
+      url: "{{ route('mc-vacation') }}",
       method: "GET",
       data: data,
       success: function(response) {

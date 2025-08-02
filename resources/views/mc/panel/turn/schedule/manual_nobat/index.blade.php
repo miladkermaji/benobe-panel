@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/appointments.css') }}" rel="stylesheet" />
 
 
 @endsection
@@ -10,10 +10,10 @@
 @endsection
 @section('content')
 @section('bread-crumb-title', 'لیست نوبت ها')
-@livewire('dr.panel.turn.schedule.manual-nobat-list')
+@livewire('mc.panel.turn.schedule.manual-nobat-list')
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 
 
 <script>

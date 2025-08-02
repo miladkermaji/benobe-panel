@@ -1,7 +1,7 @@
-@extends('dr.panel.doctors-clinic.layouts.master')
+@extends('mc.panel.doctors-clinic.layouts.master')
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/activation/workhours/workhours.css') }}">
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clinic/activation/workhours/workhours.css') }}">
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
 @endsection
 
@@ -57,7 +57,7 @@
       </div>
     </div>
   </div>
-  @livewire('dr.panel.work-hours', ['clinicId' => $clinicId])
+  @livewire('mc.panel.work-hours', ['clinicId' => $clinicId])
 @endsection
 
 

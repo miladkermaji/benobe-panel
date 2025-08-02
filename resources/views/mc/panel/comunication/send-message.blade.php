@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/comunication/send-message/send-message.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/comunication/send-message/send-message.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -11,7 +11,7 @@
 
 @section('content')
 @section('bread-crumb-title', 'ارسال پیام')
-@include('dr.panel.my-tools.loader-btn')
+@include('mc.panel.my-tools.loader-btn')
 
 <div class="blocking_users_content">
   <div class="container-fluid mt-4">
@@ -27,7 +27,7 @@
               ارسال پیام جدید
             </button>
             <button id="delete-multiple" class="btn btn-danger h-50">حذف انتخاب شده ها<img
-                src="{{ asset('dr-assets/icons/trash.svg') }}" alt=""></button>
+                src="{{ asset('mc-assets/icons/trash.svg') }}" alt=""></button>
           </div>
           <div class="table-responsive">
             <table id="messagesTable" class="table  table-hover align-middle text-center">
@@ -64,7 +64,7 @@
                     <td>
                       <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
                         onclick="deleteMessage({{ $message->id }}, this)" aria-label="حذف پیام">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                     </td>
                   </tr>
@@ -128,7 +128,7 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   function deleteMessage(messageId, element) {
     Swal.fire({
@@ -306,7 +306,7 @@
                 <td>${recipientText}</td>
                 <td>
                   <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
-                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                    <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                   </button>
                 </td>
               </tr>

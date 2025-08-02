@@ -1,9 +1,9 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
 
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
 
 @endsection
 
@@ -56,11 +56,11 @@
                     </td>
                     <td>
                       <button class="btn btn-light rounded-circle btn-sm  delete-btn" data-id="{{ $ticket->id }}">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
-                      <button onclick="location.href='{{ route('dr-panel-tickets.show', $ticket->id) }}'"
+                      <button onclick="location.href='{{ route('mc-panel-tickets.show', $ticket->id) }}'"
                         class="btn btn-light rounded-circle btn-sm  view-btn" data-id="{{ $ticket->id }}">
-                        <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="مشاهده">
+                        <img src="{{ asset('mc-assets/icons/eye.svg') }}" alt="مشاهده">
                       </button>
                     </td>
                   </tr>
@@ -115,14 +115,14 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
 </script>
 <script>
-$(document).ready(function() {
+  $(document).ready(function() {
     // مدیریت بستن مودال
     $('#add-ticket-modal').on('hidden.bs.modal', function() {
       $('body').removeClass('modal-open');
@@ -167,7 +167,7 @@ $(document).ready(function() {
       form.find('.form-group').removeClass('has-error');
 
       $.ajax({
-        url: "{{ route('dr-panel-tickets.store') }}",
+        url: "{{ route('mc-panel-tickets.store') }}",
         method: 'POST',
         data: form.serialize(),
         headers: {
@@ -235,7 +235,7 @@ $(document).ready(function() {
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-panel-tickets.destroy', ':id') }}".replace(':id', id),
+            url: "{{ route('mc-panel-tickets.destroy', ':id') }}".replace(':id', id),
             method: 'DELETE',
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -280,11 +280,11 @@ $(document).ready(function() {
               <td>${statusBadge}</td>
               <td>
                 <button class="btn btn-light rounded-circle btn-sm  delete-btn" data-id="${ticket.id}">
-                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                  <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
                 <button onclick="window.location.href='${getShowRoute(ticket.id)}'"
                   class="btn btn-light rounded-circle btn-sm  view-btn">
-                  <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="مشاهده">
+                  <img src="{{ asset('mc-assets/icons/eye.svg') }}" alt="مشاهده">
                 </button>
               </td>
             </tr>`;
@@ -294,7 +294,7 @@ $(document).ready(function() {
     }
 
     function getShowRoute(ticketId) {
-      return "{{ route('dr-panel-tickets.show', ':id') }}".replace(':id', ticketId);
+      return "{{ route('mc-panel-tickets.show', ':id') }}".replace(':id', ticketId);
     }
   });
 </script>

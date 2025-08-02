@@ -1,7 +1,7 @@
-@extends('dr.panel.doctors-clinic.layouts.master')
+@extends('mc.panel.doctors-clinic.layouts.master')
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/leaflet/leaflet.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clininc/activation/index.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/leaflet/leaflet.css') }}">
 @endsection
 
 
@@ -10,7 +10,7 @@
 @endsection
 
 @section('backUrl')
-  {{ route('dr-panel') }}
+  {{ route('mc-panel') }}
 @endsection
 @section('content')
   <div class="d-flex w-100 justify-content-center align-items-center flex-column">
@@ -158,8 +158,8 @@
 
 
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/js/leaflet/leaflet.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/leaflet/leaflet-control-geocoder/dist/Control.Geocoder.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/leaflet/leaflet.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/leaflet/leaflet-control-geocoder/dist/Control.Geocoder.js') }}"></script>
 
   <script>
     const clinicId = {{ $clinic->id }};
@@ -173,7 +173,7 @@
       const trashIcon = showTrashIcon ?
         `<div class="input-group-append">
                 <button class="btn btn-danger" type="button" onclick="deletePhone(${phoneCount}, ${index})">
-                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                    <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
            </div>` :
         ''; // عدم نمایش آیکون حذف
@@ -391,7 +391,7 @@
             <input type="text" class="form-control h-50 border-radius-4" id="clinicPhone${phoneCount}" placeholder="شماره تلفن مطب ${phoneCount}">
             <div class="input-group-append">
               <button class="btn btn-danger" type="button" onclick="removePhone(${phoneCount})" id="removeButton${phoneCount}">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="">
   </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/my-appointments.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/my-appointments.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -26,7 +26,7 @@
               <div class="d-flex align-items-center">
                 <div>
                   <img width="70" height="70" alt="avatar" class="prof-img rounded-circle bg-light"
-                    src="{{ asset('dr-assets/panel/img/pro.jpg') }}">
+                    src="{{ asset('mc-assets/panel/img/pro.jpg') }}">
                 </div>
                 <div class="mx-2">
                   <h6 class="d-block fw-bold"> {{ $appointment->doctor->first_name }}
@@ -52,20 +52,20 @@
               </span>
               <span class="mx-2 btn-details">
                 <img class="btn-show-details cursor-pointer"
-                  src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" alt="جزئیات">
+                  src="{{ asset('mc-assets/icons/dots-vertical-svgrepo-com.svg') }}" alt="جزئیات">
               </span>
               <div class="drop-side-details-content d-none">
                 <div class="d-flex flex-column p-2">
                   <a href="https://emr-benobe.ir/profile/doctor/{{ $appointment->doctor->slug }}" target="_blank"
                     rel="noreferrer" class="dropdown-item d-flex align-items-center p-2 cursor-pointer space-s-2">
-                    <img class="btn-show-details" src="{{ asset('dr-assets/icons/qabz.svg') }}" alt="قبض">
+                    <img class="btn-show-details" src="{{ asset('mc-assets/icons/qabz.svg') }}" alt="قبض">
                     <span class="text-sm font-medium">قبض نوبت</span>
                   </a>
                   <div class="dropdown-item d-flex align-items-center p-2 cursor-pointer space-s-2 share-appointment"
                     data-share-url="https://emr-benobe.ir/profile/doctor/{{ $appointment->doctor->slug }}"
                     data-share-title="نوبت پزشکی با {{ $appointment->doctor->first_name }} {{ $appointment->doctor->last_name }}"
                     data-share-text="جزئیات نوبت من در به نوبه">
-                    <img class="btn-show-details" src="{{ asset('dr-assets/icons/share.svg') }}" alt="اشتراک">
+                    <img class="btn-show-details" src="{{ asset('mc-assets/icons/share.svg') }}" alt="اشتراک">
                     <span class="text-sm font-medium">اشتراک‌گذاری</span>
                   </div>
                 </div>
@@ -108,7 +108,7 @@
         <div class="d-flex">
           <a href="#" rel="noreferrer" class="d-flex align-items-center w-100 p-3 px-0">
             <div class="d-flex align-items-center justify-content-center w-12">
-              <img class="btn-show-details" src="{{ asset('dr-assets/icons/location.svg') }}" alt="موقعیت">
+              <img class="btn-show-details" src="{{ asset('mc-assets/icons/location.svg') }}" alt="موقعیت">
             </div>
             <span class="text-sm line-clamp-2" data-testid="location__address">
               {{ $appointment->doctor->city->name ?? 'نامشخص' }}،
@@ -122,7 +122,7 @@
             <a href="https://emr-benobe.ir/profile/doctor/{{ $appointment->doctor->slug }}" target="_blank"
               rel="noreferrer" class="d-flex align-items-center text-info">
               <span class="text-sm fw-bold ml-2 text-info mx-2">ثبت نظر</span>
-              <img class="btn-show-details" src="{{ asset('dr-assets/icons/caret-left.svg') }}" alt="ثبت نظر">
+              <img class="btn-show-details" src="{{ asset('mc-assets/icons/caret-left.svg') }}" alt="ثبت نظر">
             </a>
           </div>
         </div>
@@ -151,8 +151,8 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
@@ -258,19 +258,19 @@
         const shareOptions = `
           <div class="share-options p-3">
             <a href="https://telegram.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}" target="_blank" class="share-option d-flex align-items-center p-2">
-              <img src="{{ asset('dr-assets/icons/telegram.svg') }}" alt="تلگرام" class="me-2" style="width: 24px;">
+              <img src="{{ asset('mc-assets/icons/telegram.svg') }}" alt="تلگرام" class="me-2" style="width: 24px;">
               <span>تلگرام</span>
             </a>
             <a href="https://api.whatsapp.com/send?text=${encodeURIComponent(shareText + ' ' + shareUrl)}" target="_blank" class="share-option d-flex align-items-center p-2">
-              <img src="{{ asset('dr-assets/icons/whatsapp-svgrepo-com.svg') }}" alt="واتساپ" class="me-2" style="width: 24px;">
+              <img src="{{ asset('mc-assets/icons/whatsapp-svgrepo-com.svg') }}" alt="واتساپ" class="me-2" style="width: 24px;">
               <span>واتساپ</span>
             </a>
             <a href="mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareText + ' ' + shareUrl)}" class="share-option d-flex align-items-center p-2">
-              <img src="{{ asset('dr-assets/icons/email.svg') }}" alt="ایمیل" class="me-2" style="width: 24px;">
+              <img src="{{ asset('mc-assets/icons/email.svg') }}" alt="ایمیل" class="me-2" style="width: 24px;">
               <span>ایمیل</span>
             </a>
             <div class="share-option d-flex align-items-center p-2 cursor-pointer copy-link" data-url="${shareUrl}">
-              <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی" class="me-2" style="width: 24px;">
+              <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی" class="me-2" style="width: 24px;">
               <span>کپی لینک</span>
             </div>
           </div>

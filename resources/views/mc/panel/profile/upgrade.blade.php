@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/upgrade.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/profile/upgrade.css') }}" rel="stylesheet" />
 
 @endsection
 
@@ -93,7 +93,7 @@
                 <td>{{ $payment->days }}</td>
                 <td>
                   <button class="btn  rounded-circle btn-sm delete-payment" data-id="{{ $payment->id }}">
-                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="">
+                    <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="">
                   </button>
                 </td>
               </tr>
@@ -116,10 +116,10 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/bime/bime.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/bime/bime.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
@@ -147,7 +147,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-payment-delete', ':id') }}".replace(':id', paymentId),
+            url: "{{ route('mc-payment-delete', ':id') }}".replace(':id', paymentId),
             type: 'DELETE',
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

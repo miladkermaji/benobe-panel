@@ -1,9 +1,9 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/my-performance/my-performance.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/my-performance/my-performance.css') }}" rel="stylesheet" />
   <style>
   </style>
 @endsection
@@ -41,10 +41,10 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
-<script src="{{ asset('dr-assets/js/select2/select2.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+<script src="{{ asset('mc-assets/js/select2/select2.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
 
@@ -68,7 +68,7 @@
 
   function loadPerformanceData() {
     $.ajax({
-      url: "{{ route('dr-my-performance-data') }}",
+      url: "{{ route('mc-my-performance-data') }}",
       type: 'GET',
       success: function(response) {
         // پر کردن هدر
@@ -85,7 +85,7 @@
             content: `
               تنظیم صحیح شهر و استان محل طبابت، منجر به افزایش اولویت نمایش شما به بیماران آن شهر می‌شود.
               <br>
-              <a href="{{ route('dr-edit-profile') }}" class="mt-2 text-primary fw-bold">
+              <a href="{{ route('mc-edit-profile') }}" class="mt-2 text-primary fw-bold">
                 برای مشاهده و اصلاح شهر محل طبابت خود کلیک کنید.
               </a>
             `
@@ -126,7 +126,7 @@
               ساعاتی که برای ویزیت آنلاین خود انتخاب می‌کنید فوق‌العاده در شانس شما برای دیده شدن اهمیت دارند.<br>
               در این مورد، معیار موتور جستجوی به نوبه آنلاین بودن شما در همان لحظه جستجوی بیمار است.<br>
               نکته: اگر به‌تازگی حساب خود در به نوبه را باز کرده‌اید، پیشنهاد می‌کنیم علاوه بر ساعات شلوغ، در ساعات کم‌ترافیک که معمولاً پزشکان آنلاین کمتری هستند هم آنلاین باشید (مثل نیمه‌شب، صبح زود و روزهای تعطیل). این ساعات کم رقابت فرصت رشد شما را در به نوبه فراهم خواهند کرد.<br>
-              <a href="{{ route('dr-workhours') }}" class="mt-3 fw-bold text-primary">
+              <a href="{{ route('mc-workhours') }}" class="mt-3 fw-bold text-primary">
                 برای تنظیم ساعات کاری ویزیت (حضوری و آنلاین) خود کلیک کنید.
               </a>
             `
@@ -140,7 +140,7 @@
               نوبت‌های حضوری شما برای امروز تعریف شده‌اند. این امر برای جذب بیماران بسیار مؤثر است.<br>
               تعریف نوبت‌های حضوری نزدیک‌تر می‌تواند تأثیر قابل‌توجهی در جذب بیماران داشته باشد.<br>
               مثلاً اگر نوبت دهی عصر شنبه شما در سایت فعال بوده و زمان نوبت خالی در آن دارید، برای بیماری که عصر شنبه به دنبال دکتر می‌گردد، شما اولویت بالاتری نسبت به سایر پزشکانی که نوبتشان در این روز فعال نیست دارید.<br>
-              <a href="{{ route('dr-workhours') }}" class="mt-3 fw-bold text-primary">
+              <a href="{{ route('mc-workhours') }}" class="mt-3 fw-bold text-primary">
                 برای تنظیم ساعات کاری ویزیت حضوری خود کلیک کنید.
               </a>
             `
@@ -151,7 +151,7 @@
             content: `
               آدرس واضح و کاملی که بیمار بدون پرس و جو بتواند به مرکز درمانی شما هدایت شود ثبت کنید.<br>
               آدرس کامل و دقیق بدون شماره تلفن ثبت کنید.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="text-primary fw-bold mt-2">
+              <a href="{{ route('mc-edit-profile') }}" class="text-primary fw-bold mt-2">
                 برای مشاهده و اصلاح پروفایل خود کلیک کنید.
               </a>
             `
@@ -169,7 +169,7 @@
             title: 'اطمینان از صحت تلفن مطب',
             content: `
               بخش تلفن مطب در صفحه خود را بازبینی کنید و مطمئن شوید که فرمت صحیحی نوشته شده و بیمار با کلیک روی آن، می‌تواند با مطب تماس بگیرد.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="fw-bold text-primary mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="fw-bold text-primary mt-3">
                 از شماره‌های صحیح استفاده کنید. برای مشاهده و اصلاح پروفایل خود کلیک کنید.
               </a>
             `
@@ -198,7 +198,7 @@
               درجه علمی و تخصص‌هایی که برای خود تنظیم کرده‌اید چیست؟<br>
               دسته‌بندی شما در نتایج جستجو، بر اساس درجه علمی و تخصص انتخابی شماست.<br>
               دقت کنید که در اینجا منظور عنوان مستعار تخصص نیست.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="text-primary fw-bold mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="text-primary fw-bold mt-3">
                 برای اصلاح پروفایل خود کلیک کنید.
               </a>
             `
@@ -217,7 +217,7 @@
             content: `
               معمولاً درمانگران، آخرین مدرک تحصیلی خود را ثبت می‌کنند. ولی این فرصت را دارید تا درجه علمی و تخصص‌های پایین‌تر را هم ثبت کنید.<br>
               مثلاً کاردانی، کارشناسی، پزشک عمومی و تخصص به همراه عنوان مستعار مرتبط با آن‌ها. این موضوع به بیمارانی که آن تخصص‌ها را جستجو می‌کنند کمک می‌کند تا شما راحت‌تر پیدا کنند.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="fw-bold text-primary mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="fw-bold text-primary mt-3">
                 برای اصلاح تخصص خود در بخش پروفایل کلیک کنید.
               </a>
             `
@@ -228,7 +228,7 @@
             content: `
               برای عنوان مستعار تخصص، ابتدا بالاترین درجه علمی را بگذارید.<br>
               از کلمات پرتکرار مرتبط با رشته خودتان هم می‌توانید استفاده کنید.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="fw-bold text-primary mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="fw-bold text-primary mt-3">
                 برای اصلاح تخصص خود در بخش پروفایل کلیک کنید.
               </a>
             `
@@ -264,7 +264,7 @@
             content: `
               تصویر مناسبی برای پروفایل خود انتخاب کنید.<br>
               این تصویر اولین مواجهه بیمار با صفحه شماست و در جلب اعتماد وی تاثیر دارد. توصیه می‌کنیم عکس واضح با رزولوشن مناسب و تمام‌رخ انتخاب کنید.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="fw-bold text-primary mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="fw-bold text-primary mt-3">
                 برای اصلاح تصویر در بخش پروفایل خود کلیک کنید.
               </a>
             `
@@ -295,7 +295,7 @@
               راهگشا بودن متن بیوگرافی برای بیماران، اهمیت دارد.<br>
               پیشنهاد می‌کنیم پاسخ ابهام‌های کلی و سوالات پرتکرار بیماران بازدیدکننده از صفحه خود را ثبت کنید.<br>
               لیست و هزینه خدمات درمانی حضوری خود را ثبت کنید.<br>
-              <a href="{{ route('dr-edit-profile') }}" class="fw-bold text-primary mt-3">
+              <a href="{{ route('mc-edit-profile') }}" class="fw-bold text-primary mt-3">
                 برای مشاهده و اصلاح بیوگرافی خود در پروفایل کلیک کنید.
               </a>
             `
@@ -372,13 +372,13 @@
             <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-12">
               <div class="d-flex justify-content-between align-items-center personal-data-clicked">
                 <div>
-                  <img src="{{ asset('dr-assets/icons') }}/${card.icon}.svg" alt="">
+                  <img src="{{ asset('mc-assets/icons') }}/${card.icon}.svg" alt="">
                   <span class="txt-card-span mx-1 fw-bold text-dark">
                     ${card.title}
                   </span>
                 </div>
                 <div>
-                  <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
+                  <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="">
                 </div>
               </div>
               <div class="drop-toggle-styles personal-data-drop-toggle">

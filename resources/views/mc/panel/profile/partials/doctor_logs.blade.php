@@ -24,7 +24,7 @@
           <td>{{ $log->device }}</td>
           <td>
             <button class="btn btn-light btn-sm delete-log" data-id="{{ $log->id }}">
-              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+              <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
             </button>
           </td>
         </tr>

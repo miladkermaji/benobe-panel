@@ -139,7 +139,7 @@
         <td class="text-center">
             <div class="dropdown d-inline-block position-relative">
                 <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                    <img src="{{ asset('mc-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                     <li class=" ${
@@ -247,7 +247,7 @@
         <td class="text-center">
             <div class="dropdown d-inline-block position-relative">
                 <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                    <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                    <img src="{{ asset('mc-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                     <li class=" ${
@@ -444,7 +444,7 @@
                             <td class="text-center">
                                 <div class="dropdown d-inline-block position-relative">
                                     <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                        <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                                        <img src="{{ asset('mc-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                                     </button>
                                     
                                     <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
@@ -1697,7 +1697,7 @@
                                 <td class="text-center">
                                     <div class="dropdown d-inline-block position-relative">
                                         <button class="btn btn-light p-1 btn-sm dropdown-toggle custom-dropdown-trigger" type="button">
-                                            <img src="{{ asset('dr-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
+                                            <img src="{{ asset('mc-assets/icons/dots-vertical-svgrepo-com.svg') }}" width="20" height="20">
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end my-drp-left-0">
                                             <li class="${

@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-  @include('dr.panel.doctors-clinic.layouts.partials.head-tags')
+  @include('mc.panel.doctors-clinic.layouts.partials.head-tags')
   @yield('styles')
   <title>
     @if (Auth::guard('doctor')->check())
@@ -14,14 +14,14 @@
     @endif
   </title>
 
-  @include('dr.panel.my-tools.loader-btn')
+  @include('mc.panel.my-tools.loader-btn')
   @livewireStyles
 </head>
 
 <body>
   <div class="">
     <x-global-loader />
-    @include('dr.panel.doctors-clinic.layouts.partials.header')
+    @include('mc.panel.doctors-clinic.layouts.partials.header')
     @yield('content')
   </div>
 
@@ -47,7 +47,7 @@
 
   </script>
 
-  @include('dr.panel.doctors-clinic.layouts.partials.scripts')
+  @include('mc.panel.doctors-clinic.layouts.partials.scripts')
   @yield('scripts')
 
   <!-- سایر اسکریپت‌ها -->

@@ -9,7 +9,7 @@
       پنل دکتر | به نوبه
     @elseif (Auth::guard('secretary')->check())
       پنل منشی | به نوبه
-      @elseif (Auth::guard('medical_center')->check())
+    @elseif (Auth::guard('medical_center')->check())
       پنل مراکز درمانی | به نوبه
     @else
       به نوبه
@@ -50,7 +50,7 @@
 
   @include('mc.panel.layouts.partials.scripts')
   @yield('scripts')
-   {{-- @networkStatus --}}
+  {{-- @networkStatus --}}
   <!-- سایر اسکریپت‌ها -->
   <script>
     Livewire.on('navigateTo', (event) => {
@@ -100,7 +100,7 @@
       }
     });
   </script>
-<script src="{{ asset('dr-assets/panel/js/clinic-selector.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/clinic-selector.js') }}"></script>
 
 </body>
 

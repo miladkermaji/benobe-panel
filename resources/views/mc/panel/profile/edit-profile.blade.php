@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
 
 
   <style>
@@ -35,7 +35,7 @@
       <div class="d-flex justify-content-between w-100 font-size-13">
         <div class="d-flex align-items-start">
           <div>
-            <img src="{{ asset('dr-assets/panel/img/pro.jpg') }}" class="avatar___img-main">
+            <img src="{{ asset('mc-assets/panel/img/pro.jpg') }}" class="avatar___img-main">
           </div>
           <div class="mx-2 mt-3">
             <span class="d-block fw-bold font-size-15 profile-header-name text-dark">
@@ -52,7 +52,7 @@
         </div>
         <div class="show-profile-badge">
           <a href="" class="d-flex align-items-center">
-            <img src="{{ asset('dr-assets/icons/eye.svg') }}" alt="" srcset="">
+            <img src="{{ asset('mc-assets/icons/eye.svg') }}" alt="" srcset="">
             <span class="mx-1">مشاهده پروفایل</span>
           </a>
         </div>
@@ -63,19 +63,19 @@
       <div class="d-flex justify-content-between align-items-center personal-data-clicked">
         <div>
 
-          <img src="{{ asset('dr-assets/icons/user.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/user.svg') }}" alt="" srcset="">
 
           <span class="txt-card-span mx-1">اطلاعات فردی</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
 
         </div>
       </div>
       <div class="drop-toggle-styles personal-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div class="">
-          <form action="{{ route('dr-update-profile') }}" method="POST" id="profileEdit">
+          <form action="{{ route('mc-update-profile') }}" method="POST" id="profileEdit">
             @csrf
             <div class="mt-2">
               <label for="name" class="label-top-input">نام</label>
@@ -113,7 +113,7 @@
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
                 type="button" id="editButton" data-bs-toggle="modal" data-bs-target="#mobileEditModal">
 
-                <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
+                <img src="{{ asset('mc-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
 
               </button>
             </div>
@@ -218,12 +218,12 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
-          <img src="{{ asset('dr-assets/icons/medal.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/medal.svg') }}" alt="" srcset="">
 
           <span class="txt-card-span mx-1"> تخصص</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
 
         </div>
       </div>
@@ -231,11 +231,11 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="text-left mt-3 remove-form-item">
-            <img src="{{ asset('dr-assets/icons/times.svg') }}" alt="" srcset="">
+            <img src="{{ asset('mc-assets/icons/times.svg') }}" alt="" srcset="">
 
           </div>
           <div class="mt-2">
-            <form action="{{ route('dr-specialty-update') }}" method="POST" id="specialtyEdit">
+            <form action="{{ route('mc-specialty-update') }}" method="POST" id="specialtyEdit">
               @csrf
               <div class="d-flex justify-content-between gap-4 flex-xs-wrap flex-xs-column">
                 <div class="mt-2 w-100">
@@ -281,7 +281,7 @@
                     <div class="w-100 mt-3 specialty-item" data-specialty-id="{{ $specialty->id }}">
                       <div class="text-left mt-3 remove-form-item" onclick="removeInput(this)">
 
-                        <img src="{{ asset('dr-assets/icons/times.svg') }}" alt="" srcset="">
+                        <img src="{{ asset('mc-assets/icons/times.svg') }}" alt="" srcset="">
 
                       </div>
                       <div>
@@ -339,7 +339,7 @@
                   type="button" id="addButton"
                   {{ $existingSpecialtiesCount >= 3 || $existingSpecialtiesCount < 1 ? 'disabled' : '' }}>
 
-                  <img src="{{ asset('dr-assets/icons/plus.svg') }}" alt="" srcset="">
+                  <img src="{{ asset('mc-assets/icons/plus.svg') }}" alt="" srcset="">
 
                 </button>
               </div>
@@ -353,12 +353,12 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
-          <img src="{{ asset('dr-assets/icons/note.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/note.svg') }}" alt="" srcset="">
 
           <span class="txt-card-span mx-1">ویرایش آی دی </span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
 
         </div>
       </div>
@@ -374,7 +374,7 @@
                 <li><small> لطفاً توجه نمایید ، آی دی هر مطب باید به نام مطب و یا نام پزشک اشاره کند و نمی ‌توان از نام
                     های کلی همانند tehrandoctor و یا pezeshk 1 استفاده کرد. </small></li>
               </ul>
-              <form action="{{ route('dr-uuid-update') }}" method="POST" id="uuid-form">
+              <form action="{{ route('mc-uuid-update') }}" method="POST" id="uuid-form">
                 @csrf
                 <div class="row">
                   <div class="col-12 position-relative">
@@ -408,19 +408,20 @@
       <div class="d-flex justify-content-between align-items-center">
         <div>
 
-          <img src="{{ asset('dr-assets/icons/message.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/message.svg') }}" alt="" srcset="">
 
           <span class="txt-card-span mx-1"> پیام رسان ها</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
         </div>
       </div>
       <div class="drop-toggle-styles messangers-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
-            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا، تلگرام یا نام کاربری اینستاگرام خود را وارد کنید (اختیاری).</span>
+            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا، تلگرام یا نام
+              کاربری اینستاگرام خود را وارد کنید (اختیاری).</span>
             <span class="font-size-15 mt-1">اطلاعات پیام‌رسان‌ها در صورت نیاز در دسترس بیمار قرار می‌گیرد.</span>
           </div>
           <form id="messengersForm">
@@ -432,7 +433,7 @@
             <div class="d-flex align-items-center justify-content-start gap-20">
               <div
                 class="d-flex justify-content-start gap-1 align-items-center  border border-solid py-2 px-4 rounded-lg">
-                <img src="{{ asset('dr-assets/icons/eitaa-icon-colorful.svg') }}" alt=""><span
+                <img src="{{ asset('mc-assets/icons/eitaa-icon-colorful.svg') }}" alt=""><span
                   class="text-sm mx-1">ایتا</span>
               </div>
               <div class="w-100">
@@ -454,7 +455,7 @@
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
                 class="d-flex justify-content-center gap-1 align-items-center border border-solid py-2 px-3 rounded-lg">
-                <img src="{{ asset('dr-assets/icons/telegram.svg') }}" alt="">
+                <img src="{{ asset('mc-assets/icons/telegram.svg') }}" alt="">
                 <span class="text-sm mx-1 font-size-13">تلگرام</span>
               </div>
               <div class="w-100">
@@ -473,7 +474,7 @@
             <div class="d-flex align-items-center justify-content-start gap-20 mt-2">
               <div
                 class="d-flex justify-content-center gap-1 align-items-center border border-solid py-2 px-3 rounded-lg">
-                <img src="{{ asset('dr-assets/icons/instagram.svg') }}" alt="">
+                <img src="{{ asset('mc-assets/icons/instagram.svg') }}" alt="">
                 <span class="text-sm mx-1 font-size-13">اینستاگرام</span>
               </div>
               <div class="w-100">
@@ -493,7 +494,7 @@
                 <span class="text-responsive font-size-13 fw-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
                   هر یک از
                   پیام‌رسان‌ها قرار می‌گیرد.</span>
-                <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="">
+                <img src="{{ asset('mc-assets/icons/help.svg') }}" alt="">
 
               </div>
               <div class="flex flex-col gap-2">
@@ -525,18 +526,18 @@
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="">
+          <img src="{{ asset('mc-assets/icons/lock.svg') }}" alt="">
           <span class="txt-card-span mx-1">رمز عبور ثابت</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="">
         </div>
       </div>
       <div class="drop-toggle-styles password-data-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="accordion_content__bS0xm">
-            <form class="w-100" action="{{ route('dr-static-password-update') }}" method="POST"
+            <form class="w-100" action="{{ route('mc-static-password-update') }}" method="POST"
               id="staticPasswordForm">
               @csrf
               <div class="d-flex align-items-center mt-2">
@@ -561,7 +562,7 @@
                     <span
                       class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
                       <img onclick="togglePassword('password')" class="show-pass cursor-pointer"
-                        src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
+                        src="{{ asset('mc-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
                         style="width: 20px; height: 20px;">
                     </span>
                   </div>
@@ -578,7 +579,7 @@
                     <span
                       class="input-group-text bg-transparent border-0 position-absolute end-0 translate-middle-y ms-2 top-64">
                       <img onclick="togglePassword('password_confirmation')" class="show-pass cursor-pointer"
-                        src="{{ asset('dr-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
+                        src="{{ asset('mc-assets/icons/show-pass.svg') }}" alt="نمایش/مخفی"
                         style="width: 20px; height: 20px;">
                     </span>
                   </div>
@@ -601,11 +602,11 @@
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <img src="{{ asset('dr-assets/icons/lock.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/lock.svg') }}" alt="" srcset="">
           <span class="txt-card-span mx-1">فعال‌سازی گذرواژه دو مرحله‌ای</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
         </div>
       </div>
       <div class="drop-toggle-styles two-factor-data-drop-toggle">
@@ -631,37 +632,42 @@
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12 col-md-12 col-lg-8" id="faq-section">
       <div class="d-flex justify-content-between align-items-center faq-section-clicked">
         <div>
-          <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="">
+          <img src="{{ asset('mc-assets/icons/help.svg') }}" alt="">
           <span class="txt-card-span mx-1">سوالات متداول</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="">
         </div>
       </div>
       <div class="drop-toggle-styles faq-section-drop-toggle">
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-info mt-2 text-center">
-            <span class="text-sm fw-bold d-block font-size-15">سوالات متداول شما در پروفایل عمومی نمایش داده می‌شود.</span>
+            <span class="text-sm fw-bold d-block font-size-15">سوالات متداول شما در پروفایل عمومی نمایش داده
+              می‌شود.</span>
             <span class="font-size-15 mt-1">این بخش به بیماران کمک می‌کند تا سوالات رایج را مشاهده کنند.</span>
           </div>
-          
+
           <!-- بخش افزودن سوال جدید - Dropdown -->
           <div class="mt-4">
             <div class="faq-add-toggle">
               <div class="d-flex align-items-center justify-content-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
-                  <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg" class="me-2">
+                  <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
                 <span class="fw-bold text-primary">افزودن سوال متداول جدید</span>
               </div>
               <div class="faq-add-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
               </div>
             </div>
-            
+
             <!-- فرم افزودن سوال جدید - مخفی شده -->
             <div class="faq-add-form">
               <form id="faqForm" class="mt-3 p-3">
@@ -669,24 +675,27 @@
                 <div class="row">
                   <div class="col-md-6">
                     <label for="question" class="label-top-input">سوال</label>
-                    <input type="text" id="question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           placeholder="سوال خود را وارد کنید..." maxlength="255">
+                    <input type="text" id="question" name="question"
+                      class="form-control h-50 w-100 border-radius-6 mt-3" placeholder="سوال خود را وارد کنید..."
+                      maxlength="255">
                     <div class="text-danger validation-error mt-1 font-size-13"></div>
                   </div>
                   <div class="col-md-6">
                     <label for="order" class="label-top-input">ترتیب نمایش</label>
-                    <input type="number" id="order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           placeholder="0" min="0" value="0">
+                    <input type="number" id="order" name="order"
+                      class="form-control h-50 w-100 border-radius-6 mt-3" placeholder="0" min="0"
+                      value="0">
                     <div class="text-danger validation-error mt-1 font-size-13"></div>
                   </div>
                 </div>
                 <div class="mt-3">
-                  <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
-                            rows="3" placeholder="پاسخ خود را وارد کنید..."></textarea>
+                  <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" rows="3"
+                    placeholder="پاسخ خود را وارد کنید..."></textarea>
                   <div class="text-danger validation-error mt-1 font-size-13"></div>
                 </div>
                 <div class="mt-3 d-flex gap-2">
-                  <button type="submit" class="btn my-btn-primary flex-grow-1 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                  <button type="submit"
+                    class="btn my-btn-primary flex-grow-1 h-50 border-radius-4 d-flex justify-content-center align-items-center">
                     <span class="button_text">افزودن سوال متداول</span>
                     <div class="loader"></div>
                   </button>
@@ -704,7 +713,7 @@
               <h6 class="text-right fw-bold d-block font-size-13 mb-0">سوالات متداول شما</h6>
               <span class="badge bg-primary">{{ count($doctorFaqs) }} سوال</span>
             </div>
-            
+
             <div id="faqsList" class="faqs-container">
               @forelse($doctorFaqs as $faq)
                 <div class="faq-item-compact" data-faq-id="{{ $faq->id }}">
@@ -720,13 +729,15 @@
                         </div>
                       </div>
                       <div class="faq-item-actions-compact">
-                        <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
-                                data-faq-id="{{ $faq->id }}" title="ویرایش">
-                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 14px; height: 14px;">
+                        <button type="button" class="btn btn-sm btn-light edit-faq-btn"
+                          data-faq-id="{{ $faq->id }}" title="ویرایش">
+                          <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش"
+                            style="width: 14px; height: 14px;">
                         </button>
-                        <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
-                                data-faq-id="{{ $faq->id }}" title="حذف">
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
+                        <button type="button" class="btn btn-sm btn-light delete-faq-btn"
+                          data-faq-id="{{ $faq->id }}" title="حذف">
+                          <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف"
+                            style="width: 14px; height: 14px;">
                         </button>
                       </div>
                     </div>
@@ -737,7 +748,7 @@
                 </div>
               @empty
                 <div class="faq-empty-state">
-                  <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" class="faq-empty-icon">
+                  <img src="{{ asset('mc-assets/icons/help.svg') }}" alt="" class="faq-empty-icon">
                   <p class="faq-empty-text">هنوز سوال متداولی اضافه نکرده‌اید.</p>
                 </div>
               @endforelse
@@ -749,12 +760,12 @@
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8">
       <div class="d-flex justify-content-between align-items-center">
         <div>
-          <img src="{{ asset('dr-assets/icons/cogs.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/cogs.svg') }}" alt="" srcset="">
           <span class="txt-card-span mx-1"> تنظیمات نسخه نویسی</span>
           <span class="badge bg-danger text-white mx-2" style="font-size: 13px;">به زودی</span>
         </div>
         <div>
-          <img src="{{ asset('dr-assets/icons/caret.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/caret.svg') }}" alt="" srcset="">
 
         </div>
       </div>
@@ -786,11 +797,11 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/profile/edit-profile.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/sweetalert2/sweetalert2.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/profile/edit-profile.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
 </script>
-@include('dr.panel.profile.option.profile-option')
+@include('mc.panel.profile.option.profile-option')
 @endsection

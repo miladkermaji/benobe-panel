@@ -1,19 +1,19 @@
 <script>
-  $(document).ready(function () {
+  $(document).ready(function() {
     $("#datepicker7").addClass("mt-5")
     var isInitialLoad = true; // نشانگر بارگذاری اولیه صفحه
-    $('#auto-schedule').change(function () {
+    $('#auto-schedule').change(function() {
       if (!isInitialLoad) { // اگر بارگذاری اولیه نیست
         var isChecked = $(this).is(':checked');
         // به‌روزرسانی وضعیت در دیتابیس
         $.ajax({
-          url: '{{ route("update-auto-schedule") }}', // روت مربوطه
+          url: '{{ route('update-auto-schedule') }}', // روت مربوطه
           type: 'POST',
           data: {
             auto_schedule: isChecked,
             _token: '{{ csrf_token() }}'
           },
-          success: function (response) {
+          success: function(response) {
             if (response.success) {
               Swal.fire({
                 title: 'به‌روزرسانی شد!',
@@ -23,7 +23,7 @@
               });
             }
           },
-          error: function (error) {
+          error: function(error) {
             Swal.fire({
               title: 'خطا!',
               text: 'مشکلی پیش آمده است.',
@@ -49,9 +49,9 @@
     });
     // بررسی وضعیت فعلی هنگام بارگذاری صفحه
     $.ajax({
-      url: '{{ route("check-auto-schedule") }}', // روت مربوطه برای بررسی وضعیت
+      url: '{{ route('check-auto-schedule') }}', // روت مربوطه برای بررسی وضعیت
       type: 'GET',
-      success: function (response) {
+      success: function(response) {
         if (response.auto_schedule) {
           $('#auto-schedule').prop('checked', true);
           $('.seven-col-calendar').show(); // نمایش دایو در صورت فعال بودن
@@ -65,7 +65,7 @@
         $('#auto-schedule').trigger('change'); // تحریک تغییر
         isInitialLoad = false; // بارگذاری اولیه به پایان رسیده
       },
-      error: function (error) {
+      error: function(error) {
         Swal.fire({
           title: 'خطا!',
           text: 'مشکلی پیش آمده است.',
@@ -75,8 +75,8 @@
       }
     });
   });
-  $(document).ready(function () {
-    $('#holiday-schedule_pattern').change(function () {
+  $(document).ready(function() {
+    $('#holiday-schedule_pattern').change(function() {
       var isChecked = $(this).is(':checked');
       var day = $("#day").val();
       var ToggleHolidayValue = isChecked ? 1 : 0;
@@ -103,10 +103,10 @@
 
   function loadPatterns(day) {
     $.ajax({
-      url: '{{ route("dr-schedule") }}',
+      url: '{{ route('mc-schedule') }}',
       type: 'GET',
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         var patternsList = $('#patterns-list');
         patternsList.empty();
         if (response.patterns) {
@@ -119,7 +119,7 @@
             'thursday': 'پنج‌شنبه',
             'friday': 'جمعه'
           };
-          response.patterns.forEach(function (pattern) {
+          response.patterns.forEach(function(pattern) {
             if (pattern.day === day) {
               patternsList.append(
                 `<tr id="pattern-${pattern.id}">
@@ -150,14 +150,14 @@
           $("#apply-patterns").addClass('d-none');
         }
       },
-      error: function (error) {
+      error: function(error) {
         // console.error('خطا در بارگیری الگوها:', error);
       }
     });
   }
-  $(document).ready(function () {
+  $(document).ready(function() {
 
-    $('#save-pattern').click(function () {
+    $('#save-pattern').click(function() {
       var startTime = $('#start-time').val();
       var endTime = $('#end-time').val();
       var title = $('#title').val();
@@ -185,7 +185,7 @@
         return;
       }
       $.ajax({
-        url: '{{ route("dr-schedule.store") }}',
+        url: '{{ route('mc-schedule.store') }}',
         type: 'POST',
         data: {
           day: day,
@@ -197,7 +197,7 @@
           auto_schedule: $('#auto-schedule').is(':checked'),
           include_holidays: includeHolidays
         },
-        success: function (response) {
+        success: function(response) {
           if (response.hasPattern) {
             Swal.fire({
               title: 'ذخیره شد!',
@@ -217,7 +217,7 @@
             });
           }
         },
-        error: function (error) {
+        error: function(error) {
           var errorMessage = 'مشکلی پیش آمده است.';
           if (error.responseJSON && error.responseJSON.error) {
             errorMessage = error.responseJSON.error;
@@ -231,7 +231,7 @@
         }
       });
     });
-    window.deletePattern = function (patternId, day) {
+    window.deletePattern = function(patternId, day) {
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این الگو حذف خواهد شد و قابل بازگشت نیست! توجه داشته باشید که روز هایی که الگوی خودکار برای آنها  غیر فعال شده نیز پاک خواهد شد !!!',
@@ -244,13 +244,13 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: '{{ route("dr-schedule.destroy", ":id") }}'
+            url: '{{ route('mc-schedule.destroy', ':id') }}'
               .replace(':id', patternId),
             type: 'POST',
             data: {
               _token: '{{ csrf_token() }}'
             },
-            success: function (response) {
+            success: function(response) {
               Swal.fire({
                 title: 'حذف شد!',
                 text: 'الگوی نوبت‌دهی با موفقیت حذف شد.',
@@ -281,7 +281,7 @@
                 $("#apply-patterns").addClass('d-none');
               }
             },
-            error: function (error) {
+            error: function(error) {
               var errorMessage = 'مشکلی پیش آمده است.';
               if (error.responseJSON && error.responseJSON.error) {
                 errorMessage = error.responseJSON.error; // گرفتن پیام خطا از پاسخ سرور
@@ -307,12 +307,12 @@
         day: day // ارسال تاریخ به همان صورت که هست
       },
       dataType: 'json',
-      success: function (response) {
+      success: function(response) {
         var appointmentsList = $('#patterns-list-appointments');
         appointmentsList.empty();
         if (response.manualAppointments.length > 0) {
           $("#no-pattern-message-appointments").addClass('d-none')
-          response.manualAppointments.forEach(function (appointment) {
+          response.manualAppointments.forEach(function(appointment) {
             var gDate = appointment.appointment_date.split('-');
             // if(gDate[1]<10){
             //   gDate= '0'+gDate[1];
@@ -345,35 +345,35 @@
         }
         $("#currentDayMonthModal").modal("show");
       },
-      error: function (error) {
+      error: function(error) {
         // console.error('خطا در گرفتن نوبت‌ها:', error);
       }
     });
   }
   // حذف الگوها
-  $(document).ready(function () {
+  $(document).ready(function() {
     $('.select2').select2();
     $('.select2-appointments').select2();
   });
-  $(document).ready(function () {
+  $(document).ready(function() {
     // تعریف متغیر برای تاریخ در سطح بالا  
     var currentDay = '';
     // رویداد کلیک برای ذخیره نوبت  
     function fetchAppointments() {
       $.ajax({
-        url: '{{ route("setActiveCalendar") }}',
+        url: '{{ route('setActiveCalendar') }}',
         type: 'GET',
         dataType: 'json',
-        success: function (response) {
+        success: function(response) {
           appointmentDates = response.appointmentsLists.map(appointment => appointment.appointment_date);
           $("#datepicker7").datepicker("refresh");
         },
-        error: function (error) {
+        error: function(error) {
           // console.error('خطا در دریافت نوبت‌ها:', error);
         }
       });
     }
-    $('#save-pattern-appointments').click(function () {
+    $('#save-pattern-appointments').click(function() {
       var startTime = $('#start-time-appointments').val();
       var endTime = $('#end-time-appointments').val();
       var title = $('#title-appointments').val();
@@ -382,7 +382,7 @@
       var day = $('#exampleModalTitleText').text();
       var persianDateString = day.match(/\d+ \S+ \d+/)[0];
       $.ajax({
-        url: '{{ route("manual-appointments.store") }}',
+        url: '{{ route('manual-appointments.store') }}',
         type: 'POST',
         data: {
           start_time: startTime,
@@ -393,7 +393,7 @@
           appointments_date: persianDateString,
           _token: '{{ csrf_token() }}'
         },
-        success: function (response) {
+        success: function(response) {
           if (response.hasPattern) {
             Swal.fire({
               title: 'ذخیره شد!',
@@ -413,7 +413,7 @@
             });
           }
         },
-        error: function (error) {
+        error: function(error) {
           var errorMessage = 'مشکلی پیش آمده است.';
           if (error.responseJSON && error.responseJSON.error) {
             errorMessage = error.responseJSON.error; // گرفتن پیام خطا از پاسخ سرور
@@ -428,7 +428,7 @@
       });
     });
     // حذف رویدادهای نوبت  
-    $('#patterns-list-appointments').on('click', '.btn-del-appointments', function () {
+    $('#patterns-list-appointments').on('click', '.btn-del-appointments', function() {
       var appointmentId = $(this).data('id');
       var deleteUrl = appointmentsDestroy.replace(':id', appointmentId);
       var csrfToken = $('meta[name="csrf-token"]').attr('content');
@@ -450,7 +450,7 @@
               _token: csrfToken,
               _method: 'DELETE'
             },
-            success: function (response) {
+            success: function(response) {
               Swal.fire({
                 title: 'حذف شد!',
                 text: 'نوبت با موفقیت حذف شد.',
@@ -461,7 +461,7 @@
                 fetchAppointments();
               });
             },
-            error: function (error) {
+            error: function(error) {
               var errorMessage = 'مشکلی پیش آمده است.';
               if (error.responseJSON && error.responseJSON.error) {
                 errorMessage = error.responseJSON.error; // گرفتن پیام خطا از پاسخ سرور
@@ -477,12 +477,12 @@
         }
       });
     });
-    document.addEventListener('fetchAppointmentsForDay', function (event) {
+    document.addEventListener('fetchAppointmentsForDay', function(event) {
       var day = event.detail;
       fetchAppointmentsForDay(day);
       fetchAppointments();
     });
-    window.deleteAppointment = function (id) {
+    window.deleteAppointment = function(id) {
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این نوبت حذف خواهد شد و قابل بازگشت نیست!',
@@ -495,19 +495,19 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: '{{ route("appointments.destroy", ":id") }}'
+            url: '{{ route('appointments.destroy', ':id') }}'
               .replace(':id', id),
             type: 'POST',
             data: {
               _token: '{{ csrf_token() }}',
               _method: 'DELETE'
             },
-            success: function (response) {
+            success: function(response) {
               var gDate = $('#appointments_date').val().split('-');
               // console.log('delete from blade');
               // استفاده از jQuery AJAX برای فراخوانی تبدیل تاریخ به میلادی
               $.ajax({
-                url: '{{ route("convert-to-gregorian") }}', // آدرس روت مناسب برای تبدیل
+                url: '{{ route('convert-to-gregorian') }}', // آدرس روت مناسب برای تبدیل
                 type: 'POST',
                 data: {
                   year: gDate[0],
@@ -515,7 +515,7 @@
                   day: gDate[2],
                   _token: $('meta[name="csrf-token"]').attr('content')
                 },
-                success: function (convertedResponse) {
+                success: function(convertedResponse) {
                   // لاگ گرفتن تاریخ تبدیل شده
                   Swal.fire({
                     title: 'حذف شد!',
@@ -533,12 +533,12 @@
                   fetchAppointmentsForDay(fixedDate);
                   fetchAppointments();
                 },
-                error: function (error) {
+                error: function(error) {
                   // console.error('Error converting date:', error);
                 }
               });
             },
-            error: function (error) {
+            error: function(error) {
               var errorMessage = 'مشکلی پیش آمده است.';
               if (error.responseJSON && error.responseJSON.error) {
                 errorMessage = error.responseJSON.error; // گرفتن پیام خطا از پاسخ سرور
@@ -554,7 +554,7 @@
         }
       });
     }
-    document.addEventListener('fetchAppointmentsForDay', function (event) {
+    document.addEventListener('fetchAppointmentsForDay', function(event) {
       var day = event.detail;
       fetchAppointmentsForDay(day);
       fetchAppointments();
@@ -562,5 +562,4 @@
   });
 
   // ارسال درخواست AJAX  
-
 </script>

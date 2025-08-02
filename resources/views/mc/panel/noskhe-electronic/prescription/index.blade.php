@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/noskhe-electronic/prescription/prescription.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/noskhe-electronic/prescription/prescription.css') }}"
     rel="stylesheet" />
 @endsection
 @section('site-header')
@@ -104,7 +104,8 @@
     </div>
   </div>
   <div class="vakeshi-noskhe  p-3">
-    <button class="btn btn-outline-secondary h-50" data-bs-toggle="modal" data-bs-target="#exampleModalCenterVakeshi">واکشی
+    <button class="btn btn-outline-secondary h-50" data-bs-toggle="modal"
+      data-bs-target="#exampleModalCenterVakeshi">واکشی
       نسخه</button>
     <div class="modal fade " id="exampleModalCenterVakeshi" tabindex="-1" role="dialog"
       aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -176,8 +177,8 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/noskhe-electronic/prescription/prescription.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/noskhe-electronic/prescription/prescription.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl =

@@ -1,4 +1,4 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
  <link type="text/css" href="{{ asset('admin-assets/css/panel/clinic/clinic.css') }}" rel="stylesheet" />
@@ -15,5 +15,5 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت کلینیک')
-@livewire('dr.panel.clinics.clinics-gallery', ['id' => $id])
+@livewire('mc.panel.clinics.clinics-gallery', ['id' => $id])
 @endsection

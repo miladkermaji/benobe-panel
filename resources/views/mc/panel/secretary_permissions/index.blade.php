@@ -1,9 +1,9 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/panel.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/panel.css') }}">
 
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/secretary_options/secretary_option.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/secretary_options/secretary_option.css') }}">
 
 @endsection
 
@@ -95,9 +95,9 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
 <script>
   $(document).ready(function() {
 
@@ -123,7 +123,7 @@
       });
 
       $.ajax({
-        url: "{{ route('dr-secretary-permissions-update', ':id') }}".replace(':id', secretaryId),
+        url: "{{ route('mc-secretary-permissions-update', ':id') }}".replace(':id', secretaryId),
         method: "POST",
         data: {
           permissions: permissions,

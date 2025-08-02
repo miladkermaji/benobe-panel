@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
 
 @endsection
 
@@ -17,7 +17,7 @@
   <div class="card shadow border-0">
     <div class="card-header text-white d-flex justify-content-between align-items-center">
       <h5 class="mb-0">جزئیات تیکت #{{ $ticket->id }}</h5>
-      <a href="{{ route('dr-panel-tickets') }}" class="btn btn-light btn-sm btn-custom">
+      <a href="{{ route('mc-panel-tickets') }}" class="btn btn-light btn-sm btn-custom">
         <i class="fas fa-arrow-right mr-2"></i> بازگشت
       </a>
     </div>
@@ -134,8 +134,8 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
@@ -170,7 +170,7 @@
       $('.error-message').text('');
 
       $.ajax({
-        url: "{{ route('dr-panel-tickets.responses.store', ':id') }}".replace(':id', ticketId),
+        url: "{{ route('mc-panel-tickets.responses.store', ':id') }}".replace(':id', ticketId),
         method: "POST",
         data: {
           _token: "{{ csrf_token() }}",

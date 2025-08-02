@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctorservice/doctorservice-form.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/css/panel/doctorservice/doctorservice-form.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -11,11 +11,11 @@
 
 @section('content')
 @section('bread-crumb-title', 'افزودن خدمات جدید')
-@livewire('dr.panel.doctor-services.doctor-service-create')
+@livewire('mc.panel.doctor-services.doctor-service-create')
 @section('scripts')
 
 
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 
 
 @endsection

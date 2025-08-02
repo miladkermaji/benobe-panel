@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/profile/subuser.css') }}" rel="stylesheet" />
   <style>
     .quick-user-form {
       background: #f8fafc;
@@ -217,8 +217,8 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   // --- TomSelect Safe Init ---
   function safeInitTomSelect(selector, options = {}) {
@@ -260,10 +260,10 @@
           <td>${subUser.subuserable?.national_code ?? ''}</td>
           <td class="text-center">
             <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
-              <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+              <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
             </button>
             <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
-              <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+              <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
             </button>
           </td>
         </tr>`;
@@ -344,7 +344,7 @@
   function fetchSubUsers(page = 1, search = '') {
     renderSubUserLoading();
     $.ajax({
-      url: "{{ route('dr-sub-users-list') }}",
+      url: "{{ route('mc-sub-users-list') }}",
       data: {
         page,
         search
@@ -375,7 +375,7 @@
         return;
       }
       $.ajax({
-        url: "{{ route('dr-sub-users-search-users') }}",
+        url: "{{ route('mc-sub-users-search-users') }}",
         data: {
           q: query
         },
@@ -426,7 +426,7 @@
       const data = $form.serialize();
       $form.find('.quick-user-error').text('');
       $.ajax({
-        url: "{{ route('dr-sub-users-quick-create-user') }}",
+        url: "{{ route('mc-sub-users-quick-create-user') }}",
         method: 'POST',
         data: data + '&_token={{ csrf_token() }}',
         success: function(res) {
@@ -455,7 +455,7 @@
       $('#edit-user-id').val('');
       $('#edit-user-search-results').empty().hide();
       $.ajax({
-        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        url: "{{ route('mc-sub-users-edit', ':id') }}".replace(':id', id),
         method: 'GET',
         success: function(response) {
           if (response.user) {
@@ -477,7 +477,7 @@
         return;
       }
       $.ajax({
-        url: "{{ route('dr-sub-users-search-users') }}",
+        url: "{{ route('mc-sub-users-search-users') }}",
         data: {
           q: query
         },
@@ -567,7 +567,7 @@
         }).then((result) => {
           if (result.isConfirmed) {
             $.ajax({
-              url: "{{ route('dr-sub-users-delete-multiple') }}",
+              url: "{{ route('mc-sub-users-delete-multiple') }}",
               method: 'DELETE',
               data: {
                 ids: ids
@@ -599,7 +599,7 @@
       $('#editSubUserModal').modal('show');
       $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
       $.ajax({
-        url: "{{ route('dr-sub-users-edit', ':id') }}".replace(':id', id),
+        url: "{{ route('mc-sub-users-edit', ':id') }}".replace(':id', id),
         method: 'GET',
         cache: true,
         success: function(response) {
@@ -623,7 +623,7 @@
             load: function(query, callback) {
               if (!query.length) return callback();
               $.ajax({
-                url: "{{ route('dr-sub-users-search-users') }}",
+                url: "{{ route('mc-sub-users-search-users') }}",
                 data: {
                   q: query
                 },
@@ -681,10 +681,10 @@
               <td>${subUser.subuserable.national_code}</td>
               <td>
                 <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
-                  <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                  <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
                 </button>
                 <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
-                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                  <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                 </button>
               </td>
             </tr>`;
@@ -769,7 +769,7 @@
       form.find('.field-wrapper').removeClass('has-error');
 
       $.ajax({
-        url: "{{ route('dr-sub-users-store') }}",
+        url: "{{ route('mc-sub-users-store') }}",
         method: 'POST',
         data: form.serialize(),
         success: function(response) {
@@ -823,7 +823,7 @@
       form.find('.field-wrapper').removeClass('has-error');
 
       $.ajax({
-        url: "{{ route('dr-sub-users-update', ':id') }}".replace(':id', id),
+        url: "{{ route('mc-sub-users-update', ':id') }}".replace(':id', id),
         method: 'POST',
         data: form.serialize(),
         success: function(response) {
@@ -868,7 +868,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-sub-users-delete', ':id') }}".replace(':id', id),
+            url: "{{ route('mc-sub-users-delete', ':id') }}".replace(':id', id),
             method: 'DELETE',
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

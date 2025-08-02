@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet" />
   <style>
     .myPanelOption {
       display: none
@@ -15,11 +15,11 @@
 
 @section('content')
 @section('bread-crumb-title', 'افزودن توضیحات جدید')
-@livewire('dr.panel.doctor-notes.doctor-note-create')
+@livewire('mc.panel.doctor-notes.doctor-note-create')
 @section('scripts')
 
 
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 
 
 @endsection

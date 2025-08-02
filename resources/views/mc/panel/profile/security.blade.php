@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/profile/security.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/profile/security.css') }}" rel="stylesheet" />
   <style>
     .myPanelOption {
       display: none;
@@ -25,7 +25,7 @@
         <span>📜 تاریخچه ورود منشی</span>
       </div>
       <div class="card-body" id="secretaryLogsContainer">
-        @include('dr.panel.profile.partials.secretary_logs')
+        @include('mc.panel.profile.partials.secretary_logs')
       </div>
     </div>
 
@@ -35,7 +35,7 @@
         <span>📜 تاریخچه ورود دکتر</span>
       </div>
       <div class="card-body" id="doctorLogsContainer">
-        @include('dr.panel.profile.partials.doctor_logs')
+        @include('mc.panel.profile.partials.doctor_logs')
       </div>
     </div>
   </div>
@@ -44,13 +44,13 @@
 
 @section('scripts')
 
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 
 <script>
   $(document).ready(function() {
     function loadLogs(page = 1) {
       $.ajax({
-        url: "{{ route('dr-edit-profile-security') }}?page=" + page,
+        url: "{{ route('mc-edit-profile-security') }}?page=" + page,
         type: 'GET',
         success: function(response) {
           $('#doctorLogsContainer').html(response.doctorLogs);
@@ -101,7 +101,7 @@
   $(document).ready(function() {
     function loadDoctorLogs(page) {
       $.ajax({
-        url: "{{ route('dr-get-doctor-logs') }}?page=" + page,
+        url: "{{ route('mc-get-doctor-logs') }}?page=" + page,
         type: 'GET',
         success: function(response) {
           $('#doctorLogsContainer').html(response.doctorLogsHtml);
@@ -111,7 +111,7 @@
 
     function loadSecretaryLogs(page) {
       $.ajax({
-        url: "{{ route('dr-get-secretary-logs') }}?page=" + page,
+        url: "{{ route('mc-get-secretary-logs') }}?page=" + page,
         type: 'GET',
         success: function(response) {
           $('#secretaryLogsContainer').html(response.secretaryLogsHtml);

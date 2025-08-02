@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>گزارش مالی</title>
   <style>
-    @import url('{{ asset('dr-assets/fonts/vazir/font-face.css') }}');
+    @import url('{{ asset('mc-assets/fonts/vazir/font-face.css') }}');
 
     @font-face {
       font-family: Vazir;

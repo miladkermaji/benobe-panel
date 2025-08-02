@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/doctor-clinic/deposite.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/doctor-clinic/deposite.css') }}" rel="stylesheet" />
 
 @endsection
 
@@ -75,10 +75,10 @@
                     <td class="text-center">
                       <div class="d-flex justify-content-center gap-1">
                         <button class="btn btn-icon edit-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
-                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                          <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
                         </button>
                         <button class="btn btn-icon delete-btn btn-light rounded-circle" data-id="{{ $deposit->id }}">
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                          <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                         </button>
                       </div>
                     </td>
@@ -179,8 +179,8 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   $(document).ready(function() {
     const modal = $('#depositModal');
@@ -522,7 +522,7 @@
 
     function addDepositItem(deposit) {
       const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-      'ویزیت آنلاین';
+        'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Desktop table row
@@ -535,10 +535,10 @@
           <td class="text-center">
             <div class="d-flex justify-content-center gap-1">
               <button class="btn btn-icon edit-btn btn-light rounded-circle" data-id="${deposit.id}">
-                <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
               </button>
               <button class="btn btn-icon delete-btn btn-light rounded-circle" data-id="${deposit.id}">
-                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
               </button>
             </div>
           </td>
@@ -589,7 +589,7 @@
 
     function updateDepositItem(deposit) {
       const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-      'ویزیت آنلاین';
+        'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Update desktop table row

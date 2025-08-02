@@ -1,7 +1,7 @@
-@extends('dr.panel.doctors-clinic.layouts.master')
+@extends('mc.panel.doctors-clinic.layouts.master')
 @section('styles')
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clininc/activation/index.css') }}">
-  <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/doctors-clinic/duration/duration.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clininc/activation/index.css') }}">
+  <link rel="stylesheet" href="{{ asset('mc-assets/panel/css/doctors-clinic/duration/duration.css') }}">
 @endsection
 
 
@@ -175,8 +175,8 @@
 
 
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/toastify/toastify.min.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/toastify/toastify.min.js') }}"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
       const appointmentInput = document.getElementById("appointment_duration");

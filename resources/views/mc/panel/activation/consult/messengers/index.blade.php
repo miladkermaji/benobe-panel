@@ -1,12 +1,12 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/scheduleSetting/scheduleSetting.css') }}"
     rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
+  <link type="text/css" href="{{ asset('mc-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/turn/schedule/scheduleSetting/workhours.css') }}"
     rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/activation/consult/rules/index.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/activation/consult/rules/index.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -79,7 +79,7 @@
                 <span class="text-responsive font-size-13 fw-bold">تماس امن به عنوان راه ارتباط جانبی در کنار
                   هر یک از
                   پیام‌رسان‌ها قرار می‌گیرد.</span>
-                <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="">
+                <img src="{{ asset('mc-assets/icons/help.svg') }}" alt="">
 
               </div>
               <div class="flex flex-col gap-2">
@@ -112,9 +112,9 @@
 </div>
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl =
@@ -130,7 +130,7 @@
       buttonText.style.display = 'none';
       loader.style.display = 'block';
       // ارسال درخواست Ajax
-      fetch("{{ route('dr-messengers-update') }}", {
+      fetch("{{ route('mc-messengers-update') }}", {
           method: 'PUT',
           headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -152,7 +152,7 @@
           // نمایش پیام موفقیت یا خطا
           if (data.success) {
             toastr.success(data.message);
-            location.href = "{{ route('dr-workhours', 'activation-path=true') }}"
+            location.href = "{{ route('mc-workhours', 'activation-path=true') }}"
 
           } else {
             toastr.error(data.message || "خطا در به‌روزرسانی اطلاعات");

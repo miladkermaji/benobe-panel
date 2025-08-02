@@ -1,6 +1,5 @@
-{{-- resources\views\dr\panel\my-tools\workhours.blade.php --}}
+{{-- resources\views\mc\panel\my-tools\workhours.blade.php --}}
 <script>
-
   (function() {
     let supportsPassive = false;
     try {
@@ -250,7 +249,7 @@
 
   function reloadDayData(day) {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule-counseling') }}",
+      url: "{{ route('mc-get-work-schedule-counseling') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -359,7 +358,7 @@
   // تابع بارگذاری برنامه کاری‌ها
   function loadDaySlots(day, callback) {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule-counseling') }}",
+      url: "{{ route('mc-get-work-schedule-counseling') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -705,7 +704,7 @@
   // استفاده از کش
   $(document).ready(function() {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule-counseling') }}",
+      url: "{{ route('mc-get-work-schedule-counseling') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')
@@ -1040,7 +1039,7 @@
 
       // ارسال درخواست AJAX
       $.ajax({
-        url: "{{ route('dr-save-work-schedule-counseling') }}",
+        url: "{{ route('mc-save-work-schedule-counseling') }}",
         method: 'POST',
         data: JSON.stringify(data),
         contentType: 'application/json',
@@ -1272,7 +1271,7 @@
 
   function loadAllWorkhours() {
     $.ajax({
-      url: "{{ route('dr-get-work-schedule-counseling') }}",
+      url: "{{ route('mc-get-work-schedule-counseling') }}",
       method: 'GET',
       data: {
         selectedClinicId: localStorage.getItem('selectedClinicId')

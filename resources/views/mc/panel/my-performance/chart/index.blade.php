@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/my-performance/chart/chart.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/my-performance/chart/chart.css') }}" rel="stylesheet" />
 @endsection
 @section('content')
 @section('bread-crumb-title', 'آمار و نمودار')
@@ -75,8 +75,8 @@
 @endsection
 @section('scripts')
 <script>
-  var chartUrl = "{{ route('dr-my-performance-chart-data') }}";
+  var chartUrl = "{{ route('mc-my-performance-chart-data') }}";
 </script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dashboard/dashboard.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/dashboard/dashboard.js') }}"></script>
 @endsection

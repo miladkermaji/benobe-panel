@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/secretary/secretaries.css') }}" rel="stylesheet">
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/secretary/secretaries.css') }}" rel="stylesheet">
 @endsection
 
 @section('site-header')
@@ -11,10 +11,10 @@
 @section('bread-crumb-title', 'افزودن منشی')
 
 @section('content')
-  @livewire('dr.panel.secretary.secretary-create')
+  @livewire('mc.panel.secretary.secretary-create')
 @endsection
 
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 @endsection

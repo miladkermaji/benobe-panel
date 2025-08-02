@@ -1,8 +1,8 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css"
-    href="{{ asset('dr-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}"
+    href="{{ asset('mc-assets/panel/turn/schedule/schedule-setting/blocking-users/blocking-user.css') }}"
     rel="stylesheet" />
 
 @endsection
@@ -14,7 +14,7 @@
 @section('bread-crumb-title', 'مدیریت کاربران مسدود')
 
 @section('content')
-  @include('dr.panel.my-tools.loader-btn')
+  @include('mc.panel.my-tools.loader-btn')
   <div class="blocking_users_container mt-3" dir="rtl">
     <div class="container px-0">
       <!-- هدر -->
@@ -269,10 +269,10 @@
 @endsection
 
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/vacation/vacation.js') }}"></script>
   <script>
     // مدیریت انتخاب‌ها
     let selectedUsers = [];

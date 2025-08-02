@@ -1,9 +1,9 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/patient-records/patient-records.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/tickets/tickets.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/patient-records/patient-records.css') }}" rel="stylesheet" />
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -18,7 +18,8 @@
         <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
           <h5 class="card-title text-white mb-0 fw-bold text-shadow">پرونده الکترونیک بیمار</h5>
           <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#add-patient-modal">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="me-2">
               <path d="M12 5v14M5 12h14" />
             </svg>
             افزودن بیمار جدید
@@ -30,7 +31,7 @@
               <div class="input-group position-relative">
                 <input type="text" class="form-control input-shiny" id="search-patient" placeholder="جستجو...">
                 <span class="search-icon">
-                  
+
                 </span>
               </div>
             </div>
@@ -57,10 +58,12 @@
                         <td>{{ $patient->address }}</td>
                         <td>
                           <div class="d-flex gap-2">
-                            <button class="btn my-btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#edit-patient-modal-{{ $patient->id }}">
+                            <button class="btn my-btn-primary btn-sm" data-bs-toggle="modal"
+                              data-bs-target="#edit-patient-modal-{{ $patient->id }}">
                               ویرایش
                             </button>
-                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#delete-patient-modal-{{ $patient->id }}">
+                            <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                              data-bs-target="#delete-patient-modal-{{ $patient->id }}">
                               حذف
                             </button>
                           </div>
@@ -79,7 +82,8 @@
 </div>
 
 <!-- Add Patient Modal -->
-<div class="modal fade" id="add-patient-modal" tabindex="-1" role="dialog" aria-labelledby="add-patient-modal-label" aria-hidden="true">
+<div class="modal fade" id="add-patient-modal" tabindex="-1" role="dialog" aria-labelledby="add-patient-modal-label"
+  aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-radius-6">
       <div class="modal-header border-0">
@@ -117,7 +121,8 @@
 
 <!-- Edit Patient Modal -->
 @foreach ($patients as $patient)
-  <div class="modal fade" id="edit-patient-modal-{{ $patient->id }}" tabindex="-1" role="dialog" aria-labelledby="edit-patient-modal-label-{{ $patient->id }}" aria-hidden="true">
+  <div class="modal fade" id="edit-patient-modal-{{ $patient->id }}" tabindex="-1" role="dialog"
+    aria-labelledby="edit-patient-modal-label-{{ $patient->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-0">
@@ -129,19 +134,23 @@
             <div class="row g-4">
               <div class="col-md-6 col-12 position-relative">
                 <label class="form-label" for="name-{{ $patient->id }}">نام بیمار</label>
-                <input type="text" class="form-control input-shiny" id="name-{{ $patient->id }}" value="{{ $patient->name }}" placeholder="نام بیمار">
+                <input type="text" class="form-control input-shiny" id="name-{{ $patient->id }}"
+                  value="{{ $patient->name }}" placeholder="نام بیمار">
               </div>
               <div class="col-md-6 col-12 position-relative">
                 <label class="form-label" for="family-{{ $patient->id }}">نام خانوادگی</label>
-                <input type="text" class="form-control input-shiny" id="family-{{ $patient->id }}" value="{{ $patient->family }}" placeholder="نام خانوادگی">
+                <input type="text" class="form-control input-shiny" id="family-{{ $patient->id }}"
+                  value="{{ $patient->family }}" placeholder="نام خانوادگی">
               </div>
               <div class="col-md-6 col-12 position-relative">
                 <label class="form-label" for="phone-{{ $patient->id }}">شماره تلفن</label>
-                <input type="text" class="form-control input-shiny" id="phone-{{ $patient->id }}" value="{{ $patient->phone }}" placeholder="شماره تلفن">
+                <input type="text" class="form-control input-shiny" id="phone-{{ $patient->id }}"
+                  value="{{ $patient->phone }}" placeholder="شماره تلفن">
               </div>
               <div class="col-md-6 col-12 position-relative">
                 <label class="form-label" for="address-{{ $patient->id }}">آدرس</label>
-                <input type="text" class="form-control input-shiny" id="address-{{ $patient->id }}" value="{{ $patient->address }}" placeholder="آدرس">
+                <input type="text" class="form-control input-shiny" id="address-{{ $patient->id }}"
+                  value="{{ $patient->address }}" placeholder="آدرس">
               </div>
               <div class="col-12">
                 <button type="button" class="btn my-btn-primary w-100">ویرایش</button>
@@ -156,7 +165,8 @@
 
 <!-- Delete Patient Modal -->
 @foreach ($patients as $patient)
-  <div class="modal fade" id="delete-patient-modal-{{ $patient->id }}" tabindex="-1" role="dialog" aria-labelledby="delete-patient-modal-label-{{ $patient->id }}" aria-hidden="true">
+  <div class="modal fade" id="delete-patient-modal-{{ $patient->id }}" tabindex="-1" role="dialog"
+    aria-labelledby="delete-patient-modal-label-{{ $patient->id }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-radius-6">
         <div class="modal-header border-0">
@@ -177,8 +187,8 @@
 
 @endsection
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   var appointmentsSearchUrl = "{{ route('search.appointments') }}";
   var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";

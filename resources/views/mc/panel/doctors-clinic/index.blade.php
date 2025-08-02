@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet">
+  <link type="text/css" href="{{ asset('mc-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet">
 @endsection
 
 @section('site-header')
@@ -10,8 +10,8 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدیریت مطب‌ها')
-@livewire('dr.panel.doctors-clinic.doctor-clinic-list')
+@livewire('mc.panel.doctors-clinic.doctor-clinic-list')
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 @endsection
 @endsection

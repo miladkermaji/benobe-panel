@@ -1,1 +1,1 @@
-<livewire:dr.panel.layouts.partials.header-component />
+<livewire:mc.panel.layouts.partials.header-component />

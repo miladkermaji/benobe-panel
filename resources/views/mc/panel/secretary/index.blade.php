@@ -1,7 +1,7 @@
-@extends('dr.panel.layouts.master')
+@extends('mc.panel.layouts.master')
 @section('styles')
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/css/secretary/secretaries.css') }}" rel="stylesheet">
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
+  <link type="text/css" href="{{ asset('mc-assets/panel/css/secretary/secretaries.css') }}" rel="stylesheet">
 @endsection
 
 @section('site-header')
@@ -11,12 +11,12 @@
 @section('bread-crumb-title', 'مدیریت منشی')
 
 @section('content')
-  @livewire('dr.panel.secretary.secretary-list')
+  @livewire('mc.panel.secretary.secretary-list')
 @endsection
 
 @section('scripts')
-  <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
-  <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
   <script>
     var appointmentsSearchUrl = "{{ route('search.appointments') }}";
     var updateStatusAppointmentUrl = "{{ route('updateStatusAppointment', ':id') }}";
@@ -85,7 +85,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-secretary-group-action') }}",
+            url: "{{ route('mc-secretary-group-action') }}",
             method: 'POST',
             data: {
               _token: '{{ csrf_token() }}',
@@ -156,10 +156,10 @@
                             </td>
                             <td>
                                 <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${secretary.id}" title="ویرایش">
-                                    <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش">
+                                    <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
                                 </button>
                                 <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${secretary.id}" title="حذف">
-                                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                    <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                                 </button>
                             </td>
                         </tr>`;
@@ -186,7 +186,7 @@
       form.removeClass('both-upper-fields-error');
 
       $.ajax({
-        url: "{{ route('dr-secretary-store') }}",
+        url: "{{ route('mc-secretary-store') }}",
         method: 'POST',
         data: form.serialize() + '&selectedClinicId=' + (localStorage.getItem('selectedClinicId') || 'default'),
         success: function(response) {
@@ -234,7 +234,7 @@
       const selectedClinicId = localStorage.getItem('selectedClinicId') ?? 'default';
 
       $.get(
-        "{{ route('dr-secretary-edit', ':id') }}".replace(':id', id) + '?selectedClinicId=' + selectedClinicId,
+        "{{ route('mc-secretary-edit', ':id') }}".replace(':id', id) + '?selectedClinicId=' + selectedClinicId,
         function(response) {
           $('#edit-secretary-id').val(response.id);
           $('#edit-first-name').val(response.first_name);
@@ -270,7 +270,7 @@
       const formData = form.serialize() + '&selectedClinicId=' + selectedClinicId;
 
       $.ajax({
-        url: "{{ route('dr-secretary-update', ':id') }}".replace(':id', id),
+        url: "{{ route('mc-secretary-update', ':id') }}".replace(':id', id),
         method: 'POST',
         data: formData,
         success: function(response) {
@@ -326,7 +326,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-secretary-delete', ':id') }}".replace(':id', id) + '?selectedClinicId=' +
+            url: "{{ route('mc-secretary-delete', ':id') }}".replace(':id', id) + '?selectedClinicId=' +
               selectedClinicId,
             method: 'DELETE',
             headers: {
@@ -365,7 +365,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
-            url: "{{ route('dr-secretary-update-status') }}",
+            url: "{{ route('mc-secretary-update-status') }}",
             method: 'PATCH',
             data: {
               _token: '{{ csrf_token() }}',
