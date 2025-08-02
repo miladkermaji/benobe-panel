@@ -8,7 +8,7 @@ use App\Models\DoctorSpecialty;
 use App\Models\Specialty;
 use App\Models\DoctorPermission;
 
-class DrSidebar extends Component
+class McSidebar extends Component
 {
     public $specialtyName;
     public $permissions = [];
@@ -92,7 +92,13 @@ class DrSidebar extends Component
 
     public function render()
     {
-        $user = Auth::guard('doctor')->check() ? Auth::guard('doctor')->user() : Auth::guard('secretary')->user();
+        $user = null;
+
+        if (Auth::guard('doctor')->check()) {
+            $user = Auth::guard('doctor')->user();
+        } elseif (Auth::guard('secretary')->check()) {
+            $user = Auth::guard('secretary')->user();
+        }
 
         return view('livewire.mc.panel.layouts.partials.mc-sidebar', [
             'user' => $user,
