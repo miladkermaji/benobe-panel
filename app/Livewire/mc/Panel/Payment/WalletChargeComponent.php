@@ -7,6 +7,7 @@ use App\Models\Transaction;
 use App\Models\DoctorWallet;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\DoctorWalletTransaction;
 use Modules\Payment\Services\PaymentService;
 use Livewire\Features\SupportRedirects\Redirector;
@@ -44,19 +45,34 @@ class WalletChargeComponent extends Component
 
     public function render()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $transactions = DoctorWalletTransaction::where('doctor_id', $doctorId)
             ->latest()
             ->take(10)
@@ -94,19 +110,34 @@ class WalletChargeComponent extends Component
 
         $this->isLoading = true;
 
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $callbackUrl = route('payment.callback');
         $successRedirect = route('mc-wallet-verify');
         $errorRedirect = route('mc-wallet-charge') . '?from_payment=error';
@@ -173,19 +204,34 @@ class WalletChargeComponent extends Component
                 return redirect()->route('mc-wallet-charge')->with('error', 'تراکنش تأیید نشده است.');
             }
 
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
+            // Get doctor_id based on guard
+            $doctorId = null;
+            if (Auth::guard('medical_center')->check()) {
+                // For medical_center guard, get the selected doctor
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $selectedDoctor = DB::table('medical_center_selected_doctors')
+                    ->where('medical_center_id', $medicalCenter->id)
+                    ->first();
+                $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+            } else {
+                $doctor = Auth::guard('doctor')->user();
+                if (!$doctor) {
+                    $secretary = Auth::guard('secretary')->user();
+                    if ($secretary && $secretary->doctor) {
+                        $doctor = $secretary->doctor;
+                    }
+                }
+                $doctorId = $doctor ? $doctor->id : null;
+            }
+
+            if (!$doctorId) {
+                if (Auth::guard('medical_center')->check()) {
+                    return redirect()->route('mc.auth.login-register-form');
+                } else {
+                    return redirect()->route('dr.auth.login-register-form');
                 }
             }
 
-            if (!$doctor) {
-                return redirect()->route('login');
-            }
-
-            $doctorId = $doctor->id;
             $meta = json_decode($transaction->meta, true);
 
             if (
@@ -221,19 +267,34 @@ class WalletChargeComponent extends Component
     public function deleteTransaction($transactionId)
     {
         try {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
+            // Get doctor_id based on guard
+            $doctorId = null;
+            if (Auth::guard('medical_center')->check()) {
+                // For medical_center guard, get the selected doctor
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $selectedDoctor = DB::table('medical_center_selected_doctors')
+                    ->where('medical_center_id', $medicalCenter->id)
+                    ->first();
+                $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+            } else {
+                $doctor = Auth::guard('doctor')->user();
+                if (!$doctor) {
+                    $secretary = Auth::guard('secretary')->user();
+                    if ($secretary && $secretary->doctor) {
+                        $doctor = $secretary->doctor;
+                    }
+                }
+                $doctorId = $doctor ? $doctor->id : null;
+            }
+
+            if (!$doctorId) {
+                if (Auth::guard('medical_center')->check()) {
+                    return redirect()->route('mc.auth.login-register-form');
+                } else {
+                    return redirect()->route('dr.auth.login-register-form');
                 }
             }
 
-            if (!$doctor) {
-                return redirect()->route('login');
-            }
-
-            $doctorId = $doctor->id;
             $transaction = DoctorWalletTransaction::where('id', $transactionId)
                 ->where('doctor_id', $doctorId)
                 ->first();

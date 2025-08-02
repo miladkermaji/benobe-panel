@@ -9,6 +9,7 @@ use App\Models\DoctorSettlementRequest;
 use App\Models\DoctorWallet;
 use App\Models\DoctorWalletTransaction;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class PaymentSettingComponent extends Component
@@ -20,19 +21,34 @@ class PaymentSettingComponent extends Component
 
     public function mount()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
         if (!$settings) {
@@ -49,19 +65,34 @@ class PaymentSettingComponent extends Component
 
     public function render()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $totalIncome = $this->calculateTotalIncome($doctorId);
         $paid = DoctorSettlementRequest::where('doctor_id', $doctorId)
             ->where('status', 'paid')
@@ -79,19 +110,34 @@ class PaymentSettingComponent extends Component
 
     public function deleteRequest($requestId)
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $request = DoctorSettlementRequest::where('doctor_id', $doctorId)->where('id', $requestId)->first();
 
         if (!$request) {
@@ -142,19 +188,34 @@ class PaymentSettingComponent extends Component
 
     public function requestSettlement()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $settings = DoctorPaymentSetting::where('doctor_id', $doctorId)->first();
 
         if (empty($this->card_number)) {
@@ -226,19 +287,34 @@ class PaymentSettingComponent extends Component
 
     protected function loadData()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $this->requests = DoctorSettlementRequest::where('doctor_id', $doctorId)
             ->latest()
             ->with('doctor')
