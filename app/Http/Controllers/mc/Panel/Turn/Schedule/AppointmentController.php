@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Appointment;
 use App\Models\AppointmentPattern;
 // use Hekmatinasser\Verta\Verta; // حذف Verta

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\PatientRecords;
+namespace App\Http\Controllers\Mc\Panel\PatientRecords;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class PatientRecordsController extends Controller
 {
@@ -13,7 +13,7 @@ class PatientRecordsController extends Controller
     public function index()
     {
         $patients = [];
-        return view('dr.panel.patient-records.index', compact('patients'));
+        return view('mc.panel.patient-records.index', compact('patients'));
     }
 
     /**

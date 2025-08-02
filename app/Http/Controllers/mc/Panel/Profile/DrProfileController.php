@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Profile;
+namespace App\Http\Controllers\Mc\Panel\Profile;
 
 use Carbon\Carbon;
 use App\Models\Otp;
@@ -18,7 +18,7 @@ use App\Traits\HandlesRateLimiting;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\UpdateProfileRequest;
@@ -130,7 +130,7 @@ class DrProfileController extends Controller
             }
         }
 
-        return view("dr.panel.profile.edit-profile", compact([
+        return view("mc.panel.profile.edit-profile", compact([
             'specialtyName',
             'academic_degrees',
             'specialties',
@@ -525,7 +525,7 @@ class DrProfileController extends Controller
 
     public function niceId()
     {
-        return view("dr.panel.profile.edit-niceId");
+        return view("mc.panel.profile.edit-niceId");
     }
 
     public function update_profile(UpdateProfileRequest $request)

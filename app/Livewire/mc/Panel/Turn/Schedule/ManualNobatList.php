@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Turn\Schedule;
+namespace App\Livewire\Mc\Panel\Turn\Schedule;
 
 use Exception;
 use Carbon\Carbon;
@@ -2616,6 +2616,6 @@ class ManualNobatList extends Component
     }
     public function render()
     {
-        return view('livewire.dr.panel.turn.schedule.manual-nobat-list');
+        return view('livewire.mc.panel.turn.schedule.manual-nobat-list');
     }
 }

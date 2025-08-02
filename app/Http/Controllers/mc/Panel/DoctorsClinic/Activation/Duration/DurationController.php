@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Duration;
+namespace App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Duration;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorAppointmentConfig;
 
 class DurationController extends Controller
@@ -13,10 +13,10 @@ class DurationController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-        return view('dr.panel.doctors-clinic.activation.duration.index', compact(['clinicId', 'doctorId']));
+        return view('mc.panel.doctors-clinic.activation.duration.index', compact(['clinicId', 'doctorId']));
     }
 
     public function store(Request $request)

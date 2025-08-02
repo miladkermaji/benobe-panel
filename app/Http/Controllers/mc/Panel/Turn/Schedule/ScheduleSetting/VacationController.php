@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Vacation;
 use App\Traits\HasSelectedClinic;
 use Illuminate\Http\Request;
@@ -46,7 +46,7 @@ class VacationController extends Controller
                 return response()->json(['success' => true, 'vacations' => $vacations, 'year' => $year, 'month' => $month]);
             }
 
-            return view("dr.panel.turn.schedule.scheduleSetting.vacation", compact('vacations', 'clinics'));
+            return view("mc.panel.turn.schedule.scheduleSetting.vacation", compact('vacations', 'clinics'));
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => 'خطا در پردازش تاریخ‌ها: ' . $e->getMessage()], 500);
         }

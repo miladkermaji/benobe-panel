@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation;
+namespace App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Clinic;
 use Illuminate\Http\Request;
 
@@ -14,7 +14,7 @@ class ActivationDoctorsClinicController extends Controller
     public function index($id)
     {
         $clinic = Clinic::where('id', $id)->first();
-        return view("dr.panel.doctors-clinic.activation.index", compact('clinic'));
+        return view("mc.panel.doctors-clinic.activation.index", compact('clinic'));
     }
 
     /**

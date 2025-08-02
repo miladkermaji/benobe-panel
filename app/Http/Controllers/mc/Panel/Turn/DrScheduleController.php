@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn;
+namespace App\Http\Controllers\Mc\Panel\Turn;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -13,7 +13,7 @@ use Morilog\Jalali\Jalalian;
 use App\Models\Admin\Manager;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class DrScheduleController extends Controller
 {
@@ -66,7 +66,7 @@ class DrScheduleController extends Controller
 
         $appointments = $appointments->get();
 
-        return view('dr.panel.turn.schedule.appointments', compact('appointments'));
+        return view('mc.panel.turn.schedule.appointments', compact('appointments'));
     }
 
     public function getAppointmentsByDate(Request $request)
@@ -362,6 +362,6 @@ class DrScheduleController extends Controller
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
 
-        return view("dr.panel.turn.schedule.my-appointments", compact('appointments'));
+        return view("mc.panel.turn.schedule.my-appointments", compact('appointments'));
     }
 }

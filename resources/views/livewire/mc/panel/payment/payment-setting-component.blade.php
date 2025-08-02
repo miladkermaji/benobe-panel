@@ -57,7 +57,7 @@
         <span class="fw-bold">درخواست‌های من</span>
         <span class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"
           title="موجودی قابل برداشت شامل هزینه‌های نوبت‌های حضوری ویزیت‌شده و مشاوره‌های آنلاین تکمیل‌شده (پاسخ‌داده‌شده) است که هنوز تسویه نشده‌اند.">
-          <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" srcset="">
+          <img src="{{ asset('mc-assets/icons/help.svg') }}" alt="" srcset="">
         </span>
       </div>
       <div class="card-body p-4">

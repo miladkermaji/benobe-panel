@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Secretary;
+namespace App\Livewire\Mc\Panel\Secretary;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -144,7 +144,7 @@ class SecretaryList extends Component
             }))
             ->orderByDesc('id')
             ->paginate($this->perPage);
-        return view('livewire.dr.panel.secretary.secretary-list', [
+        return view('livewire.mc.panel.secretary.secretary-list', [
             'secretaries' => $secretaries,
         ]);
     }

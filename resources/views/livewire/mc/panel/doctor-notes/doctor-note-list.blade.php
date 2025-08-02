@@ -21,7 +21,7 @@
                   </svg>
                 </span>
               </div>
-              <a href="{{ route('dr.panel.doctornotes.create') }}"
+              <a href="{{ route('mc.panel.doctornotes.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
@@ -120,7 +120,7 @@
                       </td>
                       <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
-                          <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
+                          <a href="{{ route('mc.panel.doctornotes.edit', $item->id) }}"
                             class="btn btn-sm btn-gradient-success px-2 py-1">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
@@ -194,7 +194,7 @@
                         </span>
                       </div>
                       <div class="d-flex gap-1">
-                        <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
+                        <a href="{{ route('mc.panel.doctornotes.edit', $item->id) }}"
                           class="btn btn-sm btn-gradient-success  px-2 py-1">
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2">

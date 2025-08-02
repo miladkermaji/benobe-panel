@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Layouts\Partials;
+namespace App\Livewire\Mc\Panel\Layouts\Partials;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -94,7 +94,7 @@ class DrSidebar extends Component
     {
         $user = Auth::guard('doctor')->check() ? Auth::guard('doctor')->user() : Auth::guard('secretary')->user();
 
-        return view('livewire.mc.panel.layouts.partials.dr-sidebar', [
+        return view('livewire.mc.panel.layouts.partials.mc-sidebar', [
             'user' => $user,
             'permissions' => $this->permissions
         ]);

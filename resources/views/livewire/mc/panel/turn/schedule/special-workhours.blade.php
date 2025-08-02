@@ -50,7 +50,7 @@
                         data-day="{{ $workSchedule['data']['day'] }}"
                         wire:click="openEmergencyModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                         data-index="{{ $index }}" @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                        <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                       </button>
                     </x-custom-tooltip>
                   </div>
@@ -58,7 +58,7 @@
                     <x-custom-tooltip title="حذف برنامه کاری" placement="top">
                       <button class="btn btn-light btn-sm remove-row-btn" wire:click="removeSlot({{ $index }})"
                         @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                     </x-custom-tooltip>
                   </div>
@@ -69,7 +69,7 @@
                       wire:click="openScheduleModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                       data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}"
                       @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                      <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                     </button>
                   </x-custom-tooltip>
                 </div>
@@ -80,7 +80,7 @@
             <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
               data-original-title="اضافه کردن ساعت کاری جدید" wire:click="addSlot"
               @if ($isProcessing) disabled @endif>
-              <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+              <img src="{{ asset('mc-assets/icons/plus2.svg') }}" alt="" srcset="">
               <span>افزودن ردیف جدید</span>
             </button>
           </div>
@@ -255,7 +255,7 @@
                       <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
                         data-index="{{ $index }}"
                         wire:click="deleteScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                     </div>
                   @endforeach

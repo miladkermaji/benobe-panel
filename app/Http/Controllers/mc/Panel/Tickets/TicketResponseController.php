@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Tickets;
+namespace App\Http\Controllers\Mc\Panel\Tickets;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Ticket;
 use App\Models\TicketResponse;
 use Illuminate\Http\Request;

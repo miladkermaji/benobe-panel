@@ -21,7 +21,7 @@
           </svg>
           ذخیره تغییرات
         </button>
-        <a href="{{ route('dr.panel.doctor-services.index') }}"
+        <a href="{{ route('mc.panel.doctor-services.index') }}"
           class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
           <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2">

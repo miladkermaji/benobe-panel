@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\Counseling\ConsultTerm;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\Counseling\ConsultTerm;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use Illuminate\Http\Request;
 
 class ConsultTermController extends Controller
 {
     public function index()
     {
-        return view('dr.panel.turn.schedule.Counseling.consult-term.index');
+        return view('mc.panel.turn.schedule.Counseling.consult-term.index');
     }
 }

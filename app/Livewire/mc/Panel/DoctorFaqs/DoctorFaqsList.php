@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorFaqs;
+namespace App\Livewire\Mc\Panel\DoctorFaqs;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -140,7 +140,7 @@ class DoctorFaqsList extends Component
     {
         $faqs = $this->readyToLoad ? $this->getFaqsQuery() : null;
 
-        return view('livewire.dr.panel.doctor-faqs.doctor-faqs-list', [
+        return view('livewire.mc.panel.doctor-faqs.doctor-faqs-list', [
             'faqs' => $faqs,
         ]);
     }

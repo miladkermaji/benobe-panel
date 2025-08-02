@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorPrescriptions;
+namespace App\Livewire\Mc\Panel\DoctorPrescriptions;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -123,6 +123,6 @@ class PrescriptionList extends Component
         }
         $prescriptions = $query->orderByDesc('created_at')->paginate(30);
         $insurances = \App\Models\PrescriptionInsurance::all();
-        return view('livewire.dr.panel.doctor-prescriptions.prescription-list', compact('prescriptions', 'insurances'));
+        return view('livewire.mc.panel.doctor-prescriptions.prescription-list', compact('prescriptions', 'insurances'));
     }
 }

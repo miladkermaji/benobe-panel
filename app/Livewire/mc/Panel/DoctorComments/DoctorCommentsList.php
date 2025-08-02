@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorComments;
+namespace App\Livewire\Mc\Panel\DoctorComments;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -133,7 +133,7 @@ class DoctorCommentsList extends Component
     public function render()
     {
         $comments = $this->readyToLoad ? $this->getCommentsQuery() : collect();
-        return view('livewire.dr.panel.doctor-comments.doctor-comment-list', [
+        return view('livewire.mc.panel.doctor-comments.doctor-comment-list', [
             'comments' => $comments,
         ]);
     }

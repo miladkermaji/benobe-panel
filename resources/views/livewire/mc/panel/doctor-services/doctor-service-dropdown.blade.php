@@ -26,7 +26,7 @@
   </td>
   <td class="text-center align-middle">
     <div class="d-flex justify-content-center gap-2">
-      <a href="{{ route('dr.panel.doctor-services.edit', $service->id) }}"
+      <a href="{{ route('mc.panel.doctor-services.edit', $service->id) }}"
         class="btn btn-gradient-success rounded-pill px-3">
         <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">
@@ -50,7 +50,7 @@
       <table class="table table-bordered w-100 m-0">
         <tbody>
           @foreach ($service->children as $child)
-            @include('livewire.dr.panel.doctor-services.doctor-service-dropdown', [
+            @include('livewire.mc.panel.doctor-services.doctor-service-dropdown', [
                 'service' => $child,
                 'level' => $level + 1,
                 'index' => $index . '.' . ($loop->index + 1),

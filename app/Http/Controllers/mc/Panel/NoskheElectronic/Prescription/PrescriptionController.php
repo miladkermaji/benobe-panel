@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Prescription;
+namespace App\Http\Controllers\Mc\Panel\NoskheElectronic\Prescription;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class PrescriptionController extends Controller
 {
@@ -12,7 +12,7 @@ class PrescriptionController extends Controller
      */
     public function index()
     {
-        return view('dr.panel.noskhe-electronic.prescription.index');
+        return view('mc.panel.noskhe-electronic.prescription.index');
     }
 
     /**
@@ -20,7 +20,7 @@ class PrescriptionController extends Controller
      */
     public function create()
     {
-        return view('dr.panel.noskhe-electronic.prescription.create');
+        return view('mc.panel.noskhe-electronic.prescription.create');
     }
 
     /**
@@ -69,6 +69,6 @@ class PrescriptionController extends Controller
         $prescriptions = \App\Models\PrescriptionRequest::where('doctor_id', $doctor->id)
             ->orderByDesc('created_at')
             ->paginate(20);
-        return view('dr.panel.noskhe-electronic.prescription.my-prescriptions', compact('prescriptions'));
+        return view('mc.panel.noskhe-electronic.prescription.my-prescriptions', compact('prescriptions'));
     }
 }

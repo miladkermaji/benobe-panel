@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\MyPerformance;
+namespace App\Http\Controllers\Mc\Panel\MyPerformance;
 
 use App\Models\User;
 use App\Models\Appointment;
@@ -9,7 +9,7 @@ use App\Models\ManualAppointment;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CounselingAppointment;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Doctor;
 use App\Traits\HasSelectedClinic;
 
@@ -24,7 +24,7 @@ class MyPerformanceController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
@@ -43,11 +43,11 @@ class MyPerformanceController extends Controller
             }
         ])->find($doctorId);
 
-        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
+        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
         })->get();
-        
-        return view('dr.panel.my-performance.index', compact('medicalCenters', 'medicalCenter', 'medicalCenterId'));
+
+        return view('mc.panel.my-performance.index', compact('medicalCenters', 'medicalCenter', 'medicalCenterId'));
     }
 
     /**
@@ -248,10 +248,10 @@ class MyPerformanceController extends Controller
     public function chart()
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
+        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
         })->get();
-        return view('dr.panel.my-performance.chart.index', compact('medicalCenters'));
+        return view('mc.panel.my-performance.chart.index', compact('medicalCenters'));
     }
 
     public function getChartData(Request $request)

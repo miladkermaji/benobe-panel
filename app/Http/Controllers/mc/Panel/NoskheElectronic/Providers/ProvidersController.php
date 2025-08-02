@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Providers;
+namespace App\Http\Controllers\Mc\Panel\NoskheElectronic\Providers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class ProvidersController extends Controller
 {
@@ -12,7 +12,7 @@ class ProvidersController extends Controller
      */
     public function index()
     {
-        return view('dr.panel.noskhe-electronic.providers.index');
+        return view('mc.panel.noskhe-electronic.providers.index');
     }
 
     /**

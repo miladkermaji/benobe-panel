@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel;
+namespace App\Livewire\Mc\Panel;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -152,8 +152,8 @@ class Workhours extends Component
     public $manualNobatSettingId = null;
     public function mount()
     {
-        $this->showSaveButton = request()->routeIs('dr-workhours');
-        $this->isActivationPage = request()->is('dr/panel/doctors-clinic/activation/workhours/*');
+        $this->showSaveButton = request()->routeIs('mc-workhours');
+        $this->isActivationPage = request()->is('mc/panel/doctors-clinic/activation/workhours/*');
         $this->showSaveButton = !$this->isActivationPage;
         // تنظیم activeMedicalCenterId
         $this->activeMedicalCenterId = $this->resolveMedicalCenterId();
@@ -232,7 +232,7 @@ class Workhours extends Component
      */
     private function resolveMedicalCenterId(): string
     {
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             return request()->route('clinic') ?? 'default';
         }
         return $this->getSelectedMedicalCenterId() ?? 'default';
@@ -365,7 +365,7 @@ class Workhours extends Component
     public function openScheduleModal($day, $index)
     {
         // تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -431,7 +431,7 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -590,7 +590,7 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -736,7 +736,7 @@ class Workhours extends Component
     public function addScheduleSetting($day)
     {
         // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -789,7 +789,7 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -857,7 +857,7 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -959,7 +959,7 @@ class Workhours extends Component
         }
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -1123,7 +1123,7 @@ class Workhours extends Component
     }
     public function refreshWorkSchedules()
     {
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('clinic') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -1218,7 +1218,7 @@ class Workhours extends Component
     public function saveEmergencyTimes()
     {
         // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -1264,7 +1264,7 @@ class Workhours extends Component
     {
         try {
             // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -1368,7 +1368,7 @@ class Workhours extends Component
     {
         try {
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -1549,7 +1549,7 @@ class Workhours extends Component
             $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
             $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
             // تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -1681,7 +1681,7 @@ class Workhours extends Component
     {
         try {
             // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -2034,7 +2034,7 @@ class Workhours extends Component
     {
         try {
             // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -2140,7 +2140,7 @@ class Workhours extends Component
     {
         try {
             // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -2220,7 +2220,7 @@ class Workhours extends Component
     {
         try {
             // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-            if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+            if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
                 $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
                 $this->activeMedicalCenterId = $currentMedicalCenterId;
             } else {
@@ -2303,7 +2303,7 @@ class Workhours extends Component
             return;
         }
         // تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -2377,7 +2377,7 @@ class Workhours extends Component
     public function updatedIsWorking($value, $key)
     {
         // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -2447,7 +2447,7 @@ class Workhours extends Component
     public function updateAutoScheduling()
     {
         // اضافه کردن شرط برای تنظیم activeMedicalCenterId
-        if (request()->is('dr/panel/doctors-clinic/activation/workhours/*')) {
+        if (request()->is('mc/panel/doctors-clinic/activation/workhours/*')) {
             $currentMedicalCenterId = request()->route('medicalCenter') ?? 'default';
             $this->activeMedicalCenterId = $currentMedicalCenterId;
         } else {
@@ -2506,7 +2506,7 @@ class Workhours extends Component
     }
     public function render()
     {
-        return view('livewire.dr.panel.work-hours');
+        return view('livewire.mc.panel.work-hours');
     }
     // ذخیره خودکار هر فیلد تنظیمات نوبت دستی
     public function autoSaveManualNobatSetting($field)

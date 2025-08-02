@@ -38,7 +38,7 @@
         <button wire:click="toggleStatus({{ $service->id }})" class="status-badge {{ $service->status ? 'status-active' : 'status-inactive' }}">{{ $service->status ? 'فعال' : 'غیرفعال' }}</button>
     </div>
     <div class="service-actions">
-        <a href="{{ route('dr.panel.doctor-services.edit', $service->id) }}" class="btn btn-outline-primary btn-sm">
+        <a href="{{ route('mc.panel.doctor-services.edit', $service->id) }}" class="btn btn-outline-primary btn-sm">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
@@ -53,7 +53,7 @@
 @foreach ($service->children as $child)
     @if ($service->isOpen ?? true)
         <div class="service-child {{ $service->isOpen ? 'child-open' : '' }}">
-            @include('livewire.dr.panel.doctor-services.doctor-service-tree', ['service' => $child, 'level' => $level + 1, 'index' => $index . '.' . ($loop->index + 1)])
+            @include('livewire.mc.panel.doctor-services.doctor-service-tree', ['service' => $child, 'level' => $level + 1, 'index' => $index . '.' . ($loop->index + 1)])
         </div>
     @endif
 @endforeach

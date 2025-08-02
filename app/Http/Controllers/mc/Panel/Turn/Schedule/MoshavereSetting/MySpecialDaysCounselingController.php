@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\CounselingAppointment;
 use App\Models\CounselingDailySchedule;
 use App\Models\CounselingHoliday;
@@ -20,7 +20,7 @@ class MySpecialDaysCounselingController extends Controller
 {
     public function mySpecialDays()
     {
-        return view("dr.panel.turn.schedule.Counseling.my-special-days");
+        return view("mc.panel.turn.schedule.Counseling.my-special-days");
     }
     public function updateWorkSchedule(Request $request)
     {

@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Activation\Consult\Rules;
+namespace App\Http\Controllers\Mc\Panel\Activation\Consult\Rules;
 
 use App\Models\Doctor;
 use App\Models\Specialty;
 use App\Models\AcademicDegree;
 use App\Models\DoctorSpecialty;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class ConsultRulesController extends Controller
 {
@@ -21,11 +21,11 @@ class ConsultRulesController extends Controller
     }
     public function index()
     {
-        return view('dr.panel.activation.consult.rules.index');
+        return view('mc.panel.activation.consult.rules.index');
     }
     public function help()
     {
-        return view('dr.panel.activation.consult.help.index');
+        return view('mc.panel.activation.consult.help.index');
     }
     public function messengers()
     {
@@ -44,7 +44,7 @@ class ConsultRulesController extends Controller
         $specialties        = Specialty::getOptimizedList();
         $incompleteSections = $doctor->getIncompleteProfileSections();
 
-        return view("dr.panel.activation.consult.messengers.index", compact([
+        return view("mc.panel.activation.consult.messengers.index", compact([
             'specialtyName',
             'academic_degrees',
             'specialties',

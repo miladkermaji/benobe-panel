@@ -1,23 +1,23 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorFaqs;
+namespace App\Http\Controllers\Mc\Panel\DoctorFaqs;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class DoctorFaqController extends Controller
 {
     public function index()
     {
-        return view('dr.panel.doctor-faqs.index');
+        return view('mc.panel.doctor-faqs.index');
     }
 
     public function create()
     {
-        return view('dr.panel.doctor-faqs.create');
+        return view('mc.panel.doctor-faqs.create');
     }
 
     public function edit($id)
     {
-        return view('dr.panel.doctor-faqs.edit', compact('id'));
+        return view('mc.panel.doctor-faqs.edit', compact('id'));
     }
 }

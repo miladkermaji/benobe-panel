@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Tickets;
+namespace App\Http\Controllers\Mc\Panel\Tickets;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,10 +14,10 @@ class TicketsController extends Controller
         $tickets = Ticket::latest()->paginate(2);
 
         if ($request->ajax()) {
-            return view('dr.panel.tickets.index', compact('tickets'))->render();
+            return view('mc.panel.tickets.index', compact('tickets'))->render();
         }
 
-        return view('dr.panel.tickets.index', compact('tickets'));
+        return view('mc.panel.tickets.index', compact('tickets'));
     }
 
     public function store(Request $request)
@@ -63,7 +63,7 @@ class TicketsController extends Controller
     public function show(string $id)
     {
         $ticket = Ticket::with('responses.doctor')->findOrFail($id);
-        return view('dr.panel.tickets.show', compact('ticket'));
+        return view('mc.panel.tickets.show', compact('ticket'));
     }
 
     public function destroy($id)

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Profile;
+namespace App\Http\Controllers\Mc\Panel\Profile;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorProfileUpgrade;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +37,7 @@ class DrUpgradeProfileController extends Controller
             session()->flash('error', session('error'));
         }
 
-        return view('dr.panel.profile.upgrade', compact('payments'));
+        return view('mc.panel.profile.upgrade', compact('payments'));
     }
 
     public function payForUpgrade(Request $request)
@@ -65,14 +65,14 @@ class DrUpgradeProfileController extends Controller
             return redirect()->away($paymentResponse);
         }
 
-        return redirect()->route('dr-edit-profile-upgrade')->with('error', 'خطا در انتقال به درگاه پرداخت');
+        return redirect()->route('mc-edit-profile-upgrade')->with('error', 'خطا در انتقال به درگاه پرداخت');
     }
 
     public function confirmPayment()
     {
         $doctor = Auth::guard('doctor')->user();
         if (!$doctor) {
-            return redirect()->route('dr-edit-profile-upgrade')->with('error', 'ابتدا وارد حساب خود شوید.');
+            return redirect()->route('mc-edit-profile-upgrade')->with('error', 'ابتدا وارد حساب خود شوید.');
         }
 
         // تأیید پرداخت از درگاه
@@ -97,13 +97,13 @@ class DrUpgradeProfileController extends Controller
                     'expires_at'        => now()->addDays(90),
                 ]);
 
-                return redirect()->route('dr-edit-profile-upgrade')->with('success', 'پرداخت شما با موفقیت انجام شد و حساب شما ارتقاء یافت.');
+                return redirect()->route('mc-edit-profile-upgrade')->with('success', 'پرداخت شما با موفقیت انجام شد و حساب شما ارتقاء یافت.');
             }
 
-            return redirect()->route('dr-edit-profile-upgrade')->with('error', 'تراکنش یافت شد اما با ارتقاء حساب شما مطابقت ندارد.');
+            return redirect()->route('mc-edit-profile-upgrade')->with('error', 'تراکنش یافت شد اما با ارتقاء حساب شما مطابقت ندارد.');
         }
 
-        return redirect()->route('dr-edit-profile-upgrade')->with('error', 'تأیید پرداخت ناموفق بود.');
+        return redirect()->route('mc-edit-profile-upgrade')->with('error', 'تأیید پرداخت ناموفق بود.');
     }
 
     public function deletePayment($id)

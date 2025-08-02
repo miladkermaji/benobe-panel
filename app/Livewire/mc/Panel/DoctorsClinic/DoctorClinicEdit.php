@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorsClinic;
+namespace App\Livewire\Mc\Panel\DoctorsClinic;
 
 use App\Models\Zone;
 use App\Models\Clinic;
@@ -131,11 +131,11 @@ class DoctorClinicEdit extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'مطب با موفقیت ویرایش شد!');
-        return redirect()->route('dr-clinic-management');
+        return redirect()->route('mc-clinic-management');
     }
 
     public function render()
     {
-        return view('livewire.dr.panel.doctors-clinic.doctor-clinic-edit');
+        return view('livewire.mc.panel.doctors-clinic.doctor-clinic-edit');
     }
 }

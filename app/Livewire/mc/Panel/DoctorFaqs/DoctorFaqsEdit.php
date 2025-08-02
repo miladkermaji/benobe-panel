@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorFaqs;
+namespace App\Livewire\Mc\Panel\DoctorFaqs;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -19,7 +19,7 @@ class DoctorFaqsEdit extends Component
     public function mount($id)
     {
 
-       
+
 
         $this->faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
         $this->form = $this->faq->toArray();
@@ -61,7 +61,7 @@ class DoctorFaqsEdit extends Component
 
         // نمایش اعلان موفقیت و ریدایرکت
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('dr.panel.doctor-faqs.index');
+        return redirect()->route('mc.panel.doctor-faqs.index');
     }
 
     /**
@@ -69,6 +69,6 @@ class DoctorFaqsEdit extends Component
      */
     public function render()
     {
-        return view('livewire.dr.panel.doctor-faqs.doctor-faqs-edit');
+        return view('livewire.mc.panel.doctor-faqs.doctor-faqs-edit');
     }
 }

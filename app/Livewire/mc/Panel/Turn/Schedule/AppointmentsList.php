@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Turn\Schedule;
+namespace App\Livewire\Mc\Panel\Turn\Schedule;
 
 use Exception;
 use Carbon\Carbon;
@@ -2816,7 +2816,7 @@ class AppointmentsList extends Component
     }
     public function render()
     {
-        return view('livewire.dr.panel.turn.schedule.appointments-list');
+        return view('livewire.mc.panel.turn.schedule.appointments-list');
     }
     #[On('getAppointmentDetails')]
     public function getAppointmentDetails($appointmentId = null, $appointmentIds = null)

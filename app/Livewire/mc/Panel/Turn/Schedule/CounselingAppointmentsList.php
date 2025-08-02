@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Turn\Schedule;
+namespace App\Livewire\Mc\Panel\Turn\Schedule;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -1744,6 +1744,6 @@ $this->getSelectedMedicalCenterId();
 
     public function render()
     {
-        return view('livewire.dr.panel.turn.schedule.counseling-appointments-list');
+        return view('livewire.mc.panel.turn.schedule.counseling-appointments-list');
     }
 }

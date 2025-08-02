@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel;
+namespace App\Livewire\Mc\Panel;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -1611,6 +1611,6 @@ class CounselingWorkHours extends Component
 
     public function render()
     {
-        return view('livewire.dr.panel.counseling-work-hours');
+        return view('livewire.mc.panel.counseling-work-hours');
     }
 }

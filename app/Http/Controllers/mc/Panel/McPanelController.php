@@ -10,7 +10,7 @@ use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class McPanelController extends Controller
 {
@@ -22,7 +22,7 @@ class McPanelController extends Controller
                 Auth::guard('medical_center')->user();
 
         if (!$user) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
         // اگر کاربر مرکز درمانی باشد، اطلاعات مربوط به مرکز درمانی را نمایش بده
@@ -65,7 +65,7 @@ class McPanelController extends Controller
 
             $selectedMedicalCenterId = $medicalCenter->id;
 
-            return view('dr.panel.index', compact(
+            return view('mc.panel.index', compact(
                 'totalPatientsToday',
                 'visitedPatients',
                 'remainingPatients',

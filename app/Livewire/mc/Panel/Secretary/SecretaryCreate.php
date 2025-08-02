@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Secretary;
+namespace App\Livewire\Mc\Panel\Secretary;
 
 use App\Models\Zone;
 use Livewire\Component;
@@ -107,12 +107,12 @@ class SecretaryCreate extends Component
             'status' => 1,
         ]);
         $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'منشی با موفقیت اضافه شد.']);
-        return redirect()->route('dr-secretary-management');
+        return redirect()->route('mc-secretary-management');
     }
 
     public function render()
     {
-        return view('livewire.dr.panel.secretary.secretary-create', [
+        return view('livewire.mc.panel.secretary.secretary-create', [
             'provinces' => $this->provinces,
             'cities' => $this->cities,
         ]);

@@ -169,7 +169,7 @@
                                         x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
                                         @click="$dispatch('open-modal', { name: 'schedule-modal', day: day, index: index })"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                        <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -181,7 +181,7 @@
                                       <button class="btn btn-light btn-sm emergency-slot-btn" x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
                                         @click="$dispatch('open-modal', { name: 'emergency-modal', day: day, index: index })"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                        <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -192,7 +192,7 @@
                                         x-data="{ day: '{{ $englishDay }}', index: '{{ $index }}' }"
                                         @click="$dispatch('open-modal', { name: 'checkbox-modal', day: day, index: index })"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                        <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -202,7 +202,7 @@
                                       <button class="btn btn-light btn-sm remove-row-btn"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}
                                         data-day="{{ $englishDay }}" data-index="{{ $index }}">
-                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -246,7 +246,7 @@
                                 <div class="form-group position-relative {{ $autoScheduling ? '' : 'd-none' }}">
                                   <x-custom-tooltip title="زمانبندی باز شدن نوبت‌ها" placement="top">
                                     <button type="button" class="btn text-black btn-sm schedule-btn" disabled>
-                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                      <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -255,21 +255,21 @@
                                     title="زمان‌های مخصوص منشی که می‌تواند برای شرایط خاص نگهدارد. این زمان‌ها غیرفعال می‌شوند تا زمانی که منشی یا پزشک آن‌ها را مجدداً فعال کند."
                                     placement="top">
                                     <button class="btn btn-light btn-sm emergency-slot-btn" disabled>
-                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                      <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip title="کپی ساعات کاری" placement="top">
                                     <button class="btn btn-light btn-sm copy-single-slot-btn" disabled>
-                                      <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                      <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
                                 <div class="form-group position-relative">
                                   <x-custom-tooltip title="حذف برنامه کاری" placement="top">
                                     <button class="btn btn-light btn-sm remove-row-btn" disabled>
-                                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                      <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -280,7 +280,7 @@
                             <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true"
                               data-placement="bottom" data-original-title="اضافه کردن ساعت کاری جدید"
                               wire:click="addSlot('{{ $englishDay }}')">
-                              <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+                              <img src="{{ asset('mc-assets/icons/plus2.svg') }}" alt="" srcset="">
                               <span>افزودن ردیف جدید</span>
                             </button>
                           </div>
@@ -342,7 +342,7 @@
                     </div>
                   </div>
                   <div class="p-3">
-                    <a href="{{ route('dr-panel', ['showModal' => 'true']) }}"
+                    <a href="{{ route('mc-panel', ['showModal' => 'true']) }}"
                       class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">شروع
                       نوبت‌دهی</a>
                   </div>
@@ -490,7 +490,7 @@
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                   @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
-                                  <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                                  <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی"
                                     style="width: 14px; height: 14px;">
                                 </button>
                               </x-custom-tooltip>
@@ -501,7 +501,7 @@
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
                                   @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
-                                  <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                  <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف"
                                     style="width: 14px; height: 14px;">
                                 </button>
                               </x-custom-tooltip>
@@ -528,7 +528,7 @@
                           <div class="form-group position-relative">
                             <x-custom-tooltip title="کپی تنظیمات" placement="top">
                               <button class="my-btn btn-light btn-sm copy-schedule-setting p-1" disabled>
-                                <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"
+                                <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی"
                                   style="width: 14px; height: 14px;">
                               </button>
                             </x-custom-tooltip>
@@ -536,7 +536,7 @@
                           <div class="form-group position-relative">
                             <x-custom-tooltip title="حذف تنظیمات" placement="top">
                               <button class="my-btn btn-outline-danger btn-sm delete-schedule-setting p-1" disabled>
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                                <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف"
                                   style="width: 14px; height: 14px;">
                               </button>
                             </x-custom-tooltip>
@@ -547,7 +547,7 @@
                         <button class="add-row-btn btn btn-sm btn-light p-1 font-size-12" data-tooltip="true"
                           data-placement="bottom" data-original-title="اضافه کردن تنظیم جدید"
                           wire:click="addScheduleSetting('{{ $day }}')">
-                          <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt=""
+                          <img src="{{ asset('mc-assets/icons/plus2.svg') }}" alt=""
                             style="width: 14px; height: 14px;">
                           <span>افزودن</span>
                         </button>

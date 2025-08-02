@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use App\Models\SpecialDailySchedule;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorAppointmentConfig;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
@@ -57,13 +57,13 @@ class ScheduleSettingController extends Controller
             ]
         );
 
-        return view("dr.panel.turn.schedule.scheduleSetting.workhours", [
+        return view("mc.panel.turn.schedule.scheduleSetting.workhours", [
             'appointmentConfig' => $appointmentConfig,
             'workSchedules'     => $workSchedules,
             'selectedClinicId'  => $selectedClinicId,
         ]); */
 
-        return view("dr.panel.turn.schedule.scheduleSetting.workhours");
+        return view("mc.panel.turn.schedule.scheduleSetting.workhours");
 
     }
 
@@ -935,15 +935,15 @@ class ScheduleSettingController extends Controller
     // متدهای موجود در کنترلر اصلی
     public function index()
     {
-        return view("dr.panel.turn.schedule.scheduleSetting.index");
+        return view("mc.panel.turn.schedule.scheduleSetting.index");
     }
     public function turnContract()
     {
-        return view("dr.panel.turn.schedule.turnContract.index");
+        return view("mc.panel.turn.schedule.turnContract.index");
     }
     public function mySpecialDays()
     {
-        return view("dr.panel.turn.schedule.scheduleSetting.my-special-days");
+        return view("mc.panel.turn.schedule.scheduleSetting.my-special-days");
     }
     public function getAppointmentsCountPerDay(Request $request)
     {

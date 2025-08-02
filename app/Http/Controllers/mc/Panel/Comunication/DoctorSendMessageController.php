@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Comunication;
+namespace App\Http\Controllers\Mc\Panel\Comunication;
 
 use App\Models\SmsTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class DoctorSendMessageController extends Controller
 {
@@ -18,8 +18,8 @@ class DoctorSendMessageController extends Controller
 
         $messages = SmsTemplate::with('user')->latest()->get();
 
-       
 
-        return view('dr.panel.comunication.send-message',compact('messages'));
+
+        return view('mc.panel.comunication.send-message', compact('messages'));
     }
 }

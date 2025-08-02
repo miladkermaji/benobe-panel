@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\TurnsCatByDays;
+namespace App\Http\Controllers\Mc\Panel\Turn\TurnsCatByDays;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class TurnsCatByDaysController extends Controller
 {
@@ -12,7 +12,7 @@ class TurnsCatByDaysController extends Controller
      */
     public function index()
     {
-        return view("dr.panel.turn.schedule.turnsCatByDays.index");
+        return view("mc.panel.turn.schedule.turnsCatByDays.index");
     }
 
     /**

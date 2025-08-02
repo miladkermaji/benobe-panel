@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Secretary;
+namespace App\Http\Controllers\Mc\Panel\Secretary;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\Secretary;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
@@ -13,16 +13,16 @@ class SecretaryManagementController extends Controller
 {
     public function index(Request $request)
     {
-        return view('dr.panel.secretary.index');
+        return view('mc.panel.secretary.index');
     }
 
     public function create()
     {
-        return view('dr.panel.secretary.create');
+        return view('mc.panel.secretary.create');
     }
 
     public function edit($id)
     {
-        return view('dr.panel.secretary.edit');
+        return view('mc.panel.secretary.edit');
     }
 }

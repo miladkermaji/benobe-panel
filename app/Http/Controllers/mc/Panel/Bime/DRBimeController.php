@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Bime;
+namespace App\Http\Controllers\Mc\Panel\Bime;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use Illuminate\Http\Request;
 
 class DRBimeController extends Controller
@@ -12,7 +12,7 @@ class DRBimeController extends Controller
      */
     public function index()
     {
-        return view("dr.panel.bime.index");
+        return view("mc.panel.bime.index");
     }
 
     /**

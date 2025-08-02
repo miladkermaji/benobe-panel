@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ManualNobat;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\ManualNobat;
 
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 
@@ -46,7 +46,7 @@ class ManualNobatController extends Controller
                 ]);
             }
 
-            return view('dr.panel.turn.schedule.manual_nobat.index', compact('appointments'));
+            return view('mc.panel.turn.schedule.manual_nobat.index', compact('appointments'));
         } catch (\Exception $e) {
             Log::error('Error in fetching appointments: ' . $e->getMessage());
 
@@ -76,7 +76,7 @@ class ManualNobatController extends Controller
             })
             ->first();
 
-        return view('dr.panel.turn.schedule.manual_nobat.manual-nobat-setting', compact('settings'));
+        return view('mc.panel.turn.schedule.manual_nobat.manual-nobat-setting', compact('settings'));
     }
 
     public function saveSettings(Request $request)

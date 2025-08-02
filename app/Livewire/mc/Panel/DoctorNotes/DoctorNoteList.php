@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Doctornotes;
+namespace App\Livewire\Mc\Panel\Doctornotes;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -139,7 +139,7 @@ class DoctorNoteList extends Component
     {
         $items = $this->readyToLoad ? $this->getDoctorNotesQuery() : null;
 
-        return view('livewire.dr.panel.doctor-notes.doctor-note-list', [
+        return view('livewire.mc.panel.doctor-notes.doctor-note-list', [
             'doctorNotes' => $items,
         ]);
     }

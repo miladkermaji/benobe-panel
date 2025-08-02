@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Turn\Schedule;
+namespace App\Livewire\Mc\Panel\Turn\Schedule;
 
 use Carbon\Carbon;
 use App\Models\Doctor;
@@ -1721,7 +1721,7 @@ class SpecialDaysAppointment extends Component
     }
     public function render()
     {
-        return view('livewire.dr.panel.turn.schedule.special-days-appointment');
+        return view('livewire.mc.panel.turn.schedule.special-days-appointment');
     }
     /**
      * نرمال‌سازی فرمت appointment_settings به آرایه‌ای از آبجکت‌های دارای day, start_time, end_time, work_hour_key

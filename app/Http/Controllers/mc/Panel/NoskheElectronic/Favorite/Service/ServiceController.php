@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Service;
+namespace App\Http\Controllers\Mc\Panel\NoskheElectronic\Favorite\Service;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class ServiceController extends Controller
 {
@@ -12,7 +12,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        return view('dr.panel.noskhe-electronic.favorite.service.index');
+        return view('mc.panel.noskhe-electronic.favorite.service.index');
     }
 
     /**

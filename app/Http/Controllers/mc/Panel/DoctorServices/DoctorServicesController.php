@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorServices;
+namespace App\Http\Controllers\Mc\Panel\DoctorServices;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorService;
 use Illuminate\Http\Request;
 
@@ -10,14 +10,14 @@ class DoctorServicesController extends Controller
 {
     public function index()
     {
-        return view('dr.panel.dr-services.index');
+        return view('mc.panel.mc-services.index');
     }
 
     public function create()
     {
         // دریافت تمامی خدمت‌ها جهت انتخاب به عنوان خدمت مادر
         $parentServices = DoctorService::all();
-        return view('dr.panel.dr-services.create', compact('parentServices'));
+        return view('mc.panel.mc-services.create', compact('parentServices'));
     }
 
     public function store(Request $request)
@@ -55,7 +55,7 @@ class DoctorServicesController extends Controller
         $data['medical_center_id'] = $selectedClinicId !== 'default' ? $selectedClinicId : null;
 
         DoctorService::create($data);
-        return redirect()->route('dr-services.index')->with('success', 'خدمت با موفقیت ایجاد شد.');
+        return redirect()->route('mc-services.index')->with('success', 'خدمت با موفقیت ایجاد شد.');
     }
 
     public function edit(DoctorService $service)
@@ -66,7 +66,7 @@ class DoctorServicesController extends Controller
             return abort(403, 'Access denied');
         }
         $parentServices = DoctorService::where('id', '!=', $service->id)->get();
-        return view('dr.panel.dr-services.edit', compact('service', 'parentServices'));
+        return view('mc.panel.mc-services.edit', compact('service', 'parentServices'));
     }
 
     public function update(Request $request, DoctorService $service)
@@ -104,7 +104,7 @@ class DoctorServicesController extends Controller
         }
 
         $service->update($data);
-        return redirect()->route('dr-services.index')->with('success', 'خدمت با موفقیت به‌روزرسانی شد.');
+        return redirect()->route('mc-services.index')->with('success', 'خدمت با موفقیت به‌روزرسانی شد.');
     }
 
     public function destroy(DoctorService $service)

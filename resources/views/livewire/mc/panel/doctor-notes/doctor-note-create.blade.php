@@ -9,7 +9,7 @@
         </svg>
         <h5 class="mb-0 fw-bold text-shadow">افزودن یادداشت جدید</h5>
       </div>
-      <a href="{{ route('dr.panel.doctornotes.index') }}"
+      <a href="{{ route('mc.panel.doctornotes.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1 hover:shadow-lg transition-all">
         <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">

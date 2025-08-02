@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Clinics;
+namespace App\Livewire\Mc\Panel\Clinics;
 
 use App\Models\Clinic;
 use App\Models\ClinicGallery;
@@ -61,6 +61,6 @@ class ClinicsGallery extends Component
     public function render()
     {
         $galleries = $this->clinic->galleries ?? collect();
-        return view('livewire.dr.panel.clinics.clinics-gallery', compact('galleries'));
+        return view('livewire.mc.panel.clinics.clinics-gallery', compact('galleries'));
     }
 }

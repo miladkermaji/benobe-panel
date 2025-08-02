@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorServices;
+namespace App\Livewire\Mc\Panel\DoctorServices;
 
 use App\Models\MedicalCenter;
 use App\Models\Service;
@@ -317,7 +317,7 @@ class DoctorServiceCreate extends Component
         $this->save();
         if (!$this->isSaving) {
             $this->dispatch('show-alert', type: 'success', message: 'تغییرات ذخیره شد!');
-            return redirect()->route('dr.panel.doctor-services.index');
+            return redirect()->route('mc.panel.doctor-services.index');
         }
     }
 
@@ -331,6 +331,6 @@ class DoctorServiceCreate extends Component
         $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
             ->with(['service', 'insurance', 'clinic'])
             ->get();
-        return view('livewire.dr.panel.doctor-services.doctor-service-create', compact('services', 'insurances', 'clinics', 'doctorServices'));
+        return view('livewire.mc.panel.doctor-services.doctor-service-create', compact('services', 'insurances', 'clinics', 'doctorServices'));
     }
 }

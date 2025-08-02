@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorsClinic;
+namespace App\Livewire\Mc\Panel\DoctorsClinic;
 
 use App\Models\MedicalCenter;
 use App\Models\Zone;
@@ -110,11 +110,11 @@ class DoctorClinicCreate extends Component
         $medicalCenter->doctors()->attach($doctorId);
 
         $this->dispatch('show-alert', type: 'success', message: 'مطب با موفقیت ایجاد شد!');
-        return redirect()->route('dr-clinic-management');
+        return redirect()->route('mc-clinic-management');
     }
 
     public function render()
     {
-        return view('livewire.dr.panel.doctors-clinic.doctor-clinic-create');
+        return view('livewire.mc.panel.doctors-clinic.doctor-clinic-create');
     }
 }

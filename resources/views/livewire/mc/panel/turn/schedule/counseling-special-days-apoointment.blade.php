@@ -93,7 +93,7 @@
                                 data-day="{{ $workSchedule['data']['day'] }}"
                                 wire:click="openEmergencyModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                                 data-index="{{ $index }}" @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                                <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت مخصوص منشی">
+                                <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت مخصوص منشی">
                               </button>
                             </x-custom-tooltip>
                           </div>
@@ -102,7 +102,7 @@
                               <button class="btn btn-light btn-sm remove-row-btn"
                                 wire:click="removeSlot({{ $index }})"
                                 @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                               </button>
                             </x-custom-tooltip>
                           </div>
@@ -113,7 +113,7 @@
                               wire:click="openScheduleModal('{{ $workSchedule['data']['day'] }}', {{ $index }})"
                               data-day="{{ $workSchedule['data']['day'] }}" data-index="{{ $index }}"
                               @if (empty($slot['start']) || empty($slot['end']) || empty($slot['max_appointments'])) disabled @endif>
-                              <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                              <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                             </button>
                           </x-custom-tooltip>
                         </div>
@@ -124,7 +124,7 @@
                     <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true" data-placement="bottom"
                       data-original-title="اضافه کردن ساعت کاری جدید" wire:click="addSlot"
                       @if ($isProcessing) disabled @endif>
-                      <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+                      <img src="{{ asset('mc-assets/icons/plus2.svg') }}" alt="" srcset="">
                       <span>افزودن ردیف جدید</span>
                     </button>
                   </div>
@@ -164,9 +164,9 @@
           تعطیل کنید.</p>
       </div>
       <div class="d-flex justify-content-center gap-2 mt-3 w-100">
-        <a href="{{ route('dr-moshavere_waiting', [
+        <a href="{{ route('mc-moshavere_waiting', [
             'selected_date' => \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate))->format('Y-m-d'),
-            'redirect_back' => route('dr-mySpecialDays-counseling'),
+            'redirect_back' => route('mc-mySpecialDays-counseling'),
         ]) }}"
           class="btn btn-primary w-100 h-50 text-white">
           جابجایی نوبت‌ها
@@ -341,7 +341,7 @@
                       <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
                         data-index="{{ $index }}"
                         wire:click="deleteScheduleSetting('{{ $scheduleModalDay }}', {{ $index }})">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                       </button>
                     </div>
                   @endforeach
@@ -432,7 +432,7 @@
             div.innerHTML = `
                         <span>از ${setting.start_time} تا ${setting.end_time} (روزها: ${daysText})</span>
                         <button class="btn btn-light delete-schedule-setting" data-day="${@json($scheduleModalDay)}" data-index="${index}">
-                            <img src="${@json(asset('dr-assets/icons/trash.svg'))}" alt="حذف">
+                            <img src="${@json(asset('mc-assets/icons/trash.svg'))}" alt="حذف">
                         </button>
                     `;
             settingsList.appendChild(div);

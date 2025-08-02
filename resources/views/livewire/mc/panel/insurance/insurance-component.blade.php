@@ -232,7 +232,7 @@
             <td>
               <button wire:click="confirmDelete({{ $insurance->id }})" class="btn btn-sm btn-light rounded-circle"
                 title="حذف">
-                <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
               </button>
             </td>
           </tr>

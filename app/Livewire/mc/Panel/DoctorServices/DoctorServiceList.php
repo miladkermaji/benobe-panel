@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorServices;
+namespace App\Livewire\Mc\Panel\DoctorServices;
 
 use App\Models\MedicalCenter;
 use App\Models\Service;
@@ -341,6 +341,6 @@ class DoctorServiceList extends Component
     public function render()
     {
         $services = $this->readyToLoad ? $this->getDoctorServicesQuery() : null;
-        return view('livewire.dr.panel.doctor-services.doctor-service-list', ['services' => $services]);
+        return view('livewire.mc.panel.doctor-services.doctor-service-list', ['services' => $services]);
     }
 }

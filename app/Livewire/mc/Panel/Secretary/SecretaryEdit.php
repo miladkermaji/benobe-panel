@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Secretary;
+namespace App\Livewire\Mc\Panel\Secretary;
 
 use Livewire\Component;
 use App\Models\Secretary;
@@ -113,12 +113,12 @@ class SecretaryEdit extends Component
             'password' => $this->password ? Hash::make($this->password) : $this->secretary->password,
         ]);
         $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'منشی با موفقیت ویرایش شد.']);
-        return redirect()->route('dr-secretary-management');
+        return redirect()->route('mc-secretary-management');
     }
 
     public function render()
     {
-        return view('livewire.dr.panel.secretary.secretary-edit', [
+        return view('livewire.mc.panel.secretary.secretary-edit', [
             'provinces' => $this->provinces,
             'cities' => $this->cities,
         ]);

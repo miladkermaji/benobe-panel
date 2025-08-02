@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorNotes;
+namespace App\Livewire\Mc\Panel\DoctorNotes;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -60,11 +60,11 @@ class DoctorNoteEdit extends Component
         ]);
 
         $this->dispatch('show-alert', type: 'success', message: 'یادداشت پزشک با موفقیت به‌روزرسانی شد!');
-        return redirect()->route('dr.panel.doctornotes.index');
+        return redirect()->route('mc.panel.doctornotes.index');
     }
 
     public function render()
     {
-        return view('livewire.dr.panel.doctor-notes.doctor-note-edit');
+        return view('livewire.mc.panel.doctor-notes.doctor-note-edit');
     }
 }

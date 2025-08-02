@@ -3,7 +3,7 @@
     <div class="w-100 d-flex align-items-center">
       <div class="header__right d-flex flex-grow-1 item-center">
         <span class="bars"></span>
-        <div class="top-dr-panel d-flex justify-content-between w-100 align-items-start">
+        <div class="top-mc-panel d-flex justify-content-between w-100 align-items-start">
           <div class="p-3 bg-white stylish-breadcrumb" style="display: none">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb bg-white mb-0">
@@ -173,7 +173,7 @@
             </div>
           </div>
           <div style="display: none !important" class="mx-3 cursor-pointer d-flex"
-            onclick="location.href='{{ route('dr-wallet-charge') }}'">
+            onclick="location.href='{{ route('mc-wallet-charge') }}'">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
               class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
@@ -187,7 +187,7 @@
           </div>
         </div>
         <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
-        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
+        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('mc.auth.logout') }}' })"
           class="logout ms-2" title="خروج"></a>
       </div>
     </div>

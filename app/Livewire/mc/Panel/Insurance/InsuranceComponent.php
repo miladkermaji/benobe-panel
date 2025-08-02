@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Insurance;
+namespace App\Livewire\Mc\Panel\Insurance;
 
 use App\Models\Insurance;
 use App\Models\DoctorInsurance;
@@ -65,7 +65,7 @@ class InsuranceComponent extends Component
             } else {
                 $this->dispatch('toast', message: 'شما به یک دکتر متصل نیستید.', type: 'error');
                 $this->insurances = collect();
-                return view('livewire.dr.panel.insurance.insurance-component');
+                return view('livewire.mc.panel.insurance.insurance-component');
             }
         } elseif (Auth::guard('manager')->check()) {
             $segments = request()->segments();
@@ -73,7 +73,7 @@ class InsuranceComponent extends Component
             if (!is_numeric($doctorId)) {
                 $this->dispatch('toast', message: 'لطفاً ابتدا یک دکتر را انتخاب کنید.', type: 'error');
                 $this->insurances = collect();
-                return view('livewire.dr.panel.insurance.insurance-component');
+                return view('livewire.mc.panel.insurance.insurance-component');
             }
             $query->whereHas('doctors', function ($q) use ($doctorId) {
                 $q->where('doctor_id', $doctorId);
@@ -81,7 +81,7 @@ class InsuranceComponent extends Component
         } else {
             $this->dispatch('toast', message: 'لطفاً ابتدا وارد سیستم شوید.', type: 'error');
             $this->insurances = collect();
-            return view('livewire.dr.panel.insurance.insurance-component');
+            return view('livewire.mc.panel.insurance.insurance-component');
         }
 
         if ($this->selectedClinicId === 'default') {
@@ -93,7 +93,7 @@ class InsuranceComponent extends Component
         $query->where('calculation_method', $this->calculation_method);
         $this->insurances = $query->get();
 
-        return view('livewire.dr.panel.insurance.insurance-component');
+        return view('livewire.mc.panel.insurance.insurance-component');
     }
 
     public function store()

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Turn\Schedule;
+namespace App\Livewire\Mc\Panel\Turn\Schedule;
 
 use Carbon\Carbon;
 use App\Models\Doctor;
@@ -78,7 +78,7 @@ class CounselingSpecialDaysApoointment extends Component
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);
@@ -1637,6 +1637,6 @@ $this->getSelectedMedicalCenterId();
     }
     public function render()
     {
-        return view('livewire.dr.panel.turn.schedule.counseling-special-days-apoointment');
+        return view('livewire.mc.panel.turn.schedule.counseling-special-days-apoointment');
     }
 }

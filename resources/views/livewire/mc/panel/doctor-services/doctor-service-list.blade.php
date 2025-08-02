@@ -20,7 +20,7 @@
                 </svg>
               </span>
             </div>
-            <a href="{{ route('dr.panel.doctor-services.create') }}"
+            <a href="{{ route('mc.panel.doctor-services.create') }}"
               class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 add-btn-responsive">
               <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2">
@@ -139,7 +139,7 @@
                       </button>
                     </td>
                     <td class="text-center">
-                      <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
+                      <a href="{{ route('mc.panel.doctor-services.edit', $doctorService->id) }}"
                         class="btn btn-sm btn-gradient-success px-2 py-1">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
@@ -228,7 +228,7 @@
                         class="status-badge {{ $doctorService->status ? 'status-active' : 'status-inactive' }}">{{ $doctorService->status ? 'فعال' : 'غیرفعال' }}</button>
                     </div>
                     <div class="note-card-item">
-                      <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
+                      <a href="{{ route('mc.panel.doctor-services.edit', $doctorService->id) }}"
                         class="btn btn-sm btn-gradient-success px-2 py-1">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">

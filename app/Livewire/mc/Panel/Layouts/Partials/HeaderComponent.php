@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Layouts\Partials;
+namespace App\Livewire\Mc\Panel\Layouts\Partials;
 
 use Livewire\Component;
 use App\Models\DoctorWallet;
@@ -183,6 +183,6 @@ class HeaderComponent extends Component
 
     public function render()
     {
-        return view('livewire.dr.panel.layouts.partials.header-component');
+        return view('livewire.mc.panel.layouts.partials.header-component');
     }
 }

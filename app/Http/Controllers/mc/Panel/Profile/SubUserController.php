@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Profile;
+namespace App\Http\Controllers\Mc\Panel\Profile;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\SubUser;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,7 +20,7 @@ class SubUserController extends Controller
             ->get();
         $users = User::paginate(50); // صفحه‌بندی کاربران، هر بار ۵۰ کاربر
 
-        return view('dr.panel.profile.subuser', compact('subUsers', 'users'));
+        return view('mc.panel.profile.subuser', compact('subUsers', 'users'));
     }
 
     public function store(Request $request)

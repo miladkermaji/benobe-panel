@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Financial;
+namespace App\Livewire\Mc\Panel\Financial;
 
 use App\Models\MedicalCenter;
 use Livewire\Component;
@@ -472,7 +472,7 @@ class FinancialReport extends Component
         }
 
         Log::info('Excel export initiated', ['doctor_id' => $doctor->id, 'filters' => $this->getFilters()]);
-        return redirect()->route('dr.panel.financial-reports.export-excel', $this->getFilters());
+        return redirect()->route('mc.panel.financial-reports.export-excel', $this->getFilters());
     }
 
     public function exportPdf()
@@ -500,7 +500,7 @@ class FinancialReport extends Component
             'financial_report_filters' => $this->getFilters()
         ]);
 
-        return redirect()->route('dr.panel.financial-reports.export-pdf', $this->getFilters());
+        return redirect()->route('mc.panel.financial-reports.export-pdf', $this->getFilters());
     }
 
     private function getTransactions()
@@ -742,7 +742,7 @@ class FinancialReport extends Component
             'insurances_count' => $insurances->count(),
         ]);
 
-        return view('livewire.dr.panel.financial.financial-report', [
+        return view('livewire.mc.panel.financial.financial-report', [
             'transactions' => $transactions,
             'totalAmount' => $totalAmount,
             'todayAmount' => $todayAmount,

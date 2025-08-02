@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorPrescriptions;
+namespace App\Livewire\Mc\Panel\DoctorPrescriptions;
 
 use Livewire\Component;
 use App\Models\PrescriptionRequest;
@@ -57,6 +57,6 @@ class PrescriptionSettings extends Component
 
     public function render()
     {
-        return view('livewire.dr.panel.doctor-prescriptions.prescription-settings');
+        return view('livewire.mc.panel.doctor-prescriptions.prescription-settings');
     }
 }

@@ -9,7 +9,7 @@
         </svg>
         <h5 class="mb-0 fw-bold text-dark">مدارک من</h5>
       </div>
-      <a href="{{ route('dr-clinic-management') }}"
+      <a href="{{ route('mc-clinic-management') }}"
         class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap- hover:shadow-md transition-all text-white">
         <svg width="16" style="transform: rotate(180deg)" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">

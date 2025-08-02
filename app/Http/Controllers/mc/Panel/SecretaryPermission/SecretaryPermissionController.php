@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\SecretaryPermission;
+namespace App\Http\Controllers\Mc\Panel\SecretaryPermission;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\SecretaryPermission;
 use App\Models\Secretary;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ class SecretaryPermissionController extends Controller
         $medicalCenterId = $this->getSelectedMedicalCenterId();
 
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form');
+            return redirect()->route('mc.auth.login-register-form');
         }
 
         // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
@@ -39,7 +39,7 @@ class SecretaryPermissionController extends Controller
             return response()->json(['secretaries' => $secretaries]);
         }
 
-        return view('dr.panel.secretary_permissions.index', compact('secretaries', 'permissions'));
+        return view('mc.panel.secretary_permissions.index', compact('secretaries', 'permissions'));
     }
 
     public function update(Request $request, $secretaryId)

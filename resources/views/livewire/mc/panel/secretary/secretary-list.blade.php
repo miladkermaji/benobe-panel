@@ -21,7 +21,7 @@
                   </svg>
                 </span>
               </div>
-              <a href="{{ route('dr-secretary-create') }}"
+              <a href="{{ route('mc-secretary-create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center text-white">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
@@ -98,7 +98,7 @@
                       </td>
                       <td class="text-center">
                         <div class="d-flex justify-content-center gap-1">
-                          <a href="{{ route('dr-secretary-edit', $item->id) }}"
+                          <a href="{{ route('mc-secretary-edit', $item->id) }}"
                             class="btn btn-sm btn-gradient-success ">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                               stroke-width="2">
@@ -106,9 +106,9 @@
                                 d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
                           </a>
-                          <a href="{{ route('dr-secretary-permissions') }}" class="btn btn-sm btn-primary"
+                          <a href="{{ route('mc-secretary-permissions') }}" class="btn btn-sm btn-primary"
                             title="دسترسی‌ها">
-                            <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="دسترسی‌ها">
+                            <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="دسترسی‌ها">
                           </a>
                           <button wire:click="confirmDelete({{ $item->id }})"
                             class="btn btn-sm btn-gradient-danger ">
@@ -158,7 +158,7 @@
                       <span class="fw-bold">{{ $item->first_name }} {{ $item->last_name }}</span>
                     </div>
                     <div class="d-flex gap-1">
-                      <a href="{{ route('dr-secretary-edit', $item->id) }}"
+                      <a href="{{ route('mc-secretary-edit', $item->id) }}"
                         class="btn btn-sm btn-gradient-success operation-btn">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                           stroke-width="2">
@@ -166,9 +166,9 @@
                             d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
                       </a>
-                      <a href="{{ route('dr-secretary-permissions') }}" class="btn btn-sm btn-primary operation-btn"
+                      <a href="{{ route('mc-secretary-permissions') }}" class="btn btn-sm btn-primary operation-btn"
                         title="دسترسی‌ها">
-                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="دسترسی‌ها"
+                        <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="دسترسی‌ها"
                           style="width:20px;height:20px;min-width:20px;min-height:20px;max-width:20px;max-height:20px;object-fit:contain;display:inline-block;">
                       </a>
                       <button wire:click="confirmDelete({{ $item->id }})"
@@ -235,31 +235,29 @@
     </div>
   </div>
   <script>
-  window.confirmGroupDelete = function(e) {
-    var groupAction = document.querySelector('[wire\\:model="groupAction"]').value;
-    if (groupAction === 'delete') {
-      e.preventDefault();
-      Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'آیا از حذف منشی‌های انتخاب شده اطمینان دارید؟',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'بله، حذف کن!',
-        cancelButtonText: 'انصراف'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.Livewire.find(document.querySelector('[wire\\:model="groupAction"]').closest('[wire\\:id]')
-            .getAttribute('wire:id')).executeGroupAction();
-        }
-      });
-    } else {
-      window.Livewire.find(document.querySelector('[wire\\:model="groupAction"]').closest('[wire\\:id]').getAttribute(
-        'wire:id')).executeGroupAction();
+    window.confirmGroupDelete = function(e) {
+      var groupAction = document.querySelector('[wire\\:model="groupAction"]').value;
+      if (groupAction === 'delete') {
+        e.preventDefault();
+        Swal.fire({
+          title: 'آیا مطمئن هستید؟',
+          text: 'آیا از حذف منشی‌های انتخاب شده اطمینان دارید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'بله، حذف کن!',
+          cancelButtonText: 'انصراف'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.Livewire.find(document.querySelector('[wire\\:model="groupAction"]').closest('[wire\\:id]')
+              .getAttribute('wire:id')).executeGroupAction();
+          }
+        });
+      } else {
+        window.Livewire.find(document.querySelector('[wire\\:model="groupAction"]').closest('[wire\\:id]').getAttribute(
+          'wire:id')).executeGroupAction();
+      }
     }
-  }
-</script>
+  </script>
 </div>
-
-

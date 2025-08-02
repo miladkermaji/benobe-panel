@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorsClinic;
+namespace App\Livewire\Mc\Panel\DoctorsClinic;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -138,11 +138,11 @@ class DoctorClinicList extends Component
 
     protected function getClinicsQuery()
     {
-        $doctorId = Auth::guard('doctor')->check() 
-            ? Auth::guard('doctor')->user()->id 
+        $doctorId = Auth::guard('doctor')->check()
+            ? Auth::guard('doctor')->user()->id
             : Auth::guard('secretary')->user()->doctor_id;
 
-        return MedicalCenter::whereHas('doctors', function($query) use ($doctorId) {
+        return MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
         })->where('type', 'policlinic');
     }
@@ -151,7 +151,7 @@ class DoctorClinicList extends Component
     {
         $items = $this->readyToLoad ? $this->getClinicsQuery()->paginate($this->perPage) : null;
 
-        return view('livewire.dr.panel.doctors-clinic.doctor-clinic-list', [
+        return view('livewire.mc.panel.doctors-clinic.doctor-clinic-list', [
             'clinics' => $items,
         ]);
     }

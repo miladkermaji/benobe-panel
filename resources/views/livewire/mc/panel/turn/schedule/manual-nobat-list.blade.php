@@ -10,7 +10,7 @@
         <button class="selectDate_datepicker__xkZeS" x-data @click="$dispatch('open-modal',{name:'mini-calendar-modal'})">
           <span
             class="mx-1">{{ Jalalian::fromCarbon(Carbon::parse($selectedDate)->setTimezone('Asia/Tehran'))->format('Y/m/d') }}</span>
-          <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="تقویم">
+          <img src="{{ asset('mc-assets/icons/calendar.svg') }}" alt="تقویم">
         </button>
         <div class="turning_search-wrapper__loGVc">
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
@@ -61,17 +61,17 @@
             <div class="d-flex d-none d-md-flex">
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_year')">
-                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <img src="{{ asset('mc-assets/icons/calendar.svg') }}" alt="" srcset="">
                 <span class="d-none d-md-block">سال جاری</span>
               </button>
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_month')">
-                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <img src="{{ asset('mc-assets/icons/calendar.svg') }}" alt="" srcset="">
                 <span class="d-none d-md-block">ماه جاری</span>
               </button>
               <button class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm"
                 wire:click="$set('dateFilter', 'current_week')">
-                <img src="{{ asset('dr-assets/icons/calendar.svg') }}" alt="" srcset="">
+                <img src="{{ asset('mc-assets/icons/calendar.svg') }}" alt="" srcset="">
                 <span class="d-none d-md-block">هفته جاری</span>
               </button>
             </div>
@@ -80,17 +80,17 @@
           <div class="d-flex">
             <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-              <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="" srcset="">
+              <img src="{{ asset('mc-assets/icons/block-user.svg') }}" alt="" srcset="">
               <span class="d-none d-md-block">مسدود کردن کاربر</span>
             </button>
             <button id="move-appointments-btn"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-              <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
+              <img src="{{ asset('mc-assets/icons/rescheule-appointment.svg') }}" alt="" srcset="">
               <span class="d-none d-md-block">جابجایی نوبت</span>
             </button>
             <button id="cancel-appointments-btn"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
-              <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
+              <img src="{{ asset('mc-assets/icons/cancle-appointment.svg') }}" alt="" srcset="">
               <span class="d-none d-md-block">لغو نوبت</span>
             </button>
           </div>
@@ -200,20 +200,20 @@
                           <button class="btn btn-light shadow-sm reschedule-btn" x-data
                             @click="$dispatch('open-modal', { name: 'reschedule-modal', appointmentId: {{ $appointment->id }} })"
                             {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
-                            <img src="{{ asset('dr-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
+                            <img src="{{ asset('mc-assets/icons/rescheule-appointment.svg') }}" alt="جابجایی">
                           </button>
                         </x-custom-tooltip>
                         <x-custom-tooltip title="لغو نوبت" placement="top">
                           <button class="btn btn-light shadow-sm cancel-btn"
                             wire:click="cancelSingleAppointment({{ $appointment->id }})"
                             {{ $appointment->status === 'cancelled' || $appointment->status === 'attended' ? 'disabled' : '' }}>
-                            <img src="{{ asset('dr-assets/icons/cancle-appointment.svg') }}" alt="حذف">
+                            <img src="{{ asset('mc-assets/icons/cancle-appointment.svg') }}" alt="حذف">
                           </button>
                         </x-custom-tooltip>
                         <x-custom-tooltip title="مسدود کردن کاربر" placement="top">
                           <button class="btn btn-light shadow-sm block-btn" x-data
                             @click="$dispatch('open-modal', { name: 'block-user-modal', appointmentId: {{ $appointment->id }} })">
-                            <img src="{{ asset('dr-assets/icons/block-user.svg') }}" alt="مسدود کردن">
+                            <img src="{{ asset('mc-assets/icons/block-user.svg') }}" alt="مسدود کردن">
                           </button>
                         </x-custom-tooltip>
                       </div>
@@ -969,7 +969,7 @@
           }).then((result) => {
             if (result.isConfirmed) {
               Livewire.dispatchTo(
-                'dr.panel.turn.schedule.appointments-list',
+                'mc.panel.turn.schedule.appointments-list',
                 'confirm-partial-reschedule',
                 [appointmentIds, newDate, nextDate, availableSlots]
               );
@@ -1023,13 +1023,13 @@
             if (result.isConfirmed) {
               if (isFullCapacity) {
                 Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
+                  'mc.panel.turn.schedule.appointments-list',
                   'rescheduleAppointment',
                   [appointmentIds, newDate]
                 );
               } else {
                 Livewire.dispatchTo(
-                  'dr.panel.turn.schedule.appointments-list',
+                  'mc.panel.turn.schedule.appointments-list',
                   'confirm-partial-reschedule',
                   [appointmentIds, newDate, nextDate, availableSlots]
                 );
@@ -1041,7 +1041,7 @@
               }));
             } else if (result.isDenied && !isFullCapacity) {
               Livewire.dispatchTo(
-                'dr.panel.turn.schedule.appointments-list',
+                'mc.panel.turn.schedule.appointments-list',
                 'rescheduleAppointment',
                 [appointmentIds, nextDate]
               );

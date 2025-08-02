@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
@@ -25,7 +25,7 @@ class BlockingUsersController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
@@ -52,7 +52,7 @@ class BlockingUsersController extends Controller
             return response()->json(['blockedUsers' => $blockedUsers]);
         }
 
-        return view('dr.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages'));
+        return view('mc.panel.turn.schedule.scheduleSetting.blocking_users.index', compact('blockedUsers', 'messages'));
     }
 
     private function processDate($date, $fieldName)
@@ -675,4 +675,3 @@ class BlockingUsersController extends Controller
         }
     }
 }
-

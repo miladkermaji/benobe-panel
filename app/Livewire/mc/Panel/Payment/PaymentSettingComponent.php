@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Payment;
+namespace App\Livewire\Mc\Panel\Payment;
 
 use App\Models\Appointment;
 use App\Models\CounselingAppointment;
@@ -69,7 +69,7 @@ class PaymentSettingComponent extends Component
         $available = $this->calculateAvailableAmount($doctorId);
         $this->loadData();
 
-        return view('livewire.dr.panel.payment.payment-setting-component', [
+        return view('livewire.mc.panel.payment.payment-setting-component', [
             'totalIncome'         => $totalIncome,
             'paid'                => $paid,
             'available'           => $available,

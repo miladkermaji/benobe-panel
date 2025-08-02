@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Cost;
+namespace App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Cost;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\ClinicDepositSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +13,12 @@ class CostController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $averageDeposit = ClinicDepositSetting::whereNotNull('deposit_amount')->avg('deposit_amount'); // میانگین بیعانه
 
-        return view('dr.panel.doctors-clinic.activation.cost.index', compact(['clinicId', 'doctorId', 'averageDeposit']));
+        return view('mc.panel.doctors-clinic.activation.cost.index', compact(['clinicId', 'doctorId', 'averageDeposit']));
     }
 
     public function listDeposits($clinicId)

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\DoctorFaqs;
+namespace App\Livewire\Mc\Panel\DoctorFaqs;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
@@ -53,12 +53,12 @@ class DoctorFaqsCreate extends Component
 
         // نمایش اعلان موفقیت و ریدایرکت
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت ایجاد شد!');
-        return redirect()->route('dr.panel.doctor-faqs.index');
+        return redirect()->route('mc.panel.doctor-faqs.index');
     }
     public function mount()
     {
 
-       
+
 
     }
     /**
@@ -69,6 +69,6 @@ class DoctorFaqsCreate extends Component
 
 
 
-        return view('livewire.dr.panel.doctor-faqs.doctor-faqs-create');
+        return view('livewire.mc.panel.doctor-faqs.doctor-faqs-create');
     }
 }

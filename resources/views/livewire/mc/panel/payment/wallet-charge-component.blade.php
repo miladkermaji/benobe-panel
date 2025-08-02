@@ -92,7 +92,7 @@
                   <td>{{ $transaction->description ?? '-' }}</td>
                   <td>
                     <button class="btn btn-light btn-sm delete-transaction rounded-circle"
-                      data-id="{{ $transaction->id }}"><img src="{{ asset('dr-assets/icons/trash.svg') }}"
+                      data-id="{{ $transaction->id }}"><img src="{{ asset('mc-assets/icons/trash.svg') }}"
                         alt="trash" srcset=""></button>
                   </td>
                 </tr>
@@ -110,61 +110,67 @@
 
     <script>
       document.addEventListener('livewire:init', () => {
-          toastr.options = {
-              positionClass: 'toast-top-right',
-              timeOut: 3000,
-          };
-      
-          Livewire.on('toast', (event) => {
-              if (event.type === 'success') {
-                  toastr.success(event.message);
-              } else if (event.type === 'error') {
-                  toastr.error(event.message);
-              }
-          });
-      
-          Livewire.on('redirect-to-gateway', (event) => {
-              window.location.href = event.url;
-          });
-      
-          const displayAmountInput = document.getElementById('displayAmount');
-          displayAmountInput.addEventListener('input', function(e) {
-              let value = e.target.value.replace(/[^0-9]/g, ''); // فقط اعداد
-              e.target.value = value ? Number(value).toLocaleString('en-US') : '';
-              @this.set('displayAmount', e.target.value);
-          });
-      
-          // بررسی پارامتر from_payment یا transaction_id
-          const urlParams = new URLSearchParams(window.location.search);
-          if (urlParams.get('from_payment') === 'success' || urlParams.get('transaction_id')) {
-              @this.dispatch('toast', { message: 'کیف‌پول شما با موفقیت شارژ شد.', type: 'success' });
-          } else if (urlParams.get('from_payment') === 'error') {
-              @this.dispatch('toast', { message: 'پرداخت ناموفق بود.', type: 'error' });
+        toastr.options = {
+          positionClass: 'toast-top-right',
+          timeOut: 3000,
+        };
+
+        Livewire.on('toast', (event) => {
+          if (event.type === 'success') {
+            toastr.success(event.message);
+          } else if (event.type === 'error') {
+            toastr.error(event.message);
           }
-      
-          // مدیریت دکمه حذف با SweetAlert
-          document.querySelectorAll('.delete-transaction').forEach(button => {
-              button.addEventListener('click', function(e) {
-                  e.preventDefault();
-                  const transactionId = this.getAttribute('data-id');
-      
-                  Swal.fire({
-                      title: 'آیا مطمئن هستید؟',
-                      text: "این تراکنش حذف خواهد شد و قابل بازگشت نیست!",
-                      icon: 'warning',
-                      showCancelButton: true,
-                      confirmButtonColor: '#3085d6',
-                      cancelButtonColor: '#d33',
-                      confirmButtonText: 'بله، حذف کن!',
-                      cancelButtonText: 'خیر'
-                  }).then((result) => {
-                      if (result.isConfirmed) {
-                          @this.call('deleteTransaction', transactionId);
-                      }
-                  });
-              });
+        });
+
+        Livewire.on('redirect-to-gateway', (event) => {
+          window.location.href = event.url;
+        });
+
+        const displayAmountInput = document.getElementById('displayAmount');
+        displayAmountInput.addEventListener('input', function(e) {
+          let value = e.target.value.replace(/[^0-9]/g, ''); // فقط اعداد
+          e.target.value = value ? Number(value).toLocaleString('en-US') : '';
+          @this.set('displayAmount', e.target.value);
+        });
+
+        // بررسی پارامتر from_payment یا transaction_id
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('from_payment') === 'success' || urlParams.get('transaction_id')) {
+          @this.dispatch('toast', {
+            message: 'کیف‌پول شما با موفقیت شارژ شد.',
+            type: 'success'
           });
+        } else if (urlParams.get('from_payment') === 'error') {
+          @this.dispatch('toast', {
+            message: 'پرداخت ناموفق بود.',
+            type: 'error'
+          });
+        }
+
+        // مدیریت دکمه حذف با SweetAlert
+        document.querySelectorAll('.delete-transaction').forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const transactionId = this.getAttribute('data-id');
+
+            Swal.fire({
+              title: 'آیا مطمئن هستید؟',
+              text: "این تراکنش حذف خواهد شد و قابل بازگشت نیست!",
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#3085d6',
+              cancelButtonColor: '#d33',
+              confirmButtonText: 'بله، حذف کن!',
+              cancelButtonText: 'خیر'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                @this.call('deleteTransaction', transactionId);
+              }
+            });
+          });
+        });
       });
-      </script>
+    </script>
   </div>
   </div>

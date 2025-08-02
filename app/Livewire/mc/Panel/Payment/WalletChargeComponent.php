@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Payment;
+namespace App\Livewire\Mc\Panel\Payment;
 
 use Livewire\Component;
 use App\Models\Transaction;
@@ -82,7 +82,7 @@ class WalletChargeComponent extends Component
             $this->dispatch('toast', message: 'پرداخت ناموفق بود.', type: 'error');
         }
 
-        return view('livewire.dr.panel.payment.wallet-charge-component', [
+        return view('livewire.mc.panel.payment.wallet-charge-component', [
             'transactions'    => $transactions,
             'availableAmount' => $availableAmount,
         ]);
@@ -108,8 +108,8 @@ class WalletChargeComponent extends Component
 
         $doctorId = $doctor->id;
         $callbackUrl = route('payment.callback');
-        $successRedirect = route('dr-wallet-verify');
-        $errorRedirect = route('dr-wallet-charge') . '?from_payment=error';
+        $successRedirect = route('mc-wallet-verify');
+        $errorRedirect = route('mc-wallet-charge') . '?from_payment=error';
 
         try {
             $activeGateway = \App\Models\PaymentGateway::active()->first();
@@ -159,18 +159,18 @@ class WalletChargeComponent extends Component
             $authority = request()->query('Authority');
             if (!$authority) {
                 Log::error('WalletChargeComponent::verifyPayment - No Authority provided in request');
-                return redirect()->route('dr-wallet-charge')->with('error', 'پارامتر تراکنش نامعتبر است.');
+                return redirect()->route('mc-wallet-charge')->with('error', 'پارامتر تراکنش نامعتبر است.');
             }
 
             $transaction = Transaction::where('transaction_id', $authority)->first();
             if (!$transaction) {
                 Log::error("WalletChargeComponent::verifyPayment - No transaction found for Authority: {$authority}");
-                return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش یافت نشد.');
+                return redirect()->route('mc-wallet-charge')->with('error', 'تراکنش یافت نشد.');
             }
 
             if ($transaction->status !== 'paid') {
                 Log::warning("WalletChargeComponent::verifyPayment - Transaction {$authority} is not paid: {$transaction->status}");
-                return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش تأیید نشده است.');
+                return redirect()->route('mc-wallet-charge')->with('error', 'تراکنش تأیید نشده است.');
             }
 
             $doctor = Auth::guard('doctor')->user();
@@ -206,15 +206,15 @@ class WalletChargeComponent extends Component
                     'paid_at'      => now(),
                 ]);
 
-                return redirect()->route('dr-wallet-charge')->with('success', 'کیف‌پول شما با موفقیت شارژ شد.');
+                return redirect()->route('mc-wallet-charge')->with('success', 'کیف‌پول شما با موفقیت شارژ شد.');
             }
 
-            return redirect()->route('dr-wallet-charge')->with('error', 'تراکنش یافت شد اما با شارژ کیف‌پول شما مطابقت ندارد.');
+            return redirect()->route('mc-wallet-charge')->with('error', 'تراکنش یافت شد اما با شارژ کیف‌پول شما مطابقت ندارد.');
         } catch (\Exception $e) {
             Log::error("WalletChargeComponent::verifyPayment - Error: {$e->getMessage()}", [
                 'trace' => $e->getTraceAsString(),
             ]);
-            return redirect()->route('dr-wallet-charge')->with('error', 'خطا در تأیید پرداخت: ' . $e->getMessage());
+            return redirect()->route('mc-wallet-charge')->with('error', 'خطا در تأیید پرداخت: ' . $e->getMessage());
         }
     }
 

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\NoskheElectronic\Favorite\Templates;
+namespace App\Http\Controllers\Mc\Panel\NoskheElectronic\Favorite\Templates;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class FavoriteTemplatesController extends Controller
 {
@@ -12,7 +12,7 @@ class FavoriteTemplatesController extends Controller
      */
     public function index()
     {
-        return view("dr.panel.noskhe-electronic.favorite.templates.index");
+        return view("mc.panel.noskhe-electronic.favorite.templates.index");
     }
 
     /**
@@ -20,7 +20,7 @@ class FavoriteTemplatesController extends Controller
      */
     public function create()
     {
-        return view("dr.panel.noskhe-electronic.favorite.templates.create");
+        return view("mc.panel.noskhe-electronic.favorite.templates.create");
 
     }
 

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\AppointmentsOpen;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\AppointmentsOpen;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use Illuminate\Http\Request;
 
 class AppointmentsOpenController extends Controller
@@ -12,7 +12,7 @@ class AppointmentsOpenController extends Controller
      */
     public function index()
     {
-        return view("dr.panel.turn.schedule.appointments_open.index");
+        return view("mc.panel.turn.schedule.appointments_open.index");
     }
 
     /**

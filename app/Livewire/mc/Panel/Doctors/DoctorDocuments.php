@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Dr\Panel\Doctors;
+namespace App\Livewire\Mc\Panel\Doctors;
 
 use App\Models\DoctorDocument;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +57,6 @@ class DoctorDocuments extends Component
     public function render()
     {
         $documents = DoctorDocument::where('doctor_id', $this->doctorId)->get();
-        return view('livewire.dr.panel.doctors.doctor-documents', compact('documents'));
+        return view('livewire.mc.panel.doctors.doctor-documents', compact('documents'));
     }
 }

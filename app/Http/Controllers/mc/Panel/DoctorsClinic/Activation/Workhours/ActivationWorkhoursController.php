@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours;
+namespace App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Workhours;
 
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use App\Models\DoctorWorkSchedule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorAppointmentConfig;
 
 class ActivationWorkhoursController extends Controller
@@ -16,7 +16,7 @@ class ActivationWorkhoursController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $hasCollaboration = DoctorAppointmentConfig::where('doctor_id', $doctorId)
@@ -24,7 +24,7 @@ class ActivationWorkhoursController extends Controller
             ->where('collaboration_with_other_sites', true)
             ->exists();
 
-        return view('dr.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'hasCollaboration']));
+        return view('mc.panel.doctors-clinic.activation.workhours.index', compact(['clinicId', 'doctorId', 'hasCollaboration']));
     }
 
     public function store(Request $request)
@@ -144,7 +144,7 @@ class ActivationWorkhoursController extends Controller
         $clinic->is_active = 1;
         $clinic->save();
 
-        return response()->json(['message' => 'نوبت‌دهی شروع شد.', 'redirect_url' => route('dr-panel')]);
+        return response()->json(['message' => 'نوبت‌دهی شروع شد.', 'redirect_url' => route('mc-panel')]);
     }
 
     public function deleteWorkHours(Request $request)

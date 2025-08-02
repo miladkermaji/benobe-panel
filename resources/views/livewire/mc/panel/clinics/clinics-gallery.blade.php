@@ -9,7 +9,7 @@
         </svg>
         <h5 class="mb-0 fw-bold">گالری تصاویر کلینیک: {{ $clinic->name }}</h5>
       </div>
-      <a href="{{ route('dr-clinic-management') }}"
+      <a href="{{ route('mc-clinic-management') }}"
         class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap-2 text-white hover:shadow-md transition-all">
         <svg width="16" style="transform: rotate(180deg)" height="16" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2">

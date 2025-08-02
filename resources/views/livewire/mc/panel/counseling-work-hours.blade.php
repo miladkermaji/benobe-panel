@@ -179,7 +179,7 @@
                                         data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                         data-index="{{ $index }}"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                        <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -190,7 +190,7 @@
                                         data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                         data-index="{{ $index }}"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                        <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -199,7 +199,7 @@
                                     <x-custom-tooltip title="حذف برنامه کاری" placement="top">
                                       <button class="btn btn-light btn-sm remove-row-btn"
                                         {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                        <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                                       </button>
                                     </x-custom-tooltip>
                                   </div>
@@ -210,7 +210,7 @@
                                       data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                       data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                      <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -255,7 +255,7 @@
                                       data-bs-target="#emergencyModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
+                                      <img src="{{ asset('mc-assets/icons/emergency.svg') }}" alt="نوبت اورژانسی">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -266,7 +266,7 @@
                                       data-bs-target="#checkboxModal" data-day="{{ $englishDay }}"
                                       data-index="{{ $index }}"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی">
+                                      <img src="{{ asset('mc-assets/icons/copy.svg') }}" alt="کپی">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -275,7 +275,7 @@
                                   <x-custom-tooltip title="حذف برنامه کاری" placement="top">
                                     <button class="btn btn-light btn-sm remove-row-btn"
                                       {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                      <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                                      <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                                     </button>
                                   </x-custom-tooltip>
                                 </div>
@@ -286,7 +286,7 @@
                                     data-bs-toggle="modal" data-bs-target="#scheduleModal"
                                     data-day="{{ $englishDay }}" data-index="{{ $index }}"
                                     {{ empty($slot['start_time']) || empty($slot['end_time']) || empty($slot['max_appointments']) ? 'disabled' : '' }}>
-                                    <img src="{{ asset('dr-assets/icons/open-time.svg') }}" alt="">
+                                    <img src="{{ asset('mc-assets/icons/open-time.svg') }}" alt="">
                                   </button>
                                 </x-custom-tooltip>
                               </div>
@@ -296,7 +296,7 @@
                             <button class="add-row-btn btn btn-sm btn-light" data-tooltip="true"
                               data-placement="bottom" data-original-title="اضافه کردن ساعت کاری جدید "
                               wire:click="addSlot('{{ $englishDay }}')">
-                              <img src="{{ asset('dr-assets/icons/plus2.svg') }}" alt="" srcset="">
+                              <img src="{{ asset('mc-assets/icons/plus2.svg') }}" alt="" srcset="">
                               <span>افزودن ردیف جدید</span>
                             </button>
                           </div>
@@ -351,7 +351,7 @@
                     </div>
                   </div>
                   <div class="p-3">
-                    <a href="{{ route('dr-panel', ['showModal' => 'true']) }}"
+                    <a href="{{ route('mc-panel', ['showModal' => 'true']) }}"
                       class="btn my-btn-primary w-100 h-50 d-flex align-items-center text-white justify-content-center">شروع
                       نوبت
                       دهی</a>
@@ -495,7 +495,7 @@
                         </span>
                         <button class="btn btn-light delete-schedule-setting" data-day="{{ $scheduleModalDay }}"
                           data-index="{{ $index }}">
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+                          <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
                         </button>
                       </div>
                     @endforeach

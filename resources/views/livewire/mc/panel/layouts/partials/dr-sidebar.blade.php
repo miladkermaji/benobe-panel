@@ -5,7 +5,7 @@
       <div class="profile__info border cursor-pointer text-center">
         <div class="avatar__img cursor-pointer">
           <img id="profile-photo-img"
-            src="{{ $user->avatar ? Storage::url($user->avatar) : asset('dr-assets/panel/img/pro.jpg') }}"
+            src="{{ $user->avatar ? Storage::url($user->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
             class="avatar___img cursor-pointer">
           <input type="file" accept="image/*" class="avatar-img__input" id="profile-photo-input">
           <div class="v-dialog__container" style="display: block;"></div>
@@ -20,18 +20,18 @@
     <div class="sidebar__scrollable">
       <ul class="" id="">
         @if ($this->hasPermission('dashboard'))
-          <li class="item-li i-dashboard {{ Request::routeIs('dr-panel') ? 'is-active' : '' }}">
-            <a href="{{ route('dr-panel') }}">داشبورد</a>
+          <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
+            <a href="{{ route('mc-panel') }}">داشبورد</a>
           </li>
         @endif
-        @if ($this->hasPermission('dr-workhours'))
-          <li class="item-li i-checkout__request {{ Request::routeIs('dr-workhours') ? 'is-active' : '' }}">
-            <a href="{{ route('dr-workhours') }}">ساعت کاری</a>
+        @if ($this->hasPermission('mc-workhours'))
+          <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
+            <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
           </li>
         @endif
         @if ($this->hasPermission('appointments'))
           <li
-            class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+            class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               نوبت اینترنتی
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -44,34 +44,34 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-appointments'))
-                <li class="item-li {{ Request::routeIs('dr-appointments') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-appointments') }}"> لیست نوبت ها</a>
+              @if ($this->hasPermission('mc-appointments'))
+                <li class="item-li {{ Request::routeIs('mc-appointments') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-appointments') }}"> لیست نوبت ها</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr.panel.doctornotes.index'))
-                <li class="item-li {{ Request::routeIs('dr.panel.doctornotes.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr.panel.doctornotes.index') }}"> توضیحات نوبت</a>
+              @if ($this->hasPermission('mc.panel.doctornotes.index'))
+                <li class="item-li {{ Request::routeIs('mc.panel.doctornotes.index') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc.panel.doctornotes.index') }}"> توضیحات نوبت</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-mySpecialDays'))
-                <li class="item-li {{ Request::routeIs('dr-mySpecialDays') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
+              @if ($this->hasPermission('mc-mySpecialDays'))
+                <li class="item-li {{ Request::routeIs('mc-mySpecialDays') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
                 </li>
               @endif
-              {{--    @if ($this->hasPermission('dr-manual_nobat'))
-              <li class="item-li {{ Request::routeIs('dr-manual_nobat') ? 'is-active' : '' }}">
-                <a href="{{ route('dr-manual_nobat') }}">ثبت نوبت دستی</a>
+              {{--    @if ($this->hasPermission('mc-manual_nobat'))
+              <li class="item-li {{ Request::routeIs('mc-manual_nobat') ? 'is-active' : '' }}">
+                <a href="{{ route('mc-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
             @endif --}}
-              @if ($this->hasPermission('dr-scheduleSetting'))
-                <li class="item-li {{ Request::routeIs('dr-scheduleSetting') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
+              @if ($this->hasPermission('mc-scheduleSetting'))
+                <li class="item-li {{ Request::routeIs('mc-scheduleSetting') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-vacation'))
-                <li class="item-li {{ Request::routeIs('dr-vacation') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-vacation') }}">تعطیلات</a>
+              @if ($this->hasPermission('mc-vacation'))
+                <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-vacation') }}">تعطیلات</a>
                 </li>
               @endif
               @if ($this->hasPermission('doctor-blocking-users.index'))
@@ -83,7 +83,7 @@
           </li>
         @endif
         @if ($this->hasPermission('my-prescriptions'))
-          <li class="item-li i-banners {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
+          <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">نسخه های من</span>
@@ -99,19 +99,19 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              <li class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
-                <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+              <li class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
+                <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
               </li>
               <li
-                class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
-                <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
+                class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
+                <a href="{{ route('mc.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
               </li>
             </ul>
           </li>
         @endif
         @if ($this->hasPermission('consult'))
           <li
-            class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
+            class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">مشاوره</span>
@@ -127,22 +127,22 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-moshavere_setting'))
-                <li class="item-li i-courses {{ Request::routeIs('dr-moshavere_setting') ? 'is-active' : '' }}"
+              @if ($this->hasPermission('mc-moshavere_setting'))
+                <li class="item-li i-courses {{ Request::routeIs('mc-moshavere_setting') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-moshavere_waiting'))
+              @if ($this->hasPermission('mc-moshavere_waiting'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-moshavere_waiting') ? 'is-active' : '' }}"
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-moshavere_waiting') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-mySpecialDays-counseling'))
+              @if ($this->hasPermission('mc-mySpecialDays-counseling'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}"
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
                 </li>
@@ -159,13 +159,13 @@
         @endif
         @if ($this->hasPermission('insurance'))
           <li
-            class="item-li i-checkout__request {{ Request::routeIs('dr.panel.doctor-services.index') ? 'is-active' : '' }}">
-            <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
+            class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
+            <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
         @endif
         @if ($this->hasPermission('prescription'))
           <li
-            class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
+            class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">
@@ -184,7 +184,7 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-patient-records'))
+              @if ($this->hasPermission('mc-patient-records'))
                 <li class="item-li" style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
                 </li>
@@ -216,7 +216,7 @@
               @endif
               @if ($this->hasPermission('patient_records'))
                 <li
-                  class="item-li i-checkout__request {{ Request::routeIs('dr-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+                  class="item-li i-checkout__request {{ Request::routeIs('mc-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
                   id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
                     class="d-flex align-items-center">
@@ -229,7 +229,7 @@
         @endif
         @if ($this->hasPermission('financial_reports'))
           <li
-            class="item-li i-my__peyments {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               گزارش مالی
@@ -243,28 +243,28 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr.panel.financial-reports.index'))
+              @if ($this->hasPermission('mc.panel.financial-reports.index'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.financial-reports.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.financial-reports.index') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-payment-setting'))
+              @if ($this->hasPermission('mc-payment-setting'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-payment-setting') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-payment-setting') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-wallet-charge'))
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a>
+              @if ($this->hasPermission('mc-wallet-charge'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-wallet-charge') }}">شارژ کیف‌پول</a>
                 </li>
               @endif
             </ul>
           </li>
         @endif
         @if ($this->hasPermission('patient_communication'))
-          <li class="item-li i-users {{ Request::routeIs('dr.panel.send-message') ? 'is-active' : '' }}">
+          <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               ارتباط با بیماران
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -277,15 +277,15 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr.panel.send-message'))
-                <li class="item-li"><a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a></li>
+              @if ($this->hasPermission('mc.panel.send-message'))
+                <li class="item-li"><a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a></li>
               @endif
             </ul>
           </li>
         @endif
         @if ($this->hasPermission('secretary_management'))
           <li
-            class="item-li i-user__secratary {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               منشی
@@ -301,14 +301,14 @@
             <ul class="drop-toggle d-none">
               @if ($this->hasPermission('secretary_management'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
                 </li>
               @endif
               @if ($this->hasPermission('permissions'))
                 <li
-                  class="item-li i-checkout__request {{ Request::routeIs('dr-secretary-permissions') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
+                  class="item-li i-checkout__request {{ Request::routeIs('mc-secretary-permissions') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
                 </li>
               @endif
             </ul>
@@ -316,7 +316,7 @@
         @endif
         @if ($this->hasPermission('clinic_management'))
           <li
-            class="item-li i-clinic {{ Request::routeIs('dr-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('dr.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مطب
@@ -330,16 +330,16 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-clinic-management'))
+              @if ($this->hasPermission('mc-clinic-management'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-clinic-management') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-clinic-management') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
+              @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.clinics.medical-documents') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.clinics.medical-documents') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
                 </li>
               @endif
               @if ($this->hasPermission('doctors.clinic.deposit'))
@@ -353,7 +353,7 @@
         @endif
         @if ($this->hasPermission('profile'))
           <li
-            class="item-li i-users {{ Request::routeIs('dr-edit-profile') || Request::routeIs('dr-edit-profile-security') || Request::routeIs('dr-edit-profile-upgrade') || Request::routeIs('dr-my-performance') || Request::routeIs('dr-subuser') || Request::routeIs('my-dr-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="hesab-karbari">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               حساب کاربری
@@ -367,20 +367,20 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-edit-profile'))
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-edit-profile') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
+              @if ($this->hasPermission('mc-edit-profile'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-edit-profile-security'))
+              @if ($this->hasPermission('mc-edit-profile-security'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-edit-profile-security') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-edit-profile-upgrade'))
+              @if ($this->hasPermission('mc-edit-profile-upgrade'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-edit-profile-upgrade') ? 'is-active' : '' }}"
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-upgrade') ? 'is-active' : '' }}"
                   style="opacity: 0.5; pointer-events: none;">
                   <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
                     class="d-flex align-items-center">
@@ -390,39 +390,39 @@
                   </a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-my-performance'))
+              @if ($this->hasPermission('mc-my-performance'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr-my-performance') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr-subuser'))
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-subuser') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
+              @if ($this->hasPermission('mc-subuser'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
                 </li>
               @endif
-              @if ($this->hasPermission('my-dr-appointments'))
+              @if ($this->hasPermission('my-mc-appointments'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('my-dr-appointments') ? 'is-active' : '' }}">
-                  <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
+                  <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
                 </li>
               @endif
-              @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
+              @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
                 <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr.panel.doctor-faqs.index') }}"> سوالات متداول</a>
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc.panel.doctor-faqs.index') }}"> سوالات متداول</a>
                 </li>
               @endif
             </ul>
           </li>
         @endif
         @if ($this->hasPermission('statistics'))
-          <li class="item-li i-transactions {{ Request::routeIs('dr-my-performance-chart') ? 'is-active' : '' }}">
-            <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
+          <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
+            <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
           </li>
         @endif
         @if ($this->hasPermission('messages'))
-          <li class="item-li i-comments {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
+          <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               پیام
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -435,9 +435,9 @@
               </div>
             </a>
             <ul class="drop-toggle d-none">
-              @if ($this->hasPermission('dr-panel-tickets'))
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
-                  <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
+              @if ($this->hasPermission('mc-panel-tickets'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
                 </li>
               @endif
               @if ($this->hasPermission('#'))
@@ -482,7 +482,7 @@
           const formData = new FormData();
           formData.append('photo', file);
           formData.append('_token', '{{ csrf_token() }}');
-          fetch("{{ route('dr.upload-photo') }}", {
+          fetch("{{ route('mc.upload-photo') }}", {
               method: 'POST',
               body: formData,
               headers: {
@@ -781,7 +781,7 @@
     <!-- داشبورد -->
     @if ($this->hasPermission('dashboard'))
       <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
-        <a href="{{ route('dr-panel') }}"
+        <a href="{{ route('mc-panel') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__activebox">
             <div class="mobile-bottom-nav__icon">
@@ -807,26 +807,26 @@
           <div class="mobile-bottom-nav__label">نوبت‌ها</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('dr-appointments'))
-            <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
+          @if ($this->hasPermission('mc-appointments'))
+            <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
           @endif
-          @if ($this->hasPermission('dr.panel.doctornotes.index'))
-            <a href="{{ route('dr.panel.doctornotes.index') }}">توضیحات نوبت</a>
+          @if ($this->hasPermission('mc.panel.doctornotes.index'))
+            <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
           @endif
-          @if ($this->hasPermission('dr-mySpecialDays'))
-            <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
+          @if ($this->hasPermission('mc-mySpecialDays'))
+            <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
           @endif
-          @if ($this->hasPermission('dr-scheduleSetting'))
-            <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
+          @if ($this->hasPermission('mc-scheduleSetting'))
+            <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
           @endif
-          @if ($this->hasPermission('dr-vacation'))
-            <a href="{{ route('dr-vacation') }}">تعطیلات</a>
+          @if ($this->hasPermission('mc-vacation'))
+            <a href="{{ route('mc-vacation') }}">تعطیلات</a>
           @endif
           @if ($this->hasPermission('doctor-blocking-users.index'))
             <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
           @endif
           @if ($this->hasPermission('my-prescriptions'))
-            <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
+            <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
           @endif
         </div>
       </div>
@@ -844,15 +844,15 @@
           <div class="mobile-bottom-nav__label">مشاوره</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('dr-moshavere_setting'))
+          @if ($this->hasPermission('mc-moshavere_setting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
                 class="soon-label">به زودی</span></a>
           @endif
-          @if ($this->hasPermission('dr-moshavere_waiting'))
+          @if ($this->hasPermission('mc-moshavere_waiting'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
                 class="soon-label">به زودی</span></a>
           @endif
-          @if ($this->hasPermission('dr-mySpecialDays-counseling'))
+          @if ($this->hasPermission('mc-mySpecialDays-counseling'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
                 class="soon-label">به زودی</span></a>
           @endif
@@ -876,25 +876,25 @@
           <div class="mobile-bottom-nav__label">پروفایل</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('dr-edit-profile'))
-            <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
+          @if ($this->hasPermission('mc-edit-profile'))
+            <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
           @endif
-          @if ($this->hasPermission('dr-edit-profile-security'))
-            <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
+          @if ($this->hasPermission('mc-edit-profile-security'))
+            <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
           @endif
-          @if ($this->hasPermission('dr-my-performance'))
-            <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
+          @if ($this->hasPermission('mc-my-performance'))
+            <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
           @endif
-          @if ($this->hasPermission('dr-subuser'))
-            <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
+          @if ($this->hasPermission('mc-subuser'))
+            <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
           @endif
-          @if ($this->hasPermission('my-dr-appointments'))
-            <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
+          @if ($this->hasPermission('my-mc-appointments'))
+            <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
           @endif
-          @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
-            <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
+          @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
+            <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
           @endif
-          @if ($this->hasPermission('dr-edit-profile-upgrade'))
+          @if ($this->hasPermission('mc-edit-profile-upgrade'))
             <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
                 class="soon-label">به زودی</span></a>
           @endif
@@ -902,9 +902,9 @@
       </div>
     @endif
     <!-- ساعت کاری -->
-    @if ($this->hasPermission('dr-workhours'))
+    @if ($this->hasPermission('mc-workhours'))
       <div class="mobile-bottom-nav__item" data-group="workhours">
-        <a href="{{ route('dr-workhours') }}"
+        <a href="{{ route('mc-workhours') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__activebox">
             <div class="mobile-bottom-nav__icon">
@@ -931,28 +931,28 @@
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
         @if ($this->hasPermission('statistics'))
-          <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
+          <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
         @endif
         @if ($this->hasPermission('messages'))
-          <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
+          <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
         @endif
         @if ($this->hasPermission('patient_communication'))
-          <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
+          <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
         @endif
         @if ($this->hasPermission('#'))
           <a href="#">صفحه گفتگو</a>
         @endif
         @if ($this->hasPermission('financial_reports'))
-          <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
-          <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
-          <a href="{{ route('dr-wallet-charge') }}">شارژ کیف پول</a>
+          <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
+          <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
+          <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
         @endif
         @if ($this->hasPermission('insurance'))
-          <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
+          <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
         @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-        @if ($this->hasPermission('dr-patient-records'))
+        @if ($this->hasPermission('mc-patient-records'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
               class="soon-label">به زودی</span></a>
         @endif
@@ -978,18 +978,18 @@
         @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         @if ($this->hasPermission('clinic_management'))
-          <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
-          @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
-            <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
+          <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
+          @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
+            <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
           @endif
           @if ($this->hasPermission('doctors.clinic.deposit'))
             <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
           @endif
         @endif
         @if ($this->hasPermission('secretary_management'))
-          <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
+          <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
           @if ($this->hasPermission('permissions'))
-            <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a>
+            <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
           @endif
         @endif
       </div>

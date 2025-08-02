@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\DoctorsClinic;
+namespace App\Http\Controllers\Mc\Panel\DoctorsClinic;
 
 use App\Models\Zone;
 use App\Models\MedicalCenter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Traits\HasSelectedClinic;
 use App\Helpers\PersianNumber;
 use App\Models\MedicalCenterDepositSetting;
@@ -24,7 +24,7 @@ class DoctorsClinicManagementController extends Controller
 
 
         // ارسال داده‌ها به ویو
-        return view('dr.panel.doctors-clinic.index');
+        return view('mc.panel.doctors-clinic.index');
     }
 
     public function getProvincesAndCities()
@@ -40,11 +40,11 @@ class DoctorsClinicManagementController extends Controller
         $provinces = $zones->where('level', 1)->values();             // سطح 1 => استان‌ها
         $cities    = $zones->where('level', 2)->groupBy('parent_id'); // سطح 2 => شهرها
 
-        return view('dr.panel.doctors-clinic.index', compact('provinces', 'cities'));
+        return view('mc.panel.doctors-clinic.index', compact('provinces', 'cities'));
     }
     public function create()
     {
-        return view('dr.panel.doctors-clinic.create');
+        return view('mc.panel.doctors-clinic.create');
     }
 
     public function store(Request $request)
@@ -140,7 +140,7 @@ class DoctorsClinicManagementController extends Controller
     public function edit($id)
     {
         $clinic = MedicalCenter::findOrFail($id);
-        return view('dr.panel.doctors-clinic.edit', compact('clinic'));
+        return view('mc.panel.doctors-clinic.edit', compact('clinic'));
     }
 
     public function getCitiesByProvince($provinceId)
@@ -159,14 +159,14 @@ class DoctorsClinicManagementController extends Controller
 
     public function gallery($id)
     {
-        return view("dr.panel.doctors-clinic.gallery", compact('id'));
+        return view("mc.panel.doctors-clinic.gallery", compact('id'));
     }
 
 
     public function medicalDoc()
     {
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        return view("dr.panel.doctors-clinic.medicalDoc", compact('doctorId'));
+        return view("mc.panel.doctors-clinic.medicalDoc", compact('doctorId'));
     }
     /**
      * Show the form for creating a new resource.
@@ -199,7 +199,7 @@ class DoctorsClinicManagementController extends Controller
                 $deposits = collect([]);
             }
 
-            return view('dr.panel.doctors-clinic.deposit', compact('clinics', 'deposits', 'selectedClinicId', 'doctorId'));
+            return view('mc.panel.doctors-clinic.deposit', compact('clinics', 'deposits', 'selectedClinicId', 'doctorId'));
         } catch (\Exception $e) {
             return back()->with('error', 'خطا در بارگذاری اطلاعات: ' . $e->getMessage());
         }

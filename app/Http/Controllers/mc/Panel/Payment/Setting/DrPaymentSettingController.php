@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Payment\Setting;
+namespace App\Http\Controllers\Mc\Panel\Payment\Setting;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 
 class DrPaymentSettingController extends Controller
 {
     public function index()
     {
-        return view('dr.panel.payment.setting');
+        return view('mc.panel.payment.setting');
 
     }
     public function wallet()
     {
-        return view("dr.panel.payment.wallet.index");
+        return view("mc.panel.payment.wallet.index");
     }
 
 }

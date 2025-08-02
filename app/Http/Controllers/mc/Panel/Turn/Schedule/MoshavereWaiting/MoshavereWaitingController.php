@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereWaiting;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereWaiting;
 
 use Carbon\Carbon;
 use App\Models\User;
@@ -11,7 +11,7 @@ use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Models\CounselingAppointment;
 use App\Models\DoctorCounselingConfig;
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\CounselingDailySchedule;
 use App\Models\DoctorCounselingWorkSchedule;
 use Modules\SendOtp\App\Http\Services\MessageService;
@@ -41,7 +41,7 @@ class MoshavereWaitingController extends Controller
 
 
 
-        return view("dr.panel.turn.schedule.moshavere_waiting.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
+        return view("mc.panel.turn.schedule.moshavere_waiting.index", compact('totalPatientsToday', 'visitedPatients', 'remainingPatients'));
     }
     public function searchAppointments(Request $request)
     {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting;
+namespace App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting;
 
-use App\Http\Controllers\Dr\Controller;
+use App\Http\Controllers\Mc\Controller;
 use App\Models\DoctorCounselingConfig;
 use App\Models\DoctorCounselingWorkSchedule;
 use Carbon\Carbon;
@@ -57,7 +57,7 @@ class MoshavereSettingController extends Controller
                 ]
             );
 
-            return view('dr.panel.turn.schedule.moshavere_setting.index', [
+            return view('mc.panel.turn.schedule.moshavere_setting.index', [
                 'appointmentConfig' => $appointmentConfig,
                 'workSchedules'     => $workSchedules,
             ]);
@@ -97,7 +97,7 @@ class MoshavereSettingController extends Controller
             })
             ->get();
 
-        return view("dr.panel.turn.schedule.scheduleSetting.workhours", [
+        return view("mc.panel.turn.schedule.scheduleSetting.workhours", [
             'appointmentConfig' => $appointmentConfig,
             'workSchedules'     => $workSchedules,
         ]);
