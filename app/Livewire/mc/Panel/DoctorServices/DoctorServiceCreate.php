@@ -10,6 +10,7 @@ use App\Models\DoctorService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class DoctorServiceCreate extends Component
 {
@@ -89,10 +90,23 @@ class DoctorServiceCreate extends Component
         $field = $parts[1] ?? null;
         if ($field === 'insurance_id' && isset($this->pricing[$index])) {
             $insuranceId = $value;
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            // Get doctor_id based on guard
+            $doctorId = null;
+            $medicalCenterId = null;
+            if (Auth::guard('medical_center')->check()) {
+                // For medical_center guard, get the selected doctor and medical center
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $medicalCenterId = $medicalCenter->id;
+                $selectedDoctor = DB::table('medical_center_selected_doctors')
+                    ->where('medical_center_id', $medicalCenter->id)
+                    ->first();
+                $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
-                ->where('medical_center_id', $this->medical_center_id)
+                ->where('medical_center_id', $medicalCenterId)
                 ->where('insurance_id', $insuranceId)
                 ->exists();
             if ($exists) {
@@ -202,12 +216,6 @@ class DoctorServiceCreate extends Component
         // هیچ ذخیره‌ای انجام نشود
     }
 
-    public function updatedClinicId($value)
-    {
-        Log::info('Clinic ID updated: ' . ($value ?? 'null'));
-        $this->save();
-    }
-
     public function updatedDuration($value)
     {
         $this->save();
@@ -221,10 +229,23 @@ class DoctorServiceCreate extends Component
     private function save()
     {
         $this->isSaving = true;
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        $medicalCenterId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor and medical center
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $medicalCenterId = $medicalCenter->id;
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         $currentState = [
             'service_id' => $this->service_id,
-            'medical_center_id' => $this->medical_center_id,
+            'medical_center_id' => $medicalCenterId,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -248,8 +269,8 @@ class DoctorServiceCreate extends Component
         ], [
             'service_id.required' => 'انتخاب خدمت الزامی است.',
             'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
-            'medical_center_id.required' => 'انتخاب مرکز درمانی الزامی است.',
-            'medical_center_id.exists' => 'مرکز درمانی انتخاب‌شده معتبر نیست.',
+            'medical_center_id.required' => 'مرکز درمانی الزامی است.',
+            'medical_center_id.exists' => 'مرکز درمانی معتبر نیست.',
             'duration.required' => 'مدت زمان الزامی است.',
             'duration.integer' => 'مدت زمان باید عدد صحیح باشد.',
             'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
@@ -276,7 +297,7 @@ class DoctorServiceCreate extends Component
         foreach ($this->pricing as $pricing) {
             $doctorService = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
-                ->where('medical_center_id', $this->medical_center_id)
+                ->where('medical_center_id', $medicalCenterId)
                 ->where('insurance_id', $pricing['insurance_id'])
                 ->first();
 
@@ -295,7 +316,7 @@ class DoctorServiceCreate extends Component
                 DoctorService::create([
                     'doctor_id' => $doctorId,
                     'service_id' => $this->service_id,
-                    'medical_center_id' => $this->medical_center_id,
+                    'medical_center_id' => $medicalCenterId,
                     'insurance_id' => $pricing['insurance_id'],
                     'name' => $service->name,
                     'description' => $this->description,
@@ -325,12 +346,21 @@ class DoctorServiceCreate extends Component
     {
         $services = Service::where('status', true)->get();
         $insurances = Insurance::all();
-        $clinics = MedicalCenter::whereHas('doctors', function ($query) {
-            $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
-        })->where('type', 'policlinic')->get();
-        $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
-            ->with(['service', 'insurance', 'clinic'])
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+        $doctorServices = DoctorService::where('doctor_id', $doctorId)
+            ->with(['service', 'insurance', 'medicalCenter'])
             ->get();
-        return view('livewire.mc.panel.doctor-services.doctor-service-create', compact('services', 'insurances', 'clinics', 'doctorServices'));
+        return view('livewire.mc.panel.doctor-services.doctor-service-create', compact('services', 'insurances', 'doctorServices'));
     }
 }

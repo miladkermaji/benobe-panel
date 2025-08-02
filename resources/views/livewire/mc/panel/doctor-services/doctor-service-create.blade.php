@@ -43,7 +43,7 @@
                   @foreach ($doctorServices as $doctorService)
                     <option value="doctor_service_{{ $doctorService->id }}">
                       {{ $doctorService->service->name ?? 'خدمت نامشخص' }}
-                      ({{ $doctorService->clinic->name ?? 'کلینیک نامشخص' }} -
+                      ({{ $doctorService->medicalCenter->name ?? 'مرکز درمانی نامشخص' }} -
                       {{ $doctorService->insurance->name ?? 'بیمه نامشخص' }})
                     </option>
                   @endforeach
@@ -55,16 +55,6 @@
                 </optgroup>
               </select>
               <label for="selected_service" class="form-label">خدمت</label>
-            </div>
-            <!-- کلینیک -->
-            <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.debounce.500ms="medical_center_id" class="form-select select2" id="medical_center_id">
-                <option value="" selected>انتخاب کلینیک</option>
-                @foreach ($clinics as $clinic)
-                  <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
-                @endforeach
-              </select>
-              <label for="medical_center_id" class="form-label">مرکز درمانی</label>
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
@@ -176,7 +166,7 @@
   <script>
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
-        $('#selected_service, #medical_center_id, [id^="insurance_id_"]').each(function() {
+        $('#selected_service, [id^="insurance_id_"]').each(function() {
           if ($(this).hasClass('select2-hidden-accessible')) {
             $(this).select2('destroy');
           }
@@ -184,14 +174,6 @@
         $('#selected_service').select2({
           dir: 'rtl',
           placeholder: 'انتخاب خدمت',
-          allowClear: true,
-          width: '100%',
-          dropdownAutoWidth: true,
-          minimumResultsForSearch: 5
-        });
-        $('#medical_center_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب مرکز درمانی',
           allowClear: true,
           width: '100%',
           dropdownAutoWidth: true,
@@ -208,9 +190,7 @@
           });
         });
         const selectedService = @json($selected_service);
-        const clinicId = @json($medical_center_id);
         $('#selected_service').val(selectedService || '').trigger('change');
-        $('#medical_center_id').val(clinicId || '').trigger('change');
         @foreach ($pricing as $index => $price)
           $('#insurance_id_{{ $index }}').val(@json($price['insurance_id']) || '').trigger('change');
         @endforeach
@@ -222,13 +202,6 @@
       });
       $('#selected_service').on('select2:clear', function() {
         @this.set('selected_service', null);
-      });
-      $('#medical_center_id').on('select2:select', function(e) {
-        const value = e.target.value === '' ? null : e.target.value;
-        @this.set('medical_center_id', value);
-      });
-      $('#medical_center_id').on('select2:clear', function() {
-        @this.set('medical_center_id', null);
       });
       $(document).on('select2:select', '[id^="insurance_id_"]', function(e) {
         const index = $(this).attr('id').replace('insurance_id_', '');
@@ -242,9 +215,7 @@
       Livewire.on('update-select2', ({
         clinicId
       }) => {
-        if (clinicId) {
-          $('#medical_center_id').val(clinicId).trigger('change');
-        }
+        // This event is no longer needed as medical_center_id is removed
       });
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
@@ -269,10 +240,8 @@
       });
       document.addEventListener('livewire:updated', function() {
         const currentService = $('#selected_service').val();
-        const currentClinic = $('#medical_center_id').val();
         initializeSelect2();
         $('#selected_service').val(currentService).trigger('change');
-        $('#medical_center_id').val(currentClinic).trigger('change');
       });
     });
   </script>

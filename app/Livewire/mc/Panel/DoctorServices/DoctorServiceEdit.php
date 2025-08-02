@@ -10,6 +10,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Models\MedicalCenter;
+use Illuminate\Support\Facades\DB;
 
 class DoctorServiceEdit extends Component
 {
@@ -165,11 +166,6 @@ class DoctorServiceEdit extends Component
         $this->save();
     }
 
-    public function updatedClinicId($value)
-    {
-        $this->save();
-    }
-
     public function updatedDuration($value)
     {
         $this->save();
@@ -183,10 +179,23 @@ class DoctorServiceEdit extends Component
     public function save()
     {
         $this->isSaving = true;
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        $medicalCenterId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor and medical center
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $medicalCenterId = $medicalCenter->id;
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         $currentState = [
             'service_id' => $this->service_id,
-            'medical_center_id' => $this->medical_center_id,
+            'medical_center_id' => $medicalCenterId,
             'duration' => $this->duration,
             'description' => $this->description,
             'pricing' => $this->pricing,
@@ -210,8 +219,8 @@ class DoctorServiceEdit extends Component
         ], [
             'service_id.required' => 'انتخاب خدمت الزامی است.',
             'service_id.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
-            'medical_center_id.required' => 'انتخاب کلینیک الزامی است.',
-            'medical_center_id.exists' => 'کلینیک انتخاب‌شده معتبر نیست.',
+            'medical_center_id.required' => 'مرکز درمانی الزامی است.',
+            'medical_center_id.exists' => 'مرکز درمانی معتبر نیست.',
             'duration.required' => 'مدت زمان الزامی است.',
             'duration.integer' => 'مدت زمان باید عدد صحیح باشد.',
             'duration.min' => 'مدت زمان باید حداقل ۱ دقیقه باشد.',
@@ -238,13 +247,13 @@ class DoctorServiceEdit extends Component
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
                 ->where('insurance_id', $pricing['insurance_id'])
-                ->where('medical_center_id', $this->medical_center_id)
+                ->where('medical_center_id', $medicalCenterId)
                 ->when(isset($pricing['id']), function ($query) use ($pricing) {
                     $query->where('id', '!=', $pricing['id']);
                 })
                 ->exists();
             if ($exists) {
-                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و کلینیک انتخاب‌شده قبلاً تعریف شده است.');
+                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و مرکز درمانی قبلاً تعریف شده است.');
                 $this->isSaving = false;
                 return;
             }
@@ -257,7 +266,7 @@ class DoctorServiceEdit extends Component
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([
                     'service_id' => $this->service_id,
-                    'medical_center_id' => $this->medical_center_id,
+                    'medical_center_id' => $medicalCenterId,
                     'insurance_id' => $pricing['insurance_id'],
                     'name' => $service->name,
                     'description' => $this->description,
@@ -287,13 +296,21 @@ class DoctorServiceEdit extends Component
     {
         $services = Service::where('status', true)->get();
         $insurances = Insurance::all();
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
-            $query->where('doctor_id', $doctorId);
-        })->where('type', 'policlinic')->get();
-        $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
-            ->with(['service', 'insurance', 'clinic'])
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+        $doctorServices = DoctorService::where('doctor_id', $doctorId)
+            ->with(['service', 'insurance', 'medicalCenter'])
             ->get();
-        return view('livewire.mc.panel.doctor-services.doctor-service-edit', compact('services', 'insurances', 'clinics', 'doctorServices'));
+        return view('livewire.mc.panel.doctor-services.doctor-service-edit', compact('services', 'insurances', 'doctorServices'));
     }
 }

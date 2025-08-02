@@ -43,7 +43,7 @@
                   @foreach ($doctorServices as $doctorService)
                     <option value="doctor_service_{{ $doctorService->id }}">
                       {{ $doctorService->service->name ?? 'خدمت نامشخص' }}
-                      ({{ $doctorService->clinic->name ?? 'کلینیک نامشخص' }} -
+                      ({{ $doctorService->medicalCenter->name ?? 'مرکز درمانی نامشخص' }} -
                       {{ $doctorService->insurance->name ?? 'بیمه نامشخص' }})
                     </option>
                   @endforeach
@@ -55,16 +55,6 @@
                 </optgroup>
               </select>
               <label for="selected_service" class="form-label">خدمت</label>
-            </div>
-            <!-- کلینیک -->
-            <div class="col-lg-4 col-md-6 position-relative mt-5" wire:ignore>
-              <select wire:model.debounce.500ms="medical_center_id" class="form-select select2" id="medical_center_id">
-                <option value="" selected>انتخاب کلینیک</option>
-                @foreach ($clinics as $clinic)
-                  <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
-                @endforeach
-              </select>
-              <label for="medical_center_id" class="form-label">کلینیک</label>
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
@@ -168,7 +158,7 @@
     document.addEventListener('livewire:init', function() {
       function initializeSelect2() {
         // تخریب Select2های قبلی برای جلوگیری از تداخل
-        $('#selected_service, #medical_center_id, [id^="insurance_id_"]').each(function() {
+        $('#selected_service, [id^="insurance_id_"]').each(function() {
           if ($(this).hasClass('select2-hidden-accessible')) {
             $(this).select2('destroy');
           }
@@ -183,16 +173,6 @@
           dropdownAutoWidth: true,
           minimumResultsForSearch: 5
         }).val(@json($selected_service) || '').trigger('change');
-
-        // مقداردهی اولیه برای کلینیک
-        $('#medical_center_id').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کلینیک',
-          allowClear: true,
-          width: '100%',
-          dropdownAutoWidth: true,
-          minimumResultsForSearch: 5
-        }).val(@json($medical_center_id) || '').trigger('change');
 
         // مقداردهی اولیه برای بیمه‌ها
         $('[id^="insurance_id_"]').each(function() {
@@ -223,16 +203,6 @@
         @this.set('selected_service', null);
       });
 
-      // رویداد تغییر کلینیک
-      $('#medical_center_id').on('select2:select', function(e) {
-        const value = e.target.value === '' ? null : e.target.value;
-        @this.set('medical_center_id', value);
-      });
-
-      $('#medical_center_id').on('select2:clear', function() {
-        @this.set('medical_center_id', null);
-      });
-
       // رویداد تغییر بیمه
       $(document).on('select2:select', '[id^="insurance_id_"]', function(e) {
         const index = $(this).attr('id').replace('insurance_id_', '');
@@ -250,7 +220,8 @@
         clinicId
       }) => {
         if (clinicId) {
-          $('#medical_center_id').val(clinicId).trigger('change');
+          // This part of the script is no longer needed as medical_center_id is removed
+          // $('#medical_center_id').val(clinicId).trigger('change');
         }
       });
 
