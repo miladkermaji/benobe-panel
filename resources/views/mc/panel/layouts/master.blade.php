@@ -2,27 +2,29 @@
 <html lang="en">
 
 <head>
-  @include('dr.panel.layouts.partials.head-tags')
+  @include('mc.panel.layouts.partials.head-tags')
   @yield('styles')
   <title>
     @if (Auth::guard('doctor')->check())
       پنل دکتر | به نوبه
     @elseif (Auth::guard('secretary')->check())
       پنل منشی | به نوبه
+      @elseif (Auth::guard('medical_center')->check())
+      پنل مراکز درمانی | به نوبه
     @else
       به نوبه
     @endif
   </title>
 
-  @include('dr.panel.my-tools.loader-btn')
+  @include('mc.panel.my-tools.loader-btn')
   @livewireStyles
 </head>
 
 <body>
-  @include('dr.panel.layouts.partials.sidebar')
+  @include('mc.panel.layouts.partials.sidebar')
   <div class="content">
     <x-global-loader />
-    @include('dr.panel.layouts.partials.header')
+    @include('mc.panel.layouts.partials.header')
     @yield('content')
   </div>
 
@@ -46,7 +48,7 @@
     });
   </script>
 
-  @include('dr.panel.layouts.partials.scripts')
+  @include('mc.panel.layouts.partials.scripts')
   @yield('scripts')
    {{-- @networkStatus --}}
   <!-- سایر اسکریپت‌ها -->

@@ -118,7 +118,7 @@ class McPanelController extends Controller
             ->where('status', 'attended')
             ->sum('final_price');
         $selectedMedicalCenterId = $this->getSelectedMedicalCenterId();
-        return view('dr.panel.index', compact(
+        return view('mc.panel.index', compact(
             'totalPatientsToday',
             'visitedPatients',
             'remainingPatients',

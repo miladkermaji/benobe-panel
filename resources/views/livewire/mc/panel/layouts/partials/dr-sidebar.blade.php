@@ -5,7 +5,7 @@
       <div class="profile__info border cursor-pointer text-center">
         <div class="avatar__img cursor-pointer">
           <img id="profile-photo-img"
-            src="{{ $user->profile_photo_path ? Storage::url($user->profile_photo_path) : asset('dr-assets/panel/img/pro.jpg') }}"
+            src="{{ $user->avatar ? Storage::url($user->avatar) : asset('dr-assets/panel/img/pro.jpg') }}"
             class="avatar___img cursor-pointer">
           <input type="file" accept="image/*" class="avatar-img__input" id="profile-photo-input">
           <div class="v-dialog__container" style="display: block;"></div>

@@ -1,1 +1,1 @@
-@livewire('dr.panel.layouts.partials.dr-sidebar')
+@livewire('mc.panel.layouts.partials.dr-sidebar')
