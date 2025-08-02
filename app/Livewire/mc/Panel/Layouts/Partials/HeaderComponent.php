@@ -9,158 +9,125 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Models\NotificationRecipient;
 use Illuminate\Database\Eloquent\Collection;
+use App\Traits\HasSelectedDoctor;
 
 class HeaderComponent extends Component
 {
+    use HasSelectedDoctor;
+
     public $walletBalance = 0;
     public $notifications;
     public $unreadCount = 0;
-    public $selectedMedicalCenterId = null;
-    public $selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
-    public $medicalCenters;
+    public $selectedDoctorId = null;
+    public $selectedDoctorName = 'انتخاب پزشک';
+    public $doctors;
 
     public function mount()
     {
         $this->notifications = new Collection();
-        $this->medicalCenters = new Collection(); // Initialize medicalCenters
+        $this->doctors = new Collection(); // Initialize doctors
 
-        if (Auth::guard('doctor')->check()) {
-            $doctor = Auth::guard('doctor')->user();
-            $doctorId = $doctor->id;
-            $doctorMobile = $doctor->mobile;
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
 
-            // بارگذاری مراکز درمانی
-            $this->loadMedicalCenters($doctor);
-            // تنظیم مرکز درمانی انتخاب‌شده
-            $this->setSelectedMedicalCenterFromDatabase($doctor);
+            // بارگذاری پزشکان مرکز درمانی
+            $this->loadDoctors($medicalCenter);
+            // تنظیم پزشک انتخاب‌شده
+            $this->setSelectedDoctorFromDatabase($medicalCenter);
 
-            $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
-                ->sum('balance');
-
-            // لود اعلان‌ها برای پزشک
-            $doctorNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Doctor')
-                ->where('recipient_id', $doctorId)
+            // لود اعلان‌ها برای مرکز درمانی
+            $medicalCenterNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\MedicalCenter')
+                ->where('recipient_id', $medicalCenter->id)
                 ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
             $singleNotifications = NotificationRecipient::where('recipient_type', 'phone')
-                ->where('phone_number', $doctorMobile)
+                ->where('phone_number', $medicalCenter->phone_number)
                 ->where('is_read', false)
                 ->with('notification')
                 ->get();
 
-            $this->notifications = $doctorNotifications->merge($singleNotifications);
-        } elseif (Auth::guard('secretary')->check()) {
-            $secretary = Auth::guard('secretary')->user();
-            $doctorId = $secretary->doctor_id;
-            $secretaryMobile = $secretary->mobile;
-
-            // بارگذاری مراکز درمانی
-            $this->loadMedicalCenters($secretary->doctor);
-
-            // تنظیم مرکز درمانی انتخاب‌شده
-            $this->setSelectedMedicalCenterFromDatabase($secretary->doctor);
-
-            if ($doctorId) {
-                $this->walletBalance = DoctorWallet::where('doctor_id', $doctorId)
-                    ->sum('balance');
-            }
-
-            $secretaryNotifications = NotificationRecipient::where('recipient_type', 'App\\Models\\Secretary')
-                ->where('recipient_id', $secretary->id)
-                ->where('is_read', false)
-                ->with('notification')
-                ->get();
-
-            $singleNotifications = NotificationRecipient::where('recipient_type', 'phone')
-                ->where('phone_number', $secretaryMobile)
-                ->where('is_read', false)
-                ->with('notification')
-                ->get();
-
-            $this->notifications = $secretaryNotifications->merge($singleNotifications);
+            $this->notifications = $medicalCenterNotifications->merge($singleNotifications);
         }
 
         $this->unreadCount = $this->notifications->count();
     }
 
-    protected function loadMedicalCenters($doctor)
+    protected function loadDoctors($medicalCenter)
     {
-        if ($doctor) {
-            $this->medicalCenters = $doctor->medicalCenters()
-                ->select('medical_centers.*')
-                ->where('medical_centers.type', 'policlinic')
-                ->with(['province', 'city'])
+        if ($medicalCenter) {
+            $this->doctors = $medicalCenter->doctors()
+                ->select('doctors.*')
+                ->where('doctors.is_active', true)
+                ->with(['specialties'])
                 ->get();
         }
     }
 
-    protected function setSelectedMedicalCenterFromDatabase($doctor)
+    protected function setSelectedDoctorFromDatabase($medicalCenter)
     {
-        if ($doctor) {
-            // اگر دکتر مرکز درمانی انتخاب‌شده‌ای دارد، از آن استفاده کن
-            if ($doctor->selectedMedicalCenter) {
-                if ($doctor->selectedMedicalCenter->medical_center_id) {
-                    $this->selectedMedicalCenterId = $doctor->selectedMedicalCenter->medical_center_id;
-                    $this->selectedMedicalCenterName = $doctor->selectedMedicalCenter->medicalCenter->name;
+        if ($medicalCenter) {
+            // اگر مرکز درمانی پزشک انتخاب‌شده‌ای دارد، از آن استفاده کن
+            if ($medicalCenter->selectedDoctor) {
+                if ($medicalCenter->selectedDoctor->doctor_id) {
+                    $this->selectedDoctorId = $medicalCenter->selectedDoctor->doctor_id;
+                    $this->selectedDoctorName = $medicalCenter->selectedDoctor->doctor->first_name . ' ' . $medicalCenter->selectedDoctor->doctor->last_name;
                 } else {
-                    // مشاوره آنلاین انتخاب شده
-                    $this->selectedMedicalCenterId = null;
-                    $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+                    // هیچ پزشکی انتخاب نشده
+                    $this->selectedDoctorId = null;
+                    $this->selectedDoctorName = 'انتخاب پزشک';
                 }
                 return;
             }
 
-            // اگر رکوردی وجود ندارد، بررسی کن که آیا مرکز درمانی فعالی دارد یا نه
-            $activeMedicalCenters = $doctor->medicalCenters()
-                ->where('medical_centers.type', 'policlinic')
+            // اگر رکوردی وجود ندارد، بررسی کن که آیا پزشک فعالی دارد یا نه
+            $activeDoctors = $medicalCenter->doctors()
+                ->where('doctors.is_active', true)
                 ->get();
 
-            if ($activeMedicalCenters->count() > 0) {
-                // اولین مرکز درمانی فعال را انتخاب کن
-                $firstActiveMedicalCenter = $activeMedicalCenters->first();
-                // مرکز درمانی انتخاب‌شده را در دیتابیس ذخیره کن
-                $doctor->setSelectedMedicalCenter($firstActiveMedicalCenter->id);
-                $doctor->refresh();
+            if ($activeDoctors->count() > 0) {
+                // اولین پزشک فعال را انتخاب کن
+                $firstActiveDoctor = $activeDoctors->first();
+                // پزشک انتخاب‌شده را در دیتابیس ذخیره کن
+                $medicalCenter->setSelectedDoctor($firstActiveDoctor->id);
+                $medicalCenter->refresh();
 
-                $this->selectedMedicalCenterId = $firstActiveMedicalCenter->id;
-                $this->selectedMedicalCenterName = $firstActiveMedicalCenter->name;
+                $this->selectedDoctorId = $firstActiveDoctor->id;
+                $this->selectedDoctorName = $firstActiveDoctor->first_name . ' ' . $firstActiveDoctor->last_name;
             } else {
-                // هیچ مرکز درمانی فعالی ندارد، روی مشاوره آنلاین بگذار
-                $this->selectedMedicalCenterId = null;
-                $this->selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
+                // هیچ پزشک فعالی ندارد
+                $this->selectedDoctorId = null;
+                $this->selectedDoctorName = 'انتخاب پزشک';
 
-                // در دیتابیس رکورد با medical_center_id = null ایجاد کن
-                $doctor->setSelectedMedicalCenter(null);
+                // در دیتابیس رکورد با doctor_id = null ایجاد کن
+                $medicalCenter->setSelectedDoctor(null);
             }
         }
     }
 
-    public function selectMedicalCenter($medicalCenterId = null)
+    public function selectDoctor($doctorId = null)
     {
-        $doctor = Auth::guard('doctor')->check()
-            ? Auth::guard('doctor')->user()
-            : Auth::guard('secretary')->user()->doctor;
+        $medicalCenter = Auth::guard('medical_center')->user();
 
-        if ($doctor) {
-            // اعتبارسنجی مرکز درمانی - فقط کلینیک‌ها
-            if ($medicalCenterId && !$doctor->medicalCenters()->where('medical_centers.id', $medicalCenterId)->where('medical_centers.type', 'policlinic')->exists()) {
-                $this->addError('medical_center', 'مرکز درمانی انتخاب‌شده معتبر نیست.');
+        if ($medicalCenter) {
+            // اعتبارسنجی پزشک
+            if ($doctorId && !$medicalCenter->doctors()->where('doctors.id', $doctorId)->where('doctors.is_active', true)->exists()) {
+                $this->addError('doctor', 'پزشک انتخاب‌شده معتبر نیست.');
                 return;
             }
 
-            // ذخیره مرکز درمانی انتخاب‌شده
-            $doctor->setSelectedMedicalCenter($medicalCenterId);
+            // ذخیره پزشک انتخاب‌شده
+            $medicalCenter->setSelectedDoctor($doctorId);
 
             // به‌روزرسانی مقادیر
-            $this->selectedMedicalCenterId = $medicalCenterId;
-            $this->selectedMedicalCenterName = $medicalCenterId
-                ? $doctor->medicalCenters()->where('medical_centers.type', 'policlinic')->find($medicalCenterId)->name
-                : 'مشاوره آنلاین به نوبه';
+            $this->selectedDoctorId = $doctorId;
+            $this->selectedDoctorName = $doctorId
+                ? $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId)->first_name . ' ' . $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId)->last_name
+                : 'انتخاب پزشک';
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها
-            $this->dispatch('medicalCenterSelected', ['medicalCenterId' => $medicalCenterId]);
+            $this->dispatch('doctorSelected', ['doctorId' => $doctorId]);
 
             // ارسال رویداد برای ریلود صفحه بعد از چند ثانیه
             $this->dispatch('reloadPageAfterDelay', ['delay' => 3000]); // 3 ثانیه تاخیر

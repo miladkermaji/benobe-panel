@@ -176,4 +176,20 @@ class MedicalCenter extends Authenticatable
     {
         return $this->hasMany(DoctorSelectedMedicalCenter::class, 'medical_center_id');
     }
+
+    public function selectedDoctor()
+    {
+        return $this->hasOne(MedicalCenterSelectedDoctor::class, 'medical_center_id');
+    }
+
+    /**
+     * تنظیم پزشک انتخاب‌شده
+     */
+    public function setSelectedDoctor($doctorId = null)
+    {
+        $this->selectedDoctor()->updateOrCreate(
+            ['medical_center_id' => $this->id],
+            ['doctor_id' => $doctorId]
+        );
+    }
 }

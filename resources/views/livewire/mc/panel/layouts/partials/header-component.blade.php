@@ -1,4 +1,25 @@
 <div>
+  <style>
+    .inactive-doctor {
+      opacity: 0.6;
+      background-color: #f8f9fa;
+    }
+
+    .inactive-doctor .option-card {
+      border: 1px solid #dee2e6;
+    }
+
+    .inactive-dot {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 8px;
+      height: 8px;
+      background-color: #dc3545;
+      border-radius: 50%;
+    }
+  </style>
+
   <div class="header d-flex item-center bg-white width-100 custom-border-bottom">
     <div class="w-100 d-flex align-items-center">
       <div class="header__right d-flex flex-grow-1 item-center">
@@ -7,7 +28,7 @@
           <div class="p-3 bg-white stylish-breadcrumb" style="display: none">
             <nav aria-label="breadcrumb">
               <ol class="breadcrumb bg-white mb-0">
-                <li class="breadcrumb-item"><a href="#">پنل دکتر</a></li>
+                <li class="breadcrumb-item"><a href="#">پنل مرکز درمانی</a></li>
                 <li class="breadcrumb-item active" aria-current="page">@yield('bread-crumb-title')</li>
               </ol>
             </nav>
@@ -18,10 +39,9 @@
         <div class="myPanelOption p-3 p-md-3">
           <div class="d-flex align-items-center">
             <div class="my-tooltip mx-2">
-              <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید"
-                placement="bottom">
+              <x-custom-tooltip title="از این قسمت، پزشکی که می‌خواهید مدیریت کنید را انتخاب کنید" placement="bottom">
                 <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg"
-                  class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="centerSelect" currentItem="false">
+                  class="lg:block svg-help" color="#3f4079" data-tip="true" data-for="doctorSelect" currentItem="false">
                   <path
                     d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
                     stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -37,7 +57,7 @@
                   class="dropdown-trigger btn h-40 w-md-300 bg-light-blue text-left d-flex justify-content-between align-items-center"
                   aria-haspopup="true" aria-expanded="false">
                   <div class="text-truncate">
-                    <span class="dropdown-label">{{ $selectedMedicalCenterName }}</span>
+                    <span class="dropdown-label">{{ $selectedDoctorName }}</span>
                   </div>
                   <div class="flex-shrink-0">
                     <svg width="7" height="11" viewBox="0 0 7 11" fill="none"
@@ -50,10 +70,10 @@
                 </div>
                 <div class="my-dropdown-menu d-none">
                   <div class="" aria-hidden="true">
-                    <div class="{{ Route::is('doctors.clinic.deposit') ? 'd-none' : '' }}" aria-hidden="true">
+                    <div class="{{ Route::is('medical-centers.doctor.deposit') ? 'd-none' : '' }}" aria-hidden="true">
                       <div
-                        class="d-flex align-items-center p-3 option-card {{ $selectedMedicalCenterId === null ? 'card-active' : '' }}"
-                        wire:click="selectMedicalCenter()" data-id="default">
+                        class="d-flex align-items-center p-3 option-card {{ $selectedDoctorId === null ? 'card-active' : '' }}"
+                        wire:click="selectDoctor()" data-id="default">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                           xmlns="http://www.w3.org/2000/svg">
                           <path
@@ -70,17 +90,16 @@
                             fill="#3F3F79"></path>
                         </svg>
                         <div class="d-flex flex-column mx-3">
-                          <span class="fw-bold d-block fs-15">مشاوره آنلاین به نوبه</span>
-                          <span class="fw-bold fs-13">مرکز مشاوره آنلاین به نوبه</span>
+                          <span class="fw-bold d-block fs-15">انتخاب پزشک</span>
+                          <span class="fw-bold fs-13">لطفاً پزشک مورد نظر را انتخاب کنید</span>
                         </div>
                       </div>
                     </div>
-                    @foreach ($medicalCenters as $medicalCenter)
+                    @foreach ($doctors as $doctor)
                       <div
-                        class="d-flex justify-content-between align-items-center option-card {{ $selectedMedicalCenterId == ($medicalCenter->id ?? null) ? 'card-active' : '' }} {{ !($medicalCenter->is_active ?? false) ? 'inactive-clinic' : '' }}"
-                        wire:click="selectMedicalCenter({{ $medicalCenter->id ?? '' }})"
-                        data-id="{{ $medicalCenter->id ?? '' }}"
-                        data-active="{{ $medicalCenter->is_active ?? false ? '1' : '0' }}">
+                        class="d-flex justify-content-between align-items-center option-card {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                        wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
+                        data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}">
                         <div class="d-flex align-items-center p-3 position-relative">
                           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -89,20 +108,25 @@
                               fill="#3F3F79"></path>
                           </svg>
                           <div class="d-flex flex-column mx-3">
-                            <span class="fw-bold d-block fs-15">{{ $medicalCenter->name ?? '' }}</span>
-                            <span class="fw-bold d-block fs-13">{{ $medicalCenter->province->name ?? '' }}،
-                              {{ $medicalCenter->city->name ?? '' }}</span>
+                            <span class="fw-bold d-block fs-15">{{ $doctor->first_name ?? '' }}
+                              {{ $doctor->last_name ?? '' }}</span>
+                            <span class="fw-bold d-block fs-13">
+                              @if ($doctor->specialties && $doctor->specialties->count() > 0)
+                                {{ $doctor->specialties->first()->name ?? '' }}
+                              @else
+                                پزشک عمومی
+                              @endif
+                            </span>
                           </div>
-                          @if (!($medicalCenter->is_active ?? false))
-                            <div class="inactive-dot"
-                              title="این مرکز درمانی هنوز فعال نشده است برای فعالسازی روی دکمه فعالسازی کلیک کنید">
+                          @if (!($doctor->is_active ?? false))
+                            <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
                             </div>
                           @endif
                         </div>
                         <div class="mx-2">
-                          @if (!($medicalCenter->is_active ?? false))
+                          @if (!($doctor->is_active ?? false))
                             <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
-                              onclick="window.location.href='{{ route('activation-doctor-clinic', $medicalCenter->id ?? '') }}'">فعال‌سازی
+                              onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
                             </button>
                           @endif
                         </div>
@@ -203,7 +227,7 @@
           }
         });
 
-        // گوش دادن به رویداد ریلود صفحه بعد از انتخاب مرکز درمانی
+        // گوش دادن به رویداد ریلود صفحه بعد از انتخاب پزشک
         Livewire.on('reloadPageAfterDelay', (data) => {
           const delay = data.delay || 3000; // پیش‌فرض 3 ثانیه
 
@@ -216,7 +240,7 @@
               <div class="spinner-border spinner-border-sm me-2" role="status">
                 <span class="visually-hidden">در حال بارگذاری...</span>
               </div>
-              <span>مرکز درمانی تغییر کرد. صفحه در حال بروزرسانی...</span>
+              <span>پزشک تغییر کرد. صفحه در حال بروزرسانی...</span>
             </div>
           `;
           document.body.appendChild(message);
