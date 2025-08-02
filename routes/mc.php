@@ -250,6 +250,7 @@ Route::prefix('mc')
                 Route::get('/search-appointments', [AppointmentController::class, 'searchAppointments'])->middleware('secretary.permission:appointments')->name('search.appointments');
                 Route::get('/turnsCatByDays', [TurnsCatByDaysController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-turnsCatByDays');
                 Route::post('/appointments/{id}/status', [AppointmentController::class, 'updateStatus'])->middleware('secretary.permission:appointments')->name('updateStatusAppointment');
+                Route::get('/get-appointments-count/{doctorId}/{date}', [McDrScheduleController::class, 'getAppointmentsCount'])->middleware('secretary.permission:appointments')->name('get-appointments-count');
             });
             Route::get('/patient-records', [PatientRecordsController::class, 'index'])->middleware('secretary.permission:patient_records')->name('mc-patient-records');
             Route::prefix('tickets')->group(function () {

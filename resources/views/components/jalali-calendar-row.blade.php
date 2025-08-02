@@ -1,4 +1,3 @@
-
 <link rel="stylesheet" href="{{ asset('dr-assets/panel/css/calendar/custom-calendar-row.css') }}">
 <div class="w-100 d-flex justify-content-around align-items-center" style="margin: 0; padding: 0; position: relative;">
   <div class="w-100 d-flex align-items-center gap-2">
@@ -30,7 +29,7 @@
     </div>
   </div>
   <div id="calendar-error" class="error-message">
-    
+
   </div>
 </div>
 
@@ -38,3 +37,46 @@
 <script src="{{ asset('dr-assets/panel/js/calendar/custm-calendar-row.js') }}"></script>
 
 <meta name="csrf-token" content="{{ csrf_token() }}">
+
+<script>
+  // تعیین نوع گارد و مسیرهای مناسب
+  (function() {
+    const currentPath = window.location.pathname;
+    let guardType = 'doctor'; // پیش‌فرض
+    let appointmentsCountUrl = '';
+    let getHolidaysUrl = '';
+    let searchAppointmentsUrl = '';
+
+    // تشخیص نوع گارد بر اساس مسیر
+    if (currentPath.includes('/mc/')) {
+      guardType = 'medical_center';
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('mc.search.appointments') }}";
+    } else if (currentPath.includes('/dr/')) {
+      guardType = 'doctor';
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('search.appointments') }}";
+    } else if (currentPath.includes('/secretary/')) {
+      guardType = 'secretary';
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('search.appointments') }}";
+    }
+
+    // تنظیم متغیرهای سراسری
+    window.guardType = guardType;
+    window.appointmentsCountUrl = appointmentsCountUrl;
+    window.getHolidaysUrl = getHolidaysUrl;
+    window.searchAppointmentsUrl = searchAppointmentsUrl;
+
+    // برای مراکز درمانی، نیازی به selectedClinicId نیست
+    if (guardType === 'medical_center') {
+      window.selectedClinicId = null;
+    } else {
+      // برای پزشک و منشی، از localStorage استفاده کن
+      window.selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+    }
+  })();
+</script>

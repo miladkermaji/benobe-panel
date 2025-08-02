@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\DoctorAppointmentConfig;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\HasSelectedDoctor;
+use App\Models\MedicalCenter;
 
 class AppointmentsList extends Component
 {

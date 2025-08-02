@@ -368,4 +368,42 @@ class DrScheduleController extends Controller
 
         return view("mc.panel.turn.schedule.my-appointments", compact('appointments'));
     }
+
+    public function getAppointmentsCount($doctorId, $date)
+    {
+        try {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            if (!$medicalCenter) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'کاربر احراز هویت نشده است.'
+                ], 401);
+            }
+
+            // بررسی اینکه آیا پزشک انتخاب‌شده همان پزشک درخواستی است
+            $selectedDoctorId = $medicalCenter->selectedDoctor?->doctor_id;
+            if ($selectedDoctorId != $doctorId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسترسی غیرمجاز به اطلاعات پزشک دیگر.'
+                ], 403);
+            }
+
+            // شمارش نوبت‌ها برای تاریخ مشخص
+            $count = Appointment::where('doctor_id', $doctorId)
+                ->where('medical_center_id', $medicalCenter->id)
+                ->whereDate('appointment_date', $date)
+                ->count();
+
+            return response()->json([
+                'success' => true,
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت تعداد نوبت‌ها: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

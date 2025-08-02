@@ -22,6 +22,13 @@ $(document).ready(function () {
     let lastUpdateTime = 0;
     const UPDATE_COOLDOWN = 1000; // 1 second cooldown between updates
 
+    // استفاده از متغیرهای سراسری تعریف شده در Blade
+    const guardType = window.guardType || "doctor";
+    const appointmentsCountUrl = window.appointmentsCountUrl || "";
+    const getHolidaysUrl = window.getHolidaysUrl || "";
+    const searchAppointmentsUrl = window.searchAppointmentsUrl || "";
+    const selectedClinicId = window.selectedClinicId || "default";
+
     // رویداد Livewire برای آپدیت DOM
     document.addEventListener("livewire:updated", function () {
         setTimeout(() => {
@@ -133,7 +140,7 @@ $(document).ready(function () {
             // بروزرسانی selectedClinicId در localStorage
             const medicalCenterId = event.detail?.medicalCenterId || null;
             localStorage.setItem("selectedClinicId", medicalCenterId);
-            
+
             // بروزرسانی تقویم
             fetchAppointmentsCount();
         }, 1000)
@@ -150,12 +157,26 @@ $(document).ready(function () {
         calendar.hide();
         ensureLoadingHidden();
 
+        // تنظیم پارامترهای مناسب برای هر گارد
+        let requestData = {};
+
+        if (guardType === "medical_center") {
+            // برای مراکز درمانی، نیازی به selectedClinicId نیست
+            requestData = {
+                guard_type: "medical_center",
+            };
+        } else {
+            // برای پزشک و منشی، از selectedClinicId استفاده کن
+            requestData = {
+                selectedClinicId: selectedClinicId,
+                guard_type: guardType,
+            };
+        }
+
         $.ajax({
             url: appointmentsCountUrl,
             method: "GET",
-            data: {
-                selectedClinicId: localStorage.getItem("selectedClinicId"),
-            },
+            data: requestData,
             headers: {
                 "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
             },
@@ -461,9 +482,20 @@ $(document).ready(function () {
         )?.content;
         if (!doctorId) return;
 
-        fetch(
-            `/dr/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`
-        )
+        // تنظیم URL مناسب برای هر گارد
+        let url = "";
+        if (guardType === "medical_center") {
+            url = `/mc/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`;
+        } else if (guardType === "doctor") {
+            url = `/dr/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`;
+        } else if (guardType === "secretary") {
+            url = `/secretary/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`;
+        } else {
+            // پیش‌فرض برای پزشک
+            url = `/dr/panel/turn/schedule/get-appointments-count/${doctorId}/${date}`;
+        }
+
+        fetch(url)
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
