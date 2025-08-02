@@ -369,6 +369,67 @@ class DrScheduleController extends Controller
         return view("mc.panel.turn.schedule.my-appointments", compact('appointments'));
     }
 
+    public function searchAppointments(Request $request)
+    {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $medicalCenterId = $medicalCenter->id;
+
+            $query = $request->input('query', '');
+            $date = $request->input('date', '');
+            $status = $request->input('status', '');
+
+            $appointmentsQuery = Appointment::with(['doctor', 'patientable', 'insurance', 'medicalCenter'])
+                ->where('doctor_id', $doctor->id)
+                ->where('medical_center_id', $medicalCenterId);
+
+            // جستجو بر اساس نام یا شماره تلفن بیمار
+            if (!empty($query)) {
+                $appointmentsQuery->whereHas('patientable', function ($q) use ($query) {
+                    $q->where('name', 'LIKE', "%{$query}%")
+                      ->orWhere('mobile', 'LIKE', "%{$query}%");
+                });
+            }
+
+            // فیلتر بر اساس تاریخ
+            if (!empty($date)) {
+                if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                    $gregorianDate = $date;
+                } elseif (preg_match('/^\d{4}\/\d{2}\/\d{2}$/', $date)) {
+                    $gregorianDate = Jalalian::fromFormat('Y/m/d', $date)->toCarbon()->format('Y-m-d');
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'فرمت تاریخ نامعتبر است.'
+                    ], 400);
+                }
+                $appointmentsQuery->whereDate('appointment_date', $gregorianDate);
+            }
+
+            // فیلتر بر اساس وضعیت
+            if (!empty($status)) {
+                $appointmentsQuery->where('status', $status);
+            }
+
+            $appointments = $appointmentsQuery->orderBy('appointment_date', 'desc')
+                ->orderBy('appointment_time', 'asc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'appointments' => $appointments,
+                'total' => $appointments->count()
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در جستجوی نوبت‌ها: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getAppointmentsCount($doctorId, $date)
     {
         try {

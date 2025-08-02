@@ -1339,8 +1339,34 @@ class ScheduleSettingController extends Controller
             'selectedClinicId' => 'nullable|string',
         ]);
 
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-        $selectedClinicId = $request->input('selectedClinicId');
+        $guardType = $request->input('guard_type', 'doctor');
+
+        if ($guardType === 'medical_center') {
+            // برای مراکز درمانی
+            if (!Auth::guard('medical_center')->check()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'کاربر احراز هویت نشده است.'
+                ], 401);
+            }
+
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctorId = $medicalCenter->selectedDoctor?->doctor_id;
+
+            if (!$selectedDoctorId) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'هیچ پزشکی انتخاب نشده است.'
+                ], 400);
+            }
+
+            $doctorId = $selectedDoctorId;
+            $medicalCenterId = $medicalCenter->id;
+        } else {
+            // برای پزشک و منشی
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $medicalCenterId = $request->input('selectedClinicId');
+        }
 
         try {
             // تبدیل تاریخ old_date
@@ -1372,35 +1398,41 @@ class ScheduleSettingController extends Controller
             }
 
             // بررسی کلینیک
-            if ($selectedClinicId !== 'default' && !\App\Models\MedicalCenter::where('id', $selectedClinicId)->exists()) {
+            if ($guardType !== 'medical_center' && $medicalCenterId !== 'default' && !\App\Models\MedicalCenter::where('id', $medicalCenterId)->exists()) {
                 return response()->json(['status' => false, 'message' => 'کلینیک نامعتبر است.'], 400);
             }
 
             // کوئری نوبت‌ها
             $appointmentsQuery = Appointment::where('doctor_id', $doctorId)
-                ->whereDate('appointment_date', $oldDateGregorian)
-                ->when($selectedClinicId && $selectedClinicId !== 'default', function ($query) use ($selectedClinicId) {
-                    $query->where('medical_center_id', $selectedClinicId);
-                }, function ($query) {
-                    $query->whereNull('medical_center_id');
-                });
+                ->whereDate('appointment_date', $oldDateGregorian);
+
+            if ($guardType === 'medical_center') {
+                $appointmentsQuery->where('medical_center_id', $medicalCenterId);
+            } elseif ($medicalCenterId && $medicalCenterId !== 'default') {
+                $appointmentsQuery->where('medical_center_id', $medicalCenterId);
+            } else {
+                $appointmentsQuery->whereNull('medical_center_id');
+            }
 
             $appointments = $appointmentsQuery->get();
 
             if ($appointments->isEmpty()) {
-
                 return response()->json(['status' => false, 'message' => 'هیچ نوبتی برای این تاریخ یافت نشد.'], 404);
             }
 
             // بررسی ساعات کاری برای تاریخ جدید
-            $workHours = DoctorWorkSchedule::where('doctor_id', $doctorId)
-                ->where('day', strtolower(Carbon::parse($newDateGregorian)->format('l')))
-                ->when($selectedClinicId === 'default', function ($query) {
-                    $query->whereNull('medical_center_id');
-                }, function ($query) use ($selectedClinicId) {
-                    $query->where('medical_center_id', $selectedClinicId);
-                })
-                ->first();
+            $workHoursQuery = DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->where('day', strtolower(Carbon::parse($newDateGregorian)->format('l')));
+
+            if ($guardType === 'medical_center') {
+                $workHoursQuery->where('medical_center_id', $medicalCenterId);
+            } elseif ($medicalCenterId === 'default') {
+                $workHoursQuery->whereNull('medical_center_id');
+            } else {
+                $workHoursQuery->where('medical_center_id', $medicalCenterId);
+            }
+
+            $workHours = $workHoursQuery->first();
 
             if (!$workHours) {
                 return response()->json(['status' => false, 'message' => 'ساعات کاری برای تاریخ جدید تعریف نشده است.'], 400);
@@ -1444,7 +1476,6 @@ class ScheduleSettingController extends Controller
                 'total_recipients' => count($recipients),
             ]);
         } catch (\Exception $e) {
-
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در جابجایی نوبت‌ها: ' . $e->getMessage(),

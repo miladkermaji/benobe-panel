@@ -816,4 +816,97 @@
     }
   }
 </style>
-<script src="{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}"></script>
+<script>
+  // تعیین نوع گارد و مسیرهای مناسب برای reschedule calendar
+  (function() {
+    const currentPath = window.location.pathname;
+    let guardType = 'doctor'; // پیش‌فرض
+    let rescheduleCalendarJs = '';
+    let appointmentsCountUrl = '';
+    let getHolidaysUrl = '';
+    let searchAppointmentsUrl = '';
+
+    // تشخیص نوع گارد بر اساس مسیر
+    if (currentPath.includes('/mc/')) {
+      guardType = 'medical_center';
+      rescheduleCalendarJs = "{{ asset('mc-assets/panel/js/calendar/reschedule-calendar.js') }}";
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('mc.search.appointments') }}";
+    } else if (currentPath.includes('/dr/')) {
+      guardType = 'doctor';
+      rescheduleCalendarJs = "{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}";
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('search.appointments') }}";
+    } else if (currentPath.includes('/secretary/')) {
+      guardType = 'secretary';
+      rescheduleCalendarJs = "{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}";
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('search.appointments') }}";
+    } else {
+      // پیش‌فرض برای پزشک
+      rescheduleCalendarJs = "{{ asset('dr-assets/panel/js/calendar/reschedule-calendar.js') }}";
+      appointmentsCountUrl = "{{ route('appointments.count') }}";
+      getHolidaysUrl = "{{ route('doctor.get_holidays') }}";
+      searchAppointmentsUrl = "{{ route('search.appointments') }}";
+    }
+
+    // تنظیم متغیرهای سراسری
+    window.guardType = guardType;
+    window.rescheduleCalendarJs = rescheduleCalendarJs;
+    window.appointmentsCountUrl = appointmentsCountUrl;
+    window.getHolidaysUrl = getHolidaysUrl;
+    window.searchAppointmentsUrl = searchAppointmentsUrl;
+
+    // برای مراکز درمانی، نیازی به selectedClinicId نیست
+    if (guardType === 'medical_center') {
+      window.selectedClinicId = null;
+    } else {
+      // برای پزشک و منشی، از localStorage استفاده کن
+      window.selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+    }
+
+    console.log('Reschedule calendar initialized with:', {
+      guardType: guardType,
+      appointmentsCountUrl: appointmentsCountUrl,
+      selectedClinicId: window.selectedClinicId
+    });
+
+    // بررسی اینکه آیا فایل JavaScript قبلاً بارگذاری شده است
+    const existingScript = document.querySelector(`script[src="${rescheduleCalendarJs}"]`);
+    if (existingScript) {
+      console.log('Reschedule calendar script already loaded');
+      return;
+    }
+
+    // بارگذاری فایل JavaScript مناسب
+    const script = document.createElement('script');
+    script.src = rescheduleCalendarJs;
+    script.onload = function() {
+      console.log('Reschedule calendar script loaded successfully');
+
+      // Test if initializeRescheduleCalendar function is available
+      setTimeout(() => {
+        if (typeof window.initializeRescheduleCalendar === 'function') {
+          console.log('initializeRescheduleCalendar function is available');
+
+          // Test the function directly
+          try {
+            window.initializeRescheduleCalendar(1);
+            console.log('initializeRescheduleCalendar called successfully');
+          } catch (error) {
+            console.error('Error calling initializeRescheduleCalendar:', error);
+          }
+        } else {
+          console.error('initializeRescheduleCalendar function is not available');
+        }
+      }, 500);
+    };
+    script.onerror = function() {
+      console.error('Failed to load reschedule calendar script:', rescheduleCalendarJs);
+    };
+    document.head.appendChild(script);
+  })();
+</script>
