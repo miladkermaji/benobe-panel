@@ -121,15 +121,6 @@
         </select>
       </div>
       <div class="filter-group">
-        <label>کلینیک</label>
-        <select class="filter-select" wire:model.live.debounce.500ms="clinicId">
-          <option value="">همه</option>
-          @foreach ($clinics as $clinic)
-            <option value="{{ $clinic->id }}">{{ $clinic->name }}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="filter-group">
         <label>روش پرداخت</label>
         <select class="filter-select" wire:model.live.debounce.500ms="paymentMethod">
           <option value="">همه</option>

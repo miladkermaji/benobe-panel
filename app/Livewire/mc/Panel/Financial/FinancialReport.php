@@ -24,7 +24,6 @@ class FinancialReport extends Component
     public $dateFilter = 'daily';
     public $transactionType = '';
     public $transactionStatus = '';
-    public $clinicId = '';
     public $minAmount = '';
     public $maxAmount = '';
     public $startDate;
@@ -48,7 +47,6 @@ class FinancialReport extends Component
         'dateFilter' => ['except' => 'daily'],
         'transactionType' => ['except' => ''],
         'transactionStatus' => ['except' => ''],
-        'clinicId' => ['except' => ''],
         'minAmount' => ['except' => ''],
         'maxAmount' => ['except' => ''],
         'startDate' => ['except' => ''],
@@ -67,19 +65,35 @@ class FinancialReport extends Component
         $this->updateChartData();
         $this->updateSummary();
 
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        Log::info('FinancialReport component mounted', ['doctor_id' => $doctor->id]);
+        Log::info('FinancialReport component mounted', ['doctor_id' => $doctorId]);
     }
 
     public function loadReports()
@@ -87,7 +101,28 @@ class FinancialReport extends Component
         $this->readyToLoad = true;
         $this->updateChartData();
         $this->updateSummary();
-        Log::info('Reports loaded', ['doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id, 'filters' => $this->getFilters()]);
+
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        Log::info('Reports loaded', ['doctor_id' => $doctorId, 'filters' => $this->getFilters()]);
     }
 
     public function updated($propertyName)
@@ -139,19 +174,33 @@ class FinancialReport extends Component
             return;
         }
 
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
-
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
 
         // تبدیل تاریخ‌های جلالی به میلادی
         try {
@@ -253,19 +302,33 @@ class FinancialReport extends Component
             return;
         }
 
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
-
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
 
         $this->summary = [
             'daily' => $this->getTotalAmount(Carbon::today(), Carbon::today()->endOfDay()),
@@ -280,19 +343,33 @@ class FinancialReport extends Component
 
     private function getTotalAmount($start = null, $end = null)
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
-
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
 
         $transactionsTotal = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsTotal = DoctorWalletTransaction::where('doctor_id', $doctorId);
@@ -344,7 +421,6 @@ class FinancialReport extends Component
             'dateFilter' => $this->dateFilter,
             'transactionType' => $this->transactionType,
             'transactionStatus' => $this->transactionStatus,
-            'clinicId' => $this->clinicId,
             'minAmount' => $this->minAmount,
             'maxAmount' => $this->maxAmount,
             'startDate' => $this->startDate,
@@ -390,14 +466,6 @@ class FinancialReport extends Component
                 $query->where('payment_status', $this->transactionStatus);
             } elseif ($modelType === 'ManualAppointment') {
                 $query->where('status', $this->transactionStatus);
-            }
-        }
-
-        if ($this->clinicId) {
-            if ($modelType === 'Transaction') {
-                $query->whereJsonContains('meta->medical_center_id', (int) $this->clinicId);
-            } else {
-                $query->where('medical_center_id', $this->clinicId);
             }
         }
 
@@ -459,37 +527,69 @@ class FinancialReport extends Component
 
     public function exportExcel()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        Log::info('Excel export initiated', ['doctor_id' => $doctor->id, 'filters' => $this->getFilters()]);
+        Log::info('Excel export initiated', ['doctor_id' => $doctorId, 'filters' => $this->getFilters()]);
         return redirect()->route('mc.panel.financial-reports.export-excel', $this->getFilters());
     }
 
     public function exportPdf()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        Log::info('PDF export initiated', ['doctor_id' => $doctor->id, 'filters' => $this->getFilters()]);
+        Log::info('PDF export initiated', ['doctor_id' => $doctorId, 'filters' => $this->getFilters()]);
 
         // گرفتن داده‌های تراکنش‌ها
         $transactions = $this->getTransactions()->items();
@@ -505,19 +605,33 @@ class FinancialReport extends Component
 
     private function getTransactions()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
-
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
 
         $transactionsQuery = Transaction::whereJsonContains('meta->doctor_id', $doctorId);
         $walletTransactionsQuery = DoctorWalletTransaction::where('doctor_id', $doctorId);
@@ -693,19 +807,34 @@ class FinancialReport extends Component
 
     public function render()
     {
-        $doctor = Auth::guard('doctor')->user();
-        if (!$doctor) {
-            $secretary = Auth::guard('secretary')->user();
-            if ($secretary && $secretary->doctor) {
-                $doctor = $secretary->doctor;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            if (!$doctor) {
+                $secretary = Auth::guard('secretary')->user();
+                if ($secretary && $secretary->doctor) {
+                    $doctor = $secretary->doctor;
+                }
+            }
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->route('mc.auth.login-register-form');
+            } else {
+                return redirect()->route('dr.auth.login-register-form');
             }
         }
 
-        if (!$doctor) {
-            return redirect()->route('login');
-        }
-
-        $doctorId = $doctor->id;
         $transactions = $this->readyToLoad ? $this->getTransactions() : collect([]);
         $totalAmount = $this->readyToLoad ? $this->getTotalAmount() : 0;
 
@@ -714,23 +843,8 @@ class FinancialReport extends Component
         $todayEnd = Carbon::today()->endOfDay();
         $todayAmount = $this->readyToLoad ? $this->getTotalAmount($todayStart, $todayEnd) : 0;
 
-        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
-            $query->where('doctor_id', $doctorId);
-        })->get();
-
-        // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
-        $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
-            $query->select('insurance_id')
-                ->from('appointments')
-                ->where('doctor_id', $doctorId)
-                ->whereNotNull('insurance_id')
-                ->union(
-                    DB::table('counseling_appointments')
-                        ->select('insurance_id')
-                        ->where('doctor_id', $doctorId)
-                        ->whereNotNull('insurance_id')
-                );
-        })->get();
+        // گرفتن همه بیمه‌ها
+        $insurances = Insurance::all();
 
         Log::info('Rendering FinancialReport view', [
             'doctor_id' => $doctorId,
@@ -746,7 +860,6 @@ class FinancialReport extends Component
             'transactions' => $transactions,
             'totalAmount' => $totalAmount,
             'todayAmount' => $todayAmount,
-            'clinics' => $clinics,
             'insurances' => $insurances,
             'summary' => $this->summary,
         ]);

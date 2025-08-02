@@ -339,11 +339,11 @@ Route::prefix('mc')
                 Route::get('/charge', function () {
                     return view('mc.panel.payment.charge');
                 })->middleware('secretary.permission:financial_reports')->name('mc-wallet-charge');
-                Route::get('/financial-reports', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'index'])
+                Route::get('/financial-reports', [App\Http\Controllers\Mc\Panel\FinancialReport\FinancialReportController::class, 'index'])
                                        ->name('mc.panel.financial-reports.index');
-                Route::get('/financial-reports/export-excel', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'exportExcel'])
+                Route::get('/financial-reports/export-excel', [App\Http\Controllers\Mc\Panel\FinancialReport\FinancialReportController::class, 'exportExcel'])
                     ->name('mc.panel.financial-reports.export-excel');
-                Route::get('/financial-reports/export-pdf', [App\Http\Controllers\Dr\Panel\FinancialReport\FinancialReportController::class, 'exportPdf'])
+                Route::get('/financial-reports/export-pdf', [App\Http\Controllers\Mc\Panel\FinancialReport\FinancialReportController::class, 'exportPdf'])
                     ->name('mc.panel.financial-reports.export-pdf');
             });
             Route::prefix('profile')->group(function () {
