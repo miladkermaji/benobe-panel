@@ -114,7 +114,7 @@
                         -
                       @endif
                     </td>
-                    <td>{{ optional($item->clinic)->name ?? '-' }}</td>
+                    <td>{{ optional($item->medicalCenter)->name ?? '-' }}</td>
                     <td>
                       {{ $item->price ? number_format($item->price) . ' تومان' : '-' }}
                       @switch($item->payment_status)
@@ -260,7 +260,7 @@
                               @endif
                             </span></div>
                           <div class="note-card-item"><span class="note-card-label">کلینیک:</span><span
-                              class="note-card-value">{{ optional($item->clinic)->name ?? '-' }}</span></div>
+                              class="note-card-value">{{ optional($item->medicalCenter)->name ?? '-' }}</span></div>
                           <div class="note-card-item"><span class="note-card-label">مبلغ:</span><span
                               class="note-card-value">{{ $item->price ? number_format($item->price) . ' تومان' : '-' }}
                               @switch($item->payment_status)

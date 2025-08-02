@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\PrescriptionRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PrescriptionList extends Component
 {
@@ -88,9 +89,26 @@ class PrescriptionList extends Component
 
     public function render()
     {
-        $doctor = Auth::guard('doctor')->user();
-        $query = PrescriptionRequest::with(['patient', 'insurances.parent', 'clinic', 'insulins'])
-            ->where('doctor_id', $doctor->id);
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            $doctorId = $doctor ? $doctor->id : null;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
+        $query = PrescriptionRequest::with(['patient', 'insurances.parent', 'medicalCenter', 'insulins'])
+            ->where('doctor_id', $doctorId);
         if ($this->search) {
             $query->where(function ($q) {
                 $q->whereHas('patient', function ($qq) {

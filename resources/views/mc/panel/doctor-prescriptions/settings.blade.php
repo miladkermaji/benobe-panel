@@ -11,7 +11,7 @@
 <div class="container-fluid py-3">
   <div class="row">
     <div class="col-12">
-      @livewire('mc.panel.doctor-prescriptions.prescription-settings')
+      @livewire('Mc.Panel.DoctorPrescriptions.PrescriptionSettings')
     </div>
   </div>
 </div>

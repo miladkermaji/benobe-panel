@@ -389,7 +389,7 @@ Route::prefix('mc')
             Route::get('/profile/subusers/search-users', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'searchUsers'])->name('mc-sub-users-search-users');
             Route::post('/profile/subusers/quick-create-user', [\App\Http\Controllers\Dr\Panel\Profile\SubUserController::class, 'quickCreateUser'])->name('mc-sub-users-quick-create-user');
             // My Prescriptions routes moved from bottom
-            Route::get('my-prescriptions', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'index'])->name('mc.panel.my-prescriptions');
-            Route::get('my-prescriptions/settings', [\App\Http\Controllers\Dr\Panel\DoctorPrescriptionController::class, 'settings'])->name('mc.panel.my-prescriptions.settings');
+            Route::get('my-prescriptions', [\App\Http\Controllers\Mc\Panel\DoctorPrescriptionController::class, 'index'])->name('mc.panel.my-prescriptions');
+            Route::get('my-prescriptions/settings', [\App\Http\Controllers\Mc\Panel\DoctorPrescriptionController::class, 'settings'])->name('mc.panel.my-prescriptions.settings');
         });
     });
