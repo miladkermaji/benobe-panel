@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\CalendarUtils;
 use Morilog\Jalali\Jalalian;
+use Illuminate\Support\Facades\DB;
 
 class VacationController extends Controller
 {
@@ -16,7 +17,23 @@ class VacationController extends Controller
 
     public function index(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $selectedClinicId = $this->getSelectedMedicalCenterId();
 
         // Get doctor's medical centers (clinics)
@@ -54,8 +71,25 @@ class VacationController extends Controller
 
     public function edit($id)
     {
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $vacation = Vacation::where('id', $id)
-            ->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
+            ->where('doctor_id', $doctorId)
             ->firstOrFail();
 
         return response()->json(['success' => true, 'vacation' => $vacation]);
@@ -63,7 +97,22 @@ class VacationController extends Controller
 
     public function store(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
 
         $messages = [
             'date.required' => 'لطفاً تاریخ را وارد کنید.',
@@ -124,7 +173,22 @@ class VacationController extends Controller
 
     public function update(Request $request, $id)
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
 
         $messages = [
             'date.required' => 'لطفاً تاریخ را وارد کنید.',
@@ -189,7 +253,23 @@ class VacationController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['success' => false, 'message' => 'پزشک انتخاب نشده است.'], 400);
+        }
+
         $selectedClinicId = $this->getSelectedMedicalCenterId();
 
         $vacation = Vacation::where('id', $id)
