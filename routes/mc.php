@@ -87,9 +87,9 @@ Route::prefix('mc')
             Route::get('/', [McPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('mc-panel');
 
             Route::prefix('doctor-services')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('mc.panel.doctor-services.index');
-                Route::get('/create', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('mc.panel.doctor-services.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Dr\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('mc.panel.doctor-services.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('mc.panel.doctor-services.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('mc.panel.doctor-services.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('mc.panel.doctor-services.edit');
             });
             Route::prefix('patient-contact/send-message')->group(function () {
                 Route::get('/', [DoctorSendMessageController::class, 'index'])->name('mc.panel.send-message');

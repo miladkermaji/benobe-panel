@@ -11,6 +11,7 @@ use App\Traits\HasSelectedClinic;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\DB;
 
 class DoctorServiceList extends Component
 {
@@ -42,7 +43,18 @@ class DoctorServiceList extends Component
         // باز بودن پیش‌فرض در دسکتاپ
         if ($this->isDesktop()) {
             $this->openServices = Service::whereHas('doctorServices', function ($query) {
-                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                // Get doctor_id based on guard
+                $doctorId = null;
+                if (Auth::guard('medical_center')->check()) {
+                    // For medical_center guard, get the selected doctor
+                    $medicalCenter = Auth::guard('medical_center')->user();
+                    $selectedDoctor = DB::table('medical_center_selected_doctors')
+                        ->where('medical_center_id', $medicalCenter->id)
+                        ->first();
+                    $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+                } else {
+                    $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                }
                 $query->where('doctor_id', $doctorId);
             })->pluck('id')->toArray();
         }
@@ -58,7 +70,18 @@ class DoctorServiceList extends Component
     public function setSelectedClinicId($clinicId)
     {
         $this->selectedClinicId = $this->getSelectedMedicalCenterId() ?? 'default';
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         if ($this->selectedClinicId !== 'default') {
             $clinic = MedicalCenter::where('id', $this->selectedClinicId)
                 ->whereHas('doctors', function ($query) use ($doctorId) {
@@ -77,7 +100,18 @@ class DoctorServiceList extends Component
 
     public function createDefaultVisitService()
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         $clinicId = $this->selectedClinicId === 'default' ? null : $this->selectedClinicId;
         $hasServices = DoctorService::where('doctor_id', $doctorId)->exists();
         if (!$hasServices) {
@@ -121,7 +155,18 @@ class DoctorServiceList extends Component
     public function clinicSelected($clinicId = 'default')
     {
         $this->selectedClinicId = $clinicId;
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         if ($this->selectedClinicId !== 'default') {
             $clinic = MedicalCenter::where('id', $this->selectedClinicId)
                 ->whereHas('doctors', function ($query) use ($doctorId) {
@@ -139,7 +184,18 @@ class DoctorServiceList extends Component
 
     private function getDoctorServicesQuery()
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        // Get doctor_id based on guard
+        $doctorId = null;
+        if (Auth::guard('medical_center')->check()) {
+            // For medical_center guard, get the selected doctor
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $selectedDoctor = DB::table('medical_center_selected_doctors')
+                ->where('medical_center_id', $medicalCenter->id)
+                ->first();
+            $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         $query = Service::with(['doctorServices' => function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId)
                   ->where(function ($q) {
