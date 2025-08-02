@@ -948,14 +948,42 @@ class ScheduleSettingController extends Controller
     public function getAppointmentsCountPerDay(Request $request)
     {
         try {
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
-            $selectedMedicalCenterId = $request->input('selectedClinicId');
+            $guardType = $request->input('guard_type', 'doctor');
+
+            if ($guardType === 'medical_center') {
+                // برای مراکز درمانی
+                if (!Auth::guard('medical_center')->check()) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'کاربر احراز هویت نشده است.'
+                    ], 401);
+                }
+
+                $medicalCenter = Auth::guard('medical_center')->user();
+                $selectedDoctorId = $medicalCenter->selectedDoctor?->doctor_id;
+
+                if (!$selectedDoctorId) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'هیچ پزشکی انتخاب نشده است.'
+                    ], 400);
+                }
+
+                $doctorId = $selectedDoctorId;
+                $medicalCenterId = $medicalCenter->id;
+            } else {
+                // برای پزشک و منشی
+                $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+                $medicalCenterId = $request->input('selectedClinicId');
+            }
 
             // دریافت تنظیمات تقویم
             $appointmentConfig = DoctorAppointmentConfig::where('doctor_id', $doctorId)
-                ->where(function ($query) use ($selectedMedicalCenterId) {
-                    if ($selectedMedicalCenterId !== 'default') {
-                        $query->where('medical_center_id', $selectedMedicalCenterId);
+                ->where(function ($query) use ($medicalCenterId, $guardType) {
+                    if ($guardType === 'medical_center') {
+                        $query->where('medical_center_id', $medicalCenterId);
+                    } elseif ($medicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $medicalCenterId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -967,9 +995,11 @@ class ScheduleSettingController extends Controller
             // دریافت روزهای کاری
             $workSchedules = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
-                ->where(function ($query) use ($selectedMedicalCenterId) {
-                    if ($selectedMedicalCenterId !== 'default') {
-                        $query->where('medical_center_id', $selectedMedicalCenterId);
+                ->where(function ($query) use ($medicalCenterId, $guardType) {
+                    if ($guardType === 'medical_center') {
+                        $query->where('medical_center_id', $medicalCenterId);
+                    } elseif ($medicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $medicalCenterId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -984,10 +1014,12 @@ class ScheduleSettingController extends Controller
                 ->where('status', 'scheduled')
                 ->whereNull('deleted_at');
 
-            if ($selectedMedicalCenterId === 'default') {
+            if ($guardType === 'medical_center') {
+                $appointmentsQuery->where('medical_center_id', $medicalCenterId);
+            } elseif ($medicalCenterId === 'default') {
                 $appointmentsQuery->whereNull('medical_center_id');
-            } elseif ($selectedMedicalCenterId && $selectedMedicalCenterId !== 'default') {
-                $appointmentsQuery->where('medical_center_id', $selectedMedicalCenterId);
+            } elseif ($medicalCenterId && $medicalCenterId !== 'default') {
+                $appointmentsQuery->where('medical_center_id', $medicalCenterId);
             }
 
             // اگر در صفحه نوبت دستی هستیم فقط نوبت‌های manual را بشمار
@@ -1009,9 +1041,11 @@ class ScheduleSettingController extends Controller
             // دریافت تنظیمات نوبت‌دهی
             $appointmentSettings = DoctorWorkSchedule::where('doctor_id', $doctorId)
                 ->where('is_working', true)
-                ->where(function ($query) use ($selectedMedicalCenterId) {
-                    if ($selectedMedicalCenterId !== 'default') {
-                        $query->where('medical_center_id', $selectedMedicalCenterId);
+                ->where(function ($query) use ($medicalCenterId, $guardType) {
+                    if ($guardType === 'medical_center') {
+                        $query->where('medical_center_id', $medicalCenterId);
+                    } elseif ($medicalCenterId !== 'default') {
+                        $query->where('medical_center_id', $medicalCenterId);
                     } else {
                         $query->whereNull('medical_center_id');
                     }
@@ -1034,7 +1068,6 @@ class ScheduleSettingController extends Controller
                 'appointment_settings' => $appointmentSettings,
             ]);
         } catch (\Exception $e) {
-
             return response()->json([
                 'status' => false,
                 'message' => 'خطا در دریافت داده‌ها',
