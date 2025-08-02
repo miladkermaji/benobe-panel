@@ -7,7 +7,6 @@ use App\Models\Service;
 use App\Models\Insurance;
 use Livewire\Component;
 use App\Models\DoctorService;
-use App\Traits\HasSelectedClinic;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
@@ -16,7 +15,6 @@ use Illuminate\Support\Facades\DB;
 class DoctorServiceList extends Component
 {
     use WithPagination;
-    use HasSelectedClinic;
 
     public $openServices = [];
     protected $paginationTheme = 'bootstrap';
@@ -39,7 +37,13 @@ class DoctorServiceList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-        $this->selectedClinicId = $this->getSelectedMedicalCenterId();
+        // Get medical center ID for medical_center guard
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $this->selectedClinicId = $medicalCenter->id;
+        } else {
+            $this->selectedClinicId = 'default';
+        }
         // باز بودن پیش‌فرض در دسکتاپ
         if ($this->isDesktop()) {
             $this->openServices = Service::whereHas('doctorServices', function ($query) {
@@ -69,7 +73,14 @@ class DoctorServiceList extends Component
 
     public function setSelectedClinicId($clinicId)
     {
-        $this->selectedClinicId = $this->getSelectedMedicalCenterId() ?? 'default';
+        // For medical_center guard, always use the logged-in medical center ID
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenter = Auth::guard('medical_center')->user();
+            $this->selectedClinicId = $medicalCenter->id;
+        } else {
+            $this->selectedClinicId = $clinicId ?? 'default';
+        }
+
         // Get doctor_id based on guard
         $doctorId = null;
         if (Auth::guard('medical_center')->check()) {
@@ -82,6 +93,7 @@ class DoctorServiceList extends Component
         } else {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         }
+
         if ($this->selectedClinicId !== 'default') {
             $clinic = MedicalCenter::where('id', $this->selectedClinicId)
                 ->whereHas('doctors', function ($query) use ($doctorId) {
@@ -202,7 +214,7 @@ class DoctorServiceList extends Component
                       $q->where('name', 'like', '%' . $this->search . '%')
                         ->orWhere('description', 'like', '%' . $this->search . '%');
                   })
-                  ->with('insurance');
+                  ->with(['insurance', 'medicalCenter']);
             if ($this->selectedClinicId === 'default') {
                 $query->whereNull('medical_center_id');
             } else {
