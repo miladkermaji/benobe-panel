@@ -17,13 +17,13 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Services\UserTypeDetectionService;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
-use App\Services\UserTypeDetectionService;
 
 class AuthController extends Controller
 {
@@ -73,40 +73,10 @@ class AuthController extends Controller
             'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $userTypeDetection = new UserTypeDetectionService();
-        $userInfo = $userTypeDetection->detectUserType($request->mobile);
-        $formattedMobile = $userTypeDetection->formatMobile($request->mobile);
+        $mobile = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
+        $formattedMobile = '0' . $mobile;
 
         $loginAttempts = new LoginAttemptsService();
-
-        // اگر کاربر یافت نشد، در جدول users ثبت شود
-        if (!$userInfo['model']) {
-            $user = User::create([
-                'mobile' => $formattedMobile,
-                'status' => 1,
-            ]);
-            $userInfo = [
-                'type' => 'user',
-                'model' => $user,
-                'model_class' => User::class,
-                'model_id' => $user->id,
-                'is_active' => true,
-            ];
-        } elseif (!$userInfo['is_active']) {
-            $loginAttempts->incrementLoginAttempt(
-                $userInfo['model_id'],
-                $formattedMobile,
-                $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
-                $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
-                $userInfo['type'] === 'manager' ? $userInfo['model_id'] : null,
-                $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null
-            );
-            return response()->json([
-                'status' => 'error',
-                'message' => 'حساب کاربری شما هنوز تأیید نشده است.',
-                'data' => null,
-            ], 422);
-        }
 
         if ($loginAttempts->isLocked($formattedMobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($formattedMobile);
@@ -123,6 +93,25 @@ class AuthController extends Controller
 
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
+
+        // تعیین نوع کاربر و مدل مربوطه برای OTP
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserType($request->mobile);
+
+        // اگر کاربر یافت نشد، در جدول users ثبت شود
+        if (!$userInfo['model']) {
+            $user = User::create([
+                'mobile' => $formattedMobile,
+                'status' => 1,
+            ]);
+            $userInfo = [
+                'type' => 'user',
+                'model' => $user,
+                'model_class' => User::class,
+                'model_id' => $user->id,
+                'is_active' => true,
+            ];
+        }
 
         // ایجاد رکورد OTP با ساختار پولی مورفیک
         Otp::create([
@@ -207,7 +196,7 @@ class AuthController extends Controller
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->otpable?->mobile ?? $otp?->login_id ?? 'unknown';
+        $mobile = $otp?->otpable?->mobile ?? $otp?->otpable?->phone_number ?? $otp?->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
@@ -264,24 +253,22 @@ class AuthController extends Controller
         if ($otp->otpable) {
             $user = $otp->otpable;
 
-            $userTypeDetection = new UserTypeDetectionService();
-            $guard = $userTypeDetection->getGuardByType($otp->otpable_type);
-
             switch ($otp->otpable_type) {
                 case Doctor::class:
+                    $guard = 'doctor-api';
                     $userType = 'doctor';
                     break;
                 case Secretary::class:
+                    $guard = 'secretary-api';
                     $userType = 'secretary';
                     break;
                 case Manager::class:
+                    $guard = 'manager-api';
                     $userType = 'manager';
                     break;
                 case User::class:
+                    $guard = 'api';
                     $userType = 'user';
-                    break;
-                case MedicalCenter::class:
-                    $userType = 'medical_center';
                     break;
             }
         }
@@ -358,7 +345,7 @@ class AuthController extends Controller
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile        = $otp->otpable?->mobile ?? $otp->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp->otpable?->mobile ?? $otp->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
