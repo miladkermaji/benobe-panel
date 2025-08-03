@@ -125,17 +125,17 @@ class MyPerformanceController extends Controller
             $cityStatus = !empty($doctor->city);
 
             // بررسی وضعیت ویزیت آنلاین
-            $onlineVisitEnabled = $doctor->appointmentConfig->auto_scheduling ?? false;
+            $onlineVisitEnabled = $doctor->appointmentConfig && $doctor->appointmentConfig->auto_scheduling ? true : false;
 
             // تعداد نظرات
-            $reviewsCount = $doctor->reviews->count();
+            $reviewsCount = $doctor->reviews ? $doctor->reviews->count() : 0;
             $hasEnoughReviews = $reviewsCount >= 150;
 
             // وضعیت آنلاین بودن
-            $isOnline = $doctor->appointmentConfig->auto_scheduling ?? false;
+            $isOnline = $doctor->appointmentConfig && $doctor->appointmentConfig->auto_scheduling ? true : false;
 
             // نوبت‌دهی حضوری برای امروز
-            $hasInPersonAppointmentsToday = $doctor->appointments->isNotEmpty();
+            $hasInPersonAppointmentsToday = $doctor->appointments ? $doctor->appointments->isNotEmpty() : false;
 
             // آدرس واضح
             $hasClearAddress = !empty($doctor->address) && !preg_match('/\d{10,}/', $doctor->address);
@@ -143,7 +143,38 @@ class MyPerformanceController extends Controller
             // شماره تلفن در آدرس
             $hasPhoneInAddress = !empty($doctor->address) && preg_match('/\d{10,}/', $doctor->address);
 
+            // سایر فیلدهای مورد نیاز
+            $hasValidOfficePhone = !empty($doctor->office_phone);
+            $hasClinicLocationSet = $doctor->clinics ? $doctor->clinics->isNotEmpty() : false;
+            $hasSpecialties = !empty($doctor->specialties);
+            $hasIrrelevantSpecialty = false; // منطق بررسی عنوان بی‌ربط
+            $hasLowerDegrees = false; // منطق بررسی درجه‌های پایین‌تر
+            $hasProperSpecialtyTitle = $this->checkProperSpecialtyTitle($doctor->specialties ?? []);
+            $hasRealisticTitles = !$this->checkUnrealisticTitles($doctor->specialties ?? []);
+            $satisfactionRate = $this->calculateSatisfactionRate($doctor);
+            $hasManipulatedReviews = $this->checkManipulatedReviews($doctor);
+            $hasProfilePicture = !empty($doctor->profile_picture);
+            $hasClinicGallery = $this->checkClinicGallery($doctor->clinics ?? collect());
+            $hasFacilityImages = $this->checkFacilityImages($doctor->clinics ?? collect());
+            $hasBiography = !empty($doctor->description);
+            $hasKeywordsInBiography = $this->checkKeywordsInBiography($doctor->description);
+            $hasMultipleMessengers = $doctor->messengers ? $doctor->messengers->count() > 1 : false;
+            $hasSecureCall = false; // منطق بررسی تماس امن
+            $hasMissedReports = $this->checkMissedReports($doctor);
+
+            // آماده‌سازی لیست مطب‌ها
+            $clinics = collect();
+            if ($doctor->clinics) {
+                $clinics = $doctor->clinics->map(function ($clinic) {
+                    return [
+                        'name' => $clinic->name,
+                        'url' => route('mc-clinic-edit', $clinic->id)
+                    ];
+                });
+            }
+
             return response()->json([
+                'doctor_name' => $doctor->first_name . ' ' . $doctor->last_name,
                 'performance_score' => $performanceScore,
                 'city' => $city,
                 'city_status' => $cityStatus,
@@ -154,10 +185,29 @@ class MyPerformanceController extends Controller
                 'has_in_person_appointments_today' => $hasInPersonAppointmentsToday,
                 'has_clear_address' => $hasClearAddress,
                 'has_phone_in_address' => $hasPhoneInAddress,
+                'has_valid_office_phone' => $hasValidOfficePhone,
+                'has_clinic_location_set' => $hasClinicLocationSet,
+                'has_specialties' => $hasSpecialties,
+                'has_irrelevant_specialty' => $hasIrrelevantSpecialty,
+                'has_lower_degrees' => $hasLowerDegrees,
+                'has_proper_specialty_title' => $hasProperSpecialtyTitle,
+                'has_realistic_titles' => $hasRealisticTitles,
+                'satisfaction_rate' => $satisfactionRate,
+                'has_manipulated_reviews' => $hasManipulatedReviews,
+                'has_profile_picture' => $hasProfilePicture,
+                'has_clinic_gallery' => $hasClinicGallery,
+                'has_facility_images' => $hasFacilityImages,
+                'has_biography' => $hasBiography,
+                'has_keywords_in_biography' => $hasKeywordsInBiography,
+                'has_multiple_messengers' => $hasMultipleMessengers,
+                'has_secure_call' => $hasSecureCall,
+                'has_missed_reports' => $hasMissedReports,
+                'clinics' => $clinics,
             ]);
         } catch (\Exception $e) {
             Log::error('Error in getPerformanceData: ' . $e->getMessage());
-            return response()->json(['error' => 'خطا در دریافت اطلاعات'], 500);
+            Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['error' => 'خطا در دریافت اطلاعات: ' . $e->getMessage()], 500);
         }
     }
 
@@ -203,6 +253,9 @@ class MyPerformanceController extends Controller
     private function checkClinicGallery($clinics)
     {
         // بررسی گالری تصاویر مطب
+        if (!$clinics || $clinics->isEmpty()) {
+            return false;
+        }
         return $clinics->every(function ($clinic) {
             return !empty($clinic->gallery);
         });
@@ -211,6 +264,9 @@ class MyPerformanceController extends Controller
     private function checkFacilityImages($clinics)
     {
         // بررسی تصاویر امکانات
+        if (!$clinics || $clinics->isEmpty()) {
+            return false;
+        }
         return $clinics->every(function ($clinic) {
             return !empty($clinic->facility_images);
         });
@@ -219,12 +275,18 @@ class MyPerformanceController extends Controller
     private function checkKeywordsInBiography($biography)
     {
         // بررسی کلمات کلیدی در بیوگرافی
-        return !empty($biography) && preg_match('/(بیماری|درمان|پروسیجر)/u', $biography);
+        if (empty($biography)) {
+            return false;
+        }
+        return preg_match('/(بیماری|درمان|پروسیجر)/u', $biography);
     }
 
     private function checkMissedReports($doctor)
     {
         // بررسی گزارش عدم مراجعه
+        if (!$doctor) {
+            return false;
+        }
         return Appointment::where('doctor_id', $doctor->id)
             ->where('status', 'missed')
             ->exists();

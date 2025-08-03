@@ -6,14 +6,25 @@ use App\Models\LoginLog;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Mc\Controller;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedDoctor;
 
 class LoginLogsController extends Controller
 {
+    use HasSelectedDoctor;
+
     public function security()
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (!$doctor) {
-            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+            if (!$doctorId) {
+                return redirect()->back()->with('error', 'لطفاً ابتدا یک پزشک انتخاب کنید.');
+            }
+            $doctor = \App\Models\Doctor::find($doctorId);
+        } else {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            if (!$doctor) {
+                return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            }
         }
 
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
@@ -29,8 +40,17 @@ class LoginLogsController extends Controller
 
     public function getDoctorLogs(Request $request)
     {
-        $doctor = Auth::guard('doctor')->user();
-        $doctorLogs = LoginLog::where('doctor_id', $doctor->id)->orderBy('login_at', 'desc')->paginate(5);
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+            if (!$doctorId) {
+                return response()->json(['error' => 'لطفاً ابتدا یک پزشک انتخاب کنید.'], 400);
+            }
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+            $doctorId = $doctor->id;
+        }
+
+        $doctorLogs = LoginLog::where('doctor_id', $doctorId)->orderBy('login_at', 'desc')->paginate(5);
 
         return response()->json([
          'doctorLogsHtml' => view('mc.panel.profile.partials.doctor_logs', compact('doctorLogs'))->render()
@@ -40,7 +60,16 @@ class LoginLogsController extends Controller
 
     public function getSecretaryLogs(Request $request)
     {
-        $doctor = Auth::guard('doctor')->user();
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+            if (!$doctorId) {
+                return response()->json(['error' => 'لطفاً ابتدا یک پزشک انتخاب کنید.'], 400);
+            }
+            $doctor = \App\Models\Doctor::find($doctorId);
+        } else {
+            $doctor = Auth::guard('doctor')->user();
+        }
+
         $secretaryIds = $doctor->secretaries ? $doctor->secretaries->pluck('id')->toArray() : [];
         $secretaryLogs = LoginLog::whereIn('secretary_id', $secretaryIds)->orderBy('login_at', 'desc')->paginate(5);
 
@@ -58,6 +87,21 @@ class LoginLogsController extends Controller
 
         if (!$log) {
             return response()->json(['success' => false, 'message' => 'لاگ یافت نشد'], 404);
+        }
+
+        // بررسی دسترسی: فقط لاگ‌های مربوط به پزشک انتخاب‌شده قابل حذف است
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+            if (!$doctorId || $log->doctor_id != $doctorId) {
+                return response()->json(['success' => false, 'message' => 'شما اجازه حذف این لاگ را ندارید'], 403);
+            }
+        } else {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+
+            if ($log->doctor_id != $doctorId) {
+                return response()->json(['success' => false, 'message' => 'شما اجازه حذف این لاگ را ندارید'], 403);
+            }
         }
 
         $log->delete();

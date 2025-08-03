@@ -3,11 +3,7 @@
 @section('styles')
   <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('mc-assets/panel/css/profile/security.css') }}" rel="stylesheet" />
-  <style>
-    .myPanelOption {
-      display: none;
-    }
-  </style>
+
 @endsection
 
 @section('site-header')
@@ -55,6 +51,13 @@
         success: function(response) {
           $('#doctorLogsContainer').html(response.doctorLogs);
           $('#secretaryLogsContainer').html(response.secretaryLogs);
+        },
+        error: function(xhr) {
+          if (xhr.status === 400) {
+            toastr.error('لطفاً ابتدا یک پزشک انتخاب کنید.');
+          } else {
+            toastr.error('خطا در بارگذاری اطلاعات.');
+          }
         }
       });
     }
@@ -86,10 +89,17 @@
             headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            success: function() {
+            success: function(response) {
               row.remove();
               loadLogs();
-              toastr.success('تاریخچه مورد نظر با موفقیت حذف شد.');
+              toastr.success(response.message || 'تاریخچه مورد نظر با موفقیت حذف شد.');
+            },
+            error: function(xhr) {
+              let message = 'خطا در حذف تاریخچه.';
+              if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+              }
+              toastr.error(message);
             }
           });
         }
@@ -105,6 +115,13 @@
         type: 'GET',
         success: function(response) {
           $('#doctorLogsContainer').html(response.doctorLogsHtml);
+        },
+        error: function(xhr) {
+          if (xhr.status === 400) {
+            toastr.error('لطفاً ابتدا یک پزشک انتخاب کنید.');
+          } else {
+            toastr.error('خطا در بارگذاری تاریخچه دکتر.');
+          }
         }
       });
     }
@@ -115,6 +132,13 @@
         type: 'GET',
         success: function(response) {
           $('#secretaryLogsContainer').html(response.secretaryLogsHtml);
+        },
+        error: function(xhr) {
+          if (xhr.status === 400) {
+            toastr.error('لطفاً ابتدا یک پزشک انتخاب کنید.');
+          } else {
+            toastr.error('خطا در بارگذاری تاریخچه منشی.');
+          }
         }
       });
     }

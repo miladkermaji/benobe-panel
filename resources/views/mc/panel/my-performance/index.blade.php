@@ -184,11 +184,11 @@
       برای تنظیم موقعیت دقیق مطب خود روی مطب‌های خود کلیک کرده و از روی نقشه آن‌ها را فعال کنید.
     </span>
     <span class="d-block">مطب‌های شما</span>
-    ${response.clinics.map(clinic => `
+    ${(response.clinics && response.clinics.length > 0) ? response.clinics.map(clinic => `
       <a href="${clinic.url}" class="mt-2 text-primary">
         ${clinic.name}
       </a>
-    `).join('')}
+    `).join('') : '<span class="text-muted">هیچ مطبی ثبت نشده است</span>'}
   `
           },
           {
@@ -409,11 +409,21 @@
 
         if (xhr.status === 401) {
           errorMessage = 'لطفاً ابتدا وارد حساب کاربری خود شوید.';
+        } else if (xhr.status === 400) {
+          errorMessage = 'لطفاً ابتدا یک پزشک انتخاب کنید.';
         } else if (xhr.status === 404) {
           errorMessage = 'اطلاعات پزشک یافت نشد.';
+        } else if (xhr.status === 500) {
+          if (xhr.responseJSON && xhr.responseJSON.error) {
+            errorMessage = xhr.responseJSON.error;
+          } else {
+            errorMessage = 'خطای سرور. لطفاً دوباره تلاش کنید.';
+          }
         } else if (xhr.responseJSON && xhr.responseJSON.error) {
           errorMessage = xhr.responseJSON.error;
         }
+
+        console.error('Performance data error:', xhr.responseJSON || xhr.responseText);
 
         Swal.fire({
           icon: 'error',
