@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,6 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('doctor_id')->nullable(); // برای دکترها
             $table->unsignedBigInteger('secretary_id')->nullable(); // برای منشی‌ها
             $table->unsignedBigInteger('manager_id')->nullable(); // برای منشی‌ها
+            $table->unsignedBigInteger('medical_center_id')->nullable()->after('manager_id');
             $table->string('user_type'); // 'doctor', 'secretary', 'user'
             $table->timestamp('login_at')->nullable(); // زمان ورود
             $table->timestamp('logout_at')->nullable(); // زمان خروج

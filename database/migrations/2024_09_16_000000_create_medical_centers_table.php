@@ -44,6 +44,11 @@ return new class () extends Migration {
             $table->decimal('average_rating', 2, 1)->default(0.0);
             $table->unsignedInteger('reviews_count')->default(0);
             $table->unsignedInteger('recommendation_percentage')->default(0);
+            $table->string('password')->nullable()->after('recommendation_percentage');
+            $table->boolean('static_password_enabled')->default(false)->after('password');
+            $table->boolean('two_factor_secret_enabled')->default(false)->after('static_password_enabled');
+            $table->timestamp('mobile_verified_at')->nullable()->after('two_factor_secret_enabled');
+            $table->rememberToken()->after('mobile_verified_at');
             $table->timestamps();
             $table->softDeletes();
 
