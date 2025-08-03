@@ -437,7 +437,8 @@ class AuthController extends Controller
                 }
 
                 $logoutTime = now();
-                LoginLog::where('user_id', $user->id)
+                LoginLog::where('loggable_type', get_class($user))
+                    ->where('loggable_id', $user->id)
                     ->where('user_type', $userType)
                     ->whereNull('logout_at')
                     ->latest()

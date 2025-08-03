@@ -20,7 +20,8 @@ class Logout extends Component
         }
 
         if ($user) {
-            LoginLog::where('manager_id', $guard === 'manager' ? $user->id : null)
+            LoginLog::where('loggable_type', get_class($user))
+                ->where('loggable_id', $user->id)
                 ->whereNull('logout_at')
                 ->latest()
                 ->first()

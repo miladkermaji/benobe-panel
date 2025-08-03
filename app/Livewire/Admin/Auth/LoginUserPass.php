@@ -177,7 +177,8 @@ class LoginUserPass extends Component
 
         // ثبت لاگ ورود
         LoginLog::create([
-            'manager_id' => $user instanceof Manager ? $user->id : null,
+            'loggable_type' => get_class($user),
+            'loggable_id' => $user->id,
             'user_type' => $userType,
             'login_at' => now(),
             'ip_address' => request()->ip(),
