@@ -43,7 +43,7 @@ class PaymentSettingComponent extends Component
 
         if (!$doctorId) {
             if (Auth::guard('medical_center')->check()) {
-                return redirect()->route('mc.auth.login-register-form');
+                return redirect()->route('dr.auth.login-register-form');
             } else {
                 return redirect()->route('dr.auth.login-register-form');
             }
@@ -87,7 +87,7 @@ class PaymentSettingComponent extends Component
 
         if (!$doctorId) {
             if (Auth::guard('medical_center')->check()) {
-                return redirect()->route('mc.auth.login-register-form');
+                return redirect()->route('dr.auth.login-register-form');
             } else {
                 return redirect()->route('dr.auth.login-register-form');
             }
@@ -132,7 +132,7 @@ class PaymentSettingComponent extends Component
 
         if (!$doctorId) {
             if (Auth::guard('medical_center')->check()) {
-                return redirect()->route('mc.auth.login-register-form');
+                return redirect()->route('dr.auth.login-register-form');
             } else {
                 return redirect()->route('dr.auth.login-register-form');
             }
@@ -210,7 +210,7 @@ class PaymentSettingComponent extends Component
 
         if (!$doctorId) {
             if (Auth::guard('medical_center')->check()) {
-                return redirect()->route('mc.auth.login-register-form');
+                return redirect()->route('dr.auth.login-register-form');
             } else {
                 return redirect()->route('dr.auth.login-register-form');
             }
@@ -309,7 +309,7 @@ class PaymentSettingComponent extends Component
 
         if (!$doctorId) {
             if (Auth::guard('medical_center')->check()) {
-                return redirect()->route('mc.auth.login-register-form');
+                return redirect()->route('dr.auth.login-register-form');
             } else {
                 return redirect()->route('dr.auth.login-register-form');
             }

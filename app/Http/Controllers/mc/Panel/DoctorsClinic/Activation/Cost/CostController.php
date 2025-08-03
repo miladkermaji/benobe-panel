@@ -13,7 +13,7 @@ class CostController extends Controller
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $averageDeposit = ClinicDepositSetting::whereNotNull('deposit_amount')->avg('deposit_amount'); // میانگین بیعانه

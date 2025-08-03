@@ -30,7 +30,7 @@ class MyPerformanceController extends Controller
                 Auth::guard('medical_center')->user();
 
         if (!$user) {
-            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
 
         // اگر کاربر مرکز درمانی باشد

@@ -55,7 +55,7 @@ class SpecialWorkhours extends Component
     {
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         if (!$doctor) {
-            return redirect()->route('mc.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
         }
         $this->doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         $this->doctor = Doctor::with(['clinics', 'workSchedules'])->find($this->doctorId);

@@ -100,8 +100,6 @@
 <script src="{{ asset('mc-assets/panel/js/turn/scehedule/sheduleSetting/workhours/workhours.js') }}"></script>
 <script>
   $(document).ready(function() {
-
-
     // مدیریت تاگل‌ها
     $('.toggle-header').on('click', function() {
       const secretaryId = $(this).data('secretary-id');
@@ -116,7 +114,11 @@
 
     function updatePermissions(secretaryId) {
       let permissions = [];
-      let selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+      @if (Auth::guard('medical_center')->check())
+        let selectedClinicId = '{{ Auth::guard('medical_center')->id() }}';
+      @else
+        let selectedClinicId = localStorage.getItem('selectedClinicId') || 'default';
+      @endif
 
       $('input[data-secretary-id="' + secretaryId + '"]:checked').each(function() {
         permissions.push($(this).val());

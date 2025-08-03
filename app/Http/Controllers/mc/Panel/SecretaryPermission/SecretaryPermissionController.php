@@ -8,20 +8,26 @@ use App\Models\Secretary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Doctor;
+use App\Traits\HasSelectedDoctor;
 
 class SecretaryPermissionController extends Controller
 {
+    use HasSelectedDoctor;
+
     public function index(Request $request)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $medicalCenterId = $this->getSelectedMedicalCenterId();
-
-        if (!$doctor) {
-            return redirect()->route('mc.auth.login-register-form');
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenterId = Auth::guard('medical_center')->id();
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $medicalCenterId = $this->getSelectedMedicalCenterId();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
         }
 
-        // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        if (!$doctorId) {
+            return redirect()->route('dr.auth.login-register-form');
+        }
 
         $secretaries = Secretary::where('doctor_id', $doctorId)
             ->with('permissions')
@@ -44,10 +50,16 @@ class SecretaryPermissionController extends Controller
 
     public function update(Request $request, $secretaryId)
     {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        $clinicId = $this->getSelectedMedicalCenterId();
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenterId = Auth::guard('medical_center')->id();
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
+            $medicalCenterId = $this->getSelectedMedicalCenterId();
+            $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
+        }
 
-        if (!$doctor) {
+        if (!$doctorId) {
             return response()->json([
                 'success' => false,
                 'message' => 'شما اجازه‌ی این عملیات را ندارید.',
@@ -58,15 +70,12 @@ class SecretaryPermissionController extends Controller
             'permissions' => 'array',
         ]);
 
-        // اگر کاربر منشی است، از doctor_id آن استفاده می‌کنیم
-        $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
-
         // یافتن دسترسی موجود بر اساس doctor_id, secretary_id و medical_center_id
         $permission = SecretaryPermission::where('doctor_id', $doctorId)
             ->where('secretary_id', $secretaryId)
-            ->where(function ($query) use ($clinicId) {
-                if ($clinicId) {
-                    $query->where('medical_center_id', $clinicId);
+            ->where(function ($query) use ($medicalCenterId) {
+                if ($medicalCenterId) {
+                    $query->where('medical_center_id', $medicalCenterId);
                 } else {
                     $query->whereNull('medical_center_id');
                 }
@@ -82,7 +91,7 @@ class SecretaryPermissionController extends Controller
             SecretaryPermission::create([
                 'doctor_id'    => $doctorId,
                 'secretary_id' => $secretaryId,
-                'medical_center_id'    => $clinicId,
+                'medical_center_id'    => $medicalCenterId,
                 'permissions'  => json_encode($request->permissions),
             ]);
         }
