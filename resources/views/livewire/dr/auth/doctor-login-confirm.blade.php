@@ -26,7 +26,7 @@
         <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" inputmode="numeric" maxlength="1"
-              autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]"
+              {{ $i === 0 ? 'autocomplete="one-time-code"' : '' }} pattern="[0-9]*" name="otpCode[]"
               class="form-control otp-input text-center custom-rounded border"
               style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
@@ -239,129 +239,6 @@
           input.addEventListener('focus', () => input.select());
         });
       }
-    }
-
-    if ('OTPCredential' in window) {
-      window.addEventListener('DOMContentLoaded', () => {
-        const ac = new AbortController();
-
-        // درخواست مجوز اعلان‌ها
-        function requestNotificationPermission() {
-          if (!('Notification' in window)) {
-            console.log('This browser does not support notifications');
-            return;
-          }
-
-          // اگر مجوز قبلاً داده شده
-          if (Notification.permission === 'granted') {
-            console.log('Notification permission already granted');
-            return;
-          }
-
-          // اگر مجوز قبلاً رد شده
-          if (Notification.permission === 'denied') {
-            console.log('Notification permission denied');
-            return;
-          }
-
-          // درخواست مجوز
-          Notification.requestPermission().then(function(permission) {
-            console.log('Notification permission:', permission);
-          });
-        }
-
-        // درخواست مجوز در زمان مناسب
-        setTimeout(requestNotificationPermission, 1000);
-
-        navigator.credentials.get({
-          otp: {
-            transport: ['sms']
-          },
-          signal: ac.signal
-        }).then(otp => {
-          console.log('OTP received:', otp.code); // Debug log
-
-          // نمایش اعلان
-          if (Notification.permission === 'granted') {
-            const notification = new Notification('کد تایید جدید', {
-              body: `کد تایید شما: ${otp.code}`,
-              icon: '/dr-assets/images/logo.png',
-              badge: '/dr-assets/images/logo.png',
-              tag: 'otp-code',
-              requireInteraction: true
-            });
-
-            notification.onclick = function() {
-              window.focus();
-              this.close();
-            };
-          }
-
-          // نمایش دیالوگ تایید
-          Swal.fire({
-            title: 'دریافت کد OTP',
-            text: `آیا می‌خواهید کد ${otp.code} به‌صورت خودکار وارد شود؟`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'بله',
-            cancelButtonText: 'خیر'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              console.log('User confirmed auto-fill'); // Debug log
-              const inputs = document.querySelectorAll('.otp-input');
-              console.log('Found inputs:', inputs.length); // Debug log
-
-              const code = otp.code.split('');
-              console.log('Code array:', code); // Debug log
-
-              // روش بهتر برای وارد کردن کد
-              inputs.forEach((input, index) => {
-                if (code[index]) {
-                  console.log(`Setting input ${index} to ${code[index]}`); // Debug log
-
-                  // Set the value
-                  input.value = code[index];
-
-                  // Trigger input event for Livewire
-                  input.dispatchEvent(new Event('input', {
-                    bubbles: true
-                  }));
-
-                  // Also trigger change event
-                  input.dispatchEvent(new Event('change', {
-                    bubbles: true
-                  }));
-
-                  // Force Livewire to update the model
-                  if (window.Livewire) {
-                    const wireId = input.closest('[wire\\:id]')?.getAttribute('wire:id');
-                    if (wireId) {
-                      const component = window.Livewire.find(wireId);
-                      if (component) {
-                        component.set(`otpCode.${index}`, code[index]);
-                      }
-                    }
-                  }
-                }
-              });
-
-              // Wait a bit then submit
-              setTimeout(() => {
-                const submitButton = document.querySelector('button[type="submit"]');
-                if (submitButton) {
-                  console.log('Submitting form'); // Debug log
-                  submitButton.click();
-                }
-              }, 500);
-            }
-            ac.abort();
-          });
-        }).catch(err => {
-          console.error('Failed to retrieve OTP:', err);
-        });
-
-        setTimeout(() => ac.abort(), 60000);
-      });
     }
 
     document.addEventListener('livewire:navigated', () => {
