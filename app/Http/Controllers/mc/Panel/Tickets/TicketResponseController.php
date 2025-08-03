@@ -13,6 +13,14 @@ class TicketResponseController extends Controller
 {
     public function store(Request $request, $ticket_id)
     {
+        $doctor = $this->getAuthenticatedDoctor();
+        if (!$doctor) {
+            return response()->json([
+                'message' => 'هیچ پزشکی انتخاب نشده است.',
+                'errors' => ['doctor' => 'هیچ پزشکی انتخاب نشده است.']
+            ], 422);
+        }
+
         $request->validate([
             'message' => 'required|string',
         ], [
@@ -20,11 +28,12 @@ class TicketResponseController extends Controller
             'message.string' => 'پاسخ باید یک متن باشد.',
         ]);
 
-        $ticket = Ticket::findOrFail($ticket_id);
+        // Check if the ticket belongs to the authenticated doctor
+        $ticket = Ticket::where('doctor_id', $doctor->id)->findOrFail($ticket_id);
 
         $response = TicketResponse::create([
             'ticket_id' => $ticket->id,
-            'doctor_id' => auth()->guard('doctor')->user()->id,
+            'doctor_id' => $doctor->id,
             'message' => $request->message,
         ]);
 

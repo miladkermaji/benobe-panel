@@ -72,15 +72,7 @@
       <div class="response-list">
         <!-- نمایش پیام اصلی تیکت به‌عنوان اولین پاسخ -->
         <div class="response-card doctor p-3 mb-3">
-          <strong>
-            @if (Auth::guard('doctor')->check())
-              دکتر: {{ Auth::guard('doctor')->user()->first_name ?? 'نامشخص' }}
-              {{ Auth::guard('doctor')->user()->last_name ?? '' }}
-            @elseif(Auth::guard('secretary')->check())
-              منشی: {{ Auth::guard('secretary')->user()->first_name ?? 'نامشخص' }}
-              {{ Auth::guard('secretary')->user()->last_name ?? '' }}
-            @endif
-          </strong>
+          <strong>دکتر: {{ $ticket->doctor->first_name ?? 'نامشخص' }} {{ $ticket->doctor->last_name ?? '' }}</strong>
           <p>{{ $ticket->description }}</p>
           <small class="text-muted">{{ \Morilog\Jalali\Jalalian::forge($ticket->created_at)->ago() }}</small>
         </div>
