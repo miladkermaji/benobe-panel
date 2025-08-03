@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Mc\Panel\McPanelController;
 use App\Http\Controllers\Mc\Panel\Bime\DRBimeController;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCo
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+
 // dr routes
 Route::prefix('mc')
     ->namespace('Mc')

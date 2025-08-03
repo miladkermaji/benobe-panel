@@ -3,12 +3,6 @@
   <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
   <link type="text/css" href="{{ asset('mc-assets/panel/profile/edit-profile.css') }}" rel="stylesheet" />
 
-
-  <style>
-    .myPanelOption {
-      display: none;
-    }
-  </style>
 @endsection
 @section('site-header')
   {{ 'به نوبه | پنل دکتر' }}
@@ -43,6 +37,8 @@
                 {{ $academicDegreeTitle ? $academicDegreeTitle . ' ' : '' }}{{ Auth::guard('doctor')->user()->first_name . ' ' . Auth::guard('doctor')->user()->last_name }}
               @elseif(Auth::guard('secretary')->check())
                 {{ $academicDegreeTitle ? $academicDegreeTitle . ' ' : '' }}{{ Auth::guard('secretary')->user()->doctor->first_name . ' ' . Auth::guard('secretary')->user()->doctor->last_name }}
+              @elseif(Auth::guard('medical_center')->check())
+                {{ $academicDegreeTitle ? $academicDegreeTitle . ' ' : '' }}{{ $doctor->first_name . ' ' . $doctor->last_name }}
               @endif
             </span>
             <span class="badge badge-light p-2 border-radius-8 mt-3 mx-3 font-size-13 cursor-pointer">
@@ -80,7 +76,7 @@
             <div class="mt-2">
               <label for="name" class="label-top-input">نام</label>
               <input type="text" class="my-form-control w-100 border-radius-6 mt-3"
-                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->first_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->first_name }} @endif"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->first_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->first_name }}@elseif(Auth::guard('medical_center')->check()){{ $doctor->first_name }} @endif"
                 name="first_name" readonly>
               @error('first_name')
                 <span class="text-danger fw-bold mt-2">{{ $message }}</span>
@@ -89,25 +85,26 @@
             <div class="mt-2">
               <label for="name" class="label-top-input">نام خانوادگی</label>
               <input type="text" class="my-form-control w-100 border-radius-6 mt-3"
-                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->last_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->last_name }} @endif"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->last_name }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->last_name }}@elseif(Auth::guard('medical_center')->check()){{ $doctor->last_name }} @endif"
                 name="last_name" readonly>
             </div>
             <div class="mt-2">
               <label for="name" class="label-top-input">کدملی</label>
               <input type="text"
-                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->national_code ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->national_code ?? '' }} @endif"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->national_code ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->national_code ?? '' }}@elseif(Auth::guard('medical_center')->check()){{ $doctor->national_code ?? '' }} @endif"
                 class="my-form-control-light h-50 w-100 border-radius-6 mt-3 text-right" name="national_code">
             </div>
             <div class="mt-2">
               <label for="name" class="label-top-input">شماره نظام پزشکی</label>
               <input type="text"
-                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->license_number ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->license_number ?? '' }} @endif"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->license_number ?? '' }}@elseif(Auth::guard('secretary')->check()){{ Auth::guard('secretary')->user()->doctor->license_number ?? '' }}@elseif(Auth::guard('medical_center')->check()){{ $doctor->license_number ?? '' }} @endif"
                 class="my-form-control-light h-50 w-100 border-radius-6 mt-3 text-right" name="license_number">
             </div>
             <div class="d-flex justify-content-between mt-4 gap-4 position-relative">
               <label for="name" class="label-top-input-special-takhasos">شماره موبایل</label>
               <input class="my-form-control h-50 col-lg-11 col-xs-10 col-md-11 col-sm-11 text-right disabled "
-                placeholder="شماره موبایل" name="mobile" value="{{ Auth::guard('doctor')->user()->mobile ?? '' }}"
+                placeholder="شماره موبایل" name="mobile"
+                value="@if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->mobile ?? '' }}@elseif(Auth::guard('secretary')->check()) {{ Auth::guard('secretary')->user()->doctor->mobile ?? '' }}@elseif(Auth::guard('medical_center')->check()) {{ $doctor->mobile ?? '' }} @endif"
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
@@ -126,7 +123,9 @@
                   <option value="{{ $province->id }}"
                     @if (Auth::guard('doctor')->check()) {{ Auth::guard('doctor')->user()->province_id == $province->id ? 'selected' : '' }}
                     @elseif(Auth::guard('secretary')->check())
-                      {{ Auth::guard('secretary')->user()->doctor->province_id == $province->id ? 'selected' : '' }} @endif>
+                      {{ Auth::guard('secretary')->user()->doctor->province_id == $province->id ? 'selected' : '' }}
+                    @elseif(Auth::guard('medical_center')->check())
+                      {{ $doctor->province_id == $province->id ? 'selected' : '' }} @endif>
                     {{ $province->name }}
                   </option>
                 @endforeach

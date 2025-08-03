@@ -23,15 +23,29 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\DoctorSpecialtyRequest;
+use App\Traits\HasSelectedDoctor;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
 class DrProfileController extends Controller
 {
     use HandlesRateLimiting;
+    use HasSelectedDoctor;
 
     protected function getAuthenticatedDoctor(): Doctor
     {
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+            if (!$doctorId) {
+                throw new \Exception('هیچ پزشکی انتخاب نشده است.');
+            }
+            $doctor = Doctor::find($doctorId);
+            if (!$doctor) {
+                throw new \Exception('پزشک انتخاب‌شده یافت نشد.');
+            }
+            return $doctor;
+        }
+
         $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
 
         if ($user instanceof Doctor) {
@@ -97,7 +111,15 @@ class DrProfileController extends Controller
 
     public function edit()
     {
-        $doctor                   = $this->getAuthenticatedDoctor();
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+        } catch (\Exception $e) {
+            if (Auth::guard('medical_center')->check()) {
+                return redirect()->back()->with('error', 'لطفاً ابتدا یک پزشک انتخاب کنید.');
+            }
+            throw $e;
+        }
+
         $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
         $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id ?? $doctor->doctor_id)->get();
