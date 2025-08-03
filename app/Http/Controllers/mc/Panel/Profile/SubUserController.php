@@ -13,9 +13,9 @@ class SubUserController extends Controller
 {
     public function index()
     {
-        $doctorId = Auth::guard('doctor')->id();
+        $doctor = $this->getAuthenticatedDoctor();
         $subUsers = SubUser::with('subuserable')
-            ->where('owner_id', $doctorId)
+            ->where('owner_id', $doctor->id)
             ->where('owner_type', \App\Models\Doctor::class)
             ->get();
         $users = User::paginate(50); // صفحه‌بندی کاربران، هر بار ۵۰ کاربر
@@ -36,9 +36,9 @@ class SubUserController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $doctorId = Auth::guard('doctor')->id();
+        $doctor = $this->getAuthenticatedDoctor();
 
-        $existingSubUser = SubUser::where('owner_id', $doctorId)
+        $existingSubUser = SubUser::where('owner_id', $doctor->id)
             ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_id', $request->user_id)
             ->where('subuserable_type', User::class)
@@ -49,7 +49,7 @@ class SubUserController extends Controller
         }
 
         SubUser::create([
-            'owner_id'        => $doctorId,
+            'owner_id'        => $doctor->id,
             'owner_type'      => \App\Models\Doctor::class,
             'subuserable_id'   => $request->user_id,
             'subuserable_type' => User::class,
@@ -57,13 +57,18 @@ class SubUserController extends Controller
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت اضافه شد!',
-            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
     public function edit($id)
     {
-        $subUser = SubUser::with('subuserable')->findOrFail($id);
+        $doctor = $this->getAuthenticatedDoctor();
+        $subUser = SubUser::with('subuserable')
+            ->where('owner_id', $doctor->id)
+            ->where('owner_type', \App\Models\Doctor::class)
+            ->findOrFail($id);
+
         $user = User::find($subUser->subuserable_id);
 
         return response()->json([
@@ -75,7 +80,10 @@ class SubUserController extends Controller
 
     public function update(Request $request, $id)
     {
-        $subUser = SubUser::findOrFail($id);
+        $doctor = $this->getAuthenticatedDoctor();
+        $subUser = SubUser::where('owner_id', $doctor->id)
+            ->where('owner_type', \App\Models\Doctor::class)
+            ->findOrFail($id);
 
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
@@ -92,8 +100,7 @@ class SubUserController extends Controller
             return response()->json(['message' => 'بدون تغییر! مقدار جدید همان مقدار قبلی است.']);
         }
 
-        $doctorId = Auth::guard('doctor')->id();
-        $existingSubUser = SubUser::where('owner_id', $doctorId)
+        $existingSubUser = SubUser::where('owner_id', $doctor->id)
             ->where('owner_type', \App\Models\Doctor::class)
             ->where('subuserable_id', $request->user_id)
             ->where('subuserable_type', User::class)
@@ -110,36 +117,40 @@ class SubUserController extends Controller
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه با موفقیت ویرایش شد!',
-            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
     public function destroy($id)
     {
-        $subUser  = SubUser::find($id);
+        $doctor = $this->getAuthenticatedDoctor();
+        $subUser = SubUser::where('owner_id', $doctor->id)
+            ->where('owner_type', \App\Models\Doctor::class)
+            ->find($id);
+
         if (!$subUser) {
             return response()->json([
                 'error' => 'کاربر مورد نظر پیدا نشد یا قبلاً حذف شده است.'
             ], 404);
         }
-        $doctorId = $subUser->owner_id;
+
         $subUser->delete();
 
         return response()->json([
             'message'  => 'کاربر زیرمجموعه حذف شد!',
-            'subUsers' => SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
+            'subUsers' => SubUser::where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->get(),
         ]);
     }
 
     public function destroyMultiple(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->id();
+        $doctor = $this->getAuthenticatedDoctor();
         $ids = $request->input('ids', []);
         if (!is_array($ids) || empty($ids)) {
             return response()->json(['error' => 'هیچ کاربری انتخاب نشده است.'], 422);
         }
-        SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->whereIn('id', $ids)->delete();
-        $subUsers = SubUser::where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->orderByDesc('id')->paginate(20);
+        SubUser::where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class)->whereIn('id', $ids)->delete();
+        $subUsers = SubUser::where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class)->with('subuserable')->orderByDesc('id')->paginate(20);
         return response()->json([
             'message' => 'کاربران زیرمجموعه با موفقیت حذف شدند!',
             'subUsers' => $subUsers
@@ -148,8 +159,8 @@ class SubUserController extends Controller
 
     public function list(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->id();
-        $query = SubUser::with('subuserable')->where('owner_id', $doctorId)->where('owner_type', \App\Models\Doctor::class);
+        $doctor = $this->getAuthenticatedDoctor();
+        $query = SubUser::with('subuserable')->where('owner_id', $doctor->id)->where('owner_type', \App\Models\Doctor::class);
 
         if ($request->has('search') && $request->search) {
             $search = $request->search;
