@@ -9,7 +9,7 @@ use App\Models\DoctorTag;
 use App\Models\Secretary;
 use App\Models\Specialty;
 use Morilog\Jalali\Jalalian;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\MedicalCenter;
 use App\Models\DoctorDocument;
 use App\Models\UserDoctorLike;

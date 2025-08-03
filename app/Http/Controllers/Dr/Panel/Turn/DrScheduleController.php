@@ -10,7 +10,7 @@ use App\Models\Secretary;
 use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Morilog\Jalali\Jalalian;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Dr\Controller;

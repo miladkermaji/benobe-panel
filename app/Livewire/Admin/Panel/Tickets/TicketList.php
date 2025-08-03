@@ -5,7 +5,7 @@ namespace App\Livewire\Admin\Panel\Tickets;
 use App\Models\Ticket;
 use App\Models\Doctor;
 use App\Models\User;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use Livewire\Component;
 use Livewire\WithPagination;
 

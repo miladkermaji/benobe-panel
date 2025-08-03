@@ -2,7 +2,7 @@
 
 namespace App\Livewire;
 
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Doctor;

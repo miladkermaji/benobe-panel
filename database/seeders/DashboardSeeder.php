@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Doctor;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\Secretary;
 use App\Models\User;
 use Illuminate\Database\Seeder;

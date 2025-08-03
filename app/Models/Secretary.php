@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Doctor;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;

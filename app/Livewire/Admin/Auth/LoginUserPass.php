@@ -8,7 +8,7 @@ use App\Models\LoginLog;
 use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;

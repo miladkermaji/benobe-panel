@@ -11,7 +11,7 @@ use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Http\Request;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\MedicalCenter;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;

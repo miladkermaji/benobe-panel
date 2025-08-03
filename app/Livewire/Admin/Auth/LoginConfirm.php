@@ -9,7 +9,7 @@ use App\Models\LoginLog;
 use App\Models\Secretary;
 use Illuminate\Support\Str;
 use App\Models\LoginSession;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use Illuminate\Support\Facades\Auth;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;

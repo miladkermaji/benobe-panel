@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Secretary;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\MedicalCenter;
 
 class UserTypeDetectionService

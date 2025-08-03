@@ -17,7 +17,7 @@ use Livewire\Attributes\On;
 use App\Models\UserBlocking;
 use Livewire\WithPagination;
 use Morilog\Jalali\Jalalian;
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use App\Models\DoctorHoliday;
 use App\Models\DoctorService;
 use Livewire\Attributes\Validate;

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin\Panel\Tools\SiteMap;
 
 use App\Http\Controllers\Admin\Controller;
-use App\Models\Admin\Panel\Tools\SitemapSetting;
+use App\Models\SitemapSetting;
 use Illuminate\Http\Request;
 
 class SitemapSettingsController extends Controller

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Admin\Manager;
+use App\Models\Manager;
 use Illuminate\Database\Eloquent\Model;
 
 class LoginSession extends Model
