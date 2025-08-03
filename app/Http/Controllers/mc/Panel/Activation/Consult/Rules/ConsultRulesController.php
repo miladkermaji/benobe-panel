@@ -7,18 +7,11 @@ use App\Models\Specialty;
 use App\Models\AcademicDegree;
 use App\Models\DoctorSpecialty;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Mc\Controller;
 
 class ConsultRulesController extends Controller
 {
-    protected function getAuthenticatedDoctor(): Doctor
-    {
-        $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-        if (! $doctor instanceof Doctor) {
-            throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
-        }
-        return $doctor;
-    }
     public function index()
     {
         return view('mc.panel.activation.consult.rules.index');
@@ -29,8 +22,13 @@ class ConsultRulesController extends Controller
     }
     public function messengers()
     {
+        try {
+            $doctor = $this->getAuthenticatedDoctor();
+        } catch (\Exception $e) {
+            // If no doctor is selected, redirect with error message
+            return redirect()->back()->with('error', 'لطفاً ابتدا یک پزشک انتخاب کنید.');
+        }
 
-        $doctor                   = $this->getAuthenticatedDoctor();
         $currentSpecialty         = DoctorSpecialty::where('doctor_id', $doctor->id)->first();
         $specialtyName            = $currentSpecialty->specialty_title ?? 'نامشخص';
         $doctor_specialties       = DoctorSpecialty::where('doctor_id', $doctor->id)->get();
@@ -56,7 +54,5 @@ class ConsultRulesController extends Controller
             'doctor',
             'incompleteSections',
         ]));
-
-
     }
 }

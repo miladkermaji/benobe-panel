@@ -2,6 +2,7 @@
 
 namespace App\Traits;
 
+use App\Models\Doctor;
 use App\Models\MedicalCenter;
 use App\Models\MedicalCenterSelectedDoctor;
 use Illuminate\Support\Facades\Auth;

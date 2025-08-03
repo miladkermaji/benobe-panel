@@ -23,41 +23,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\UpdateProfileRequest;
 use App\Http\Requests\DoctorSpecialtyRequest;
-use App\Traits\HasSelectedDoctor;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 
 class DrProfileController extends Controller
 {
     use HandlesRateLimiting;
-    use HasSelectedDoctor;
-
-    protected function getAuthenticatedDoctor(): Doctor
-    {
-        if (Auth::guard('medical_center')->check()) {
-            $doctorId = $this->getSelectedDoctorId();
-            if (!$doctorId) {
-                throw new \Exception('هیچ پزشکی انتخاب نشده است.');
-            }
-            $doctor = Doctor::find($doctorId);
-            if (!$doctor) {
-                throw new \Exception('پزشک انتخاب‌شده یافت نشد.');
-            }
-            return $doctor;
-        }
-
-        $user = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
-
-        if ($user instanceof Doctor) {
-            return $user;
-        }
-
-        if ($user instanceof Secretary) {
-            return $user->doctor;
-        }
-
-        throw new \Exception('کاربر احراز هویت شده از نوع Doctor نیست یا وجود ندارد.');
-    }
 
     public function uploadPhoto(Request $request)
     {
@@ -395,6 +366,12 @@ class DrProfileController extends Controller
                 'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
             ],
             'telegram_username' => 'nullable|string|max:100',
+            'whatsapp_phone' => [
+                'nullable',
+                'string',
+                'max:20',
+                'regex:/^(?!09{1}([0-9۰-۹])\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)[0-9۰-۹]{7}$/u',
+            ],
             'instagram_username' => 'nullable|string|max:100',
             'secure_call'    => 'nullable|boolean',
         ], [
@@ -408,6 +385,9 @@ class DrProfileController extends Controller
             'telegram_phone.regex'  => 'شماره موبایل تلگرام باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
             'telegram_username.string' => 'نام کاربری تلگرام باید یک رشته باشد.',
             'telegram_username.max'    => 'نام کاربری تلگرام نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
+            'whatsapp_phone.string' => 'شماره موبایل واتساپ باید یک رشته باشد.',
+            'whatsapp_phone.max'    => 'شماره موبایل واتساپ نمی‌تواند بیشتر از ۲۰ کاراکتر باشد.',
+            'whatsapp_phone.regex'  => 'شماره موبایل واتساپ باید با اعداد فارسی یا انگلیسی و فرمت صحیح وارد شود.',
             'instagram_username.string' => 'نام کاربری اینستاگرام باید یک رشته باشد.',
             'instagram_username.max'    => 'نام کاربری اینستاگرام نمی‌تواند بیشتر از ۱۰۰ کاراکتر باشد.',
             'secure_call.boolean'   => 'وضعیت تماس امن باید یک مقدار بولین باشد.',
@@ -427,6 +407,14 @@ class DrProfileController extends Controller
             [
                 'phone_number'   => $request->telegram_phone,
                 'username'       => $request->telegram_username,
+                'is_secure_call' => $request->secure_call,
+            ]
+        );
+
+        $doctor->messengers()->updateOrCreate(
+            ['messenger_type' => 'whatsapp'],
+            [
+                'phone_number'   => $request->whatsapp_phone,
                 'is_secure_call' => $request->secure_call,
             ]
         );

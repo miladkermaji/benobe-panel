@@ -17,26 +17,6 @@ use App\Http\Controllers\Mc\Controller;
 
 class DrScheduleController extends Controller
 {
-    public function getAuthenticatedDoctor()
-    {
-        if (Auth::guard('medical_center')->check()) {
-            $medicalCenter = Auth::guard('medical_center')->user();
-            $selectedDoctorId = $medicalCenter->selectedDoctor?->doctor_id;
-
-            if (!$selectedDoctorId) {
-                throw new \Exception('هیچ پزشکی انتخاب نشده است. لطفاً ابتدا یک پزشک انتخاب کنید.');
-            }
-
-            $doctor = \App\Models\Doctor::find($selectedDoctorId);
-            if (!$doctor) {
-                throw new \Exception('پزشک انتخاب‌شده یافت نشد.');
-            }
-
-            return $doctor;
-        }
-        throw new \Exception('کاربر احراز هویت نشده است.');
-    }
-
     public function index(Request $request)
     {
         $doctor = $this->getAuthenticatedDoctor();
