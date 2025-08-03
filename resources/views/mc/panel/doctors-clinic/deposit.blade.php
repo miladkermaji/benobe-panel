@@ -59,7 +59,7 @@
               <thead>
                 <tr>
                   <th class="text-center align-middle" style="width: 60px;">ردیف</th>
-                  <th class="align-middle">مطب</th>
+                  <th class="align-middle">مرکز درمانی</th>
                   <th class="align-middle">مبلغ (تومان)</th>
                   <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
@@ -69,7 +69,11 @@
                   <tr data-id="{{ $deposit->id }}">
                     <td class="text-center">{{ $index + 1 }}</td>
                     <td>
-                      {{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}
+                      @if (Auth::guard('medical_center')->check())
+                        {{ $deposit->medical_center_id ? Auth::guard('medical_center')->user()->name : 'ویزیت آنلاین' }}
+                      @else
+                        {{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}
+                      @endif
                     </td>
                     <td>{{ $deposit->deposit_amount ? number_format($deposit->deposit_amount) : 'بدون بیعانه' }}</td>
                     <td class="text-center">
@@ -94,7 +98,11 @@
                 <div class="note-card-header d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-primary-subtle text-primary">
-                      {{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}
+                      @if (Auth::guard('medical_center')->check())
+                        {{ $deposit->medical_center_id ? Auth::guard('medical_center')->user()->name : 'ویزیت آنلاین' }}
+                      @else
+                        {{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}
+                      @endif
                     </span>
                   </div>
                   <div class="d-flex gap-1">
@@ -117,9 +125,14 @@
                 </div>
                 <div class="note-card-body">
                   <div class="note-card-item">
-                    <span class="note-card-label">مطب:</span>
-                    <span
-                      class="note-card-value">{{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}</span>
+                    <span class="note-card-label">مرکز درمانی:</span>
+                    <span class="note-card-value">
+                      @if (Auth::guard('medical_center')->check())
+                        {{ $deposit->medical_center_id ? Auth::guard('medical_center')->user()->name : 'ویزیت آنلاین' }}
+                      @else
+                        {{ $deposit->medical_center_id ? $clinics->find($deposit->medical_center_id)->name : 'ویزیت آنلاین' }}
+                      @endif
+                    </span>
                   </div>
                   <div class="note-card-item">
                     <span class="note-card-label">مبلغ:</span>
@@ -148,7 +161,11 @@
         <form id="depositForm">
           @csrf
           <input type="hidden" name="id" id="depositId">
-          <input type="hidden" name="selectedClinicId" value="{{ $selectedClinicId }}">
+          @if (Auth::guard('medical_center')->check())
+            <input type="hidden" name="selectedClinicId" value="{{ Auth::guard('medical_center')->id() }}">
+          @else
+            <input type="hidden" name="selectedClinicId" value="{{ $selectedClinicId }}">
+          @endif
           <input type="hidden" name="is_custom_price" id="isCustomPrice" value="0">
           <div class="mb-3 position-relative">
             <label for="depositAmount" class="label-top-input-special-takhasos">مبلغ بیعانه</label>
@@ -192,6 +209,9 @@
     const modalTitle = $('#depositModalLabel');
     const isCustomPrice = $('#isCustomPrice');
     const clinics = @json($clinics->pluck('name', 'id')->toArray());
+    @if (Auth::guard('medical_center')->check())
+      const medicalCenterName = '{{ Auth::guard('medical_center')->user()->name }}';
+    @endif
 
     // Function to convert Persian/Farsi numbers to English numbers
     function convertPersianToEnglishNumbers(str) {
@@ -521,8 +541,12 @@
     }
 
     function addDepositItem(deposit) {
-      const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-        'ویزیت آنلاین';
+      @if (Auth::guard('medical_center')->check())
+        const clinicName = deposit.medical_center_id ? medicalCenterName : 'ویزیت آنلاین';
+      @else
+        const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
+          'ویزیت آنلاین';
+      @endif
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Desktop table row
@@ -569,7 +593,7 @@
           </div>
           <div class="note-card-body">
             <div class="note-card-item">
-              <span class="note-card-label">مطب:</span>
+              <span class="note-card-label">مرکز درمانی:</span>
               <span class="note-card-value">${clinicName}</span>
             </div>
             <div class="note-card-item">
@@ -588,8 +612,12 @@
     }
 
     function updateDepositItem(deposit) {
-      const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-        'ویزیت آنلاین';
+      @if (Auth::guard('medical_center')->check())
+        const clinicName = deposit.medical_center_id ? medicalCenterName : 'ویزیت آنلاین';
+      @else
+        const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
+          'ویزیت آنلاین';
+      @endif
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Update desktop table row
@@ -605,7 +633,7 @@
         card.find('.badge').text(clinicName);
         card.find('.note-card-value').each(function() {
           const label = $(this).prev('.note-card-label').text();
-          if (label.includes('مطب')) {
+          if (label.includes('مرکز درمانی')) {
             $(this).text(clinicName);
           } else if (label.includes('مبلغ')) {
             $(this).text(amountText);

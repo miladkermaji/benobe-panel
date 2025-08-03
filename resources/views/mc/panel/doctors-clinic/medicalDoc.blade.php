@@ -15,7 +15,11 @@
 
 @section('content')
 @section('bread-crumb-title', 'مدارک من')
-@livewire('mc.panel.doctors.doctor-documents', ['doctorId' => $doctorId])
+@if (Auth::guard('medical_center')->check())
+  @livewire('mc.panel.doctors.doctor-documents')
+@else
+  @livewire('mc.panel.doctors.doctor-documents', ['doctorId' => $doctorId])
+@endif
 @endsection
 @section('scripts')
 <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>

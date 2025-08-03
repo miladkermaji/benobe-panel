@@ -188,10 +188,11 @@ class DoctorsClinicManagementController extends Controller
         try {
             if (Auth::guard('medical_center')->check()) {
                 $doctorId = $this->getSelectedDoctorId();
+                $selectedClinicId = Auth::guard('medical_center')->id();
             } else {
                 $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                $selectedClinicId = $this->getSelectedMedicalCenterId();
             }
-            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // Get clinics with error handling
             try {
@@ -226,10 +227,11 @@ class DoctorsClinicManagementController extends Controller
         try {
             if (Auth::guard('medical_center')->check()) {
                 $doctorId = $this->getSelectedDoctorId();
+                $selectedClinicId = Auth::guard('medical_center')->id();
             } else {
                 $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                $selectedClinicId = $this->getSelectedMedicalCenterId();
             }
-            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -335,10 +337,11 @@ class DoctorsClinicManagementController extends Controller
         try {
             if (Auth::guard('medical_center')->check()) {
                 $doctorId = $this->getSelectedDoctorId();
+                $selectedClinicId = Auth::guard('medical_center')->id();
             } else {
                 $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                $selectedClinicId = $this->getSelectedMedicalCenterId();
             }
-            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
             if ($request->has('custom_price') && $request->custom_price) {
@@ -428,10 +431,11 @@ class DoctorsClinicManagementController extends Controller
         try {
             if (Auth::guard('medical_center')->check()) {
                 $doctorId = $this->getSelectedDoctorId();
+                $selectedClinicId = Auth::guard('medical_center')->id();
             } else {
                 $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+                $selectedClinicId = $this->getSelectedMedicalCenterId();
             }
-            $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             $deposit = MedicalCenterDepositSetting::where('id', $id)
                 ->where('doctor_id', $doctorId)

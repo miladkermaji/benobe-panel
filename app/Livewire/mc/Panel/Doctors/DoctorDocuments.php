@@ -7,18 +7,24 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorDocuments extends Component
 {
     use WithFileUploads;
+    use HasSelectedDoctor;
 
     public $doctorId;
     public $files = [];
     public $titles = [];
 
-    public function mount($doctorId)
+    public function mount($doctorId = null)
     {
-        $this->doctorId = $doctorId;
+        if (Auth::guard('medical_center')->check()) {
+            $this->doctorId = $this->getSelectedDoctorId();
+        } else {
+            $this->doctorId = $doctorId;
+        }
     }
 
     public function uploadFiles()
@@ -27,6 +33,11 @@ class DoctorDocuments extends Component
             'files.*' => 'file|max:5120', // حداکثر 5 مگابایت برای هر فایل
             'titles.*' => 'nullable|string|max:255',
         ]);
+
+        if (!$this->doctorId) {
+            $this->dispatch('show-alert', type: 'error', message: 'پزشک انتخاب نشده است.');
+            return;
+        }
 
         foreach ($this->files as $index => $file) {
             $path = $file->store('doctor_documents', 'public');
@@ -49,6 +60,13 @@ class DoctorDocuments extends Component
     public function deleteFile($id)
     {
         $document = DoctorDocument::findOrFail($id);
+
+        // بررسی اینکه مدرک متعلق به پزشک انتخاب‌شده باشد
+        if ($document->doctor_id != $this->doctorId) {
+            $this->dispatch('show-alert', type: 'error', message: 'شما اجازه حذف این مدرک را ندارید.');
+            return;
+        }
+
         Storage::disk('public')->delete($document->file_path);
         $document->delete();
         $this->dispatch('show-alert', type: 'success', message: 'مدرک حذف شد!');
@@ -56,6 +74,10 @@ class DoctorDocuments extends Component
 
     public function render()
     {
+        if (!$this->doctorId) {
+            return view('livewire.mc.panel.doctors.doctor-documents', ['documents' => collect()]);
+        }
+
         $documents = DoctorDocument::where('doctor_id', $this->doctorId)->get();
         return view('livewire.mc.panel.doctors.doctor-documents', compact('documents'));
     }
