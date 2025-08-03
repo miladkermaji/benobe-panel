@@ -7,12 +7,12 @@ use Livewire\WithPagination;
 use App\Models\Secretary;
 use App\Models\Zone;
 use Illuminate\Support\Facades\Auth;
-use App\Traits\HasSelectedClinic;
+use App\Traits\HasSelectedDoctor;
 
 class SecretaryList extends Component
 {
     use WithPagination;
-    use HasSelectedClinic;
+    use HasSelectedDoctor;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -37,7 +37,11 @@ class SecretaryList extends Component
 
     public function mount()
     {
-        $this->medical_center_id = $this->getSelectedMedicalCenterId();
+        if (Auth::guard('medical_center')->check()) {
+            $this->medical_center_id = Auth::guard('medical_center')->id();
+        } else {
+            $this->medical_center_id = $this->getSelectedMedicalCenterId();
+        }
     }
 
     public function loadSecretaries()
@@ -121,7 +125,9 @@ class SecretaryList extends Component
     {
         if (Auth::guard('medical_center')->check()) {
             $medicalCenterId = Auth::guard('medical_center')->id();
+            $doctorId = $this->getSelectedDoctorId();
             return Secretary::where('medical_center_id', $medicalCenterId)
+                ->where('doctor_id', $doctorId)
                 ->when($this->search, function ($query) {
                     $query->where(function ($q) {
                         $q->where('first_name', 'like', "%{$this->search}%")
@@ -149,8 +155,11 @@ class SecretaryList extends Component
     public function render()
     {
         if (Auth::guard('medical_center')->check()) {
+            $medicalCenterId = Auth::guard('medical_center')->id();
+            $doctorId = $this->getSelectedDoctorId();
             $secretaries = Secretary::query()
-                ->where('medical_center_id', Auth::guard('medical_center')->id())
+                ->where('medical_center_id', $medicalCenterId)
+                ->where('doctor_id', $doctorId)
                 ->when($this->search, fn ($q) => $q->where(function ($q) {
                     $q->where('first_name', 'like', "%{$this->search}%")
                         ->orWhere('last_name', 'like', "%{$this->search}%")

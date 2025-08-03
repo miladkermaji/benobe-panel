@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\HasSelectedDoctor;
 
 class SecretaryCreate extends Component
 {
+    use HasSelectedDoctor;
+
     public $first_name;
     public $last_name;
     public $mobile;
@@ -37,13 +40,13 @@ class SecretaryCreate extends Component
         if ($this->province_id) {
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
+
         if (Auth::guard('medical_center')->check()) {
             $this->medical_center_id = Auth::guard('medical_center')->id();
         } else {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $doctor = Doctor::find($doctorId);
-            $this->medical_center_id = $doctor?->selectedMedicalCenter?->medical_center_id;
+            $this->medical_center_id = $this->getSelectedMedicalCenterId();
         }
+
         Log::info('mount medical_center_id', ['medical_center_id' => $this->medical_center_id]);
     }
 
@@ -58,16 +61,17 @@ class SecretaryCreate extends Component
     {
         if (Auth::guard('medical_center')->check()) {
             $clinicId = Auth::guard('medical_center')->id();
-            $doctorId = null;
+            $doctorId = $this->getSelectedDoctorId();
         } else {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-            $doctor = Doctor::find($doctorId);
-            $clinicId = $doctor?->selectedMedicalCenter?->medical_center_id;
+            $doctorId = $this->getDoctor()?->id;
+            $clinicId = $this->getSelectedMedicalCenterId();
         }
+
         if (!$clinicId) {
             $this->addError('medical_center_id', 'مرکز درمانی انتخاب نشده است.');
             return;
         }
+
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
@@ -78,6 +82,7 @@ class SecretaryCreate extends Component
             'city_id' => 'required|exists:zone,id',
             'password' => 'nullable|min:6',
         ]);
+
         Secretary::create([
             'doctor_id' => $doctorId,
             'medical_center_id' => $clinicId,
@@ -91,6 +96,7 @@ class SecretaryCreate extends Component
             'password' => $this->password ? Hash::make($this->password) : null,
             'status' => 1,
         ]);
+
         $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'منشی با موفقیت اضافه شد.']);
         return redirect()->route('mc-secretary-management');
     }
