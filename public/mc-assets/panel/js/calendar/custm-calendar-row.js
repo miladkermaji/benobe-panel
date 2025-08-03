@@ -133,7 +133,7 @@ $(document).ready(function () {
             // بروزرسانی selectedClinicId در localStorage
             const medicalCenterId = event.detail?.medicalCenterId || null;
             localStorage.setItem("selectedClinicId", medicalCenterId);
-
+            
             // بروزرسانی تقویم
             fetchAppointmentsCount();
         }, 1000)

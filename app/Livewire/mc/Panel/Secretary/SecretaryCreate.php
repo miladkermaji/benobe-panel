@@ -37,12 +37,13 @@ class SecretaryCreate extends Component
         if ($this->province_id) {
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
-
-        // دریافت medical_center_id از doctor relationship
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        $doctor = Doctor::find($doctorId);
-        $this->medical_center_id = $doctor?->selectedMedicalCenter?->medical_center_id;
-
+        if (Auth::guard('medical_center')->check()) {
+            $this->medical_center_id = Auth::guard('medical_center')->id();
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $doctor = Doctor::find($doctorId);
+            $this->medical_center_id = $doctor?->selectedMedicalCenter?->medical_center_id;
+        }
         Log::info('mount medical_center_id', ['medical_center_id' => $this->medical_center_id]);
     }
 
@@ -55,44 +56,28 @@ class SecretaryCreate extends Component
 
     public function store()
     {
-        // دریافت doctor_id
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-
-        // دریافت doctor و medical_center_id از رابطه
-        $doctor = Doctor::find($doctorId);
-        if (!$doctor) {
-            $this->addError('doctor', 'دکتر یافت نشد.');
-            return;
+        if (Auth::guard('medical_center')->check()) {
+            $clinicId = Auth::guard('medical_center')->id();
+            $doctorId = null;
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            $doctor = Doctor::find($doctorId);
+            $clinicId = $doctor?->selectedMedicalCenter?->medical_center_id;
         }
-
-        $clinicId = $doctor->selectedMedicalCenter?->medical_center_id;
-
-        // بررسی اینکه medical_center_id null نباشد
         if (!$clinicId) {
             $this->addError('medical_center_id', 'مرکز درمانی انتخاب نشده است.');
             return;
         }
-
         $this->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'mobile' => 'required|regex:/^09[0-9]{9}$/|unique:secretaries,mobile,NULL,id,doctor_id,' . $doctorId . ',medical_center_id,' . $clinicId,
-            'national_code' => 'required|digits:10|unique:secretaries,national_code,NULL,id,doctor_id,' . $doctorId . ',medical_center_id,' . $clinicId,
+            'mobile' => 'required|regex:/^09[0-9]{9}$/|unique:secretaries,mobile,NULL,id,doctor_id,' . ($doctorId ?? 'NULL') . ',medical_center_id,' . $clinicId,
+            'national_code' => 'required|digits:10|unique:secretaries,national_code,NULL,id,doctor_id,' . ($doctorId ?? 'NULL') . ',medical_center_id,' . $clinicId,
             'gender' => 'required|in:male,female',
             'province_id' => 'required|exists:zone,id',
             'city_id' => 'required|exists:zone,id',
             'password' => 'nullable|min:6',
         ]);
-
-        // اضافه کردن لاگ برای دیباگ
-        Log::info('store method medical_center_id', [
-            'medical_center_id_property' => $this->medical_center_id,
-            'medical_center_id_from_doctor' => $clinicId,
-            'medical_center_id_property_type' => gettype($this->medical_center_id),
-            'medical_center_id_from_doctor_type' => gettype($clinicId),
-            'doctor_id' => $doctorId
-        ]);
-
         Secretary::create([
             'doctor_id' => $doctorId,
             'medical_center_id' => $clinicId,

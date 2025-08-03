@@ -119,31 +119,58 @@ class SecretaryList extends Component
 
     private function getSecretariesQuery()
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        return Secretary::where('doctor_id', $doctorId)
-            ->when($this->search, function ($query) {
-                $query->where(function ($q) {
-                    $q->where('first_name', 'like', "%{$this->search}%")
-                        ->orWhere('last_name', 'like', "%{$this->search}%")
-                        ->orWhere('mobile', 'like', "%{$this->search}%")
-                        ->orWhere('national_code', 'like', "%{$this->search}%");
-                });
-            })
-            ->orderByDesc('id');
+        if (Auth::guard('medical_center')->check()) {
+            $medicalCenterId = Auth::guard('medical_center')->id();
+            return Secretary::where('medical_center_id', $medicalCenterId)
+                ->when($this->search, function ($query) {
+                    $query->where(function ($q) {
+                        $q->where('first_name', 'like', "%{$this->search}%")
+                            ->orWhere('last_name', 'like', "%{$this->search}%")
+                            ->orWhere('mobile', 'like', "%{$this->search}%")
+                            ->orWhere('national_code', 'like', "%{$this->search}%");
+                    });
+                })
+                ->orderByDesc('id');
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            return Secretary::where('doctor_id', $doctorId)
+                ->when($this->search, function ($query) {
+                    $query->where(function ($q) {
+                        $q->where('first_name', 'like', "%{$this->search}%")
+                            ->orWhere('last_name', 'like', "%{$this->search}%")
+                            ->orWhere('mobile', 'like', "%{$this->search}%")
+                            ->orWhere('national_code', 'like', "%{$this->search}%");
+                    });
+                })
+                ->orderByDesc('id');
+        }
     }
 
     public function render()
     {
-        $secretaries = Secretary::query()
-            ->where('medical_center_id', $this->medical_center_id)
-            ->when($this->search, fn ($q) => $q->where(function ($q) {
-                $q->where('first_name', 'like', "%{$this->search}%")
-                  ->orWhere('last_name', 'like', "%{$this->search}%")
-                  ->orWhere('mobile', 'like', "%{$this->search}%")
-                  ->orWhere('national_code', 'like', "%{$this->search}%");
-            }))
-            ->orderByDesc('id')
-            ->paginate($this->perPage);
+        if (Auth::guard('medical_center')->check()) {
+            $secretaries = Secretary::query()
+                ->where('medical_center_id', Auth::guard('medical_center')->id())
+                ->when($this->search, fn ($q) => $q->where(function ($q) {
+                    $q->where('first_name', 'like', "%{$this->search}%")
+                        ->orWhere('last_name', 'like', "%{$this->search}%")
+                        ->orWhere('mobile', 'like', "%{$this->search}%")
+                        ->orWhere('national_code', 'like', "%{$this->search}%");
+                }))
+                ->orderByDesc('id')
+                ->paginate($this->perPage);
+        } else {
+            $secretaries = Secretary::query()
+                ->where('medical_center_id', $this->medical_center_id)
+                ->when($this->search, fn ($q) => $q->where(function ($q) {
+                    $q->where('first_name', 'like', "%{$this->search}%")
+                        ->orWhere('last_name', 'like', "%{$this->search}%")
+                        ->orWhere('mobile', 'like', "%{$this->search}%")
+                        ->orWhere('national_code', 'like', "%{$this->search}%");
+                }))
+                ->orderByDesc('id')
+                ->paginate($this->perPage);
+        }
         return view('livewire.mc.panel.secretary.secretary-list', [
             'secretaries' => $secretaries,
         ]);

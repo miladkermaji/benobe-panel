@@ -973,7 +973,7 @@ class ScheduleSettingController extends Controller
                 $medicalCenterId = $medicalCenter->id;
             } else {
                 // برای پزشک و منشی
-                $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
                 $medicalCenterId = $request->input('selectedClinicId');
             }
 
@@ -1394,7 +1394,7 @@ class ScheduleSettingController extends Controller
             $medicalCenterId = $medicalCenter->id;
         } else {
             // برای پزشک و منشی
-            $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
+        $doctorId = Auth::guard('doctor')->id() ?? Auth::guard('secretary')->id();
             $medicalCenterId = $request->input('selectedClinicId');
         }
 

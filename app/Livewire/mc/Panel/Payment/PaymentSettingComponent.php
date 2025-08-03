@@ -31,13 +31,13 @@ class PaymentSettingComponent extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
-                }
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
             }
+        }
             $doctorId = $doctor ? $doctor->id : null;
         }
 
@@ -75,13 +75,13 @@ class PaymentSettingComponent extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
-                }
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
             }
+        }
             $doctorId = $doctor ? $doctor->id : null;
         }
 
@@ -120,13 +120,13 @@ class PaymentSettingComponent extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
-                }
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
             }
+        }
             $doctorId = $doctor ? $doctor->id : null;
         }
 
@@ -198,13 +198,13 @@ class PaymentSettingComponent extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
-                }
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
             }
+        }
             $doctorId = $doctor ? $doctor->id : null;
         }
 
@@ -297,13 +297,13 @@ class PaymentSettingComponent extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctor = Auth::guard('doctor')->user();
-            if (!$doctor) {
-                $secretary = Auth::guard('secretary')->user();
-                if ($secretary && $secretary->doctor) {
-                    $doctor = $secretary->doctor;
-                }
+        $doctor = Auth::guard('doctor')->user();
+        if (!$doctor) {
+            $secretary = Auth::guard('secretary')->user();
+            if ($secretary && $secretary->doctor) {
+                $doctor = $secretary->doctor;
             }
+        }
             $doctorId = $doctor ? $doctor->id : null;
         }
 

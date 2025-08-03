@@ -197,8 +197,8 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const appointments = response.data || [];
                 const holidays =
                     window.holidaysData && window.holidaysData.status
-                        ? window.holidaysData.holidays
-                        : [];
+                    ? window.holidaysData.holidays
+                    : [];
 
                 const data = { holidays, appointments };
                 calendarDataCache.set(cacheKey, data);

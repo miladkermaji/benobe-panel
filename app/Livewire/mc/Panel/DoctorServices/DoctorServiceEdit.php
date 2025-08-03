@@ -191,7 +191,7 @@ class DoctorServiceEdit extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         }
         $currentState = [
             'service_id' => $this->service_id,
@@ -306,7 +306,7 @@ class DoctorServiceEdit extends Component
                 ->first();
             $doctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
         } else {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         }
         $doctorServices = DoctorService::where('doctor_id', $doctorId)
             ->with(['service', 'insurance', 'medicalCenter'])

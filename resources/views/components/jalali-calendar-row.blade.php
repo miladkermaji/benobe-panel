@@ -29,7 +29,7 @@
     </div>
   </div>
   <div id="calendar-error" class="error-message">
-
+    
   </div>
 </div>
 

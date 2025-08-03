@@ -895,7 +895,7 @@
           <div class="text-center">
             <div id="available-times" class="d-flex flex-wrap justify-content-center gap-2">
               <!-- زمان‌های موجود اینجا نمایش داده می‌شوند -->
-            </div>
+                </div>
           </div>
         </x-slot:body>
       </x-modal>
@@ -1552,8 +1552,8 @@
 
             if (!container) {
               console.error('Container not found!');
-              return;
-            }
+                                                                                                                                                                                                                    return;
+                                                                                                                                                                                                                  }
 
             // Clear container
             container.innerHTML = '';
@@ -1576,18 +1576,18 @@
 
               // Add click handler
               button.addEventListener('click', function() {
-                // Remove selection from other buttons
+                                                                                                                                                                                                                    // Remove selection from other buttons
                 document.querySelectorAll('.time-slot-btn').forEach(btn => {
                   btn.classList.remove('btn-primary');
                   btn.classList.add('btn-outline-primary');
                 });
 
-                // Select this button
+                                                                                                                                                                                                                    // Select this button
                 this.classList.remove('btn-outline-primary');
                 this.classList.add('btn-primary');
 
-                // Update Livewire component
-                @this.set('appointmentTime', time);
+                                                                                                                                                                                                                    // Update Livewire component
+                                                                                                                                                                                                                    @this.set('appointmentTime', time);
 
                 // Close modal
                 window.dispatchEvent(new CustomEvent('close-modal', {
