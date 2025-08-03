@@ -297,7 +297,41 @@ class MyPerformanceController extends Controller
      */
     public function chart()
     {
-        return view('mc.panel.my-performance.chart');
+        $user = Auth::guard('doctor')->user() ??
+                Auth::guard('secretary')->user() ??
+                Auth::guard('medical_center')->user();
+
+        if (!$user) {
+            return redirect()->route('dr.auth.login-register-form')->with('error', 'ابتدا وارد شوید.');
+        }
+
+        // اگر کاربر مرکز درمانی باشد
+        if (Auth::guard('medical_center')->check()) {
+            /** @var MedicalCenter $medicalCenter */
+            $medicalCenter = $user;
+            $selectedDoctor = $medicalCenter->selectedDoctor;
+            $selectedDoctorId = $selectedDoctor ? $selectedDoctor->doctor_id : null;
+
+            if (!$selectedDoctorId) {
+                return redirect()->route('mc.panel.my-performance.index')->with('error', 'هیچ پزشکی انتخاب نشده است.');
+            }
+
+            $medicalCenters = collect([$medicalCenter]);
+            $medicalCenterId = $medicalCenter->id;
+
+            return view('mc.panel.my-performance.chart.index', compact('medicalCenters', 'medicalCenter', 'medicalCenterId', 'selectedDoctorId'));
+        }
+
+        // برای دکتر و منشی (کد قبلی)
+        $doctorId = $user instanceof \App\Models\Doctor ? $user->id : $user->doctor_id;
+        $medicalCenter = $this->getSelectedMedicalCenter();
+        $medicalCenterId = $this->getSelectedMedicalCenterId();
+
+        $medicalCenters = \App\Models\MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })->get();
+
+        return view('mc.panel.my-performance.chart.index', compact('medicalCenters', 'medicalCenter', 'medicalCenterId'));
     }
 
     /**
