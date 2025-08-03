@@ -26,7 +26,7 @@
         <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" inputmode="numeric" maxlength="1"
-              {{ $i === 0 ? 'autocomplete="one-time-code"' : '' }} pattern="[0-9]*" name="otpCode[]"
+              {{ $i === 0 ? 'autocomplete="one-time-code"' : 'autocomplete="off"' }} pattern="[0-9]*" name="otpCode[]"
               class="form-control otp-input text-center custom-rounded border"
               style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
@@ -239,6 +239,53 @@
           input.addEventListener('focus', () => input.select());
         });
       }
+    }
+
+    // OTP Auto-fill functionality
+    if ('OTPCredential' in window) {
+      window.addEventListener('DOMContentLoaded', () => {
+        const ac = new AbortController();
+
+        navigator.credentials.get({
+          otp: {
+            transport: ['sms']
+          },
+          signal: ac.signal
+        }).then(otp => {
+          console.log('OTP received:', otp.code);
+
+          // Auto-fill the OTP inputs
+          const inputs = document.querySelectorAll('.otp-input');
+          const code = otp.code.split('');
+
+          inputs.forEach((input, index) => {
+            if (code[index]) {
+              input.value = code[index];
+              input.dispatchEvent(new Event('input', {
+                bubbles: true
+              }));
+              input.dispatchEvent(new Event('change', {
+                bubbles: true
+              }));
+            }
+          });
+
+          // Auto-submit after a short delay
+          setTimeout(() => {
+            const submitButton = document.querySelector('button[type="submit"]');
+            if (submitButton) {
+              submitButton.click();
+            }
+          }, 500);
+
+          ac.abort();
+        }).catch(err => {
+          console.log('OTP auto-fill not available:', err);
+        });
+
+        // Timeout after 60 seconds
+        setTimeout(() => ac.abort(), 60000);
+      });
     }
 
     document.addEventListener('livewire:navigated', () => {
