@@ -167,7 +167,7 @@ class SubUserController extends Controller
             ['model' => \App\Models\User::class, 'type' => 'user'],
             ['model' => \App\Models\Doctor::class, 'type' => 'doctor'],
             ['model' => \App\Models\Secretary::class, 'type' => 'secretary'],
-            ['model' => \App\Models\Admin\Manager::class, 'type' => 'manager'],
+            ['model' => \App\Models\Manager::class, 'type' => 'manager'],
         ];
         $found = null;
         $foundType = null;

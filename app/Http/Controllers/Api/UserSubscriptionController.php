@@ -114,7 +114,7 @@ class UserSubscriptionController extends Controller
             $meta['doctor_id'] = $user->id;
         } elseif ($user instanceof \App\Models\Secretary) {
             $meta['secretary_id'] = $user->id;
-        } elseif ($user instanceof \App\Models\Admin\Manager) {
+        } elseif ($user instanceof \App\Models\Manager) {
             $meta['manager_id'] = $user->id;
         } else {
             $meta['user_id'] = $user->id;
@@ -244,7 +244,7 @@ class UserSubscriptionController extends Controller
             } elseif (isset($meta['secretary_id'])) {
                 $subscribable = \App\Models\Secretary::find($meta['secretary_id']);
             } elseif (isset($meta['manager_id'])) {
-                $subscribable = \App\Models\Admin\Manager::find($meta['manager_id']);
+                $subscribable = \App\Models\Manager::find($meta['manager_id']);
             }
             if (!$subscribable) {
                 return response()->json([

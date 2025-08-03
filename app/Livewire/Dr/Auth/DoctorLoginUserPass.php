@@ -188,9 +188,8 @@ class DoctorLoginUserPass extends Component
 
         // ثبت لاگ ورود
         LoginLog::create([
-            'doctor_id' => $user instanceof Doctor ? $user->id : null,
-            'secretary_id' => $user instanceof Secretary ? $user->id : null,
-            'medical_center_id' => $user instanceof MedicalCenter ? $user->id : null,
+            'loggable_type' => get_class($user),
+            'loggable_id' => $user->id,
             'user_type' => $userType,
             'login_at' => now(),
             'ip_address' => request()->ip(),

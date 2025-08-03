@@ -12,16 +12,13 @@ return new class () extends Migration {
     {
         Schema::create('login_logs', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id')->nullable(); // برای کاربران عادی
-            $table->unsignedBigInteger('doctor_id')->nullable(); // برای دکترها
-            $table->unsignedBigInteger('secretary_id')->nullable(); // برای منشی‌ها
-            $table->unsignedBigInteger('manager_id')->nullable(); // برای منشی‌ها
-            $table->unsignedBigInteger('medical_center_id')->nullable()->after('manager_id');
-            $table->string('user_type'); // 'doctor', 'secretary', 'user'
+            $table->morphs('loggable'); // Creates loggable_type and loggable_id columns
+            $table->string('user_type'); // 'doctor', 'secretary', 'user', 'manager', 'medical_center'
             $table->timestamp('login_at')->nullable(); // زمان ورود
             $table->timestamp('logout_at')->nullable(); // زمان خروج
             $table->string('ip_address')->nullable(); // آی‌پی کاربر
             $table->string('device')->nullable(); // نام دستگاه
+            $table->string('login_method')->nullable(); // روش ورود (otp, password, etc.)
             $table->timestamps();
         });
     }

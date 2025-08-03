@@ -49,7 +49,7 @@
                     <option value="{{ $secretary->id }}">{{ $secretary->first_name . ' ' . $secretary->last_name }}
                     </option>
                   @endforeach
-                @elseif ($transactable_type === 'App\Models\Admin\Manager')
+                @elseif ($transactable_type === 'App\Models\Manager')
                   @foreach ($managers as $manager)
                     <option value="{{ $manager->id }}">{{ $manager->first_name . ' ' . $manager->last_name }}
                     </option>

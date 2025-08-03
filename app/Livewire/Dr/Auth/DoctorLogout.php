@@ -28,9 +28,8 @@ class DoctorLogout extends Component
         }
 
         if ($user) {
-            LoginLog::where('doctor_id', $guard === 'doctor' ? $user->id : null)
-                ->where('secretary_id', $guard === 'secretary' ? $user->id : null)
-                ->where('medical_center_id', $guard === 'medical_center' ? $user->id : null)
+            LoginLog::where('loggable_type', get_class($user))
+                ->where('loggable_id', $user->id)
                 ->whereNull('logout_at')
                 ->latest()
                 ->first()

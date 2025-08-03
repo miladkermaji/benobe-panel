@@ -30,6 +30,7 @@ use App\Models\PrescriptionRequest;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
+use App\Models\LoginLog;
 
 class Doctor extends Authenticatable implements JWTSubject
 {
@@ -386,10 +387,7 @@ class Doctor extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Insurance::class, 'doctor_insurance', 'doctor_id', 'insurance_id')
             ->withTimestamps();
     }
-    public function hospital()
-    {
-        return $this->belongsTo(Hospital::class);
-    }
+
 
     public function medicalCenters()
     {
@@ -488,6 +486,11 @@ class Doctor extends Authenticatable implements JWTSubject
     public function loginSessions()
     {
         return $this->morphMany(LoginSession::class, 'sessionable');
+    }
+
+    public function loginLogs()
+    {
+        return $this->morphMany(LoginLog::class, 'loggable');
     }
 
     /**

@@ -6,6 +6,7 @@ use App\Models\Doctor;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
+use App\Models\LoginLog;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
@@ -73,6 +74,11 @@ class Manager extends Authenticatable implements JWTSubject
     public function loginSessions()
     {
         return $this->morphMany(\App\Models\LoginSession::class, 'sessionable');
+    }
+
+    public function loginLogs()
+    {
+        return $this->morphMany(\App\Models\LoginLog::class, 'loggable');
     }
 
     /**

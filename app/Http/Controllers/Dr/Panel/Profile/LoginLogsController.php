@@ -19,9 +19,16 @@ class LoginLogsController extends Controller
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
         // دریافت لاگ‌های دکتر و منشی برای بارگذاری اولیه صفحه
-        $doctorLogs = LoginLog::where('doctor_id', $doctorId)->orderBy('login_at', 'desc')->paginate(5);
+        $doctorLogs = LoginLog::where('loggable_type', \App\Models\Doctor::class)
+            ->where('loggable_id', $doctorId)
+            ->orderBy('login_at', 'desc')
+            ->paginate(5);
+
         $secretaryIds = $doctor->secretaries ? $doctor->secretaries->pluck('id')->toArray() : [];
-        $secretaryLogs = LoginLog::whereIn('secretary_id', $secretaryIds)->orderBy('login_at', 'desc')->paginate(5);
+        $secretaryLogs = LoginLog::where('loggable_type', \App\Models\Secretary::class)
+            ->whereIn('loggable_id', $secretaryIds)
+            ->orderBy('login_at', 'desc')
+            ->paginate(5);
 
         return view("dr.panel.profile.security", compact('doctorLogs', 'secretaryLogs'));
     }
@@ -30,7 +37,10 @@ class LoginLogsController extends Controller
     public function getDoctorLogs(Request $request)
     {
         $doctor = Auth::guard('doctor')->user();
-        $doctorLogs = LoginLog::where('doctor_id', $doctor->id)->orderBy('login_at', 'desc')->paginate(5);
+        $doctorLogs = LoginLog::where('loggable_type', \App\Models\Doctor::class)
+            ->where('loggable_id', $doctor->id)
+            ->orderBy('login_at', 'desc')
+            ->paginate(5);
 
         return response()->json([
          'doctorLogsHtml' => view('dr.panel.profile.partials.doctor_logs', compact('doctorLogs'))->render()
@@ -42,10 +52,13 @@ class LoginLogsController extends Controller
     {
         $doctor = Auth::guard('doctor')->user();
         $secretaryIds = $doctor->secretaries ? $doctor->secretaries->pluck('id')->toArray() : [];
-        $secretaryLogs = LoginLog::whereIn('secretary_id', $secretaryIds)->orderBy('login_at', 'desc')->paginate(5);
+        $secretaryLogs = LoginLog::where('loggable_type', \App\Models\Secretary::class)
+            ->whereIn('loggable_id', $secretaryIds)
+            ->orderBy('login_at', 'desc')
+            ->paginate(5);
 
         return response()->json([
-         'secretaryLogsHtml' => view('dr.panel.profile.partials.secretary_logs', compact('secretaryLogs'))->render()
+            'secretaryLogsHtml' => view('dr.panel.profile.partials.secretary_logs', compact('secretaryLogs'))->render()
         ]);
     }
 

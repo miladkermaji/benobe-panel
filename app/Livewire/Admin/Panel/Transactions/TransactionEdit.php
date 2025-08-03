@@ -29,7 +29,7 @@ class TransactionEdit extends Component
         'App\Models\User' => 'کاربر',
         'App\Models\Doctor' => 'دکتر',
         'App\Models\Secretary' => 'منشی',
-        'App\Models\Admin\Manager' => 'مدیر',
+        'App\Models\Manager' => 'مدیر',
     ];
 
     public function mount($id)

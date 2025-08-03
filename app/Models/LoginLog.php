@@ -10,11 +10,8 @@ class LoginLog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'doctor_id',
-        'secretary_id',
-        'manager_id',
-        'medical_center_id',
+        'loggable_type',
+        'loggable_id',
         'user_type',
         'login_at',
         'logout_at',
@@ -27,4 +24,28 @@ class LoginLog extends Model
         'login_at' => 'datetime',
         'logout_at' => 'datetime',
     ];
+
+    /**
+     * Get the parent loggable model (doctor, secretary, user, manager, medical_center).
+     */
+    public function loggable()
+    {
+        return $this->morphTo();
+    }
+
+    /**
+     * Scope for filtering by user type
+     */
+    public function scopeByUserType($query, $userType)
+    {
+        return $query->where('user_type', $userType);
+    }
+
+    /**
+     * Scope for filtering by loggable type
+     */
+    public function scopeByLoggableType($query, $loggableType)
+    {
+        return $query->where('loggable_type', $loggableType);
+    }
 }

@@ -109,7 +109,7 @@ return [
         ],
         'managers' => [
             'driver' => 'eloquent',
-            'model' => App\Models\Admin\Manager::class,
+            'model' => App\Models\Manager::class,
         ],
 
         'doctors' => [

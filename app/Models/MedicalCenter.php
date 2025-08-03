@@ -11,6 +11,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
+use App\Models\LoginLog;
 
 class MedicalCenter extends Authenticatable
 {
@@ -211,5 +212,10 @@ class MedicalCenter extends Authenticatable
     public function loginSessions()
     {
         return $this->morphMany(LoginSession::class, 'sessionable');
+    }
+
+    public function loginLogs()
+    {
+        return $this->morphMany(LoginLog::class, 'loggable');
     }
 }

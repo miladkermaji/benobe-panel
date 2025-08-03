@@ -287,7 +287,15 @@ class AuthController extends Controller
         $loginAttempts->resetLoginAttempts($user->mobile);
 
         LoginSession::where('token', $token)->delete();
-        LoginLog::create(['user_id' => $user->id, 'user_type' => $userType, 'login_at' => now(), 'ip_address' => $request->ip(), 'device' => $request->header('User-Agent')]);
+        LoginLog::create([
+            'loggable_type' => get_class($user),
+            'loggable_id' => $user->id,
+            'user_type' => $userType,
+            'login_at' => now(),
+            'ip_address' => $request->ip(),
+            'device' => $request->header('User-Agent'),
+            'login_method' => 'otp'
+        ]);
 
         return response()->json([
             'status' => 'success',
@@ -422,7 +430,7 @@ class AuthController extends Controller
                     $userType = 'doctor';
                 } elseif ($user instanceof \App\Models\Secretary) {
                     $userType = 'secretary';
-                } elseif ($user instanceof \App\Models\Admin\Manager) {
+                } elseif ($user instanceof \App\Models\Manager) {
                     $userType = 'manager';
                 } elseif ($user instanceof \App\Models\User) {
                     $userType = 'user';
