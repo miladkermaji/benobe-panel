@@ -31,4 +31,26 @@ class UpdateProfileRequest extends FormRequest
             'city_id'        => 'nullable|exists:zone,id,level,2', // فقط شهرها (level=2)
         ];
     }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'first_name.string' => 'نام باید یک رشته متنی باشد.',
+            'first_name.max' => 'نام نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'last_name.string' => 'نام خانوادگی باید یک رشته متنی باشد.',
+            'last_name.max' => 'نام خانوادگی نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'national_code.string' => 'کد ملی باید یک رشته متنی باشد.',
+            'national_code.max' => 'کد ملی نمی‌تواند بیش از ۱۰ کاراکتر باشد.',
+            'license_number.string' => 'شماره نظام پزشکی باید یک رشته متنی باشد.',
+            'license_number.max' => 'شماره نظام پزشکی نمی‌تواند بیش از ۲۵۵ کاراکتر باشد.',
+            'description.string' => 'توضیحات باید یک رشته متنی باشد.',
+            'province_id.exists' => 'استان انتخاب‌شده معتبر نیست.',
+            'city_id.exists' => 'شهر انتخاب‌شده معتبر نیست.',
+        ];
+    }
 }
