@@ -314,21 +314,37 @@
               const code = otp.code.split('');
               console.log('Code array:', code); // Debug log
 
+              // روش بهتر برای وارد کردن کد
               inputs.forEach((input, index) => {
                 if (code[index]) {
                   console.log(`Setting input ${index} to ${code[index]}`); // Debug log
-                  // Set the value directly
+
+                  // Set the value
                   input.value = code[index];
+
                   // Trigger input event for Livewire
                   input.dispatchEvent(new Event('input', {
                     bubbles: true
                   }));
+
                   // Also trigger change event
                   input.dispatchEvent(new Event('change', {
                     bubbles: true
                   }));
+
+                  // Force Livewire to update the model
+                  if (window.Livewire) {
+                    const wireId = input.closest('[wire\\:id]')?.getAttribute('wire:id');
+                    if (wireId) {
+                      const component = window.Livewire.find(wireId);
+                      if (component) {
+                        component.set(`otpCode.${index}`, code[index]);
+                      }
+                    }
+                  }
                 }
               });
+
               // Wait a bit then submit
               setTimeout(() => {
                 const submitButton = document.querySelector('button[type="submit"]');
@@ -336,7 +352,7 @@
                   console.log('Submitting form'); // Debug log
                   submitButton.click();
                 }
-              }, 100);
+              }, 500);
             }
             ac.abort();
           });
@@ -461,11 +477,5 @@
       }
       toastr.options.rtl = true;
     });
-  </script>
-  <script type="module">
-    import NotificationHandler from '/js/components/NotificationHandler.js';
-
-    // راه‌اندازی مدیریت اعلان‌ها
-    const notificationHandler = new NotificationHandler();
   </script>
 @endpush
