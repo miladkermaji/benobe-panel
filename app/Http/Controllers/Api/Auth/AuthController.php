@@ -100,6 +100,7 @@ class AuthController extends Controller
 
         // اگر کاربر یافت نشد، در جدول users ثبت شود
         if (!$userInfo['model']) {
+            $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null, null);
             $user = User::create([
                 'mobile' => $formattedMobile,
                 'status' => 1,
