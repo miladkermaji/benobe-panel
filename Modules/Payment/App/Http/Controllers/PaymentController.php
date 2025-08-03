@@ -68,9 +68,8 @@ class PaymentController
                     // فراخوانی داخلی کنترلر و متد paymentResult
                     $controller = app(\App\Http\Controllers\Api\AppointmentBookingController::class);
                     $paymentResultRequest = Request::create(
-                        '/appointments/payment/result',
-                        'GET',
-                        ['transaction_id' => $transaction->transaction_id]
+                        '/appointments/payment/result?transaction_id=' . urlencode($transaction->transaction_id),
+                        'GET'
                     );
                     $controller->paymentResult($paymentResultRequest);
                     Log::info('PaymentController::callback - paymentResult called internally for appointment');
