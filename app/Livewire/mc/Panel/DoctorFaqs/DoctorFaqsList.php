@@ -6,10 +6,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\DoctorFaq;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorFaqsList extends Component
 {
     use WithPagination;
+    use HasSelectedDoctor;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -43,7 +45,13 @@ class DoctorFaqsList extends Component
 
     public function deleteFaq($id)
     {
-        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
+        $faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
         $faq->delete();
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت حذف شد!');
     }
@@ -94,7 +102,13 @@ class DoctorFaqsList extends Component
 
     private function updateStatus($status)
     {
-        DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
+        DoctorFaq::where('doctor_id', $doctor->id)
             ->whereIn('id', $this->selectedFaqs)
             ->update(['is_active' => $status]);
 
@@ -110,7 +124,13 @@ class DoctorFaqsList extends Component
             return;
         }
 
-        DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
+        DoctorFaq::where('doctor_id', $doctor->id)
             ->whereIn('id', $this->selectedFaqs)
             ->delete();
         $this->selectedFaqs = [];
@@ -120,14 +140,25 @@ class DoctorFaqsList extends Component
 
     public function toggleStatus($id)
     {
-        $faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
+        $faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
         $faq->update(['is_active' => !$faq->is_active]);
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت سوال متداول تغییر کرد!');
     }
 
     private function getFaqsQuery()
     {
-        return DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            return collect()->paginate($this->perPage);
+        }
+
+        return DoctorFaq::where('doctor_id', $doctor->id)
             ->where(function ($query) {
                 $query->where('question', 'like', '%' . $this->search . '%')
                     ->orWhere('answer', 'like', '%' . $this->search . '%');

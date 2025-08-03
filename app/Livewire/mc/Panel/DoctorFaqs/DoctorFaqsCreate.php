@@ -6,9 +6,12 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorFaq;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorFaqsCreate extends Component
 {
+    use HasSelectedDoctor;
+
     // آرایه فرم برای ذخیره داده‌های ورودی
     public $form = [
         'question' => '',
@@ -22,6 +25,12 @@ class DoctorFaqsCreate extends Component
      */
     public function store()
     {
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
         // تعریف قوانین اعتبارسنجی
         $validator = Validator::make($this->form, [
             'question' => 'required|string|max:255',
@@ -49,26 +58,28 @@ class DoctorFaqsCreate extends Component
         }
 
         // ایجاد سوال متداول جدید با افزودن doctor_id
-        DoctorFaq::create(array_merge($this->form, ['doctor_id' => Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id]));
+        DoctorFaq::create(array_merge($this->form, ['doctor_id' => $doctor->id]));
 
         // نمایش اعلان موفقیت و ریدایرکت
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت ایجاد شد!');
         return redirect()->route('mc.panel.doctor-faqs.index');
     }
+
     public function mount()
     {
-
-
-
+        // Check if doctor is selected
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return redirect()->route('mc.panel.doctor-faqs.index');
+        }
     }
+
     /**
      * رندر صفحه ایجاد
      */
     public function render()
     {
-
-
-
         return view('livewire.mc.panel.doctor-faqs.doctor-faqs-create');
     }
 }

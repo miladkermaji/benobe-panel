@@ -6,9 +6,12 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Validator;
 use App\Models\DoctorFaq;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorFaqsEdit extends Component
 {
+    use HasSelectedDoctor;
+
     // متغیرها برای ذخیره مدل و فرم
     public $faq;
     public $form = [];
@@ -18,10 +21,13 @@ class DoctorFaqsEdit extends Component
      */
     public function mount($id)
     {
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return redirect()->route('mc.panel.doctor-faqs.index');
+        }
 
-
-
-        $this->faq = DoctorFaq::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)->findOrFail($id);
+        $this->faq = DoctorFaq::where('doctor_id', $doctor->id)->findOrFail($id);
         $this->form = $this->faq->toArray();
     }
 
@@ -30,6 +36,12 @@ class DoctorFaqsEdit extends Component
      */
     public function update()
     {
+        $doctor = $this->getSelectedDoctor();
+        if (!$doctor) {
+            $this->dispatch('show-alert', type: 'error', message: 'هیچ پزشکی انتخاب نشده است.');
+            return;
+        }
+
         // تعریف قوانین اعتبارسنجی
         $validator = Validator::make($this->form, [
             'question' => 'required|string|max:255',
