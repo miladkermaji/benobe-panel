@@ -29,9 +29,7 @@
 .bg-primary{
   background-color: var(--primary) !important;
 }
-.myPanelOption {
-  display: none !important;
-}
+
 
 .container,
 .container-fluid {
