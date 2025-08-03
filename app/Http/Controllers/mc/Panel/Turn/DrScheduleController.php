@@ -333,15 +333,8 @@ class DrScheduleController extends Controller
         $medicalCenter = Auth::guard('medical_center')->user();
         $medicalCenterId = $medicalCenter->id;
 
-        $subUserIds = SubUser::where('owner_id', $doctor->id)
-            ->where('owner_type', \App\Models\Doctor::class)
-            ->where('subuserable_type', \App\Models\User::class)
-            ->pluck('subuserable_id')
-            ->toArray();
-
-        $appointments = Appointment::with(['patientable', 'medicalCenter'])
-            ->whereIn('patientable_id', $subUserIds)
-            ->where('patientable_type', User::class)
+        $appointments = Appointment::with(['patientable', 'medicalCenter', 'doctor'])
+            ->where('doctor_id', $doctor->id)
             ->where('medical_center_id', $medicalCenterId)
             ->orderBy('appointment_date', 'desc')
             ->paginate(10);
