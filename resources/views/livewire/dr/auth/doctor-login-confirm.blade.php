@@ -279,6 +279,8 @@
           },
           signal: ac.signal
         }).then(otp => {
+          console.log('OTP received:', otp.code); // Debug log
+
           // نمایش اعلان
           if (Notification.permission === 'granted') {
             const notification = new Notification('کد تایید جدید', {
@@ -305,21 +307,36 @@
             cancelButtonText: 'خیر'
           }).then((result) => {
             if (result.isConfirmed) {
+              console.log('User confirmed auto-fill'); // Debug log
               const inputs = document.querySelectorAll('.otp-input');
-              const code = otp.code.split('').reverse();
+              console.log('Found inputs:', inputs.length); // Debug log
+
+              const code = otp.code.split('');
+              console.log('Code array:', code); // Debug log
+
               inputs.forEach((input, index) => {
                 if (code[index]) {
+                  console.log(`Setting input ${index} to ${code[index]}`); // Debug log
+                  // Set the value directly
                   input.value = code[index];
-                  Livewire.dispatch('input', {
-                    target: {
-                      name: `otpCode.${index}`,
-                      value: code[index]
-                    }
-                  });
+                  // Trigger input event for Livewire
+                  input.dispatchEvent(new Event('input', {
+                    bubbles: true
+                  }));
+                  // Also trigger change event
+                  input.dispatchEvent(new Event('change', {
+                    bubbles: true
+                  }));
                 }
               });
-              const submitButton = document.querySelector('button[type="submit"]');
-              if (submitButton) submitButton.click();
+              // Wait a bit then submit
+              setTimeout(() => {
+                const submitButton = document.querySelector('button[type="submit"]');
+                if (submitButton) {
+                  console.log('Submitting form'); // Debug log
+                  submitButton.click();
+                }
+              }, 100);
             }
             ac.abort();
           });
