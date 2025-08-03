@@ -1,7 +1,8 @@
 @extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('mc-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet">
+<link type="text/css" href="{{ asset('mc-assets/panel/css/mc-panel.css') }}" rel="stylesheet">
+<link type="text/css" href="{{ asset('mc-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet">
 @endsection
 
 @section('site-header')

@@ -9,20 +9,20 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Controllers\Mc\Controller;
 use App\Traits\HasSelectedClinic;
+use App\Traits\HasSelectedDoctor;
 use App\Helpers\PersianNumber;
 use App\Models\MedicalCenterDepositSetting;
 
 class DoctorsClinicManagementController extends Controller
 {
     use HasSelectedClinic;
+    use HasSelectedDoctor;
 
     /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
     {
-
-
         // ارسال داده‌ها به ویو
         return view('mc.panel.doctors-clinic.index');
     }
@@ -75,7 +75,15 @@ class DoctorsClinicManagementController extends Controller
             'description.string'       => 'توضیحات باید یک رشته معتبر باشد.',
         ]);
 
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return response()->json(['message' => 'پزشک انتخاب نشده است.'], 400);
+        }
 
         $medicalCenter = MedicalCenter::create([
             'name' => $request->name,
@@ -165,7 +173,11 @@ class DoctorsClinicManagementController extends Controller
 
     public function medicalDoc()
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
         return view("mc.panel.doctors-clinic.medicalDoc", compact('doctorId'));
     }
     /**
@@ -174,7 +186,11 @@ class DoctorsClinicManagementController extends Controller
     public function deposit(Request $request)
     {
         try {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            if (Auth::guard('medical_center')->check()) {
+                $doctorId = $this->getSelectedDoctorId();
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // Get clinics with error handling
@@ -208,7 +224,11 @@ class DoctorsClinicManagementController extends Controller
     public function storeDeposit(Request $request)
     {
         try {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            if (Auth::guard('medical_center')->check()) {
+                $doctorId = $this->getSelectedDoctorId();
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
@@ -313,7 +333,11 @@ class DoctorsClinicManagementController extends Controller
     public function updateDeposit(Request $request, $id)
     {
         try {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            if (Auth::guard('medical_center')->check()) {
+                $doctorId = $this->getSelectedDoctorId();
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             // تبدیل اعداد فارسی به انگلیسی
@@ -402,7 +426,11 @@ class DoctorsClinicManagementController extends Controller
     public function destroyDeposit(Request $request, $id)
     {
         try {
-            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            if (Auth::guard('medical_center')->check()) {
+                $doctorId = $this->getSelectedDoctorId();
+            } else {
+                $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            }
             $selectedClinicId = $this->getSelectedMedicalCenterId();
 
             $deposit = MedicalCenterDepositSetting::where('id', $id)

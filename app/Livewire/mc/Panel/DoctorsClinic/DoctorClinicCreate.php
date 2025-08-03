@@ -8,9 +8,12 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorClinicCreate extends Component
 {
+    use HasSelectedDoctor;
+
     public $name;
     public $title;
     public $phone_numbers = [''];
@@ -88,7 +91,16 @@ class DoctorClinicCreate extends Component
             return;
         }
 
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            $this->dispatch('show-alert', type: 'error', message: 'پزشک انتخاب نشده است.');
+            return;
+        }
 
         $medicalCenter = MedicalCenter::create([
             'name' => $this->name,

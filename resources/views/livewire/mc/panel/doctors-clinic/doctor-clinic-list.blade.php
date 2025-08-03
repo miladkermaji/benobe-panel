@@ -239,6 +239,11 @@
         </div>
       </div>
     </div>
+    <style>
+      .myPanelOption {
+       display: flex !important;
+      }
+    </style>
     <script>
       document.addEventListener('livewire:init', function() {
         Livewire.on('show-alert', (event) => {

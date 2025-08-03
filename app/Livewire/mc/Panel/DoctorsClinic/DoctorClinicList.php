@@ -6,10 +6,12 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorClinicList extends Component
 {
     use WithPagination;
+    use HasSelectedDoctor;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -138,9 +140,17 @@ class DoctorClinicList extends Component
 
     protected function getClinicsQuery()
     {
-        $doctorId = Auth::guard('doctor')->check()
-            ? Auth::guard('doctor')->user()->id
-            : Auth::guard('secretary')->user()->doctor_id;
+        if (Auth::guard('medical_center')->check()) {
+            $doctorId = $this->getSelectedDoctorId();
+        } else {
+            $doctorId = Auth::guard('doctor')->check()
+                ? Auth::guard('doctor')->user()->id
+                : Auth::guard('secretary')->user()->doctor_id;
+        }
+
+        if (!$doctorId) {
+            return MedicalCenter::where('id', 0); // Return empty result if no doctor found
+        }
 
         return MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
             $query->where('doctor_id', $doctorId);
