@@ -26,7 +26,8 @@
       <form action="{{ route('secretary.login-confirm-form', $token) }}" method="POST">
         @csrf
         <section class="login-input-text">
-          <input type="text" name="otp_code" class="form-control" id="login-input-dr-otp" placeholder="1234">
+          <input type="text" name="otp_code" class="form-control" id="login-input-dr-otp" placeholder="1234"
+            inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="4">
           <section class="my-invalid-feedback-otp">
             @error('otp-code')
               <strong>
@@ -81,8 +82,7 @@
 @section('scripts')
   <script src="{{ asset('dr-assets/js/login.js') }}"></script>
   @php
-    $timer =
-        ((new \Carbon\Carbon($otp->created_at))->addMinutes(2)->timestamp - \Carbon\Carbon::now()->timestamp) * 1000;
+    $timer = (new \Carbon\Carbon($otp->created_at)->addMinutes(2)->timestamp - \Carbon\Carbon::now()->timestamp) * 1000;
   @endphp
 
   <script>

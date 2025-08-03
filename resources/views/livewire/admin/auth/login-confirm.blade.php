@@ -26,8 +26,9 @@
         <div class="d-flex justify-content-center mb-3 gap-4" dir="rtl">
           @for ($i = 0; $i < 4; $i++)
             <input wire:model="otpCode.{{ $i }}" inputmode="numeric" maxlength="1"
+              autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]"
               class="form-control otp-input text-center custom-rounded border"
-              style="width: 60px; height: 60px; font-size: 1.5rem;" autocomplete="one-time-code">
+              style="width: 60px; height: 60px; font-size: 1.5rem;">
           @endfor
         </div>
         @error('otpCode')

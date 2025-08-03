@@ -188,13 +188,13 @@
               <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
               <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
                 <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
+                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
                 <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
+                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
                 <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
+                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
                 <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
+                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
               </div>
               <div class="d-flex mt-3">
                 <button onclick="verifyOtpCode()"
