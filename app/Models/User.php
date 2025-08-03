@@ -16,6 +16,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Morilog\Jalali\Jalalian;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\PrescriptionRequest;
+use App\Models\Otp;
+use App\Models\LoginAttempt;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -125,5 +127,15 @@ class User extends Authenticatable implements JWTSubject
     public function subUsers()
     {
         return $this->morphMany(\App\Models\SubUser::class, 'owner');
+    }
+
+    public function otps()
+    {
+        return $this->morphMany(Otp::class, 'otpable');
+    }
+
+    public function loginAttempts()
+    {
+        return $this->morphMany(LoginAttempt::class, 'attemptable');
     }
 }

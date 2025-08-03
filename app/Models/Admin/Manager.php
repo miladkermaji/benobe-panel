@@ -57,6 +57,16 @@ class Manager extends Authenticatable implements JWTSubject
         return $this->morphMany(\App\Models\SubUser::class, 'owner');
     }
 
+    public function otps()
+    {
+        return $this->morphMany(\App\Models\Otp::class, 'otpable');
+    }
+
+    public function loginAttempts()
+    {
+        return $this->morphMany(\App\Models\LoginAttempt::class, 'attemptable');
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

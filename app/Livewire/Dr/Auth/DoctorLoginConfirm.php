@@ -108,7 +108,7 @@ class DoctorLoginConfirm extends Component
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->doctor?->mobile ?? $otp?->secretary?->mobile ?? $otp?->medicalCenter?->phone_number ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp?->otpable?->mobile ?? $otp?->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $this->dispatch('rateLimitExceeded', remainingTime: $loginAttempts->getRemainingLockTime($mobile));
@@ -122,21 +122,34 @@ class DoctorLoginConfirm extends Component
         }
 
         if ($otp->otp_code !== $otpCode) {
-            $userId = $otp->doctor_id ?? $otp->secretary_id ?? $otp->medical_center_id ?? null;
-            $loginAttempts->incrementLoginAttempt(
-                $userId,
-                $mobile,
-                $otp->doctor_id,
-                $otp->secretary_id,
-                null,
-                $otp->medical_center_id
-            );
+            // تعیین نوع کاربر برای incrementLoginAttempt
+            $userId = null;
+            $doctorId = null;
+            $secretaryId = null;
+            $managerId = null;
+            $medicalCenterId = null;
+
+            if ($otp) {
+                switch ($otp->otpable_type) {
+                    case Doctor::class:
+                        $doctorId = $otp->otpable_id;
+                        break;
+                    case Secretary::class:
+                        $secretaryId = $otp->otpable_id;
+                        break;
+                    case MedicalCenter::class:
+                        $medicalCenterId = $otp->otpable_id;
+                        break;
+                }
+            }
+
+            $loginAttempts->incrementLoginAttempt($userId, $mobile, $doctorId, $secretaryId, $managerId, $medicalCenterId);
             $this->addError('otpCode', 'کد تأیید وارد شده صحیح نیست.');
             return;
         }
 
         $otp->update(['used' => 1]);
-        $user = $otp->doctor ?? $otp->secretary ?? $otp->medicalCenter;
+        $user = $otp->otpable;
 
         if (empty($user->mobile_verified_at)) {
             $user->update(['mobile_verified_at' => Carbon::now()]);
@@ -235,7 +248,7 @@ class DoctorLoginConfirm extends Component
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp->doctor?->mobile ?? $otp->secretary?->mobile ?? $otp->medicalCenter?->phone_number ?? $otp->login_id ?? 'unknown';
+        $mobile = $otp->otpable?->mobile ?? $otp->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
 
         // بررسی قفل بودن حساب
         if ($loginAttempts->isLocked($mobile)) {
@@ -251,25 +264,24 @@ class DoctorLoginConfirm extends Component
 
         Otp::create([
             'token' => $newToken,
-            'doctor_id' => $otp->doctor_id,
-            'secretary_id' => $otp->secretary_id,
-            'medical_center_id' => $otp->medical_center_id,
             'otp_code' => $otpCode,
             'login_id' => $mobile,
             'type' => 0,
+            'otpable_type' => $otp->otpable_type,
+            'otpable_id' => $otp->otpable_id,
         ]);
 
         LoginSession::where('token', $this->token)->delete();
         LoginSession::create([
             'token' => $newToken,
-            'doctor_id' => $otp->doctor_id,
-            'secretary_id' => $otp->secretary_id,
-            'medical_center_id' => $otp->medical_center_id,
+            'doctor_id' => $otp->otpable_type === Doctor::class ? $otp->otpable_id : null,
+            'secretary_id' => $otp->otpable_type === Secretary::class ? $otp->otpable_id : null,
+            'medical_center_id' => $otp->otpable_type === MedicalCenter::class ? $otp->otpable_id : null,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
-        $user = $otp->doctor ?? $otp->secretary ?? $otp->medicalCenter;
+        $user = $otp->otpable;
         $messagesService = new MessageService(
             SmsService::create(100286, $user->mobile ?? $user->phone_number, [$otpCode])
         );

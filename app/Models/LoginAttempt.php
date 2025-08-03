@@ -10,14 +10,17 @@ class LoginAttempt extends Model
     use HasFactory;
 
     protected $fillable = [
-        'doctor_id',
-        'secretary_id',
-        'manager_id',
-        'medical_center_id',
+        'attemptable_type',
+        'attemptable_id',
         'mobile',
         'attempts',
         'last_attempt_at',
         'lockout_until',
     ];
 
+    // تبدیل به پولی مورفیک
+    public function attemptable()
+    {
+        return $this->morphTo();
+    }
 }

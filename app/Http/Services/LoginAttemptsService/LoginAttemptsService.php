@@ -3,6 +3,11 @@
 namespace App\Http\Services\LoginAttemptsService;
 
 use App\Models\LoginAttempt;
+use App\Models\User;
+use App\Models\Doctor;
+use App\Models\Secretary;
+use App\Models\Admin\Manager;
+use App\Models\MedicalCenter;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
@@ -22,18 +27,43 @@ class LoginAttemptsService
             return false;
         }
 
+        // تعیین نوع کاربر و ID مربوطه
+        $attemptableType = null;
+        $attemptableId = null;
+
+        if ($doctorId) {
+            $attemptableType = Doctor::class;
+            $attemptableId = $doctorId;
+        } elseif ($secretaryId) {
+            $attemptableType = Secretary::class;
+            $attemptableId = $secretaryId;
+        } elseif ($managerId) {
+            $attemptableType = Manager::class;
+            $attemptableId = $managerId;
+        } elseif ($medicalCenterId) {
+            $attemptableType = MedicalCenter::class;
+            $attemptableId = $medicalCenterId;
+        } elseif ($userId) {
+            $attemptableType = User::class;
+            $attemptableId = $userId;
+        }
+
         $attempt = LoginAttempt::firstOrCreate(
             ['mobile' => $mobile],
             [
-                'doctor_id' => $doctorId ?: null,
-                'secratary_id' => $secretaryId ?: null,
-                'manager_id' => $managerId ?: null,
-                'medical_center_id' => $medicalCenterId ?: null,
+                'attemptable_type' => $attemptableType,
+                'attemptable_id' => $attemptableId,
                 'attempts' => 0,
                 'last_attempt_at' => null,
                 'lockout_until' => null
             ]
         );
+
+        // به‌روزرسانی نوع کاربر در صورت تغییر
+        if ($attemptableType && $attemptableId) {
+            $attempt->attemptable_type = $attemptableType;
+            $attempt->attemptable_id = $attemptableId;
+        }
 
         // بررسی قفل فعلی
         if ($attempt->lockout_until && $attempt->lockout_until > now()) {
@@ -45,11 +75,6 @@ class LoginAttemptsService
             $attempt->attempts = 2;
             $attempt->lockout_until = null;
         }
-
-        $attempt->doctor_id = $doctorId ?: null;
-        $attempt->secratary_id = $secretaryId ?: null;
-        $attempt->manager_id = $managerId ?: null;
-        $attempt->medical_center_id = $medicalCenterId ?: null;
 
         $attempt->attempts++;
         $attempt->last_attempt_at = now();
@@ -163,18 +188,17 @@ class LoginAttemptsService
         Cache::forget(self::CACHE_PREFIX . $mobile);
     }
 
-    // محاسبه زمان قفل بر اساس تعداد تلاش‌ها
     private function calculateLockDuration($attempts)
     {
-        return match ($attempts) {
-            3 => 5,      // 5 minutes
-            4 => 15,     // 15 minutes
-            5 => 30,     // 30 minutes
-            6 => 60,     // 1 hour
-            7 => 120,    // 2 hours
-            8 => 240,    // 4 hours
-            9 => 480,    // 8 hours
-            default => 1440 // 24 hours
-        };
+        // افزایش مدت قفل با افزایش تعداد تلاش‌ها
+        if ($attempts >= 10) {
+            return 60; // 1 ساعت
+        } elseif ($attempts >= 7) {
+            return 30; // 30 دقیقه
+        } elseif ($attempts >= 5) {
+            return 15; // 15 دقیقه
+        } else {
+            return 5; // 5 دقیقه
+        }
     }
 }

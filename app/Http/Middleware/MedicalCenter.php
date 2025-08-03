@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -12,7 +13,7 @@ class MedicalCenter
     public function handle(Request $request, Closure $next): Response
     {
         // إضافة logging للتأكد من حالة المستخدم
-        \Log::info("MedicalCenter middleware check", [
+        Log::info("MedicalCenter middleware check", [
             'manager_check' => Auth::guard('manager')->check(),
             'doctor_check' => Auth::guard('doctor')->check(),
             'secretary_check' => Auth::guard('secretary')->check(),
@@ -28,7 +29,7 @@ class MedicalCenter
 
         // چک کردن گارد دکتر، منشی یا مرکز درمانی
         if (!Auth::guard('doctor')->check() && !Auth::guard('secretary')->check() && !Auth::guard('medical_center')->check()) {
-            \Log::info("No authenticated user found, redirecting to login");
+            Log::info("No authenticated user found, redirecting to login");
             return redirect()->to(route('dr.auth.login-register-form'));
         }
 

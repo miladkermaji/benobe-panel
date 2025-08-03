@@ -27,6 +27,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\Service;
 use App\Models\PrescriptionRequest;
+use App\Models\Otp;
+use App\Models\LoginAttempt;
 
 class Doctor extends Authenticatable implements JWTSubject
 {
@@ -472,12 +474,22 @@ class Doctor extends Authenticatable implements JWTSubject
         return $this->morphMany(PrescriptionRequest::class, 'requestable');
     }
 
+    public function otps()
+    {
+        return $this->morphMany(Otp::class, 'otpable');
+    }
+
+    public function loginAttempts()
+    {
+        return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
+
     /**
      * Compatibility: legacy code expects $doctor->clinics or $doctor->clinics()
      */
     public function clinics()
     {
-        return $this->medicalCenters();
+        return $this->belongsToMany(MedicalCenter::class, 'doctor_medical_center', 'doctor_id', 'medical_center_id');
     }
 
     /**

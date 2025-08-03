@@ -187,9 +187,21 @@ class MedicalCenter extends Authenticatable
      */
     public function setSelectedDoctor($doctorId = null)
     {
-        $this->selectedDoctor()->updateOrCreate(
-            ['medical_center_id' => $this->id],
-            ['doctor_id' => $doctorId]
-        );
+        if ($doctorId) {
+            $this->selected_doctor_id = $doctorId;
+        } else {
+            $this->selected_doctor_id = null;
+        }
+        $this->save();
+    }
+
+    public function otps()
+    {
+        return $this->morphMany(Otp::class, 'otpable');
+    }
+
+    public function loginAttempts()
+    {
+        return $this->morphMany(LoginAttempt::class, 'attemptable');
     }
 }

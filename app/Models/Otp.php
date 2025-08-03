@@ -16,24 +16,9 @@ class Otp extends Model
 
     protected $guarded = ['id'];
 
-    public function doctor()
+    // تبدیل به پولی مورفیک
+    public function otpable()
     {
-        return $this->belongsTo(Doctor::class);
-    }
-    public function manager()
-    {
-        return $this->belongsTo(Manager::class);
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    public function secretary()
-    {
-        return $this->belongsTo(Secretary::class);
-    }
-    public function medicalCenter()
-    {
-        return $this->belongsTo(MedicalCenter::class);
+        return $this->morphTo();
     }
 }

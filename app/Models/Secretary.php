@@ -94,4 +94,14 @@ class Secretary extends Authenticatable implements JWTSubject
     {
         return $this->belongsTo(Manager::class);
     }
+
+    public function otps()
+    {
+        return $this->morphMany(Otp::class, 'otpable');
+    }
+
+    public function loginAttempts()
+    {
+        return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
 }

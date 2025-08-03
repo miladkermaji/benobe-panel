@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Services\UserTypeDetectionService;
 
 class DoctorLoginUserPass extends Component
 {
@@ -88,16 +89,15 @@ class DoctorLoginUserPass extends Component
             }
         }
 
-        $doctor = Doctor::where('mobile', $formattedMobile)->first();
-        $secretary = Secretary::where('mobile', $formattedMobile)->first();
-        $medicalCenter = MedicalCenter::where('phone_number', $formattedMobile)->first();
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserTypeForDoctorOnly($formattedMobile);
 
-        if (!$doctor && !$secretary && !$medicalCenter) {
+        if (!$userInfo['model']) {
             $this->addError('password', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $doctor ?? $secretary ?? $medicalCenter;
+        $user = $userInfo['model'];
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
         if (($user->static_password_enabled ?? 0) !== 1) {
@@ -106,14 +106,21 @@ class DoctorLoginUserPass extends Component
         }
 
         // بررسی وضعیت حساب
-        if ($user->status !== 1 || ($user instanceof MedicalCenter && !$user->is_active)) {
+        if (!$userInfo['is_active']) {
             $this->addError('password', 'حساب کاربری شما غیرفعال است.');
             return;
         }
 
         // بررسی رمز عبور
         if (!Hash::check($this->password, $user->password)) {
-            $loginAttempts->incrementLoginAttempt($user->id, $formattedMobile, $doctor ? $doctor->id : null, $secretary ? $secretary->id : null, null, $medicalCenter ? $medicalCenter->id : null);
+            $loginAttempts->incrementLoginAttempt(
+                $userInfo['type'] === 'user' ? $userInfo['model_id'] : null,
+                $formattedMobile,
+                $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'manager' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null
+            );
             $this->addError('password', 'رمز عبور نادرست است.');
             $this->dispatch('password-error');
             return;
@@ -127,9 +134,9 @@ class DoctorLoginUserPass extends Component
             $token = Str::random(60);
             LoginSession::create([
                 'token' => $token,
-                'doctor_id' => $doctor ? $user->id : null,
-                'secretary_id' => $secretary ? $user->id : null,
-                'medical_center_id' => $medicalCenter ? $user->id : null,
+                'doctor_id' => $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
+                'secretary_id' => $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
+                'medical_center_id' => $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null,
                 'step' => 2,
                 'expires_at' => now()->addMinutes(10),
             ]);
@@ -137,12 +144,11 @@ class DoctorLoginUserPass extends Component
             $otpCode = rand(1000, 9999);
             Otp::create([
                 'token' => $token,
-                'doctor_id' => $doctor ? $user->id : null,
-                'secretary_id' => $secretary ? $user->id : null,
-                'medical_center_id' => $medicalCenter ? $user->id : null,
                 'otp_code' => $otpCode,
                 'login_id' => $user->mobile ?? $user->phone_number,
                 'type' => 0,
+                'otpable_type' => $userInfo['model_class'],
+                'otpable_id' => $userInfo['model_id'],
             ]);
 
             $messagesService = new MessageService(SmsService::create(100286, $user->mobile ?? $user->phone_number, [$otpCode]));
@@ -159,9 +165,9 @@ class DoctorLoginUserPass extends Component
         $token = Str::random(60);
         LoginSession::create([
             'token' => $token,
-            'doctor_id' => $doctor ? $user->id : null,
-            'secretary_id' => $secretary ? $user->id : null,
-            'medical_center_id' => $medicalCenter ? $user->id : null,
+            'doctor_id' => $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
+            'secretary_id' => $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
+            'medical_center_id' => $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null,
             'step' => 3,
             'expires_at' => now()->addMinutes(10),
         ]);

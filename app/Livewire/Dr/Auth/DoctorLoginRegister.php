@@ -15,6 +15,7 @@ use App\Services\NotificationService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Services\UserTypeDetectionService;
 
 class DoctorLoginRegister extends Component
 {
@@ -68,24 +69,22 @@ class DoctorLoginRegister extends Component
             'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
-        $formattedMobile = '0' . $mobile;
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserTypeForDoctorOnly($this->mobile);
+        $formattedMobile = $userTypeDetection->formatMobile($this->mobile);
 
-        $doctor = Doctor::where('mobile', $formattedMobile)->first();
-        $secretary = Secretary::where('mobile', $formattedMobile)->first();
-        $medicalCenter = MedicalCenter::where('phone_number', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
         // بررسی وجود کاربر
-        if (!$doctor && !$secretary && !$medicalCenter) {
+        if (!$userInfo['model']) {
             $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $doctor ?? $secretary ?? $medicalCenter;
+        $user = $userInfo['model'];
 
         // بررسی وضعیت کاربر
-        if ($user->status === 0 || ($user instanceof MedicalCenter && !$user->is_active)) {
+        if (!$userInfo['is_active']) {
             $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
         }
@@ -112,19 +111,18 @@ class DoctorLoginRegister extends Component
 
         Otp::create([
             'token' => $token,
-            'doctor_id' => $doctor ? $doctor->id : null,
-            'secretary_id' => $secretary ? $secretary->id : null,
-            'medical_center_id' => $medicalCenter ? $medicalCenter->id : null,
             'otp_code' => $otpCode,
             'login_id' => $user->mobile ?? $user->phone_number,
             'type' => 0,
+            'otpable_type' => $userInfo['model_class'],
+            'otpable_id' => $userInfo['model_id'],
         ]);
 
         LoginSession::create([
             'token' => $token,
-            'doctor_id' => $doctor ? $doctor->id : null,
-            'secretary_id' => $secretary ? $secretary->id : null,
-            'medical_center_id' => $medicalCenter ? $medicalCenter->id : null,
+            'doctor_id' => $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
+            'secretary_id' => $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
+            'medical_center_id' => $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);

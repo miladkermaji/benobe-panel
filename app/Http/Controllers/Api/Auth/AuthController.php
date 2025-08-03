@@ -12,6 +12,7 @@ use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Http\Request;
 use App\Models\Admin\Manager;
+use App\Models\MedicalCenter;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -22,6 +23,7 @@ use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Services\UserTypeDetectionService;
 
 class AuthController extends Controller
 {
@@ -71,51 +73,39 @@ class AuthController extends Controller
             'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile = preg_replace('/^(\+98|98|0)/', '', $request->mobile);
-        $formattedMobile = '0' . $mobile;
-
-        // بررسی وجود شماره موبایل در جداول مختلف
-        $user = User::where('mobile', $formattedMobile)->first();
-        $doctor = Doctor::where('mobile', $formattedMobile)->first();
-        $secretary = Secretary::where('mobile', $formattedMobile)->first();
-        $manager = Manager::where('mobile', $formattedMobile)->first();
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserType($request->mobile);
+        $formattedMobile = $userTypeDetection->formatMobile($request->mobile);
 
         $loginAttempts = new LoginAttemptsService();
 
-        // تعیین نوع کاربر و مدل مربوطه
-        if ($doctor) {
-            $existingUser = $doctor;
-            $userType = 'doctor';
-            $otpData = [
-                'doctor_id' => $doctor->id,
+        // اگر کاربر یافت نشد، در جدول users ثبت شود
+        if (!$userInfo['model']) {
+            $user = User::create([
+                'mobile' => $formattedMobile,
+                'status' => 1,
+            ]);
+            $userInfo = [
+                'type' => 'user',
+                'model' => $user,
+                'model_class' => User::class,
+                'model_id' => $user->id,
+                'is_active' => true,
             ];
-        } elseif ($secretary) {
-            $existingUser = $secretary;
-            $userType = 'secretary';
-            $otpData = [
-                'secretary_id' => $secretary->id,
-            ];
-        } elseif ($manager) {
-            $existingUser = $manager;
-            $userType = 'manager';
-            $otpData = [
-                'manager_id' => $manager->id,
-            ];
-        } else {
-            // اگر کاربر در هیچ جدولی نبود، در جدول users ثبت شود
-            if (!$user) {
-                $user = User::create([
-                    'mobile' => $formattedMobile,
-                    'status' => 1,
-                ]);
-            } elseif ($user->status === 0) {
-                $user->update(['status' => 1]);
-            }
-            $existingUser = $user;
-            $userType = 'user';
-            $otpData = [
-                'user_id' => $user->id,
-            ];
+        } elseif (!$userInfo['is_active']) {
+            $loginAttempts->incrementLoginAttempt(
+                $userInfo['model_id'],
+                $formattedMobile,
+                $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'manager' ? $userInfo['model_id'] : null,
+                $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null
+            );
+            return response()->json([
+                'status' => 'error',
+                'message' => 'حساب کاربری شما هنوز تأیید نشده است.',
+                'data' => null,
+            ], 422);
         }
 
         if ($loginAttempts->isLocked($formattedMobile)) {
@@ -134,19 +124,21 @@ class AuthController extends Controller
         $otpCode = rand(1000, 9999);
         $token = Str::random(60);
 
-        // ایجاد رکورد OTP با کلید خارجی مناسب
-        Otp::create(array_merge([
+        // ایجاد رکورد OTP با ساختار پولی مورفیک
+        Otp::create([
             'token' => $token,
             'otp_code' => $otpCode,
             'login_id' => $formattedMobile,
             'type' => 0, // 0 برای شماره موبایل
             'used' => 0,
             'status' => 0,
-        ], $otpData));
+            'otpable_type' => $userInfo['model_class'],
+            'otpable_id' => $userInfo['model_id'],
+        ]);
 
         LoginSession::create([
             'token' => $token,
-            'user_id' => $user ? $user->id : null, // فقط برای کاربران جدول users
+            'user_id' => $userInfo['type'] === 'user' ? $userInfo['model_id'] : null,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
@@ -215,7 +207,7 @@ class AuthController extends Controller
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile        = $otp?->user?->mobile ?? $otp?->login_id ?? 'unknown';
+        $mobile = $otp?->otpable?->mobile ?? $otp?->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
@@ -231,9 +223,34 @@ class AuthController extends Controller
         }
 
         if (!$otp || $otp->otp_code !== $request->otpCode) {
-            $userId = $otp->user_id ?? $otp->doctor_id ?? $otp->secretary_id ?? $otp->manager_id ?? null;
-            $userType = $otp->user_id ? 'user' : ($otp->doctor_id ? 'doctor' : ($otp->secretary_id ? 'secretary' : ($otp->manager_id ? 'manager' : 'unknown')));
-            $loginAttempts->incrementLoginAttempt($userId, $mobile, $userType, '', '');
+            // تعیین نوع کاربر برای incrementLoginAttempt
+            $userId = null;
+            $doctorId = null;
+            $secretaryId = null;
+            $managerId = null;
+            $medicalCenterId = null;
+
+            if ($otp) {
+                switch ($otp->otpable_type) {
+                    case User::class:
+                        $userId = $otp->otpable_id;
+                        break;
+                    case Doctor::class:
+                        $doctorId = $otp->otpable_id;
+                        break;
+                    case Secretary::class:
+                        $secretaryId = $otp->otpable_id;
+                        break;
+                    case Manager::class:
+                        $managerId = $otp->otpable_id;
+                        break;
+                    case MedicalCenter::class:
+                        $medicalCenterId = $otp->otpable_id;
+                        break;
+                }
+            }
+
+            $loginAttempts->incrementLoginAttempt($userId, $mobile, $doctorId, $secretaryId, $managerId, $medicalCenterId);
             return response()->json(['status' => 'error', 'message' => 'کد تأیید وارد شده صحیح نیست.', 'data' => null], 422);
         }
 
@@ -243,22 +260,30 @@ class AuthController extends Controller
         $guard = null;
         $userType = '';
 
-        if ($otp->doctor_id) {
-            $user = Doctor::find($otp->doctor_id);
-            $guard = 'doctor-api';
-            $userType = 'doctor';
-        } elseif ($otp->secretary_id) {
-            $user = Secretary::find($otp->secretary_id);
-            $guard = 'secretary-api';
-            $userType = 'secretary';
-        } elseif ($otp->manager_id) {
-            $user = Manager::find($otp->manager_id);
-            $guard = 'manager-api';
-            $userType = 'manager';
-        } elseif ($otp->user_id) {
-            $user = User::find($otp->user_id);
-            $guard = 'api';
-            $userType = 'user';
+        // استفاده از رابطه پولی مورفیک
+        if ($otp->otpable) {
+            $user = $otp->otpable;
+
+            $userTypeDetection = new UserTypeDetectionService();
+            $guard = $userTypeDetection->getGuardByType($otp->otpable_type);
+
+            switch ($otp->otpable_type) {
+                case Doctor::class:
+                    $userType = 'doctor';
+                    break;
+                case Secretary::class:
+                    $userType = 'secretary';
+                    break;
+                case Manager::class:
+                    $userType = 'manager';
+                    break;
+                case User::class:
+                    $userType = 'user';
+                    break;
+                case MedicalCenter::class:
+                    $userType = 'medical_center';
+                    break;
+            }
         }
 
         if (!$user) {
@@ -333,7 +358,7 @@ class AuthController extends Controller
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile        = $otp->user?->mobile ?? $otp->login_id ?? 'unknown';
+        $mobile        = $otp->otpable?->mobile ?? $otp->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
@@ -353,22 +378,23 @@ class AuthController extends Controller
 
         Otp::create([
             'token'    => $newToken,
-            'user_id'  => $otp->user_id,
             'otp_code' => $otpCode,
-            'login_id' => $otp->user->mobile,
+            'login_id' => $otp->otpable->mobile ?? $otp->otpable->phone_number,
             'type'     => 0,
+            'otpable_type' => $otp->otpable_type,
+            'otpable_id' => $otp->otpable_id,
         ]);
 
         LoginSession::where('token', $token)->delete();
         LoginSession::create([
             'token'      => $newToken,
-            'user_id'    => $otp->user_id,
+            'user_id'    => $otp->otpable_type === User::class ? $otp->otpable_id : null,
             'step'       => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100286, $otp->user->mobile, [$otpCode])
+            SmsService::create(100286, $otp->otpable->mobile ?? $otp->otpable->phone_number, [$otpCode])
         );
         $messagesService->send();
 

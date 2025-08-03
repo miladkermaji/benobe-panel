@@ -14,6 +14,7 @@ use App\Services\NotificationService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Services\UserTypeDetectionService;
 
 class LoginRegister extends Component
 {
@@ -60,29 +61,29 @@ class LoginRegister extends Component
             'mobile.regex' => 'شماره موبایل باید فرمت معتبر داشته باشد (مثلاً 09181234567).',
         ]);
 
-        $mobile = preg_replace('/^(\+98|98|0)/', '', $this->mobile);
-        $formattedMobile = '0' . $mobile;
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserTypeForAdminOnly($this->mobile);
+        $formattedMobile = $userTypeDetection->formatMobile($this->mobile);
 
-        $manager = Manager::where('mobile', $formattedMobile)->first();
         $loginAttempts = new LoginAttemptsService();
 
-        // بررسی وجود کاربر
-        if (!$manager) {
+        // بررسی وجود کاربر (فقط مدیر)
+        if (!$userInfo['model']) {
             $loginAttempts->incrementLoginAttempt(null, $formattedMobile, null, null, null);
             $this->addError('mobile', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $manager;
+        $user = $userInfo['model'];
 
         // بررسی وضعیت کاربر
-        if ($user->status === 0) {
+        if (!$userInfo['is_active']) {
             $loginAttempts->incrementLoginAttempt(
-                $user->id,
+                $userInfo['model_id'],
                 $formattedMobile,
                 null,
                 null,
-                $manager ? $manager->id : null
+                $userInfo['model_id']
             );
             $this->addError('mobile', 'حساب کاربری شما هنوز تأیید نشده است.');
             return;
@@ -110,15 +111,16 @@ class LoginRegister extends Component
 
         Otp::create([
             'token' => $token,
-            'manager_id' => $manager ? $user->id : null,
             'otp_code' => $otpCode,
             'login_id' => $user->mobile,
             'type' => 0,
+            'otpable_type' => $userInfo['model_class'],
+            'otpable_id' => $userInfo['model_id'],
         ]);
 
         LoginSession::create([
             'token' => $token,
-            'manager_id' => $manager ? $user->id : null,
+            'manager_id' => $userInfo['model_id'],
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);

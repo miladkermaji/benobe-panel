@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
+use App\Services\UserTypeDetectionService;
 
 class LoginUserPass extends Component
 {
@@ -85,14 +86,15 @@ class LoginUserPass extends Component
             }
         }
 
-        $manager = Manager::where('mobile', $formattedMobile)->first();
+        $userTypeDetection = new UserTypeDetectionService();
+        $userInfo = $userTypeDetection->detectUserTypeForAdminOnly($formattedMobile);
 
-        if (!$manager) {
+        if (!$userInfo['model']) {
             $this->addError('password', 'کاربری با این شماره موبایل وجود ندارد.');
             return;
         }
 
-        $user = $manager;
+        $user = $userInfo['model'];
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
         if (($user->static_password_enabled ?? 0) !== 1) {
@@ -101,7 +103,7 @@ class LoginUserPass extends Component
         }
 
         // بررسی وضعیت حساب
-        if ($user->status !== 1) {
+        if (!$userInfo['is_active']) {
             $this->addError('password', 'حساب کاربری شما غیرفعال است.');
             return;
         }
@@ -109,11 +111,11 @@ class LoginUserPass extends Component
         // بررسی رمز عبور
         if (!Hash::check($this->password, $user->password)) {
             $loginAttempts->incrementLoginAttempt(
-                $user->id,
+                null,
                 $formattedMobile,
                 null,
                 null,
-                $manager ? $manager->id : null,
+                $userInfo['model_id']
             );
 
             $this->addError('password', 'رمز عبور نادرست است.');
@@ -128,7 +130,7 @@ class LoginUserPass extends Component
             $token = Str::random(60);
             LoginSession::create([
                 'token' => $token,
-                'manager_id' => $manager ? $user->id : null,
+                'manager_id' => $userInfo['model_id'],
                 'step' => 2,
                 'expires_at' => now()->addMinutes(10),
             ]);
@@ -136,10 +138,11 @@ class LoginUserPass extends Component
             $otpCode = rand(1000, 9999);
             Otp::create([
                 'token' => $token,
-                'manager_id' => $manager ? $user->id : null,
                 'otp_code' => $otpCode,
                 'login_id' => $user->mobile,
                 'type' => 0,
+                'otpable_type' => $userInfo['model_class'],
+                'otpable_id' => $userInfo['model_id'],
             ]);
 
             $messagesService = new MessageService(
@@ -158,7 +161,7 @@ class LoginUserPass extends Component
         $token = Str::random(60);
         LoginSession::create([
             'token' => $token,
-            'manager_id' => $manager ? $user->id : null,
+            'manager_id' => $userInfo['model_id'],
             'step' => 3,
             'expires_at' => now()->addMinutes(10),
         ]);
