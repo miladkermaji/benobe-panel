@@ -1,52 +1,20 @@
 <?php
-
-use App\Livewire\Admin\Auth\Logout;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Livewire\Admin\Auth\TwoFactor;
-use App\Livewire\Dr\Auth\DoctorLogout;
-use Illuminate\Support\Facades\Storage;
-use App\Livewire\Admin\Auth\LoginConfirm;
-use App\Livewire\Dr\Auth\DoctorTwoFactor;
-use App\Livewire\Admin\Auth\LoginRegister;
-use App\Livewire\Admin\Auth\LoginUserPass;
-use App\Livewire\Dr\Auth\DoctorLoginConfirm;
-use App\Livewire\Dr\Auth\DoctorLoginRegister;
-use App\Livewire\Dr\Auth\DoctorLoginUserPass;
 use App\Http\Controllers\Mc\Panel\McPanelController;
 use App\Http\Controllers\Mc\Panel\Bime\DRBimeController;
 use App\Livewire\Mc\Panel\Payment\WalletChargeComponent;
-use App\Http\Controllers\Admin\Panel\Users\UserController;
-use Modules\SendOtp\App\Http\Controllers\SendOtpController;
 use App\Http\Controllers\Mc\Panel\Profile\SubUserController;
 use App\Http\Controllers\Mc\Panel\Tickets\TicketsController;
-use App\Http\Controllers\Mc\Panel\Turn\DrScheduleController;
 use App\Http\Controllers\Mc\Panel\Profile\DrProfileController;
 use App\Http\Controllers\Mc\Panel\Profile\LoginLogsController;
-use App\Http\Controllers\Admin\Panel\UserSubscriptionController;
-use App\Http\Controllers\Mc\Panel\DoctorFaqs\DoctorFaqController;
-use App\Http\Controllers\Admin\Panel\UserAppointmentFeeController;
-use App\Http\Controllers\Admin\Panel\UserMembershipPlanController;
 use App\Http\Controllers\Mc\Panel\Tickets\TicketResponseController;
-use App\Http\Controllers\Admin\Panel\Profile\AdminProfileController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapController;
 use App\Http\Controllers\Mc\Panel\Profile\DrUpgradeProfileController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\AppointmentController;
-use App\Http\Controllers\Admin\Panel\Tools\Redirect\RedirectController;
-use App\Http\Controllers\Admin\Panel\Dashboard\AdminDashboardController;
 use App\Http\Controllers\Mc\Panel\MyPerformance\MyPerformanceController;
-use App\Http\Controllers\Mc\Panel\DoctorServices\DoctorServicesController;
 use App\Http\Controllers\Mc\Panel\PatientRecords\PatientRecordsController;
 use App\Http\Controllers\Mc\Panel\Secretary\SecretaryManagementController;
-use App\Http\Controllers\Admin\Panel\Tools\NewsLatter\NewsLatterController;
-use App\Http\Controllers\Admin\Panel\Tools\SmsGateway\SmsGatewayController;
 use App\Http\Controllers\Mc\Panel\Comunication\DoctorSendMessageController;
-use App\Http\Controllers\Admin\Panel\Tools\FileManager\FileManagerController;
-use App\Http\Controllers\Admin\Panel\Tools\PageBuilder\PageBuilderController;
-use App\Http\Controllers\Admin\Panel\Tools\SiteMap\SitemapSettingsController;
 use App\Http\Controllers\Mc\Panel\Payment\Setting\DrPaymentSettingController;
-use App\Http\Controllers\Admin\Panel\Tools\MailTemplate\MailTemplateController;
-use App\Http\Controllers\Admin\Panel\Tools\Notification\NotificationController;
 use App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Cost\CostController;
 use App\Http\Controllers\Mc\Panel\Turn\TurnsCatByDays\TurnsCatByDaysController;
 use App\Http\Controllers\Mc\Panel\NoskheElectronic\Providers\ProvidersController;
@@ -55,12 +23,10 @@ use App\Http\Controllers\Mc\Panel\DoctorsClinic\DoctorsClinicManagementControlle
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ManualNobat\ManualNobatController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\VacationController;
 use App\Http\Controllers\Mc\Panel\SecretaryPermission\SecretaryPermissionController;
-use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysController;
 use App\Http\Controllers\Mc\Panel\NoskheElectronic\Favorite\Service\ServiceController;
 use App\Http\Controllers\mc\Panel\Turn\DrScheduleController as McDrScheduleController;
 use App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Duration\DurationController;
 use App\Http\Controllers\Mc\Panel\NoskheElectronic\Prescription\PrescriptionController;
-use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereWaiting\MoshavereWaitingController;
 use App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\ActivationDoctorsClinicController;
@@ -71,7 +37,6 @@ use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCo
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
-
 // dr routes
 Route::prefix('mc')
     ->namespace('Mc')
@@ -80,11 +45,8 @@ Route::prefix('mc')
             Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorComments\DoctorCommentController::class, 'index'])->name('mc.panel.doctor-comments.index');
         });
         Route::prefix('panel')->middleware(['medical_center'])->group(function () {
-
             Route::get('mc/panel', [McPanelController::class, 'index'])->name('mc-panel');
-
             Route::get('/', [McPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('mc-panel');
-
             Route::prefix('doctor-services')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('mc.panel.doctor-services.index');
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('mc.panel.doctor-services.create');
