@@ -4,6 +4,9 @@ namespace App\Models;
 
 use App\Models\Doctor;
 use App\Models\Admin\Manager;
+use App\Models\Otp;
+use App\Models\LoginAttempt;
+use App\Models\LoginSession;
 use Illuminate\Database\Eloquent\Model;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -103,5 +106,10 @@ class Secretary extends Authenticatable implements JWTSubject
     public function loginAttempts()
     {
         return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
+
+    public function loginSessions()
+    {
+        return $this->morphMany(LoginSession::class, 'sessionable');
     }
 }

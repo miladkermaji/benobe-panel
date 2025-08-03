@@ -127,7 +127,8 @@ class AuthController extends Controller
 
         LoginSession::create([
             'token' => $token,
-            'user_id' => $userInfo['type'] === 'user' ? $userInfo['model_id'] : null,
+            'sessionable_type' => $userInfo['model_class'],
+            'sessionable_id' => $userInfo['model_id'],
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
@@ -375,7 +376,8 @@ class AuthController extends Controller
         LoginSession::where('token', $token)->delete();
         LoginSession::create([
             'token'      => $newToken,
-            'user_id'    => $otp->otpable_type === User::class ? $otp->otpable_id : null,
+            'sessionable_type' => $otp->otpable_type,
+            'sessionable_id' => $otp->otpable_id,
             'step'       => 2,
             'expires_at' => now()->addMinutes(10),
         ]);

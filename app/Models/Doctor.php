@@ -29,6 +29,7 @@ use App\Models\Service;
 use App\Models\PrescriptionRequest;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
+use App\Models\LoginSession;
 
 class Doctor extends Authenticatable implements JWTSubject
 {
@@ -482,6 +483,11 @@ class Doctor extends Authenticatable implements JWTSubject
     public function loginAttempts()
     {
         return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
+
+    public function loginSessions()
+    {
+        return $this->morphMany(LoginSession::class, 'sessionable');
     }
 
     /**

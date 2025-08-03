@@ -130,7 +130,8 @@ class LoginUserPass extends Component
             $token = Str::random(60);
             LoginSession::create([
                 'token' => $token,
-                'manager_id' => $userInfo['model_id'],
+                'sessionable_type' => $userInfo['model_class'],
+                'sessionable_id' => $userInfo['model_id'],
                 'step' => 2,
                 'expires_at' => now()->addMinutes(10),
             ]);
@@ -161,7 +162,8 @@ class LoginUserPass extends Component
         $token = Str::random(60);
         LoginSession::create([
             'token' => $token,
-            'manager_id' => $userInfo['model_id'],
+            'sessionable_type' => $userInfo['model_class'],
+            'sessionable_id' => $userInfo['model_id'],
             'step' => 3,
             'expires_at' => now()->addMinutes(10),
         ]);

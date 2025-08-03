@@ -120,7 +120,8 @@ class LoginRegister extends Component
 
         LoginSession::create([
             'token' => $token,
-            'manager_id' => $userInfo['model_id'],
+            'sessionable_type' => $userInfo['model_class'],
+            'sessionable_id' => $userInfo['model_id'],
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);

@@ -18,6 +18,7 @@ use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Models\PrescriptionRequest;
 use App\Models\Otp;
 use App\Models\LoginAttempt;
+use App\Models\LoginSession;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -137,5 +138,10 @@ class User extends Authenticatable implements JWTSubject
     public function loginAttempts()
     {
         return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
+
+    public function loginSessions()
+    {
+        return $this->morphMany(LoginSession::class, 'sessionable');
     }
 }

@@ -8,6 +8,9 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Otp;
+use App\Models\LoginAttempt;
+use App\Models\LoginSession;
 
 class MedicalCenter extends Authenticatable
 {
@@ -203,5 +206,10 @@ class MedicalCenter extends Authenticatable
     public function loginAttempts()
     {
         return $this->morphMany(LoginAttempt::class, 'attemptable');
+    }
+
+    public function loginSessions()
+    {
+        return $this->morphMany(LoginSession::class, 'sessionable');
     }
 }

@@ -120,9 +120,8 @@ class DoctorLoginRegister extends Component
 
         LoginSession::create([
             'token' => $token,
-            'doctor_id' => $userInfo['type'] === 'doctor' ? $userInfo['model_id'] : null,
-            'secretary_id' => $userInfo['type'] === 'secretary' ? $userInfo['model_id'] : null,
-            'medical_center_id' => $userInfo['type'] === 'medical_center' ? $userInfo['model_id'] : null,
+            'sessionable_type' => $userInfo['model_class'],
+            'sessionable_id' => $userInfo['model_id'],
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);

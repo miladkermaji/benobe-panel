@@ -7,5 +7,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class LoginSession extends Model
 {
-    protected $fillable = ['token', 'manager_id','user_id', 'secretary_id', 'doctor_id', 'step', 'expires_at'];
+    protected $fillable = [
+        'token',
+        'sessionable_type',
+        'sessionable_id',
+        'step',
+        'expires_at'
+    ];
+
+    // تبدیل به پولی مورفیک
+    public function sessionable()
+    {
+        return $this->morphTo();
+    }
 }

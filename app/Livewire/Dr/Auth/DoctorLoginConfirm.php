@@ -265,18 +265,16 @@ class DoctorLoginConfirm extends Component
         Otp::create([
             'token' => $newToken,
             'otp_code' => $otpCode,
-            'login_id' => $mobile,
+            'login_id' => $otp->login_id,
             'type' => 0,
             'otpable_type' => $otp->otpable_type,
             'otpable_id' => $otp->otpable_id,
         ]);
 
-        LoginSession::where('token', $this->token)->delete();
         LoginSession::create([
             'token' => $newToken,
-            'doctor_id' => $otp->otpable_type === Doctor::class ? $otp->otpable_id : null,
-            'secretary_id' => $otp->otpable_type === Secretary::class ? $otp->otpable_id : null,
-            'medical_center_id' => $otp->otpable_type === MedicalCenter::class ? $otp->otpable_id : null,
+            'sessionable_type' => $otp->otpable_type,
+            'sessionable_id' => $otp->otpable_id,
             'step' => 2,
             'expires_at' => now()->addMinutes(10),
         ]);
