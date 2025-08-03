@@ -240,7 +240,7 @@ button {
     border-radius: var(--radius-card);
     position: relative;
     overflow: hidden;
-    animation: fadeInUp 0.6s ease-out;
+
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(10px);
 }
