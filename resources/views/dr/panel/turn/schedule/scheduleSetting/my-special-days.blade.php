@@ -1,4 +1,4 @@
-@extends('mc.panel.layouts.master')
+@extends('dr.panel.layouts.master')
 @section('styles')
   <link type="text/css" href="{{ asset('mc-assets/panel/css/panel.css') }}" rel="stylesheet" />
 
@@ -17,7 +17,7 @@
 <script src="{{ asset('mc-assets/panel/js/home/bootstrap/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 
-@livewire('mc.panel.turn.schedule.special-days-appointment')
+@livewire('dr.panel.turn.schedule.special-days-appointment')
 <script src="{{ asset('mc-assets/panel/js/jalali-moment/dist/jalali-moment.browser.js') }}"></script>
 <script src="{{ asset('mc-assets/panel/js/calendar/special-days-calendar.js') }}"></script>
 @endsection

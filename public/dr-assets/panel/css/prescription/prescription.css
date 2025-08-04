@@ -626,10 +626,7 @@ body {
         font-size: 0.75rem;
     }
 }
-/* مخفی کردن گزینه‌های پنل */
-.myPanelOption {
-    display: none !important;
-}
+
 /* استایل کارت‌های موبایل برای یادداشت‌ها */
 .notes-cards {
     display: none;

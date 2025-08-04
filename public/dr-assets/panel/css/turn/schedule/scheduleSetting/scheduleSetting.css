@@ -181,10 +181,6 @@ body {
   line-height: 1.5; /* فاصله خطوط بیشتر */
 }
 
-.myPanelOption,
-.floating-panel-btn {
-  display: none !important;
-}
 
 /* ریسپانسیو */
 @media only screen and (max-width: 991px) {
