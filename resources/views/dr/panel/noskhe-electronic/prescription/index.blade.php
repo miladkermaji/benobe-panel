@@ -21,7 +21,7 @@
 
       </div>
       <div class="">
-        <button class="btn btn-light h-50" data-bs-toggle="modal" data-bs-target="#exampleModalCenterAddSick">
+        <button class="btn btn-light h-50" onclick="openXModal('exampleModalCenterAddSick')">
 
           <svg width="20px" height="20px" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
             class="sc-8d06d158-0 jrjHxO">
@@ -30,110 +30,82 @@
               clip-rule="evenodd"></path>
           </svg>
         </button>
-        <div class="modal fade " id="exampleModalCenterAddSick" tabindex="-1" role="dialog"
-          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered " role="document">
-            <div class="modal-content border-radius-6">
-              <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle"> فیلترها </h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="">
-                  <div class="border  d-flex justify-content-between p-2-5 border-radius-6" id="top-modal-div">
-                    <div class="d-flex gap-4">
-                      <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">تامین
-                          اجتماعی</span></div>
-                      <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">سلامت</span>
-                      </div>
-                    </div>
-                    <div><span
-                        class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">سلامت</span>
-                    </div>
-                  </div>
-                  <div
-                    class="border d-flex justify-content-between gap-4 p-2-5 border-radius-6 turning_selectDate__MLRSb w-100 mt-2">
-                    <button class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50  w-100 ">
-                      <div class="d-flex justify-content-start w-100">
-                        <label for="name" class="label-top-input"> شروع</label>
-
-                        <input type="text" class="form-control h-50 text-center cursor-pointer"
-                          placeholder="1404/05/08" data-jdp="" readonly="">
-                      </div>
-
-
-                    </button>
-                    <button class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50  w-100 ">
-                      <div class="d-flex justify-content-start w-100">
-                        <label for="name" class="label-top-input"> پایان</label>
-
-                        <input type="text" class="form-control h-50 text-center cursor-pointer"
-                          placeholder="1404/05/08" data-jdp="" readonly="">
-                      </div>
-
-
-                    </button>
-                  </div>
-                  <div class="border d-flex justify-content-between p-2-5 border-radius-6 mt-3" id="top-modal-div">
-                    <div class="d-flex gap-4">
-                      <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">آقا
-                        </span></div>
-                      <div><span
-                          class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">خانم</span>
-                      </div>
-                    </div>
-                    <div><span
-                        class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">همه</span>
-                    </div>
-                  </div>
-                  <div class="w-100 d-flex justify-content-between gap-4 mt-3">
-                    <div class="w-100"><button class="btn my-btn-primary h-50 w-100">اعمال فیلتر</button></div>
-                    <div class="w-100"><button class="btn btn-outline-info h-50 w-100"> حذف فیلتر</button></div>
-                  </div>
-
+        <x-custom-modal id="exampleModalCenterAddSick" title="فیلترها" size="md">
+          <div class="">
+            <div class="border  d-flex justify-content-between p-2-5 border-radius-6" id="top-modal-div">
+              <div class="d-flex gap-4">
+                <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">تامین
+                    اجتماعی</span></div>
+                <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">سلامت</span>
                 </div>
               </div>
+              <div><span
+                  class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">سلامت</span>
+              </div>
             </div>
+            <div
+              class="border d-flex justify-content-between gap-4 p-2-5 border-radius-6 turning_selectDate__MLRSb w-100 mt-2">
+              <button class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50  w-100 ">
+                <div class="d-flex justify-content-start w-100">
+                  <label for="name" class="label-top-input"> شروع</label>
+
+                  <input type="text" class="form-control h-50 text-center cursor-pointer" placeholder="1404/05/08"
+                    data-jdp="" readonly="">
+                </div>
+
+
+              </button>
+              <button class="selectDate_datepicker__xkZeS cursor-pointer text-center h-50  w-100 ">
+                <div class="d-flex justify-content-start w-100">
+                  <label for="name" class="label-top-input"> پایان</label>
+
+                  <input type="text" class="form-control h-50 text-center cursor-pointer" placeholder="1404/05/08"
+                    data-jdp="" readonly="">
+                </div>
+
+
+              </button>
+            </div>
+            <div class="border d-flex justify-content-between p-2-5 border-radius-6 mt-3" id="top-modal-div">
+              <div class="d-flex gap-4">
+                <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">آقا
+                  </span></div>
+                <div><span class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer">خانم</span>
+                </div>
+              </div>
+              <div><span
+                  class="font-size-13 bg-light-blue p-2 border-radius-6 fw-bold cursor-pointer border border-primary">همه</span>
+              </div>
+            </div>
+            <div class="w-100 d-flex justify-content-between gap-4 mt-3">
+              <div class="w-100"><button class="btn my-btn-primary h-50 w-100">اعمال فیلتر</button></div>
+              <div class="w-100"><button class="btn btn-outline-info h-50 w-100"> حذف فیلتر</button></div>
+            </div>
+
           </div>
-        </div>
+        </x-custom-modal>
       </div>
 
     </div>
   </div>
   <div class="vakeshi-noskhe  p-3">
-    <button class="btn btn-outline-secondary h-50" data-bs-toggle="modal" data-bs-target="#exampleModalCenterVakeshi">واکشی
+    <button class="btn btn-outline-secondary h-50" onclick="openXModal('exampleModalCenterVakeshi')">واکشی
       نسخه</button>
-    <div class="modal fade " id="exampleModalCenterVakeshi" tabindex="-1" role="dialog"
-      aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered " role="document">
-        <div class="modal-content border-radius-6">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLongTitle"> واکشی نسخه </h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form action="">
-              <div class="position-relative">
-                <label for="" class="label-top-input-special">کد پیگیری</label>
-                <input type="text" class="my-form-control-light h-50 border-radius-4 w-100 position-relative">
-              </div>
-              <div class="mt-3">
-                <label for="" class="label-top-input-special">کدملی/کد اتباع بیمار</label>
-                <input type="text" class="my-form-control-light h-50 border-radius-4 w-100 position-relative">
-              </div>
-              <div class="w-100 mt-3">
-                <button class="w-100 btn my-btn-primary h-50 border-radius-4">جستجو</button>
-              </div>
-            </form>
-          </div>
+    <x-custom-modal id="exampleModalCenterVakeshi" title="واکشی نسخه" size="md">
+      <form action="">
+        <div class="position-relative">
+          <label for="" class="label-top-input-special">کد پیگیری</label>
+          <input type="text" class="my-form-control-light h-50 border-radius-4 w-100 position-relative">
         </div>
-      </div>
-    </div>
+        <div class="mt-3">
+          <label for="" class="label-top-input-special">کدملی/کد اتباع بیمار</label>
+          <input type="text" class="my-form-control-light h-50 border-radius-4 w-100 position-relative">
+        </div>
+        <div class="w-100 mt-3">
+          <button class="w-100 btn my-btn-primary h-50 border-radius-4">جستجو</button>
+        </div>
+      </form>
+    </x-custom-modal>
   </div>
 </div>
 <div class="all-noskhe-list mt-2">
