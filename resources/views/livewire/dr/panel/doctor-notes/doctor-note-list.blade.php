@@ -184,12 +184,13 @@
             <div class="notes-cards d-md-none">
               @if ($readyToLoad)
                 @forelse ($doctorNotes as $index => $item)
-                  <div class="note-card mb-3">
-                    <div class="note-card-header d-flex justify-content-between align-items-center">
+                  <div class="note-card mb-2" x-data="{ open: false }">
+                    <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                      @click="open = !open" style="cursor:pointer;">
                       <div class="d-flex align-items-center gap-2">
                         <input type="checkbox" wire:model.live="selectedDoctorNotes" value="{{ $item->id }}"
-                          class="form-check-input m-0 align-middle">
-                        <span class="badge bg-primary-subtle text-primary">
+                          class="form-check-input m-0 align-middle" @click.stop>
+                        <span class="fw-bold">
                           @switch($item->appointment_type)
                             @case('in_person')
                               حضوری
@@ -208,35 +209,23 @@
                             @break
                           @endswitch
                         </span>
+                        <span class="text-muted">({{ $item->clinic ? $item->clinic->name : 'ندارد' }})</span>
                       </div>
-                      <div class="d-flex gap-1">
-                        <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
-                          class="btn btn-sm btn-gradient-success  px-2 py-1">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path
-                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
-                        <button wire:click="confirmDelete({{ $item->id }})"
-                          class="btn btn-sm btn-gradient-danger  px-2 py-1">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                          </svg>
-                        </button>
-                      </div>
+                      <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                        <path d="M6 9l6 6 6-6" />
+                      </svg>
                     </div>
-                    <div class="note-card-body">
-                      <div class="note-card-item">
+                    <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                      <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                         <span class="note-card-label">کلینیک:</span>
                         <span class="note-card-value">{{ $item->clinic ? $item->clinic->name : 'ندارد' }}</span>
                       </div>
-                      <div class="note-card-item">
+                      <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                         <span class="note-card-label">یادداشت:</span>
                         <span class="note-card-value">{{ e($item->notes) ?? 'بدون یادداشت' }}</span>
                       </div>
-                      <div class="note-card-item">
+                      <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                         <span class="note-card-label">وضعیت:</span>
                         <div class="form-check form-switch d-inline-block">
                           <input class="form-check-input" type="checkbox" role="switch"
@@ -244,6 +233,23 @@
                             {{ $item->status === 'active' ? 'checked' : '' }}
                             style="width: 3em; height: 1.5em; margin-top: 0;">
                         </div>
+                      </div>
+                      <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top">
+                        <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
+                          class="btn btn-sm btn-gradient-success px-2 py-1">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </a>
+                        <button wire:click="confirmDelete({{ $item->id }})"
+                          class="btn btn-sm btn-gradient-danger px-2 py-1">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          </svg>
+                        </button>
                       </div>
                     </div>
                   </div>
