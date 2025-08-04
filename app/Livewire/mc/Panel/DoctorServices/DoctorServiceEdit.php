@@ -101,10 +101,10 @@ class DoctorServiceEdit extends Component
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             // Clean price value by removing commas
-            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ? 
-                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) : 
+            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
-            
+
             if ($cleanPrice && $value) {
                 $this->discountPercent = ($value / $cleanPrice) * 100;
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $value;
@@ -120,10 +120,10 @@ class DoctorServiceEdit extends Component
         $index = explode('.', $name)[0];
         if (isset($this->pricing[$index])) {
             // Clean price value by removing commas
-            $cleanPrice = is_string($this->pricing[$index]['price']) ? 
-                (float) str_replace(',', '', $this->pricing[$index]['price']) : 
+            $cleanPrice = is_string($this->pricing[$index]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$index]['price']) :
                 (float) $this->pricing[$index]['price'];
-            
+
             $this->pricing[$index]['final_price'] = $cleanPrice - ($cleanPrice * ($this->pricing[$index]['discount'] ?? 0) / 100);
             $this->save();
         }
@@ -133,12 +133,12 @@ class DoctorServiceEdit extends Component
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             $this->pricing[$this->currentPricingIndex]['discount'] = $this->discountPercent;
-            
+
             // Clean price value by removing commas
-            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ? 
-                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) : 
+            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
-            
+
             $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - ($cleanPrice * $this->discountPercent / 100);
             $this->save();
         }
@@ -223,12 +223,27 @@ class DoctorServiceEdit extends Component
         } else {
             $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
         }
+
+        // Clean pricing data before validation
+        $cleanedPricing = [];
+        foreach ($this->pricing as $pricing) {
+            $cleanedPricing[] = [
+                'id' => $pricing['id'] ?? null,
+                'insurance_id' => $pricing['insurance_id'],
+                'price' => is_string($pricing['price']) ?
+                    (float) str_replace(',', '', $pricing['price']) :
+                    (float) $pricing['price'],
+                'discount' => $pricing['discount'] ?? 0,
+                'final_price' => $pricing['final_price'] ?? 0,
+            ];
+        }
+
         $currentState = [
             'service_id' => $this->service_id,
             'medical_center_id' => $medicalCenterId,
             'duration' => $this->duration,
             'description' => $this->description,
-            'pricing' => $this->pricing,
+            'pricing' => $cleanedPricing,
         ];
 
         // بررسی تغییرات
@@ -273,7 +288,7 @@ class DoctorServiceEdit extends Component
         }
 
         // بررسی وجود رکورد تکراری
-        foreach ($this->pricing as $pricing) {
+        foreach ($cleanedPricing as $pricing) {
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
                 ->where('insurance_id', $pricing['insurance_id'])
@@ -283,7 +298,7 @@ class DoctorServiceEdit extends Component
                 })
                 ->exists();
             if ($exists) {
-                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و مرکز درمانی قبلاً تعریف شده است.');
+                $this->dispatch('show-alert', type: 'error', message: 'این خدمت با بیمه ' . Insurance::find($pricing['insurance_id'])->name . ' و مرکز درمانی انتخاب‌شده قبلاً تعریف شده است.');
                 $this->isSaving = false;
                 return;
             }
@@ -291,7 +306,7 @@ class DoctorServiceEdit extends Component
 
         // به‌روزرسانی یا ایجاد رکوردها
         $service = Service::find($this->service_id);
-        foreach ($this->pricing as $pricing) {
+        foreach ($cleanedPricing as $pricing) {
             if (isset($pricing['id']) && $pricing['id']) {
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([

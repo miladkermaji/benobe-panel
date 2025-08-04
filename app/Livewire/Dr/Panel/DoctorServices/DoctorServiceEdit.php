@@ -214,12 +214,27 @@ class DoctorServiceEdit extends Component
     {
         $this->isSaving = true;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        
+        // Clean pricing data before validation
+        $cleanedPricing = [];
+        foreach ($this->pricing as $pricing) {
+            $cleanedPricing[] = [
+                'id' => $pricing['id'] ?? null,
+                'insurance_id' => $pricing['insurance_id'],
+                'price' => is_string($pricing['price']) ? 
+                    (float) str_replace(',', '', $pricing['price']) : 
+                    (float) $pricing['price'],
+                'discount' => $pricing['discount'] ?? 0,
+                'final_price' => $pricing['final_price'] ?? 0,
+            ];
+        }
+        
         $currentState = [
             'service_id' => $this->service_id,
             'medical_center_id' => $this->medical_center_id,
             'duration' => $this->duration,
             'description' => $this->description,
-            'pricing' => $this->pricing,
+            'pricing' => $cleanedPricing,
         ];
 
         // بررسی تغییرات
@@ -264,7 +279,7 @@ class DoctorServiceEdit extends Component
         }
 
         // بررسی وجود رکورد تکراری
-        foreach ($this->pricing as $pricing) {
+        foreach ($cleanedPricing as $pricing) {
             $exists = DoctorService::where('doctor_id', $doctorId)
                 ->where('service_id', $this->service_id)
                 ->where('insurance_id', $pricing['insurance_id'])
@@ -282,7 +297,7 @@ class DoctorServiceEdit extends Component
 
         // به‌روزرسانی یا ایجاد رکوردها
         $service = Service::find($this->service_id);
-        foreach ($this->pricing as $pricing) {
+        foreach ($cleanedPricing as $pricing) {
             if (isset($pricing['id']) && $pricing['id']) {
                 // به‌روزرسانی رکورد موجود
                 DoctorService::find($pricing['id'])->update([

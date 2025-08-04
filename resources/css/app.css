@@ -114,7 +114,11 @@ select:focus[data-flux-control] {
 /* \[:where(&)\]:size-4 {
     @apply size-4;
 } */
-
+button {
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+}
 /* Appointment indicator styles */
 .appointment-indicator {
     position: absolute;

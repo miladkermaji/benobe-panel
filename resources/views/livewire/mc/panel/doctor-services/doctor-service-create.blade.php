@@ -58,13 +58,14 @@
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
-              <input type="number" wire:model.debounce.500ms="duration" class="form-control position-relative" id="duration"
-                placeholder=" " required>
+              <input type="number" wire:model.debounce.500ms="duration" class="form-control position-relative"
+                id="duration" placeholder=" " required>
               <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
             </div>
             <!-- توضیحات -->
             <div class="position-relative mt-5">
-              <textarea wire:model.debounce.500ms="description" class="form-control position-relative" id="description" rows="3" placeholder=" "></textarea>
+              <textarea wire:model.debounce.500ms="description" class="form-control position-relative" id="description" rows="3"
+                placeholder=" "></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
             </div>
             <!-- بخش قیمت‌گذاری -->
@@ -102,8 +103,9 @@
                 </div>
                 <!-- قیمت نهایی -->
                 <div class="col-lg-2 col-md-6 position-relative mt-5">
-                  <input type="number" wire:model="pricing.{{ $index }}.final_price" class="form-control position-relative"
-                    id="final_price_{{ $index }}" placeholder=" " readonly>
+                  <input type="number" wire:model="pricing.{{ $index }}.final_price"
+                    class="form-control position-relative" id="final_price_{{ $index }}" placeholder=" "
+                    readonly>
                   <label for="final_price_{{ $index }}" class="form-label">قیمت نهایی (تومان)</label>
                 </div>
                 <!-- دکمه حذف ردیف -->
@@ -137,13 +139,13 @@
   <x-custom-modal id="discountModal" title="محاسبه تخفیف" size="md">
     <div class="mb-4 position-relative mt-2">
       <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
-      <input type="number" wire:model.live="discountPercent" class="form-control position-relative" id="discountPercent"
-        placeholder="درصد را وارد کنید" min="0" max="100">
+      <input type="number" wire:model.live="discountPercent" class="form-control position-relative"
+        id="discountPercent" placeholder="درصد را وارد کنید" min="0" max="100">
     </div>
     <div class="mb-4 position-relative mt-2">
       <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
-      <input type="number" wire:model.live="discountAmount" class="form-control position-relative" id="discountAmount"
-        placeholder="مبلغ را وارد کنید" min="0">
+      <input type="number" wire:model.live="discountAmount" class="form-control position-relative"
+        id="discountAmount" placeholder="مبلغ را وارد کنید" min="0">
     </div>
     <div class="mt-3 d-flex gap-2">
       <button type="button" class="btn btn-secondary flex-grow-1" wire:click="closeDiscountModal">لغو</button>

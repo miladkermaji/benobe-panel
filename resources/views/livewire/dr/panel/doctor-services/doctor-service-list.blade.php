@@ -138,7 +138,7 @@
                         {{ $doctorService->status ? 'فعال' : 'غیرفعال' }}
                       </button>
                     </td>
-                    <td class="text-center">
+                    <td class="text-center d-flex align-itmems-center gap-2">
                       <a href="{{ route('dr.panel.doctor-services.edit', $doctorService->id) }}"
                         class="btn btn-sm btn-gradient-success px-2 py-1">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
