@@ -46,6 +46,10 @@ class LoginAttemptsService
         } elseif ($userId) {
             $attemptableType = User::class;
             $attemptableId = $userId;
+        } else {
+            // اگر هیچ نوع کاربری مشخص نشده، از نوع عمومی استفاده کن
+            $attemptableType = 'App\Models\Guest';
+            $attemptableId = 0;
         }
 
         $attempt = LoginAttempt::firstOrCreate(
