@@ -1,8 +1,7 @@
 <div class="container-fluid py-5" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <!-- هدر اصلی -->
-    <div
-      class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3"
+    <div class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between  gap-3"
       style="background: linear-gradient(135deg, #1e3a8a, #60a5fa);">
       <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"

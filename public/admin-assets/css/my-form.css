@@ -57,7 +57,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     gap: 1rem;
     transition: all 0.3s ease;
 }
@@ -240,8 +239,6 @@ input:not([type="checkbox"]) {
     margin-top: 0.25rem;
 }
 
-
-
 /* پیجینیشن */
 .pagination-container {
     display: flex;
@@ -315,7 +312,6 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای تبلت */
 @media (max-width: 991px) {
-
     .card-header {
         padding: 1rem;
         flex-direction: row;
@@ -390,7 +386,6 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای موبایل */
 @media (max-width: 767px) {
-
     .row > * {
         flex-shrink: 0;
         width: 100%;
@@ -440,7 +435,6 @@ input:not([type="checkbox"]) {
 
     .my-btn-primary,
     .btn-outline-light {
-        width: 100%;
         justify-content: center;
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
@@ -487,8 +481,9 @@ input:not([type="checkbox"]) {
 
 /* ریسپانسیو برای موبایل‌های خیلی کوچک (زیر 576px) */
 @media (max-width: 576px) {
-
-
+    .card-header.bg-gradient-primary.text-white.p-4.d-flex.align-items-center.justify-content-between.gap-3 {
+        padding: 0.5rem !important;
+    }
     .card {
         margin: 0;
     }

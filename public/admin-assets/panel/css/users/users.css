@@ -187,7 +187,6 @@
     }
 
     .btn {
-        width: 100%;
         justify-content: center;
     }
 }
@@ -476,12 +475,10 @@ img.loaded {
 /* ریسپانسیو */
 @media (max-width: 767px) {
     .card-header {
-        flex-direction: column;
         gap: 1rem;
     }
 
     .btn-outline-light {
-        width: 100%;
         justify-content: center;
     }
 
@@ -497,7 +494,6 @@ img.loaded {
     }
 
     .my-btn-primary {
-        width: 100%;
         justify-content: center;
     }
 }
