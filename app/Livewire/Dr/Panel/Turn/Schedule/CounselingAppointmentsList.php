@@ -348,7 +348,7 @@ $this->getSelectedMedicalCenterId();
             return [];
         }
         $gregorianDate = $this->convertToGregorian($this->selectedDate);
-        $query = CounselingAppointment::with(['doctor', 'patient', 'insurance', 'clinic'])
+        $query = CounselingAppointment::with(['doctor', 'patient', 'insurance', 'medicalCenter'])
             ->withTrashed()
             ->where('doctor_id', $doctor->id);
         if ($this->dateFilter) {
