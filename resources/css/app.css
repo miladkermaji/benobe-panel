@@ -184,3 +184,8 @@ select:focus[data-flux-control] {
     position: relative;
     min-height: 400px;
 }
+@media (min-width: 768px) {
+    .notes-cards.d-md-none {
+        display: none !important;
+    }
+}
