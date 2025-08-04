@@ -435,7 +435,7 @@ input:not([type="checkbox"]) {
     textarea {
         font-size: 0.875rem;
         padding: 0.5rem 0.6rem;
-        height: 42px !important;
+        height: 50px !important;
     }
 
     .my-btn-primary,
