@@ -53,11 +53,11 @@ class MedicalCentersController extends Controller
     public function getStats()
     {
         try {
-            $clinicsCount          = MedicalCenter::where('is_active', 1)->where('type', 'clinic')->count();
-            $treatmentCentersCount = MedicalCenter::where('is_active', 1)->where('type', 'treatment_centers')->count();
-            $imagingCentersCount   = MedicalCenter::where('is_active', 1)->where('type', 'imaging_center')->count();
-            $hospitalsCount        = MedicalCenter::where('is_active', 1)->where('type', 'hospital')->count();
-            $laboratoriesCount     = MedicalCenter::where('is_active', 1)->where('type', 'laboratory')->count();
+            $clinicsCount          = MedicalCenter::where('is_active', 1)->where('type', 'clinic')->whereNotIn('type', ['policlinic'])->count();
+            $treatmentCentersCount = MedicalCenter::where('is_active', 1)->where('type', 'treatment_centers')->whereNotIn('type', ['policlinic'])->count();
+            $imagingCentersCount   = MedicalCenter::where('is_active', 1)->where('type', 'imaging_center')->whereNotIn('type', ['policlinic'])->count();
+            $hospitalsCount        = MedicalCenter::where('is_active', 1)->where('type', 'hospital')->whereNotIn('type', ['policlinic'])->count();
+            $laboratoriesCount     = MedicalCenter::where('is_active', 1)->where('type', 'laboratory')->whereNotIn('type', ['policlinic'])->count();
 
             return response()->json([
                 'status' => 'success',
@@ -114,6 +114,7 @@ class MedicalCentersController extends Controller
 
             $clinics = MedicalCenter::where('is_active', 1)
             ->where('type', 'clinic')
+                ->whereNotIn('type', ['policlinic'])
                 ->withCount('doctor')
                 ->with([
                     'province' => fn ($query) => $query->select('id', 'name'),
@@ -189,6 +190,7 @@ class MedicalCentersController extends Controller
 
             $treatmentCenters = MedicalCenter::where('is_active', 1)
             ->where('type', 'treatment_centers')
+                ->whereNotIn('type', ['policlinic'])
                 ->withCount('doctor')
                 ->with([
                     'province' => fn ($query) => $query->select('id', 'name'),
@@ -265,6 +267,7 @@ class MedicalCentersController extends Controller
             $imagingCenters = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'imaging_center')
+                ->whereNotIn('type', ['policlinic'])
                 ->with([
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
@@ -340,6 +343,7 @@ class MedicalCentersController extends Controller
             $hospitals = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'hospital')
+                ->whereNotIn('type', ['policlinic'])
                 ->with([
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
@@ -415,6 +419,7 @@ class MedicalCentersController extends Controller
             $laboratories = MedicalCenter::where('is_active', 1)
                 ->withCount('doctor')
                 ->where('type', 'laboratory')
+                ->whereNotIn('type', ['policlinic'])
                 ->with([
                     'province' => fn ($query) => $query->select('id', 'name'),
                     'city' => fn ($query) => $query->select('id', 'name')
@@ -480,10 +485,10 @@ class MedicalCentersController extends Controller
             $limit = max(1, (int) $request->input('limit', 10));
 
             $provinces = Zone::where('level', 1)
-                ->whereHas('medicalCenters', fn ($q) => $q->where('is_active', true))
+                ->whereHas('medicalCenters', fn ($q) => $q->where('is_active', true)->whereNotIn('type', ['policlinic']))
                 ->with([
                     'children' => fn ($query) => $query->withCount([
-                        'medicalCenters as centers_count' => fn ($q) => $q->where('is_active', true)
+                        'medicalCenters as centers_count' => fn ($q) => $q->where('is_active', true)->whereNotIn('type', ['policlinic'])
                     ])->select('id', 'name')
                 ])
                 ->select('id', 'name')
@@ -504,7 +509,7 @@ class MedicalCentersController extends Controller
                 'data'   => $formattedProvinces,
             ], 200);
         } catch (\Exception $e) {
-           
+
 
             return response()->json([
                 'status'  => 'error',
@@ -543,6 +548,7 @@ class MedicalCentersController extends Controller
             $limit = (int) $request->input('limit', 5);
 
             $query = MedicalCenter::where('is_active', true)
+                ->whereNotIn('type', ['policlinic'])
                 ->with([
                     'province' => fn ($q) => $q->select('id', 'name')->where('level', 1)
                 ])
@@ -567,7 +573,7 @@ class MedicalCentersController extends Controller
                 'data'   => $formattedCenters,
             ], 200);
         } catch (\Exception $e) {
-            
+
 
             return response()->json([
                 'status'  => 'error',
@@ -641,7 +647,8 @@ class MedicalCentersController extends Controller
     {
         try {
             $perPage = (int) $request->input('per_page', 20);
-            $query = MedicalCenter::where('is_active', 1);
+            $query = MedicalCenter::where('is_active', 1)
+                ->whereNotIn('type', ['policlinic']);
 
             // فیلتر استان
             if ($request->filled('province_id')) {
@@ -836,6 +843,7 @@ class MedicalCentersController extends Controller
 
             // گرفتن تمام تخصص‌های موجود در مراکز درمانی فعال
             $query = MedicalCenter::where('is_active', 1)
+                ->whereNotIn('type', ['policlinic'])
                 ->whereNotNull('specialty_ids')
                 ->where('specialty_ids', '!=', '[]')
                 ->with([
@@ -1036,6 +1044,7 @@ class MedicalCentersController extends Controller
             // گرفتن تمام تخصص‌های موجود در درمانگاه‌های فعال
             $query = MedicalCenter::where('is_active', 1)
                 ->where('type', 'treatment_centers')
+                ->whereNotIn('type', ['policlinic'])
                 ->whereNotNull('specialty_ids')
                 ->where('specialty_ids', '!=', '[]')
                 ->with([

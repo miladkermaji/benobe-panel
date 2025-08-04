@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\BannerText;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+
 /**
  * @group بنر و گرفتن  امار
  */
@@ -67,7 +69,7 @@ class BannerController extends Controller
         }
     }
 
-   /**
+    /**
  * گرفتن آمار (تعداد پزشکان، بیمارستان‌ها،  کاربران و آزمایشگاه‌ها)
  *
  * @response 200 {
@@ -86,33 +88,33 @@ class BannerController extends Controller
  *   "data": null
  * }
  */
-public function getStats(Request $request)
-{
-    try {
-        $doctorsCount = \App\Models\Doctor::count();
-        $usersCount = \App\Models\User::count();
-        $hospitalsCount = \App\Models\MedicalCenter::where('is_active', 1)->where('type','hospital')->count();
-        $laboratoriesCount = \App\Models\MedicalCenter::where('is_active', 1)->where('type','laboratory')->count();
+    public function getStats(Request $request)
+    {
+        try {
+            $doctorsCount = \App\Models\Doctor::count();
+            $usersCount = \App\Models\User::count();
+            $hospitalsCount = \App\Models\MedicalCenter::where('is_active', 1)->where('type', 'hospital')->whereNotIn('type', ['policlinic'])->count();
+            $laboratoriesCount = \App\Models\MedicalCenter::where('is_active', 1)->where('type', 'laboratory')->whereNotIn('type', ['policlinic'])->count();
 
 
-        return response()->json([
-            'status' => 'success',
-            'data' => [
-                'doctors_count' => $doctorsCount,
-                'users_count' => $usersCount,
-                'hospitals_count' => $hospitalsCount,
-                'laboratories_count' => $laboratoriesCount,
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'doctors_count' => $doctorsCount,
+                    'users_count' => $usersCount,
+                    'hospitals_count' => $hospitalsCount,
+                    'laboratories_count' => $laboratoriesCount,
 
-            ],
-        ], 200);
+                ],
+            ], 200);
 
-    } catch (\Exception $e) {
-        Log::error('GetStats - Error: ' . $e->getMessage());
-        return response()->json([
-            'status' => 'error',
-            'message' => 'خطای سرور',
-            'data' => null,
-        ], 500);
+        } catch (\Exception $e) {
+            Log::error('GetStats - Error: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطای سرور',
+                'data' => null,
+            ], 500);
+        }
     }
-}
 }

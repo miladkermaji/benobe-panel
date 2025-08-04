@@ -98,6 +98,7 @@ class SearchController extends Controller
 
         // مراکز درمانی
         $medicalCentersQuery = MedicalCenter::where('is_active', 1)
+            ->whereNotIn('type', ['policlinic'])
             ->where(function ($q) use ($words) {
                 foreach ($words as $word) {
                     $q->where(function ($qq) use ($word) {
@@ -141,7 +142,7 @@ class SearchController extends Controller
             ->limit(10)
             ->get();
 
-$specialtyId = $request->input('specialty_id');
+        $specialtyId = $request->input('specialty_id');
 
         // اگر specialty_id ارسال شده و جزو لیست نبود، آن را به ابتدای خروجی اضافه کن
         if ($specialtyId) {
