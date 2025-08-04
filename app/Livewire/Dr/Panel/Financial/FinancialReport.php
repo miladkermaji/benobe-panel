@@ -719,18 +719,23 @@ class FinancialReport extends Component
         })->get();
 
         // گرفتن بیمه‌هایی که در نوبت‌ها برای این دکتر استفاده شدن
-        $insurances = Insurance::whereIn('id', function ($query) use ($doctorId) {
-            $query->select('insurance_id')
-                ->from('appointments')
-                ->where('doctor_id', $doctorId)
-                ->whereNotNull('insurance_id')
-                ->union(
-                    DB::table('counseling_appointments')
-                        ->select('insurance_id')
-                        ->where('doctor_id', $doctorId)
-                        ->whereNotNull('insurance_id')
-                );
-        })->get();
+        $appointmentInsuranceIds = DB::table('appointments')
+            ->select('insurance_id')
+            ->where('doctor_id', $doctorId)
+            ->whereNotNull('insurance_id')
+            ->distinct()
+            ->pluck('insurance_id');
+
+        $counselingInsuranceIds = DB::table('counseling_appointments')
+            ->select('insurance_id')
+            ->where('doctor_id', $doctorId)
+            ->whereNotNull('insurance_id')
+            ->distinct()
+            ->pluck('insurance_id');
+
+        $allInsuranceIds = $appointmentInsuranceIds->merge($counselingInsuranceIds)->unique()->filter();
+
+        $insurances = Insurance::whereIn('id', $allInsuranceIds)->get();
 
         Log::info('Rendering FinancialReport view', [
             'doctor_id' => $doctorId,

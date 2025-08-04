@@ -248,7 +248,7 @@
           </ul>
         </li>
         <li
-          class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('mc-doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             مطب
@@ -270,8 +270,8 @@
               <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
             </li>
             <li
-              class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
-              <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+              class="item-li i-checkout__request {{ Request::routeIs('mc-doctors.clinic.deposit') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
             </li>
           </ul>
         </li>
@@ -806,7 +806,7 @@
           <span class="soon-label">به زودی</span></a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
-        <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+        <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
         <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
         <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
       </div>

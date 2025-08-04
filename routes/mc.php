@@ -271,7 +271,7 @@ Route::prefix('mc')
                 Route::post('/update/{id}', [DoctorsClinicManagementController::class, 'update'])->middleware('secretary.permission:clinic_management')->name('mc-clinic-update');
                 Route::delete('/delete/{id}', [DoctorsClinicManagementController::class, 'destroy'])->middleware('secretary.permission:clinic_management')->name('mc-clinic-destroy');
                 Route::get('/create', [DoctorsClinicManagementController::class, 'create'])->name('mc.panel.clinics.create');
-                Route::get('/deposit', [DoctorsClinicManagementController::class, 'deposit'])->middleware('secretary.permission:clinic_management')->name('doctors.clinic.deposit');
+                Route::get('/deposit', [DoctorsClinicManagementController::class, 'deposit'])->middleware('secretary.permission:clinic_management')->name('mc-doctors.clinic.deposit');
                 Route::post('/deposit/store', [DoctorsClinicManagementController::class, 'storeDeposit'])->middleware('secretary.permission:clinic_management')->name('doctors.clinic.deposit.store');
                 Route::post('/deposit/update/{id}', [DoctorsClinicManagementController::class, 'updateDeposit'])->middleware('secretary.permission:clinic_management')->name('doctors.clinic.deposit.update');
                 Route::post('/deposit/destroy/{id}', [DoctorsClinicManagementController::class, 'destroyDeposit'])->middleware('secretary.permission:clinic_management')->name('doctors.clinic.deposit.destroy');
