@@ -21,7 +21,7 @@
                   </svg>
                 </span>
               </div>
-              <select class="form-select form-select-sm w-100 mb-2 mb-md-0" style="min-width: 0;"
+              <select class="form-select form-select-sm w-100 mb-2 mb-md-0 h-50" style="min-width: 0;"
                 wire:model.live="statusFilter">
                 <option value="">همه وضعیت‌ها</option>
                 <option value="open">باز</option>
