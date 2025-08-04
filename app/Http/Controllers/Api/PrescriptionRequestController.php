@@ -279,7 +279,7 @@ class PrescriptionRequestController extends Controller
                 'payment_url' => $payment_url,
             ], 201);
         }
-        $prescription->load(['clinic', 'transaction', 'insulins']);
+        $prescription->load(['medicalCenter', 'transaction', 'insulins']);
         return response()->json([
             'status' => 'success',
             'message' => 'درخواست نسخه با موفقیت ثبت شد',
