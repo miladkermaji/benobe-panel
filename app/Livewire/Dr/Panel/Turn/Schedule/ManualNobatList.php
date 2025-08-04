@@ -1099,7 +1099,10 @@ class ManualNobatList extends Component
             }
 
             $remainingIds = [];
-            $appointments = Appointment::whereIn('id', $appointmentIds)->get();
+            $appointments = Appointment::whereIn('id', $appointmentIds)
+                ->where('doctor_id', $doctor->id)
+                ->whereIn('status', ['scheduled', 'pending_review'])
+                ->get();
 
             // If we have selected times for multiple appointments
             if (is_array($selectedTime)) {
@@ -1461,7 +1464,7 @@ class ManualNobatList extends Component
             }
             $appointments = Appointment::whereIn('id', $normalizedIds)
                 ->where('doctor_id', $doctor->id)
-                ->whereNotIn('status', ['cancelled', 'attended'])
+                ->whereIn('status', ['scheduled', 'pending_review'])
                 ->get();
             if ($appointments->isEmpty()) {
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');

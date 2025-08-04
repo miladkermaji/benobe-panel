@@ -1638,7 +1638,7 @@ class AppointmentsList extends Component
             }
             $appointments = Appointment::whereIn('id', $normalizedIds)
                 ->where('doctor_id', $doctor->id)
-                ->whereNotIn('status', ['cancelled', 'attended'])
+                ->whereIn('status', ['scheduled', 'pending_review'])
                 ->get();
             if ($appointments->isEmpty()) {
                 $this->dispatch('show-toastr', type: 'error', message: 'هیچ نوبت معتبری برای لغو یافت نشد.');

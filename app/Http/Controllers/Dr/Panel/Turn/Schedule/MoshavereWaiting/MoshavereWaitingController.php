@@ -197,13 +197,13 @@ class MoshavereWaitingController extends Controller
 
         // چک کردن وضعیت نوبت‌ها
         $allCancelledOrAttended = $appointments->every(function ($appointment) {
-            return $appointment->status === 'cancelled' || $appointment->status === 'attended';
+            return $appointment->status === 'cancelled' || $appointment->status === 'attended' || $appointment->status === 'missed';
         });
 
         if ($allCancelledOrAttended) {
             return response()->json([
                 'status' => false,
-                'message' => 'نوبت‌ها یا قبلاً لغو شده‌اند یا ویزیت شده‌اند و قابل لغو نیستند'
+                'message' => 'نوبت‌ها یا قبلاً لغو شده‌اند، ویزیت شده‌اند، یا غیبت شده‌اند و قابل لغو نیستند'
             ], 400);
         }
 
@@ -211,7 +211,8 @@ class MoshavereWaitingController extends Controller
         $newlyCancelled = false;
 
         foreach ($appointments as $appointment) {
-            if ($appointment->status !== 'cancelled' && $appointment->status !== 'attended') { // فقط اگه لغو یا ویزیت نشده باشه
+            // فقط نوبت‌های در انتظار و در حال بررسی قابل لغو هستند
+            if (in_array($appointment->status, ['scheduled', 'pending_review'])) {
                 if ($appointment->patient && $appointment->patient->mobile) {
                     $recipients[] = $appointment->patient->mobile;
                 }

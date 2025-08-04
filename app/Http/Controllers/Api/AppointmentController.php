@@ -73,10 +73,11 @@ class AppointmentController extends Controller
                 ], 400);
             }
 
-            if ($appointment->status !== 'scheduled') {
+            // فقط نوبت‌های در انتظار و در حال بررسی قابل لغو هستند
+            if (!in_array($appointment->status, ['scheduled', 'pending_review'])) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'فقط نوبت‌های در انتظار قابل لغو هستند',
+                    'message' => 'فقط نوبت‌های در انتظار و در حال بررسی قابل لغو هستند',
                     'data'    => null,
                 ], 400);
             }
