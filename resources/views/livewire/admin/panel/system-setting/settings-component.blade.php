@@ -1,7 +1,7 @@
 <div class="container-fluid py-5">
   <!-- هدر اصلی -->
   <div class="bg-gradient-primary text-white p-4 rounded-top-3 shadow-sm">
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-3 mb-2">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
         class="animate-spin-slow">
         <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8Z" />

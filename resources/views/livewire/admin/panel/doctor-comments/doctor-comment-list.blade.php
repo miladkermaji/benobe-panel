@@ -3,7 +3,7 @@
     <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
-          <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center gap-3 mb-2">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               class="header-icon">
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />

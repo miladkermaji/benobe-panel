@@ -30,7 +30,7 @@
             <div class="doctor-toggle border-bottom">
               <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
                 wire:click="toggleDoctor({{ $data['doctor']->id }})">
-                <div class="d-flex align-items-center gap-3">
+                <div class="d-flex align-items-center gap-3 mb-2">
                   <img src="{{ $data['doctor']->profile_photo_url ?? asset('default-avatar.png') }}"
                     class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل پزشک">
                   <span class="fw-bold">{{ $data['doctor']->first_name . ' ' . $data['doctor']->last_name }}</span>

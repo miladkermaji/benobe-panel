@@ -4,7 +4,7 @@
     <div
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3"
       style="background: linear-gradient(135deg, #1e3a8a, #60a5fa);">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
           <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>

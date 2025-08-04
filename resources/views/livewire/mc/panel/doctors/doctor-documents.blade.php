@@ -2,7 +2,7 @@
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div
       class="card-header glass-header text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
@@ -11,8 +11,7 @@
       </div>
       <a href="{{ route('mc-clinic-management') }}"
         class="btn btn-outline-light btn-sm rounded-pill d-flex align-items-center gap- hover:shadow-md transition-all text-white">
-        <svg width="16"  height="16" viewBox="0 0 24 24" fill="none"
-          stroke="currentColor" stroke-width="2">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         بازگشت
@@ -72,8 +71,8 @@
                       @endif
                       <button wire:click="deleteFile({{ $document->id }})"
                         class="btn btn-sm btn-outline-danger rounded-pill">
-                        <svg  width="16" height="16" viewBox="0 0 24 24"
-                          fill="none" stroke="currentColor" stroke-width="2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
                           <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
                       </button>

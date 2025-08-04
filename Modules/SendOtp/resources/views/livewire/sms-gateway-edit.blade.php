@@ -2,7 +2,7 @@
   <div class="container-fluid py-4">
     <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
       <div class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3 mb-2">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
           </svg>
@@ -22,7 +22,7 @@
         <div class="row g-3">
           <div class="col-md-6">
             <div class="bg-light rounded-3 p-3 shadow-sm">
-              <div class="d-flex align-items-center gap-3 mb-3">
+              <div class="d-flex align-items-center gap-3 mb-2 mb-3">
                 <div
                   class="gateway-logo rounded-circle bg-white shadow-sm d-flex align-items-center justify-content-center"
                   style="width: 40px; height: 40px; border: 2px solid #e5e7eb;">

@@ -2,7 +2,7 @@
   <!-- هدر -->
   <header class="glass-header p-4 rounded-2xl mb-5">
     <div class="d-flex align-items-center justify-content-between gap-4 flex-wrap">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5v14" />

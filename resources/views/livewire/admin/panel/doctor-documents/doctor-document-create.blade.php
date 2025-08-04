@@ -2,7 +2,7 @@
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
     <div
       class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
@@ -51,7 +51,7 @@
               @enderror
             </div>
             <div class="col-12 position-relative mt-5">
-              <div class="form-check form-switch d-flex align-items-center gap-3">
+              <div class="form-check form-switch d-flex align-items-center gap-3 mb-2">
                 <input class="form-check-input" type="checkbox" id="is_verified" wire:model="is_verified">
                 <label class="form-check-label fw-medium mx-4" for="is_verified">
                   وضعیت تأیید: <span

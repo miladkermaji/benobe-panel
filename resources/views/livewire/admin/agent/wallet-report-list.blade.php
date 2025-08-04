@@ -16,7 +16,7 @@
         <span class="input-group-text"><i class="fas fa-search"></i></span>
         <input type="text" class="form-control" wire:model.live="search" placeholder="جستجو توضیح یا تاریخ">
       </div>
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <select wire:model.live="perPage" class="form-select w-auto">
           <option value="10">10</option>
           <option value="20">20</option>

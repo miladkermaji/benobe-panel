@@ -240,7 +240,7 @@
   </div>
   <!-- نکته راهنما -->
   <div
-    class="alert alert-warning help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 animate__animated animate__fadeInUp">
+    class="alert alert-warning help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 mb-2 animate__animated animate__fadeInUp">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
       <circle cx="12" cy="12" r="10" />
       <path d="M12 16v-4" />

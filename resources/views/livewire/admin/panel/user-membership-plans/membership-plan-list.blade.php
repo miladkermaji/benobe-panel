@@ -2,7 +2,7 @@
   <!-- Header Section -->
   <div class="glass-header mb-4">
     <div class="d-flex justify-content-between align-items-center w-100">
-      <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-3 mb-2">
         <h4 class="mb-0 fw-bold text-white">طرح‌های عضویت</h4>
       </div>
       <div class="d-flex">

@@ -10,7 +10,7 @@
     <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
-          <div class="d-flex align-items-center gap-3">
+          <div class="d-flex align-items-center gap-3 mb-2">
             <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">مدیریت تراکنش‌های کیف‌پول پزشکان</h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
@@ -80,7 +80,7 @@
                 <div class="entity-toggle border-bottom" x-data="{ open: false }">
                   <div class="d-flex justify-content-between align-items-center p-3 cursor-pointer"
                     @click="open = !open">
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 mb-2">
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                         stroke-width="2">
                         <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
