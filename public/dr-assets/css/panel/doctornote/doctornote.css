@@ -1197,6 +1197,21 @@ body {
     }
 }
 
+/* Collapsible Section Styles */
+#mobileSearchSection {
+    transition: all 0.3s ease;
+}
+
+#mobileSearchSection.collapse:not(.show) {
+    display: none;
+}
+
+#mobileSearchSection.collapsing {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.5s ease;
+}
+
 /* Mobile Toggle Button Styles */
 .mobile-toggle-btn {
     background: none;
@@ -1223,23 +1238,51 @@ body {
     transition: transform 0.3s ease;
 }
 
-.mobile-toggle-btn[aria-expanded="true"] .toggle-icon {
+.toggle-icon.rotate-180 {
     transform: rotate(180deg);
 }
 
-/* Collapsible Section Styles */
-#mobileSearchSection {
-    transition: all 0.3s ease;
+/* Alpine.js Transition Classes */
+.transition {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
 }
 
-#mobileSearchSection.collapse:not(.show) {
-    display: none;
+.ease-out {
+    transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
 
-#mobileSearchSection.collapsing {
-    height: 0;
-    overflow: hidden;
-    transition: height 0.35s ease;
+.ease-in {
+    transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+
+.duration-200 {
+    transition-duration: 200ms;
+}
+
+.duration-300 {
+    transition-duration: 300ms;
+}
+
+.opacity-0 {
+    opacity: 0;
+}
+
+.opacity-100 {
+    opacity: 1;
+}
+
+.transform {
+    transform: translateZ(0);
+}
+
+.-translate-y-2 {
+    transform: translateY(-0.5rem);
+}
+
+.translate-y-0 {
+    transform: translateY(0);
 }
 
 /* Desktop styles - always show */
@@ -1249,10 +1292,6 @@ body {
     }
 
     #mobileSearchSection {
-        display: block !important;
-    }
-
-    #mobileSearchSection.collapse {
         display: block !important;
     }
 }
@@ -1266,8 +1305,18 @@ body {
     #mobileSearchSection {
         margin-top: 0.5rem;
     }
+}
 
-    #mobileSearchSection.collapse:not(.show) {
-        display: none !important;
+/* Animation for smooth slide down */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 200px;
     }
 }

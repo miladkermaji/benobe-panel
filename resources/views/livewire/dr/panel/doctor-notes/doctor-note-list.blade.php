@@ -1,4 +1,4 @@
-<div class="doctor-notes-container">
+<div class="doctor-notes-container" x-data="{ mobileSearchOpen: false }">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadDoctorNotes">
     <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
@@ -7,16 +7,20 @@
             <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">یادداشت‌های من</h1>
             <!-- Mobile Toggle Button -->
             <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
-              data-bs-toggle="collapse" data-bs-target="#mobileSearchSection" aria-expanded="false"
-              aria-controls="mobileSearchSection">
+              @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2" class="toggle-icon">
+                stroke-width="2" class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
                 <path d="M6 9l6 6 6-6" />
               </svg>
             </button>
           </div>
           <!-- Mobile Collapsible Section -->
-          <div class="collapse d-md-block" id="mobileSearchSection">
+          <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-block" id="mobileSearchSection">
             <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
               <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
                 <div class="search-container position-relative" style="max-width: 100%;">
@@ -300,43 +304,6 @@
               }
             });
           });
-        });
-
-        // Mobile Toggle Button Functionality
-        document.addEventListener('DOMContentLoaded', function() {
-          const toggleBtn = document.querySelector('.mobile-toggle-btn');
-          const searchSection = document.getElementById('mobileSearchSection');
-
-          if (toggleBtn && searchSection) {
-            // Set initial state - collapsed on mobile
-            if (window.innerWidth <= 767) {
-              searchSection.classList.remove('show');
-              toggleBtn.setAttribute('aria-expanded', 'false');
-            }
-
-            // Handle toggle button click
-            toggleBtn.addEventListener('click', function() {
-              const isExpanded = this.getAttribute('aria-expanded') === 'true';
-              this.setAttribute('aria-expanded', !isExpanded);
-
-              if (isExpanded) {
-                searchSection.classList.remove('show');
-              } else {
-                searchSection.classList.add('show');
-              }
-            });
-
-            // Handle window resize
-            window.addEventListener('resize', function() {
-              if (window.innerWidth > 767) {
-                searchSection.classList.add('show');
-                toggleBtn.setAttribute('aria-expanded', 'true');
-              } else {
-                searchSection.classList.remove('show');
-                toggleBtn.setAttribute('aria-expanded', 'false');
-              }
-            });
-          }
         });
       </script>
     </div>
