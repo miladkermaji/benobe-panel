@@ -273,8 +273,6 @@
               dropdownMenu.style.top = '80px';
               dropdownMenu.style.left = '20px';
               dropdownMenu.style.right = 'auto';
-              dropdownMenu.style.width = '400px';
-              dropdownMenu.style.maxWidth = '400px';
               dropdownMenu.style.minHeight = '200px';
               dropdownMenu.style.height = 'auto';
               dropdownMenu.style.background = '#ffffff';
