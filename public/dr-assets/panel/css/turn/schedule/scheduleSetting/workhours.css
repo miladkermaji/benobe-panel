@@ -828,6 +828,12 @@ h6 {
         max-width: 98vw;
         padding: 0.3rem !important;
     }
+    #day-contents-outside.gap-40 {
+        gap: 20px !important;
+    }
+    #day-contents-outside label {
+        font-size: 12px !important;
+    }
     .col-md-6 {
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -920,6 +926,12 @@ h6 {
     .max-appointments,
     [data-bs-target="#CalculatorModal"] {
         width: 70px !important;
+    }
+      #day-contents-outside.gap-40 {
+        gap: 18px !important;
+    }
+    #day-contents-outside label {
+        font-size: 11px !important;
     }
 
     .schedule-modal .modal-dialog {
