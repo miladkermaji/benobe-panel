@@ -15,7 +15,7 @@
 
 @section('content')
   @include('dr.panel.my-tools.loader-btn')
-  <div class="blocking_users_container mt-3" dir="rtl">
+  <div class="blocking_users_container mt-3" dir="rtl" x-data="{ mobileSearchOpen: false }">
     <div class="container px-0">
       <!-- هدر -->
       <div class="glass-header text-white p-2  shadow-lg">
@@ -23,31 +23,47 @@
           <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3 mb-2">
               <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0"> کاربران مسدود</h1>
+              <!-- Mobile Toggle Button -->
+              <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+                @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
             </div>
-            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-              <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-                <div class="search-container position-relative" style="max-width: 100%;">
-                  <input type="text" id="searchInput"
-                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
-                    placeholder="جستجو (نام، موبایل، دلیل)..."
-                    style="padding-right: 20px; text-align: right; direction: auto;">
-                  <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
-                    style="z-index: 5; top: 50%; right: 8px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                      stroke-width="2">
-                      <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+            <!-- Mobile Collapsible Section -->
+            <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+              x-transition:enter-start="opacity-0 transform -translate-y-2"
+              x-transition:enter-end="opacity-100 transform translate-y-0"
+              x-transition:leave="transition ease-in duration-200"
+              x-transition:leave-start="opacity-100 transform translate-y-0"
+              x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-block">
+              <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+                <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+                  <div class="search-container position-relative" style="max-width: 100%;">
+                    <input type="text" id="searchInput"
+                      class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                      placeholder="جستجو (نام، موبایل، دلیل)..."
+                      style="padding-right: 20px; text-align: right; direction: auto;">
+                    <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                      style="z-index: 5; top: 50%; right: 8px;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                        stroke-width="2">
+                        <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                      </svg>
+                    </span>
+                  </div>
+                  <button
+                    class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
+                    data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14" />
                     </svg>
-                  </span>
+                    <span>افزودن کاربر</span>
+                  </button>
                 </div>
-                <button
-                  class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
-                  data-bs-toggle="modal" data-bs-target="#addUserModal">
-                  <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14" />
-                  </svg>
-                  <span>افزودن کاربر</span>
-                </button>
               </div>
             </div>
           </div>
@@ -117,8 +133,8 @@
                     </td>
                     <td class="text-center">
                       <div class="form-check form-switch d-flex justify-content-center">
-                        <input class="form-check-input" type="checkbox" role="switch" data-id="{{ $blockedUser->id }}"
-                          data-status="{{ (int) $blockedUser->status }}"
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          data-id="{{ $blockedUser->id }}" data-status="{{ (int) $blockedUser->status }}"
                           {{ $blockedUser->status == 1 ? 'checked' : '' }} onchange="toggleStatus(this)"
                           style="width: 3em; height: 1.5em; margin-top: 0;">
                       </div>
@@ -154,55 +170,54 @@
           <!-- نمای کارت برای موبایل -->
           <div class="notes-cards d-md-none">
             @forelse ($blockedUsers as $index => $blockedUser)
-              <div class="note-card mb-3" data-id="{{ $blockedUser->id }}">
-                <div class="note-card-header d-flex justify-content-between align-items-center"
-                  onclick="toggleMobileCard(this, event)">
+              <div class="note-card mb-2" x-data="{ open: false }" data-id="{{ $blockedUser->id }}">
+                <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                  @click="open = !open" style="cursor:pointer;">
                   <div class="d-flex align-items-center gap-2">
                     <input type="checkbox" class="form-check-input m-0 align-middle select-user"
-                      value="{{ $blockedUser->id }}">
-                    <span class="badge bg-primary-subtle text-primary">
-                      {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }} <span
-                        class="text-secondary">({{ $blockedUser->user->mobile }})</span>
+                      value="{{ $blockedUser->id }}" @click.stop>
+                    <span class="fw-bold">
+                      {{ $blockedUser->user->first_name }} {{ $blockedUser->user->last_name }}
+                      <span class="text-muted">({{ $blockedUser->user->mobile }})</span>
                     </span>
                   </div>
-                  <div class="d-flex gap-1 align-items-center">
-                    <button type="button" class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                      </svg>
-                    </button>
-                    <span class="dropdown-icon">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="2">
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </span>
-                  </div>
+                  <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
                 </div>
-                <div class="note-card-body" style="display:none;">
-                  <div class="note-card-item">
+                <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                     <span class="note-card-label">تاریخ شروع:</span>
-                    <span
-                      class="note-card-value">{{ \Morilog\Jalali\Jalalian::fromDateTime($blockedUser->blocked_at)->format('Y/m/d') }}</span>
+                    <span class="note-card-value">
+                      {{ \Morilog\Jalali\Jalalian::fromDateTime($blockedUser->blocked_at)->format('Y/m/d') }}
+                    </span>
                   </div>
-                  <div class="note-card-item">
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                     <span class="note-card-label">تاریخ پایان:</span>
                     <span class="note-card-value">
                       {{ $blockedUser->unblocked_at ? \Morilog\Jalali\Jalalian::fromDateTime($blockedUser->unblocked_at)->format('Y/m/d') : '-' }}
                     </span>
                   </div>
-                  <div class="note-card-item">
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                     <span class="note-card-label">دلیل:</span>
                     <span class="note-card-value">{{ $blockedUser->reason ?? 'بدون دلیل' }}</span>
                   </div>
-                  <div class="note-card-item">
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                     <span class="note-card-label">وضعیت:</span>
                     <div class="form-check form-switch d-inline-block">
                       <input class="form-check-input" type="checkbox" role="switch" data-id="{{ $blockedUser->id }}"
                         data-status="{{ (int) $blockedUser->status }}" {{ $blockedUser->status == 1 ? 'checked' : '' }}
                         onchange="toggleStatus(this)" style="width: 3em; height: 1.5em; margin-top: 0;">
                     </div>
+                  </div>
+                  <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top justify-content-end">
+                    <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -515,41 +530,35 @@
       const unblockedAt = user.unblocked_at ? moment(user.unblocked_at).locale('fa').format('jYYYY/jMM/jDD') : '-';
 
       const card = `
-                <div class="note-card mb-3" data-id="${user.id}">
-                    <div class="note-card-header d-flex justify-content-between align-items-center" onclick="toggleMobileCard(this, event)">
+                <div class="note-card mb-2" x-data="{ open: false }" data-id="${user.id}">
+                    <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                        @click="open = !open" style="cursor:pointer;">
                         <div class="d-flex align-items-center gap-2">
-                            <input type="checkbox" class="form-check-input m-0 align-middle select-user" value="${user.id}">
-                            <span class="badge bg-primary-subtle text-primary">
-                                ${user.user.first_name} ${user.user.last_name} <span class='text-secondary'>(${user.user.mobile})</span>
+                            <input type="checkbox" class="form-check-input m-0 align-middle select-user" value="${user.id}" @click.stop>
+                            <span class="fw-bold">
+                                ${user.user.first_name} ${user.user.last_name}
+                                <span class='text-muted'>(${user.user.mobile})</span>
                             </span>
                         </div>
-                        <div class="d-flex gap-1 align-items-center">
-                            <button type="button" class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                            </button>
-                            <span class="dropdown-icon">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="6 9 12 15 18 9" />
-                                </svg>
-                            </span>
-                        </div>
+                        <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
                     </div>
-                    <div class="note-card-body" style="display:none;">
-                        <div class="note-card-item">
+                    <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                        <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="note-card-label">تاریخ شروع:</span>
                             <span class="note-card-value">${blockedAt}</span>
                         </div>
-                        <div class="note-card-item">
+                        <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="note-card-label">تاریخ پایان:</span>
                             <span class="note-card-value">${unblockedAt}</span>
                         </div>
-                        <div class="note-card-item">
+                        <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="note-card-label">دلیل:</span>
                             <span class="note-card-value">${user.reason || 'بدون دلیل'}</span>
                         </div>
-                        <div class="note-card-item">
+                        <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="note-card-label">وضعیت:</span>
                             <div class="form-check form-switch d-inline-block">
                                 <input class="form-check-input" type="checkbox" role="switch" 
@@ -559,6 +568,13 @@
                                     onchange="toggleStatus(this)"
                                     style="width: 3em; height: 1.5em; margin-top: 0;">
                             </div>
+                        </div>
+                        <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top justify-content-end">
+                            <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-user-btn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>`;
@@ -754,23 +770,6 @@
           });
         }
       });
-    }
-
-    // آکاردئون کارت موبایل
-    function toggleMobileCard(header, event) {
-      // اگر روی دکمه حذف یا آیکون فلش کلیک شد، آکاردئون اجرا نشود
-      if (event && (event.target.closest('.delete-user-btn') || event.target.closest('.dropdown-icon'))) {
-        return;
-      }
-      const card = header.closest('.note-card');
-      const body = card.querySelector('.note-card-body');
-      if (!card.classList.contains('open')) {
-        card.classList.add('open');
-        body.style.display = 'block';
-      } else {
-        card.classList.remove('open');
-        body.style.display = 'none';
-      }
     }
 
     $(document).ready(function() {

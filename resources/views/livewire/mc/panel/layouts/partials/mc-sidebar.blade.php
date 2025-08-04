@@ -59,8 +59,8 @@
             <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
               <a href="{{ route('mc-vacation') }}">تعطیلات</a>
             </li>
-            <li class="item-li {{ Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
-              <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
+            <li class="item-li {{ Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-doctor-blocking-users.index') }}">کاربران مسدود</a>
             </li>
           </ul>
         </li>

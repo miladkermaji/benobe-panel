@@ -121,7 +121,7 @@ Route::prefix('mc')
                     Route::prefix('scheduleSetting/blocking_users')->group(function () {
                         Route::get('/', [BlockingUsersController::class, 'index'])
                             ->middleware('secretary.permission:appointments')
-                            ->name('doctor-blocking-users.index');
+                            ->name('mc-doctor-blocking-users.index');
                         Route::post('/store', [BlockingUsersController::class, 'store'])
                             ->middleware('secretary.permission:appointments')
                             ->name('doctor-blocking-users.store');
