@@ -79,7 +79,7 @@ class DoctorServiceEdit extends Component
         $this->dispatch('closeDiscountModal');
     }
 
-    public function updatedDiscountPercent($value)
+    public function calculateDiscountPercent($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             // Clean price value by removing commas
@@ -88,7 +88,7 @@ class DoctorServiceEdit extends Component
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
             if ($cleanPrice && $value) {
-                $this->discountAmount = $cleanPrice * $value / 100;
+                $this->discountAmount = round($cleanPrice * $value / 100, 0);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $this->discountAmount;
             } else {
                 $this->discountAmount = 0;
@@ -97,7 +97,7 @@ class DoctorServiceEdit extends Component
         }
     }
 
-    public function updatedDiscountAmount($value)
+    public function calculateDiscountAmount($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             // Clean price value by removing commas
@@ -106,7 +106,7 @@ class DoctorServiceEdit extends Component
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
             if ($cleanPrice && $value) {
-                $this->discountPercent = ($value / $cleanPrice) * 100;
+                $this->discountPercent = round(($value / $cleanPrice) * 100, 2);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $value;
             } else {
                 $this->discountPercent = 0;

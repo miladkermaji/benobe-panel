@@ -78,7 +78,7 @@ class DoctorServiceEdit extends Component
         $this->dispatch('closeDiscountModal');
     }
 
-    public function updatedDiscountPercent($value)
+    public function calculateDiscountPercent($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             // Clean price value by removing commas
@@ -87,7 +87,7 @@ class DoctorServiceEdit extends Component
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
             if ($cleanPrice && $value) {
-                $this->discountAmount = $cleanPrice * $value / 100;
+                $this->discountAmount = round($cleanPrice * $value / 100, 0);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $this->discountAmount;
             } else {
                 $this->discountAmount = 0;
@@ -96,7 +96,7 @@ class DoctorServiceEdit extends Component
         }
     }
 
-    public function updatedDiscountAmount($value)
+    public function calculateDiscountAmount($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             // Clean price value by removing commas
@@ -105,7 +105,7 @@ class DoctorServiceEdit extends Component
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
             if ($cleanPrice && $value) {
-                $this->discountPercent = ($value / $cleanPrice) * 100;
+                $this->discountPercent = round(($value / $cleanPrice) * 100, 2);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $value;
             } else {
                 $this->discountPercent = 0;
@@ -214,21 +214,21 @@ class DoctorServiceEdit extends Component
     {
         $this->isSaving = true;
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
-        
+
         // Clean pricing data before validation
         $cleanedPricing = [];
         foreach ($this->pricing as $pricing) {
             $cleanedPricing[] = [
                 'id' => $pricing['id'] ?? null,
                 'insurance_id' => $pricing['insurance_id'],
-                'price' => is_string($pricing['price']) ? 
-                    (float) str_replace(',', '', $pricing['price']) : 
+                'price' => is_string($pricing['price']) ?
+                    (float) str_replace(',', '', $pricing['price']) :
                     (float) $pricing['price'],
                 'discount' => $pricing['discount'] ?? 0,
                 'final_price' => $pricing['final_price'] ?? 0,
             ];
         }
-        
+
         $currentState = [
             'service_id' => $this->service_id,
             'medical_center_id' => $this->medical_center_id,

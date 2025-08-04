@@ -140,13 +140,14 @@
   <x-custom-modal id="discountModal" title="محاسبه تخفیف" size="md">
     <div class="mb-4 position-relative mt-2">
       <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
-      <input type="number" wire:model.live="discountPercent" class="form-control position-relative"
-        id="discountPercent" placeholder="درصد را وارد کنید" min="0" max="100">
+      <input type="number" wire:model="discountPercent" wire:input="calculateDiscountPercent($event.target.value)"
+        class="form-control position-relative" id="discountPercent" placeholder="درصد را وارد کنید" min="0"
+        max="100">
     </div>
     <div class="mb-4 position-relative mt-2">
       <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
-      <input type="number" wire:model.live="discountAmount" class="form-control position-relative"
-        id="discountAmount" placeholder="مبلغ را وارد کنید" min="0">
+      <input type="number" wire:model="discountAmount" wire:input="calculateDiscountAmount($event.target.value)"
+        class="form-control position-relative" id="discountAmount" placeholder="مبلغ را وارد کنید" min="0">
     </div>
     <div class="mt-3 d-flex gap-2">
       <button type="button" class="btn btn-secondary flex-grow-1" wire:click="closeDiscountModal">لغو</button>
@@ -258,7 +259,9 @@
 
       // بستن مودال تخفیف
       Livewire.on('closeDiscountModal', () => {
-        closeXModal('discountModal');
+        setTimeout(() => {
+          closeXModal('discountModal');
+        }, 50);
       });
 
       // بازسازی Select2 بعد از به‌روزرسانی Livewire
