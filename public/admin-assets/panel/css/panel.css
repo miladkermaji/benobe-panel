@@ -477,7 +477,7 @@ body {
         left: 2px !important;
         top: 327px !important;
     }
-     .notification-box {
+    .notification-box {
         width: 95vw !important;
         right: inherit !important;
         top: 70px !important;
@@ -1997,12 +1997,12 @@ img {
             width: 93vw !important;
         }
         .notification-box {
-        width: 95vw !important;
-        right: inherit !important;
-        top: 70px !important;
-        left: 9px !important;
-        position: fixed !important;
-    }
+            width: 95vw !important;
+            right: inherit !important;
+            top: 70px !important;
+            left: 9px !important;
+            position: fixed !important;
+        }
     }
 }
 
@@ -2015,7 +2015,7 @@ img {
 .my-dropdown-menu {
     position: fixed !important;
     top: 80px;
-    
+
     right: auto;
     width: 400px;
     background: #ffffff !important;
@@ -2050,4 +2050,37 @@ img {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
+}
+
+/* اطمینان از قرارگیری بالای هدر و زیر مودال */
+.x-tooltip__content {
+    z-index: 300 !important;
+}
+
+/* آیکون‌های trigger همیشه زیر بقیه */
+.x-tooltip__trigger {
+    z-index: 50 !important;
+    position: relative;
+}
+
+/* تنظیم z-index برای کلاس‌های خاص */
+.مabel-top-input-special-takhasos {
+    z-index: 100 !important; /* پایین‌تر از تولتیپ‌ها */
+    position: relative;
+}
+
+/* هدرها */
+header,
+.header,
+.navbar,
+.nav-header {
+    z-index: 200 !important;
+}
+
+/* برای مودال‌ها */
+.modal,
+.modal-backdrop,
+[data-modal],
+.modal-overlay {
+    z-index: 1000 !important;
 }

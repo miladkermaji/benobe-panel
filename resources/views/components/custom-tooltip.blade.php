@@ -235,14 +235,14 @@
     // اصلاح z-index هنگام باز شدن مودال
     document.addEventListener('open-modal', () => {
       document.querySelectorAll('.x-tooltip__content').forEach(content => {
-        content.style.zIndex = '999'; // کمتر از z-index مودال (1000)
+        content.style.zIndex = '150'; // کمتر از z-index مودال، بالاتر از هدر
       });
     });
 
     // بازگرداندن z-index هنگام بسته شدن مودال
     document.addEventListener('close-modal', () => {
       document.querySelectorAll('.x-tooltip__content').forEach(content => {
-        content.style.zIndex = '5001'; // بازگشت به مقدار اصلی
+        content.style.zIndex = '300'; // بازگشت به مقدار اصلی
       });
     });
     const handleResize = debounce(() => {
@@ -273,8 +273,8 @@
     --tooltip-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     --tooltip-arrow-size: 8px;
     --tooltip-arrow-color: #2e3b4e;
-    --tooltip-z-index: 900;
-    /* کاهش z-index پیش‌فرض */
+    --tooltip-z-index: 300;
+    /* بالاتر از هدر، پایین‌تر از مودال */
   }
 
   .x-tooltip {
@@ -282,7 +282,8 @@
     display: inline-block;
     font-family: var(--tooltip-font);
     isolation: isolate;
-    z-index: var(--tooltip-z-index);
+    z-index: 50;
+    /* آیکون‌ها زیر بقیه عناصر */
   }
 
   .x-tooltip__content {
@@ -304,7 +305,8 @@
     visibility: hidden;
     transform: scale(0.95);
     transition: var(--tooltip-transition);
-    z-index: var(--tooltip-z-index);
+    z-index: 300;
+    /* محتوای تولتیپ روی عناصر */
     box-shadow: 0 8px 24px var(--tooltip-shadow);
     pointer-events: none;
     backdrop-filter: blur(4px);
@@ -316,7 +318,32 @@
     cursor: pointer;
   }
 
+  /* اطمینان از قرارگیری بالای هدر و زیر مودال */
+  .x-tooltip__content {
+    z-index: 300 !important;
+  }
 
+  /* آیکون‌های trigger همیشه زیر بقیه */
+  .x-tooltip__trigger {
+    z-index: 50 !important;
+    position: relative;
+  }
+
+  /* هدرها */
+  header,
+  .header,
+  .navbar,
+  .nav-header {
+    z-index: 200 !important;
+  }
+
+  /* برای مودال‌ها */
+  .modal,
+  .modal-backdrop,
+  [data-modal],
+  .modal-overlay {
+    z-index: 1000 !important;
+  }
 
   .x-tooltip__content::before {
     content: '';
