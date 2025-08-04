@@ -5,7 +5,7 @@
       <div class="profile__info border cursor-pointer text-center">
         <div class="avatar__img cursor-pointer">
           <img id="profile-photo-img"
-            src="{{ $medical_center->avatar ? Storage::url($medical_center->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
+            src="{{ optional($medical_center)->avatar ? Storage::url(optional($medical_center)->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
             class="avatar___img cursor-pointer">
           <input type="file" accept="image/*" class="avatar-img__input" id="profile-photo-input">
           <div class="v-dialog__container" style="display: block;"></div>
@@ -19,339 +19,333 @@
     </div>
     <div class="sidebar__scrollable">
       <ul class="" id="">
-          <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
-            <a href="{{ route('mc-panel') }}">داشبورد</a>
-          </li>
-          <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
-            <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
-          </li>
-          <li
-            class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              نوبت اینترنتی
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li {{ Request::routeIs('mc-appointments') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-appointments') }}"> لیست نوبت ها</a>
-                </li>
-                <li class="item-li {{ Request::routeIs('mc.panel.doctornotes.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc.panel.doctornotes.index') }}"> توضیحات نوبت</a>
-                </li>
-                <li class="item-li {{ Request::routeIs('mc-mySpecialDays') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
-                </li>
-              {{--    @if ($this->hasPermission('mc-manual_nobat'))
+        <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
+          <a href="{{ route('mc-panel') }}">داشبورد</a>
+        </li>
+        <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
+          <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
+        </li>
+        <li
+          class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            نوبت اینترنتی
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li {{ Request::routeIs('mc-appointments') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-appointments') }}"> لیست نوبت ها</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('mc.panel.doctornotes.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.doctornotes.index') }}"> توضیحات نوبت</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('mc-mySpecialDays') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
+            </li>
+            {{--    @if ($this->hasPermission('mc-manual_nobat'))
               <li class="item-li {{ Request::routeIs('mc-manual_nobat') ? 'is-active' : '' }}">
                 <a href="{{ route('mc-manual_nobat') }}">ثبت نوبت دستی</a>
               </li>
              --}}
-                <li class="item-li {{ Request::routeIs('mc-scheduleSetting') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
-                </li>
-                <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-vacation') }}">تعطیلات</a>
-                </li>
-                <li class="item-li {{ Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
-                </li>
-            </ul>
-          </li>
-          <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              <div class="d-flex align-items-center">
-                <span class="fw-bold">نسخه های من</span>
-                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">جدید</span>
-              </div>
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-              <li class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
-                <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
-              </li>
-              <li
-                class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
-                <a href="{{ route('mc.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
-              </li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              <div class="d-flex align-items-center">
-                <span class="fw-bold">مشاوره</span>
-                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
-              </div>
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li i-courses {{ Request::routeIs('mc-moshavere_setting') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-moshavere_waiting') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
-                </li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
-            <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
-          </li>
-          <li
-            class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              <div class="d-flex align-items-center">
-                <span class="fw-bold">
-                  نسخه الکترونیک
-                </span>
+            <li class="item-li {{ Request::routeIs('mc-scheduleSetting') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-vacation') }}">تعطیلات</a>
+            </li>
+            <li class="item-li {{ Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+              <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
+            </li>
+          </ul>
+        </li>
+        <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex align-items-center">
+              <span class="fw-bold">نسخه های من</span>
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">جدید</span>
+            </div>
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+            </li>
+            <li
+              class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
+            </li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex align-items-center">
+              <span class="fw-bold">مشاوره</span>
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به زودی</span>
+            </div>
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-courses {{ Request::routeIs('mc-moshavere_setting') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-moshavere_waiting') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
+            </li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
+          <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
+        </li>
+        <li
+          class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            <div class="d-flex align-items-center">
+              <span class="fw-bold">
+                نسخه الکترونیک
+              </span>
+              <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
+                زودی</span>
+            </div>
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
+            </li>
+            <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
+            </li>
+            <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
+            </li>
+            <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
+            </li>
+            <li
+              class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
+            </li>
+            <li
+              class="item-li i-checkout__request {{ Request::routeIs('mc-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+              id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
+                class="d-flex align-items-center">
+                پرونده الکترونیک
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="gozaresh-mali">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            گزارش مالی
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.financial-reports.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-payment-setting') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-wallet-charge') }}">شارژ کیف‌پول</a>
+            </li>
+          </ul>
+        </li>
+        <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            ارتباط با بیماران
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li"><a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a></li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="gozaresh-mali">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            منشی
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
+            </li>
+            <li
+              class="item-li i-checkout__request {{ Request::routeIs('mc-secretary-permissions') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
+            </li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="gozaresh-mali">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            مطب
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-clinic-management') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.clinics.medical-documents') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
+            </li>
+            <li
+              class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
+              <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+            </li>
+          </ul>
+        </li>
+        <li
+          class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="hesab-karbari">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            حساب کاربری
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-upgrade') ? 'is-active' : '' }}"
+              style="opacity: 0.5; pointer-events: none;">
+              <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
+                class="d-flex align-items-center">
+                ارتقا حساب
                 <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
                   زودی</span>
-              </div>
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li" style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
-                </li>
-                <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
-                </li>
-                <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
-                </li>
-                <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
-                </li>
-                <li
-                  class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
-                </li>
-                <li
-                  class="item-li i-checkout__request {{ Request::routeIs('mc-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-                  id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
-                    class="d-flex align-items-center">
-                    پرونده الکترونیک
-                  </a>
-                </li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-            id="gozaresh-mali">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              گزارش مالی
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.financial-reports.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-payment-setting') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
-                </li>
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-wallet-charge') }}">شارژ کیف‌پول</a>
-                </li>
-            </ul>
-          </li>
-          <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              ارتباط با بیماران
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li"><a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a></li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-            id="gozaresh-mali">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              منشی
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
-                </li>
-                <li
-                  class="item-li i-checkout__request {{ Request::routeIs('mc-secretary-permissions') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
-                </li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-            id="gozaresh-mali">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              مطب
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-clinic-management') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.clinics.medical-documents') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
-                </li>
-                <li
-                  class="item-li i-checkout__request {{ Request::routeIs('doctors.clinic.deposit') ? 'is-active' : '' }}">
-                  <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-                </li>
-            </ul>
-          </li>
-          <li
-            class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-            id="hesab-karbari">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              حساب کاربری
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-upgrade') ? 'is-active' : '' }}"
-                  style="opacity: 0.5; pointer-events: none;">
-                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;"
-                    class="d-flex align-items-center">
-                    ارتقا حساب
-                    <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">به
-                      زودی</span>
-                  </a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
-                </li>
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
-                  <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
-                </li>
-                <li
-                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc.panel.doctor-faqs.index') }}"> سوالات متداول</a>
-                </li>
-            </ul>
-          </li>
-          <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
-            <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
-          </li>
-          <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
-            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-              پیام
-              <div class="d-flex justify-content-end w-100 align-items-center">
-                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                  <path fill-rule="evenodd" clip-rule="evenodd"
-                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                    fill="currentColor"></path>
-                </svg>
-              </div>
-            </a>
-            <ul class="drop-toggle d-none">
-                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
-                  <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
-                </li>
-                <li class="item-li i-user__inforamtion">
-                  <a href="#">صفحه گفتگو</a>
-                </li>
-            </ul>
-          </li>
+              </a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
+              <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.doctor-faqs.index') }}"> سوالات متداول</a>
+            </li>
+          </ul>
+        </li>
+        <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
+          <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
+        </li>
+        <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            پیام
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
+              <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
+            </li>
+            <li class="item-li i-user__inforamtion">
+              <a href="#">صفحه گفتگو</a>
+            </li>
+          </ul>
+        </li>
       </ul>
     </div>
     <script>
@@ -381,6 +375,7 @@
             photoInput.click();
           });
         }
+
         function uploadPhoto(file) {
           const formData = new FormData();
           formData.append('photo', file);
@@ -422,12 +417,15 @@
           font-size: 9px !important;
         }
       }
+
       @media (max-width: 768px) {
+
         .sidebar__nav,
         .sidebar__fixed,
         .bars {
           display: none !important;
         }
+
         .mobile-bottom-nav {
           display: flex;
           position: fixed;
@@ -446,6 +444,7 @@
           border-top: 1px solid rgba(224, 224, 224, 0.8);
           backdrop-filter: blur(10px);
         }
+
         .mobile-bottom-nav__item {
           position: relative;
           flex: 1 1 0px;
@@ -458,15 +457,18 @@
           margin: 0 2px;
           overflow: hidden;
         }
+
         @media (max-width: 400px) {
           .mobile-bottom-nav__label {
             font-size: 10px;
           }
+
           .mobile-bottom-nav__item svg {
             width: 22px;
             height: 22px;
           }
         }
+
         .mobile-bottom-nav__item svg {
           display: block;
           margin: 0 auto 2px auto;
@@ -476,12 +478,14 @@
           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
         }
+
         .mobile-bottom-nav__item.active svg,
         .mobile-bottom-nav__item:active svg,
         .mobile-bottom-nav__item.open svg {
           fill: #1976d2;
           transform: scale(1.15);
         }
+
         .mobile-bottom-nav__label {
           font-size: 11px;
           color: #444;
@@ -491,11 +495,13 @@
           opacity: 0.92;
           transition: all 0.3s ease;
         }
+
         .mobile-bottom-nav__item:active,
         .mobile-bottom-nav__item.open {
           background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
           box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
         }
+
         .mobile-bottom-nav__dropdown {
           position: absolute;
           bottom: 68px;
@@ -512,9 +518,11 @@
           animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: none;
         }
+
         .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
           display: block !important;
         }
+
         .mobile-bottom-nav__dropdown a {
           display: block;
           padding: 12px 20px;
@@ -527,29 +535,35 @@
           margin: 4px 8px;
           font-weight: 500;
         }
+
         .mobile-bottom-nav__dropdown a:last-child {
           border-bottom: none;
         }
+
         .mobile-bottom-nav__dropdown a:hover {
           background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
           color: #1976d2;
           transform: translateX(3px);
           box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
         }
+
         @keyframes dropdownIn {
           0% {
             opacity: 0;
             transform: translateX(-50%) translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateX(-50%) translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
           }
         }
+
         /* Fix for dashboard dropdown (first item, right edge) */
         .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
           left: auto;
@@ -557,20 +571,24 @@
           transform: none;
           animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         @keyframes dropdownInRight {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
+
         /* Fix for other dropdown (last item, left edge) */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
           left: 2.5vw;
@@ -578,26 +596,31 @@
           transform: none;
           animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+
         @keyframes dropdownInLeft {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
+
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
+
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
       }
+
       @media (min-width: 769px) {
         .mobile-bottom-nav {
           display: none !important;
         }
       }
+
       .soon-label {
         font-size: 10px;
         color: #d32f2f;
@@ -609,12 +632,14 @@
       (function() {
         let navItems;
         let lastOpen = null;
+
         function closeAllDropdowns(e) {
           if (!e.target.closest('.mobile-bottom-nav')) {
             navItems.forEach(i => i.classList.remove('open'));
             lastOpen = null;
           }
         }
+
         function setupMobileNavDropdowns() {
           navItems = document.querySelectorAll('.mobile-bottom-nav__item');
           navItems.forEach(item => {
@@ -652,99 +677,99 @@
   </div>
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
-      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
-        <a href="{{ route('mc-panel') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__activebox">
-            <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-              </svg>
-            </div>
-            <div class="mobile-bottom-nav__label">داشبورد</div>
+    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
+      <a href="{{ route('mc-panel') }}"
+        style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+        <div class="mobile-bottom-nav__activebox">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24">
+              <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+            </svg>
           </div>
-        </a>
-      </div>
+          <div class="mobile-bottom-nav__label">داشبورد</div>
+        </div>
+      </a>
+    </div>
     <!-- نوبت‌ها -->
-      <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
-            </svg>
-          </div>
-          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+    <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
+      <div class="mobile-bottom-nav__activebox">
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
+          </svg>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-            <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
-            <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
-            <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
-            <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
-            <a href="{{ route('mc-vacation') }}">تعطیلات</a>
-            <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
-            <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
-        </div>
+        <div class="mobile-bottom-nav__label">نوبت‌ها</div>
       </div>
+      <div class="mobile-bottom-nav__dropdown" style="display:none">
+        <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
+        <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
+        <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
+        <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
+        <a href="{{ route('mc-vacation') }}">تعطیلات</a>
+        <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
+        <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
+      </div>
+    </div>
     <!-- مشاوره -->
-      <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
-            </svg>
-          </div>
-          <div class="mobile-bottom-nav__label">مشاوره</div>
+    <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
+      <div class="mobile-bottom-nav__activebox">
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+          </svg>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
-                class="soon-label">به زودی</span></a>
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
-                class="soon-label">به زودی</span></a>
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
-                class="soon-label">به زودی</span></a>
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین <span
-                class="soon-label">به زودی</span></a>
-        </div>
+        <div class="mobile-bottom-nav__label">مشاوره</div>
       </div>
+      <div class="mobile-bottom-nav__dropdown" style="display:none">
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین <span
+            class="soon-label">به زودی</span></a>
+      </div>
+    </div>
     <!-- پروفایل -->
-      <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
+    <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
+      <div class="mobile-bottom-nav__activebox">
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+          </svg>
+        </div>
+        <div class="mobile-bottom-nav__label">پروفایل</div>
+      </div>
+      <div class="mobile-bottom-nav__dropdown" style="display:none">
+        <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
+        <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
+        <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
+        <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
+        <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
+        <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
+            class="soon-label">به زودی</span></a>
+      </div>
+    </div>
+    <!-- ساعت کاری -->
+    <div class="mobile-bottom-nav__item" data-group="workhours">
+      <a href="{{ route('mc-workhours') }}"
+        style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24">
               <path
-                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+                d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
             </svg>
           </div>
-          <div class="mobile-bottom-nav__label">پروفایل</div>
+          <div class="mobile-bottom-nav__label">ساعت کاری</div>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-            <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
-            <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
-            <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
-            <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
-            <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
-            <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
-                class="soon-label">به زودی</span></a>
-        </div>
-      </div>
-    <!-- ساعت کاری -->
-      <div class="mobile-bottom-nav__item" data-group="workhours">
-        <a href="{{ route('mc-workhours') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__activebox">
-            <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
-              </svg>
-            </div>
-            <div class="mobile-bottom-nav__label">ساعت کاری</div>
-          </div>
-        </a>
-      </div>
+      </a>
+    </div>
     <!-- سایر -->
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
       <div class="mobile-bottom-nav__activebox">
@@ -757,33 +782,33 @@
         <div class="mobile-bottom-nav__label">سایر</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
-          <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
-          <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
-          <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
-          <a href="#">صفحه گفتگو</a>
-          <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
-          <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
-          <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
-          <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
+        <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
+        <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
+        <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
+        <a href="#">صفحه گفتگو</a>
+        <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
+        <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
+        <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
+        <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
-              class="soon-label">به زودی</span></a>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
-            <span class="soon-label">به زودی</span></a>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
-              class="soon-label">به زودی</span></a>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
-              class="soon-label">به زودی</span></a>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
-            <span class="soon-label">به زودی</span></a>
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
-            <span class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
+          <span class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
+            class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
+          <span class="soon-label">به زودی</span></a>
+        <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
+          <span class="soon-label">به زودی</span></a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-            <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
-            <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-          <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
-            <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
+        <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
+        <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+        <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
+        <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
       </div>
     </div>
   </div>
@@ -821,21 +846,25 @@
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(10px);
     }
+
     .mobile-submenu-overlay.active {
       display: flex;
       opacity: 1;
       animation: overlayFadeIn 0.3s ease-out;
     }
+
     @keyframes overlayFadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
+
     .mobile-submenu-header {
       display: flex;
       justify-content: flex-end;
@@ -846,6 +875,7 @@
       top: 0;
       z-index: 1;
     }
+
     .close-mobile-submenu-btn {
       background: rgba(240, 240, 240, 0.8);
       border: none;
@@ -859,10 +889,12 @@
       align-items: center;
       justify-content: center;
     }
+
     .close-mobile-submenu-btn:hover {
       background: rgba(220, 220, 220, 0.9);
       transform: scale(1.05);
     }
+
     .mobile-submenu-list {
       width: 100%;
       margin-top: 20px;
@@ -875,6 +907,7 @@
       max-height: calc(100vh - 68px - 64px);
       /* 64px تقریبی هدر */
     }
+
     .mobile-submenu-list a {
       display: block;
       background: #f7f7fa;
@@ -889,15 +922,18 @@
       font-weight: 500;
       text-align: right;
     }
+
     .mobile-submenu-list a:hover {
       background: #e3f2fd;
       color: #1976d2;
     }
+
     @media (min-width: 769px) {
       .mobile-submenu-overlay {
         display: none !important;
       }
     }
+
     .mobile-bottom-nav__activebox {
       display: flex;
       flex-direction: column;
@@ -906,17 +942,20 @@
       padding: 0;
       transition: background 0.2s, box-shadow 0.2s;
     }
+
     .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
       background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
       box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
       border-radius: 16px;
       padding: 6px 8px 4px 8px;
     }
+
     .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
       fill: #1976d2;
       transform: scale(1.12);
       transition: fill 0.2s, transform 0.2s;
     }
+
     .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
       color: #1976d2;
       font-weight: bold;
@@ -929,6 +968,7 @@
       let overlay = document.getElementById('mobile-submenu-overlay');
       let closeBtn = document.getElementById('close-mobile-submenu');
       let submenuList = document.getElementById('mobile-submenu-list');
+
       function closeOverlay() {
         overlay.classList.remove('active');
         submenuList.innerHTML = '';
@@ -936,6 +976,7 @@
         // حذف کلاس active از همه آیتم‌ها
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
       }
+
       function openOverlayWithSubmenu(submenuHtml, parentItem) {
         submenuList.innerHTML = submenuHtml;
         overlay.classList.add('active');
@@ -944,6 +985,7 @@
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
         if (parentItem) parentItem.classList.add('active');
       }
+
       function setupMobileNavOverlay() {
         navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
         navItems.forEach(item => {

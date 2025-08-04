@@ -10,11 +10,9 @@ use App\Models\DoctorPermission;
 
 class McSidebar extends Component
 {
-   
-
     public function render()
     {
-        $user = null;
+        $medical_center = null;
 
         if (Auth::guard('medical_center')->check()) {
             $medical_center = Auth::guard('medical_center')->user();
@@ -22,7 +20,7 @@ class McSidebar extends Component
 
         return view('livewire.mc.panel.layouts.partials.mc-sidebar', [
             'medical_center' => $medical_center,
-            
+
         ]);
     }
 }
