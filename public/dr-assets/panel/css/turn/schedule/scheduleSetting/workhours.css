@@ -609,8 +609,9 @@ h6 {
 /* تنظیمات ریسپانسیو */
 @media (max-width: 992px) {
     .workhours-wrapper-content {
-        max-width: 95vw;
+        max-width: 100vw;
         padding: 1rem;
+        border-radius: 0 !important;
     }
 
     /* روزهای هفته */
@@ -704,6 +705,12 @@ h6 {
     .schedule-modal .timepicker-ui-input {
         width: 140px;
     }
+      #day-contents-outside.gap-40{
+        gap: 34px !important;
+    }
+    #day-contents-outside label{
+        font-size: 14px !important;
+    }
 }
 
 @media (max-width: 768px) {
@@ -720,8 +727,15 @@ h6 {
         white-space: nowrap !important;
     }
     .workhours-wrapper-content {
-        max-width: 98vw;
-        padding: 0.75rem;
+        max-width: 100vw;
+        padding: 0.4rem !important;
+        border-radius: 0 !important;
+    }
+    #day-contents-outside.gap-40{
+        gap: 28px !important;
+    }
+    #day-contents-outside label{
+        font-size: 13px !important;
     }
 
     .day-contents {
@@ -737,8 +751,16 @@ h6 {
     .form-control,
     .timepicker-ui-input,
     .btn {
-        height: 44px;
         font-size: var(--font-size-small);
+    }
+    .form-group.position-relative.timepicker-ui .h-50 ,.form-group.position-relative input{
+        height: 40px !important;
+        width: 60px !important;
+        font-size: 12px !important;
+    }
+    .label-top-input-special-takhasos{
+        font-size: 11px !important;
+        font-weight: bold !important;
     }
     .sixty-min-768,
     .therty-min-768 {

@@ -10,7 +10,7 @@
     <div class="workhours-content w-100 d-flex justify-content-center mb-3">
       <div class="workhours-wrapper-content p-3 pt-4">
         <!-- تنظیمات نوبت دستی (فقط وقتی autoScheduling غیرفعال باشد) -->
-        <div class="card border border-radius-11 p-3 mb-4 bg-white shadow-sm">
+        <div class="card border border-radius-11  mb-2 bg-white shadow-sm">
           <div class="card-header d-flex align-items-center justify-content-between">
             <h6 class="mb-0">تنظیمات تایید دو مرحله ای نوبت‌های دستی</h6>
             @component('components.custom-tooltip', [
@@ -22,10 +22,10 @@
               <span class="toggle-appointment-help" tabindex="0">&#9432;</span>
             @endcomponent
           </div>
-          <div class="card-body">
+          <div class="py-2 px-2">
             <div class="row">
               @if (!$autoScheduling)
-                <div class="col-12 mb-3">
+                <div class="col-12 mb-1">
                   <div class="d-flex flex-row gap-3 flex-wrap align-items-center justify-content-center">
                     <div class="p-1 rounded bg-white"
                       style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
@@ -123,7 +123,7 @@
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <div
                       class="work-hours-{{ $englishDay }} {{ $isWorking[$englishDay] ? '' : 'd-none' }} position-relative">
-                      <div class="border-333 p-3 mt-3 border-radius-11">
+                      <div class="border-333 p-2 mt-2 border-radius-11">
                         <h6>{{ $persianDay }}</h6>
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
                           @if (!empty($slots[$englishDay]))

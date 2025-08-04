@@ -22,7 +22,7 @@
               <span class="toggle-appointment-help" tabindex="0">&#9432;</span>
             @endcomponent
           </div>
-          <div class="card-body">
+          <div class="p-2">
             <div class="row">
               @if (!$autoScheduling)
                 <div class="col-12 mb-3">
@@ -123,7 +123,7 @@
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <div
                       class="work-hours-{{ $englishDay }} {{ $isWorking[$englishDay] ? '' : 'd-none' }} position-relative">
-                      <div class="border-333 p-3 mt-3 border-radius-11">
+                      <div class="border-333 p-2 mt-2 border-radius-11">
                         <h6>{{ $persianDay }}</h6>
                         <div id="morning-{{ $englishDay }}-details" class="mt-4">
                           @if (!empty($slots[$englishDay]))
