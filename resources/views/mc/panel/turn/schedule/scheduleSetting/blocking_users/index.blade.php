@@ -56,7 +56,7 @@
                   </div>
                   <button
                     class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
-                    data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    onclick="openXModal('addUserModal')">
                     <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2">
                       <path d="M12 5v14M5 12h14" />
@@ -237,49 +237,38 @@
       </div>
     </div>
 
-    <!-- مودال افزودن کاربر -->
-    <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-radius-6">
-          <div class="modal-header">
-            <h5 class="modal-title" id="addUserModalLabel">افزودن کاربر مسدود</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form id="addUserForm" method="POST">
-              @csrf
-              <div class="form-group position-relative">
-                <label class="label-top-input-special-takhasos" for="userMobile">شماره موبایل</label>
-                <input type="text" name="mobile" id="userMobile" class="form-control h-50 mb-3"
-                  placeholder="09123456789">
-              </div>
-              <div class="form-group position-relative">
-                <label class="label-top-input-special-takhasos" for="startDate">تاریخ شروع مسدودیت</label>
-                <input type="text" id="startDate" name="blocked_at" class="form-control h-50 mb-3"
-                  placeholder="1403/01/01" data-jdp>
-              </div>
-              <div class="form-group position-relative">
-                <label class="label-top-input-special-takhasos" for="endDate">تاریخ پایان مسدودیت</label>
-                <input type="text" id="endDate" name="unblocked_at" class="form-control h-50 mb-3"
-                  placeholder="1403/01/10" data-jdp>
-              </div>
-              <div class="form-group position-relative">
-                <textarea id="reason" name="reason" class="form-control h-50 mb-3" placeholder="دلیل مسدودیت را وارد کنید"></textarea>
-              </div>
-              <div class="mt-2 w-100">
-                <button id="saveBlockedUserBtn" type="submit"
-                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ثبت</span>
-                  <div class="loader" style="display: none;"></div>
-                </button>
-              </div>
-            </form>
-          </div>
+    <!-- مودال افزودن کاربر با کاستوم مودال -->
+    <x-custom-modal id="addUserModal" title="افزودن کاربر مسدود" size="md">
+      <form id="addUserForm" method="POST">
+        @csrf
+        <div class="form-group position-relative">
+          <label class="label-top-input-special-takhasos" for="userMobile">شماره موبایل</label>
+          <input type="text" name="mobile" id="userMobile" class="form-control h-50 mb-3"
+            placeholder="09123456789">
         </div>
-      </div>
-    </div>
+        <div class="form-group position-relative">
+          <label class="label-top-input-special-takhasos" for="startDate">تاریخ شروع مسدودیت</label>
+          <input type="text" id="startDate" name="blocked_at" class="form-control h-50 mb-3"
+            placeholder="1403/01/01" data-jdp>
+        </div>
+        <div class="form-group position-relative">
+          <label class="label-top-input-special-takhasos" for="endDate">تاریخ پایان مسدودیت</label>
+          <input type="text" id="endDate" name="unblocked_at" class="form-control h-50 mb-3"
+            placeholder="1403/01/10" data-jdp>
+        </div>
+        <div class="form-group position-relative">
+          <label class="label-top-input-special-takhasos" for="reason">دلیل مسدودیت</label>
+          <textarea id="reason" name="reason" class="form-control h-50 mb-3" placeholder="دلیل مسدودیت را وارد کنید"></textarea>
+        </div>
+        <div class="mt-2 w-100">
+          <button id="saveBlockedUserBtn" type="submit"
+            class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+            <span class="button_text">ثبت</span>
+            <div class="loader" style="display: none;"></div>
+          </button>
+        </div>
+      </form>
+    </x-custom-modal>
   </div>
 @endsection
 
@@ -460,7 +449,7 @@
             // پاک کردن فیلد جستجو
             $('#searchInput').val('');
             form[0].reset();
-            $('#addUserModal').modal('hide');
+            closeXModal('addUserModal');
           }
         },
         error: function(xhr) {
