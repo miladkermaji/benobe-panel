@@ -5,30 +5,42 @@
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3 mb-2">
             <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">یادداشت‌های من</h1>
+            <!-- Mobile Toggle Button -->
+            <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+              data-bs-toggle="collapse" data-bs-target="#mobileSearchSection" aria-expanded="false"
+              aria-controls="mobileSearchSection">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="toggle-icon">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
           </div>
-          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-              <div class="search-container position-relative" style="max-width: 100%;">
-                <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
-                  wire:model.live="search" placeholder="جستجو در یادداشت‌ها..."
-                  style="padding-right: 20px; text-align: right; direction: rtl;">
-                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
-                  style="z-index: 5; top: 50%; right: 8px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                    stroke-width="2">
-                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+          <!-- Mobile Collapsible Section -->
+          <div class="collapse d-md-block" id="mobileSearchSection">
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+              <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+                <div class="search-container position-relative" style="max-width: 100%;">
+                  <input type="text"
+                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                    wire:model.live="search" placeholder="جستجو در یادداشت‌ها..."
+                    style="padding-right: 20px; text-align: right; direction: rtl;">
+                  <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                    style="z-index: 5; top: 50%; right: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                      stroke-width="2">
+                      <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                    </svg>
+                  </span>
+                </div>
+                <a href="{{ route('dr.panel.doctornotes.create') }}"
+                  class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
+                  <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
                   </svg>
-                </span>
+                  <span>افزودن</span>
+                </a>
               </div>
-              <a href="{{ route('dr.panel.doctornotes.create') }}"
-                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1">
-                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <span>افزودن</span>
-              </a>
             </div>
           </div>
         </div>
@@ -122,8 +134,8 @@
                         <div class="d-flex justify-content-center gap-1">
                           <a href="{{ route('dr.panel.doctornotes.edit', $item->id) }}"
                             class="btn btn-sm btn-gradient-success px-2 py-1">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                              stroke-width="2">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
                                 d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                             </svg>
@@ -288,6 +300,43 @@
               }
             });
           });
+        });
+
+        // Mobile Toggle Button Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+          const toggleBtn = document.querySelector('.mobile-toggle-btn');
+          const searchSection = document.getElementById('mobileSearchSection');
+
+          if (toggleBtn && searchSection) {
+            // Set initial state - collapsed on mobile
+            if (window.innerWidth <= 767) {
+              searchSection.classList.remove('show');
+              toggleBtn.setAttribute('aria-expanded', 'false');
+            }
+
+            // Handle toggle button click
+            toggleBtn.addEventListener('click', function() {
+              const isExpanded = this.getAttribute('aria-expanded') === 'true';
+              this.setAttribute('aria-expanded', !isExpanded);
+
+              if (isExpanded) {
+                searchSection.classList.remove('show');
+              } else {
+                searchSection.classList.add('show');
+              }
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', function() {
+              if (window.innerWidth > 767) {
+                searchSection.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+              } else {
+                searchSection.classList.remove('show');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+              }
+            });
+          }
         });
       </script>
     </div>

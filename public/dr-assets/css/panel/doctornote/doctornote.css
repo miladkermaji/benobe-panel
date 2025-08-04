@@ -1196,3 +1196,78 @@ body {
         width: 100%;
     }
 }
+
+/* Mobile Toggle Button Styles */
+.mobile-toggle-btn {
+    background: none;
+    border: none;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.mobile-toggle-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+.toggle-icon {
+    transition: transform 0.3s ease;
+}
+
+.mobile-toggle-btn[aria-expanded="true"] .toggle-icon {
+    transform: rotate(180deg);
+}
+
+/* Collapsible Section Styles */
+#mobileSearchSection {
+    transition: all 0.3s ease;
+}
+
+#mobileSearchSection.collapse:not(.show) {
+    display: none;
+}
+
+#mobileSearchSection.collapsing {
+    height: 0;
+    overflow: hidden;
+    transition: height 0.35s ease;
+}
+
+/* Desktop styles - always show */
+@media (min-width: 768px) {
+    .mobile-toggle-btn {
+        display: none !important;
+    }
+
+    #mobileSearchSection {
+        display: block !important;
+    }
+
+    #mobileSearchSection.collapse {
+        display: block !important;
+    }
+}
+
+/* Mobile styles - collapsible by default */
+@media (max-width: 767px) {
+    .mobile-toggle-btn {
+        display: flex !important;
+    }
+
+    #mobileSearchSection {
+        margin-top: 0.5rem;
+    }
+
+    #mobileSearchSection.collapse:not(.show) {
+        display: none !important;
+    }
+}
