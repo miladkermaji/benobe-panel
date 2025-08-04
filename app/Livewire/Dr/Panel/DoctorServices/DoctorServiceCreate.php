@@ -44,27 +44,40 @@ class DoctorServiceCreate extends Component
         $this->showDiscountModal = true;
         if ($index !== null && isset($this->pricing[$index])) {
             $this->discountPercent = $this->pricing[$index]['discount'] ?? 0;
-            $this->discountAmount = $this->pricing[$index]['price'] && $this->discountPercent
-                ? ($this->pricing[$index]['price'] * $this->discountPercent / 100)
+
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$index]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$index]['price']) :
+                (float) $this->pricing[$index]['price'];
+
+            $this->discountAmount = $cleanPrice && $this->discountPercent
+                ? ($cleanPrice * $this->discountPercent / 100)
                 : 0;
         }
+        $this->dispatch('openDiscountModal');
     }
 
     public function closeDiscountModal()
     {
         $this->showDiscountModal = false;
         $this->currentPricingIndex = null;
+        $this->dispatch('closeDiscountModal');
     }
 
     public function updatedDiscountPercent($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
-            if ($this->pricing[$this->currentPricingIndex]['price'] && $value) {
-                $this->discountAmount = $this->pricing[$this->currentPricingIndex]['price'] * $value / 100;
-                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - $this->discountAmount;
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
+                (float) $this->pricing[$this->currentPricingIndex]['price'];
+
+            if ($cleanPrice && $value) {
+                $this->discountAmount = $cleanPrice * $value / 100;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $this->discountAmount;
             } else {
                 $this->discountAmount = 0;
-                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'];
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice;
             }
         }
     }
@@ -72,12 +85,17 @@ class DoctorServiceCreate extends Component
     public function updatedDiscountAmount($value)
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
-            if ($this->pricing[$this->currentPricingIndex]['price'] && $value) {
-                $this->discountPercent = ($value / $this->pricing[$this->currentPricingIndex]['price']) * 100;
-                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - $value;
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
+                (float) $this->pricing[$this->currentPricingIndex]['price'];
+
+            if ($cleanPrice && $value) {
+                $this->discountPercent = ($value / $cleanPrice) * 100;
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $value;
             } else {
                 $this->discountPercent = 0;
-                $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'];
+                $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice;
             }
         }
     }
@@ -109,7 +127,12 @@ class DoctorServiceCreate extends Component
             }
         }
         if (isset($this->pricing[$index])) {
-            $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$index]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$index]['price']) :
+                (float) $this->pricing[$index]['price'];
+
+            $this->pricing[$index]['final_price'] = $cleanPrice - ($cleanPrice * ($this->pricing[$index]['discount'] ?? 0) / 100);
             $this->save();
         }
     }
@@ -118,7 +141,12 @@ class DoctorServiceCreate extends Component
     {
         if ($this->pendingInsuranceIndex !== null) {
             $index = $this->pendingInsuranceIndex;
-            $this->pricing[$index]['final_price'] = $this->pricing[$index]['price'] - ($this->pricing[$index]['price'] * ($this->pricing[$index]['discount'] ?? 0) / 100);
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$index]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$index]['price']) :
+                (float) $this->pricing[$index]['price'];
+
+            $this->pricing[$index]['final_price'] = $cleanPrice - ($cleanPrice * ($this->pricing[$index]['discount'] ?? 0) / 100);
             $this->save();
             $this->pendingInsuranceIndex = null;
             $this->pendingInsuranceOldValue = null;
@@ -139,11 +167,18 @@ class DoctorServiceCreate extends Component
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
             $this->pricing[$this->currentPricingIndex]['discount'] = $this->discountPercent;
-            $this->pricing[$this->currentPricingIndex]['final_price'] = $this->pricing[$this->currentPricingIndex]['price'] - ($this->pricing[$this->currentPricingIndex]['price'] * $this->discountPercent / 100);
+
+            // Clean price value by removing commas
+            $cleanPrice = is_string($this->pricing[$this->currentPricingIndex]['price']) ?
+                (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
+                (float) $this->pricing[$this->currentPricingIndex]['price'];
+
+            $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - ($cleanPrice * $this->discountPercent / 100);
             $this->save();
         }
         $this->showDiscountModal = false;
         $this->currentPricingIndex = null;
+        $this->dispatch('closeDiscountModal');
     }
 
     public function addPricingRow()
@@ -329,7 +364,7 @@ class DoctorServiceCreate extends Component
             $query->where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id);
         })->where('type', 'policlinic')->get();
         $doctorServices = DoctorService::where('doctor_id', Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id)
-            ->with(['service', 'insurance', 'clinic'])
+            ->with(['service', 'insurance', 'medicalCenter'])
             ->get();
         return view('livewire.dr.panel.doctor-services.doctor-service-create', compact('services', 'insurances', 'clinics', 'doctorServices'));
     }

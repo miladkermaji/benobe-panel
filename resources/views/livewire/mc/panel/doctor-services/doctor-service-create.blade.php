@@ -58,13 +58,13 @@
             </div>
             <!-- مدت زمان -->
             <div class="col-lg-4 col-md-6 position-relative mt-5">
-              <input type="number" wire:model.debounce.500ms="duration" class="form-control" id="duration"
+              <input type="number" wire:model.debounce.500ms="duration" class="form-control position-relative" id="duration"
                 placeholder=" " required>
               <label for="duration" class="form-label">مدت زمان (دقیقه)</label>
             </div>
             <!-- توضیحات -->
             <div class="position-relative mt-5">
-              <textarea wire:model.debounce.500ms="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
+              <textarea wire:model.debounce.500ms="description" class="form-control position-relative" id="description" rows="3" placeholder=" "></textarea>
               <label for="description" class="form-label">توضیحات (اختیاری)</label>
             </div>
             <!-- بخش قیمت‌گذاری -->
@@ -87,8 +87,10 @@
                 </div>
                 <!-- قیمت -->
                 <div class="col-lg-3 col-md-6 position-relative mt-5">
-                  <input type="number" wire:model.debounce.500ms="pricing.{{ $index }}.price"
-                    class="form-control" id="price_{{ $index }}" placeholder=" " required>
+                  <input type="text" wire:model.debounce.500ms="pricing.{{ $index }}.price"
+                    class="form-control price-input" id="price_{{ $index }}" placeholder=" " required
+                    oninput="this.value = this.value.replace(/[^0-9]/g, '').replace(/\B(?=(\d{3})+(?!\d))/g, ',')"
+                    onblur="this.value = this.value.replace(/,/g, '')">
                   <label for="price_{{ $index }}" class="form-label">قیمت (تومان)</label>
                 </div>
                 <!-- تخفیف -->
@@ -100,7 +102,7 @@
                 </div>
                 <!-- قیمت نهایی -->
                 <div class="col-lg-2 col-md-6 position-relative mt-5">
-                  <input type="number" wire:model="pricing.{{ $index }}.final_price" class="form-control"
+                  <input type="number" wire:model="pricing.{{ $index }}.final_price" class="form-control position-relative"
                     id="final_price_{{ $index }}" placeholder=" " readonly>
                   <label for="final_price_{{ $index }}" class="form-label">قیمت نهایی (تومان)</label>
                 </div>
@@ -132,36 +134,22 @@
   </div>
 
   <!-- مودال تخفیف -->
-  @if ($showDiscountModal)
-    <div class="modal fade show d-block" id="discountModal" tabindex="-1" role="dialog"
-      aria-labelledby="discountModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header border-0">
-            <h5 class="modal-title" id="discountModalLabel">محاسبه تخفیف</h5>
-            <button type="button" class="btn-close" wire:click="closeDiscountModal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-4">
-              <label for="discountPercent" class="form-label">درصد تخفیف</label>
-              <input type="number" wire:model.live="discountPercent" class="form-control" id="discountPercent"
-                placeholder="درصد را وارد کنید">
-            </div>
-            <div class="mb-4">
-              <label for="discountAmount" class="form-label">مبلغ تخفیف (تومان)</label>
-              <input type="number" wire:model.live="discountAmount" class="form-control" id="discountAmount"
-                placeholder="مبلغ را وارد کنید">
-            </div>
-          </div>
-          <div class="modal-footer border-0">
-            <button type="button" class="btn btn-secondary" wire:click="closeDiscountModal">لغو</button>
-            <button type="button" class="btn btn-primary" wire:click="applyDiscount">تأیید</button>
-          </div>
-        </div>
-      </div>
+  <x-custom-modal id="discountModal" title="محاسبه تخفیف" size="md">
+    <div class="mb-4 position-relative mt-2">
+      <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
+      <input type="number" wire:model.live="discountPercent" class="form-control position-relative" id="discountPercent"
+        placeholder="درصد را وارد کنید" min="0" max="100">
     </div>
-    <div class="modal-backdrop fade show"></div>
-  @endif
+    <div class="mb-4 position-relative mt-2">
+      <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
+      <input type="number" wire:model.live="discountAmount" class="form-control position-relative" id="discountAmount"
+        placeholder="مبلغ را وارد کنید" min="0">
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button type="button" class="btn btn-secondary flex-grow-1" wire:click="closeDiscountModal">لغو</button>
+      <button type="button" class="btn btn-primary flex-grow-1" wire:click="applyDiscount">تأیید</button>
+    </div>
+  </x-custom-modal>
 
   <script>
     document.addEventListener('livewire:init', function() {
@@ -219,6 +207,18 @@
       });
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      // باز کردن مودال تخفیف
+      Livewire.on('openDiscountModal', () => {
+        setTimeout(() => {
+          openXModal('discountModal');
+        }, 100);
+      });
+
+      // بستن مودال تخفیف
+      Livewire.on('closeDiscountModal', () => {
+        closeXModal('discountModal');
       });
 
       Livewire.on('confirm-edit', (data) => {
