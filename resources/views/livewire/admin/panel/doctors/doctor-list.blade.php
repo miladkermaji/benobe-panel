@@ -93,109 +93,94 @@
               <tbody>
                 @if ($readyToLoad)
                   @forelse ($doctors as $index => $item)
-              <tbody x-data="{ open: false }">
-                <tr>
-                  <td class="text-center align-middle">
-                    <input type="checkbox" wire:model.live="selectedDoctors" value="{{ $item->id }}"
-                      class="form-check-input m-0 align-middle">
-                  </td>
-                  <td class="text-center align-middle">{{ $doctors->firstItem() + $index }}</td>
-                  <td class="text-center align-middle">
-                    <div class="position-relative" style="width: 40px; height: 40px;">
-                      <img loading="lazy"
-                        src="{{ str_starts_with($item->profile_photo_url, 'http') ? $item->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
-                        class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
-                        onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
-                      <div
-                        class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-light d-none align-items-center justify-content-center"
-                        style="background-color: #f8f9fa;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
-                          stroke-width="2">
-                          <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                    <tr>
+                      <td class="text-center align-middle">
+                        <input type="checkbox" wire:model.live="selectedDoctors" value="{{ $item->id }}"
+                          class="form-check-input m-0 align-middle">
+                      </td>
+                      <td class="text-center align-middle">{{ $doctors->firstItem() + $index }}</td>
+                      <td class="text-center align-middle">
+                        <div class="position-relative" style="width: 40px; height: 40px;">
+                          <img loading="lazy"
+                            src="{{ str_starts_with($item->profile_photo_url, 'http') ? $item->profile_photo_url : asset('admin-assets/images/default-avatar.png') }}"
+                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                            alt="پروفایل" onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                          <div
+                            class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-light d-none align-items-center justify-content-center"
+                            style="background-color: #f8f9fa;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
+                              stroke-width="2">
+                              <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                          </div>
+                        </div>
+                      </td>
+                      <td class="align-middle">{{ $item->first_name . ' ' . $item->last_name }}</td>
+                      <td class="align-middle">{{ $item->mobile }}</td>
+                      <td class="align-middle">
+                        {{ $item->created_at ? \Morilog\Jalali\Jalalian::fromCarbon($item->created_at)->format('Y/m/d') : '---' }}
+                      </td>
+                      <td class="align-middle">رایگان</td>
+                      <td class="align-middle">رایگان</td>
+                      <td class="align-middle">
+                        {{ $item->province ? $item->province->name : 'ندارد' }} /
+                        {{ $item->city ? $item->city->name : 'ندارد' }}
+                      </td>
+                      <td class="text-center align-middle">
+                        <button wire:click="confirmToggleStatus({{ $item->id }})"
+                          class="badge {{ $item->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                          {{ $item->status ? 'فعال' : 'غیرفعال' }}
+                        </button>
+                      </td>
+                      <td class="text-center align-middle">
+                        <a href="{{ route('doctor.login', $item->id) }}"
+                          class="btn btn-gradient-primary btn-sm rounded-pill px-3">
+                          ورود
+                        </a>
+                      </td>
+                      <td class="text-center align-middle">
+                        <div class="d-flex justify-content-center gap-2">
+                          <a href="{{ route('admin.panel.doctors.edit', $item->id) }}"
+                            class="btn btn-gradient-primary rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $item->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="12" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium">هیچ پزشکی یافت نشد.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
+                  <tr>
+                    <td colspan="12" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
-                    </div>
-                  </td>
-                  <td class="align-middle">{{ $item->first_name . ' ' . $item->last_name }}</td>
-                  <td class="align-middle">{{ $item->mobile }}</td>
-                  <td class="align-middle">
-                    {{ $item->created_at ? \Morilog\Jalali\Jalalian::fromCarbon($item->created_at)->format('Y/m/d') : '---' }}
-                  </td>
-                  <td class="align-middle">رایگان</td>
-                  <td class="align-middle">رایگان</td>
-                  <td class="align-middle">
-                    {{ $item->province ? $item->province->name : 'ندارد' }} /
-                    {{ $item->city ? $item->city->name : 'ندارد' }}
-                  </td>
-                  <td class="text-center align-middle">
-                    <button wire:click="confirmToggleStatus({{ $item->id }})"
-                      class="badge {{ $item->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                      {{ $item->status ? 'فعال' : 'غیرفعال' }}
-                    </button>
-                  </td>
-                  <td class="text-center align-middle">
-                    <a href="{{ route('doctor.login', $item->id) }}"
-                      class="btn btn-gradient-primary btn-sm rounded-pill px-3">
-                      ورود
-                    </a>
-                  </td>
-                  <td class="text-center align-middle">
-                    <div class="d-flex justify-content-center gap-2">
-                      <a href="{{ route('admin.panel.doctors.edit', $item->id) }}"
-                        class="btn btn-gradient-primary rounded-pill px-3">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path
-                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </a>
-                      <button wire:click="confirmDelete({{ $item->id }})"
-                        class="btn btn-gradient-danger rounded-pill px-3">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                  <td class="text-center align-middle" style="width: 40px; padding: 0;">
-                    <button @click="open = !open"
-                      class="d-flex justify-content-center align-items-center w-100 h-100 border-0 bg-transparent"
-                      style="min-height: 40px; min-width: 40px;">
-                      <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2"
-                        :style="open ? 'display: block; transition: transform 0.2s; transform: rotate(180deg);' :
-                            'display: block; transition: transform 0.2s;'">
-                        <path d="M6 9l6 6 6-6" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-                <tr x-show="open" x-transition>
-                  <td colspan="13" class="bg-light text-center">جزئیات پزشک (قابل سفارشی‌سازی)</td>
-                </tr>
-              </tbody>
-            @empty
-              <tr>
-                <td colspan="12" class="text-center py-4">
-                  <div class="d-flex justify-content-center align-items-center flex-column">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                      stroke-width="2" class="text-muted mb-2">
-                      <path d="M5 12h14M12 5l7 7-7 7" />
-                    </svg>
-                    <p class="text-muted fw-medium">هیچ پزشکی یافت نشد.</p>
-                  </div>
-                </td>
-              </tr>
-              @endforelse
-            @else
-              <tr>
-                <td colspan="12" class="text-center py-4">
-                  <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">در حال بارگذاری...</span>
-                  </div>
-                </td>
-              </tr>
-              @endif
+                    </td>
+                  </tr>
+                @endif
               </tbody>
             </table>
           </div>
