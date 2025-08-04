@@ -121,13 +121,13 @@
                     </div>
                   @endforeach
                 </div>
-                <div id="work-hours" class="mt-4">
+                <div id="work-hours" class="mt-3">
                   @foreach (['saturday' => 'شنبه', 'sunday' => 'یکشنبه', 'monday' => 'دوشنبه', 'tuesday' => 'سه‌شنبه', 'wednesday' => 'چهارشنبه', 'thursday' => 'پنج‌شنبه', 'friday' => 'جمعه'] as $englishDay => $persianDay)
                     <div
                       class="work-hours-{{ $englishDay }} {{ $isWorking[$englishDay] ? '' : 'd-none' }} position-relative">
                       <div class="border-333 p-2 mt-2 border-radius-11">
                         <h6>{{ $persianDay }}</h6>
-                        <div id="morning-{{ $englishDay }}-details" class="mt-4">
+                        <div id="morning-{{ $englishDay }}-details" class="mt-2">
                           @if (!empty($slots[$englishDay]))
                             @foreach ($slots[$englishDay] as $index => $slot)
                               <div class="mt-2 form-row d-flex w-100 pt-4 bg-active-slot border-radius-11"
