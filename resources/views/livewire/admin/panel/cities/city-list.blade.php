@@ -2,7 +2,7 @@
   <div class="glass-header text-white p-3 rounded-3 mb-5 shadow-lg">
     <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
       <div class="d-flex align-items-center gap-3">
-        <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">مدیریت شهرها {{ $province ? ' - ' . $province->name : '' }}
+        <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">مدیریت شهرها {{ $province ? ' - ' . $province->name : '' }}
         </h1>
       </div>
       <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">

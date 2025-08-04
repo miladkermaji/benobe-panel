@@ -8,7 +8,7 @@
               class="header-icon">
               <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
             </svg>
-            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">مدیریت نوبت‌ها</h1>
+            <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">مدیریت نوبت‌ها</h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">

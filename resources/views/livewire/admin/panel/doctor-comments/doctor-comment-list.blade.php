@@ -9,7 +9,7 @@
               <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">نظرات پزشکان</h1>
+            <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">نظرات پزشکان</h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">

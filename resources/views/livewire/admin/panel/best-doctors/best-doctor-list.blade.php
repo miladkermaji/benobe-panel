@@ -8,7 +8,7 @@
               class="header-icon">
               <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0"> بهترین پزشکان</h1>
+            <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0"> بهترین پزشکان</h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">

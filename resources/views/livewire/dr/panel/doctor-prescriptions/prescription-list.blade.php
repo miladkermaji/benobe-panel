@@ -4,7 +4,7 @@
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
-            <h1 class="m-0 h4 font-thin text-nowrap mb-3 mb-md-0">نسخه‌های من</h1>
+            <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">نسخه‌های من</h1>
           </div>
           <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 search-filter-bar">
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-row-reverse flex-md-row">
