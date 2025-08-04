@@ -307,9 +307,11 @@ body {
 
 @media screen and (max-width: 768px) {
     .notification-box {
-        width: 93vw !important;
+        width: 450px !important;
         right: inherit !important;
-        left: -20px !important;
+        top: 70px !important;
+        left: 20px !important;
+        position: fixed !important;
     }
 
     .top-details-sicks-cards .rounded-lg span {
@@ -474,6 +476,13 @@ body {
         position: absolute !important;
         left: 2px !important;
         top: 327px !important;
+    }
+     .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 11px !important;
+        position: fixed !important;
     }
     /* .myPanelOption .dropdown-trigger{
         width: 200px;
@@ -1987,6 +1996,13 @@ img {
         .my-dropdown-menu {
             width: 93vw !important;
         }
+        .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 9px !important;
+        position: fixed !important;
+    }
     }
 }
 
