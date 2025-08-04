@@ -57,7 +57,8 @@
             <td>{{ $prescription->tracking_code ?? '-' }}</td>
             <td>
               @if ($prescription->status == 'pending')
-                <button class="btn btn-sm btn-primary" wire:click="openModal({{ $prescription->id }})">پاسخ
+                <button class="btn btn-sm btn-primary"
+                  onclick="openXModal('prescriptionModal'); $wire.openModal({{ $prescription->id }})">پاسخ
                   نسخه</button>
               @else
                 <span class="text-success">پاسخ داده شد</span>
@@ -78,33 +79,19 @@
   </div>
 
   <!-- Modal -->
-  <div class="modal fade @if ($showModal) show d-block @endif" tabindex="-1" role="dialog"
-    @if ($showModal) style="background:rgba(0,0,0,0.5);" @endif>
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">ثبت کد رهگیری نسخه</h5>
-          <button type="button" class="close" wire:click="closeModal"><span>&times;</span></button>
-        </div>
-        <form wire:submit.prevent="submitTrackingCode">
-          <div class="modal-body">
-            <div class="form-group">
-              <label>کد رهگیری</label>
-              <input type="text" class="form-control" wire:model.defer="tracking_code">
-              @error('tracking_code')
-                <span class="text-danger">{{ $message }}</span>
-              @enderror
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" wire:click="closeModal">انصراف</button>
-            <button type="submit" class="btn btn-primary">ثبت</button>
-          </div>
-        </form>
+  <x-custom-modal id="prescriptionModal" title="ثبت کد رهگیری نسخه" size="md">
+    <form wire:submit.prevent="submitTrackingCode">
+      <div class="form-group">
+        <label>کد رهگیری</label>
+        <input type="text" class="form-control" wire:model.defer="tracking_code">
+        @error('tracking_code')
+          <span class="text-danger">{{ $message }}</span>
+        @enderror
       </div>
-    </div>
-  </div>
-  @if ($showModal)
-    <div class="modal-backdrop fade show"></div>
-  @endif
+      <div class="mt-3 d-flex gap-2">
+        <button type="button" class="btn btn-secondary flex-grow-1" wire:click="closeModal">انصراف</button>
+        <button type="submit" class="btn btn-primary flex-grow-1">ثبت</button>
+      </div>
+    </form>
+  </x-custom-modal>
 </div>

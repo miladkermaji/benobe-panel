@@ -325,42 +325,25 @@
             </div>
           </div>
           <!-- Modal ثبت کد رهگیری -->
-          <div class="modal fade" id="trackingModal" tabindex="-1" aria-labelledby="trackingModalLabel"
-            aria-hidden="true" wire:ignore.self>
-            <div class="modal-dialog modal-dialog-centered">
-              <!-- اضافه کردن modal-dialog-centered برای وسط چین شدن عمودی -->
-              <div class="modal-content tracking-modal-animate"> <!-- کلاس افکت -->
-                <div class="modal-header">
-                  <h5 class="modal-title" id="trackingModalLabel">ثبت/ویرایش کد رهگیری نسخه</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <input type="text" class="form-control mb-2" wire:model.defer="tracking_code"
-                    placeholder="کد رهگیری نسخه">
-                  <textarea class="form-control" wire:model.defer="doctor_description" placeholder="توضیحات پزشک" rows="3"></textarea>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
-                  <button type="button" class="btn btn-primary" wire:click="updateTrackingCode">ثبت</button>
-                </div>
-              </div>
+          <x-custom-modal id="trackingModal" title="ثبت/ویرایش کد رهگیری نسخه" size="md">
+            <input type="text" class="form-control mb-2" wire:model.defer="tracking_code"
+              placeholder="کد رهگیری نسخه">
+            <textarea class="form-control" wire:model.defer="doctor_description" placeholder="توضیحات پزشک" rows="3"></textarea>
+            <div class="mt-3 d-flex gap-2">
+              <button type="button" class="btn btn-secondary flex-grow-1"
+                onclick="closeXModal('trackingModal')">بستن</button>
+              <button type="button" class="btn btn-primary flex-grow-1" wire:click="updateTrackingCode">ثبت</button>
             </div>
-          </div>
+          </x-custom-modal>
           <script>
             document.addEventListener('livewire:init', function() {
               Livewire.on('showTrackingModal', () => {
                 setTimeout(function() {
-                  if (typeof bootstrap !== 'undefined') {
-                    var modal = new bootstrap.Modal(document.getElementById('trackingModal'));
-                    modal.show();
-                  }
+                  openXModal('trackingModal');
                 }, 100);
               });
               Livewire.on('hideTrackingModal', () => {
-                if (typeof bootstrap !== 'undefined') {
-                  var modal = bootstrap.Modal.getInstance(document.getElementById('trackingModal'));
-                  if (modal) modal.hide();
-                }
+                closeXModal('trackingModal');
               });
               Livewire.on('show-alert', (event) => {
                 toastr[event.type](event.message);
@@ -389,148 +372,131 @@
       </div>
 
       {{-- Patient Info Modal --}}
-      <div class="modal fade" id="patientInfoModal" tabindex="-1" aria-labelledby="patientInfoModalLabel"
-        aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="patientInfoModalLabel">اطلاعات بیمار</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="بستن"></button>
-            </div>
-            <div class="modal-body">
-              @if ($selectedPatient)
-                <div class="bg-light rounded-3 p-3 mb-2 border" style="font-size:1.04em;">
-                  <ul class="list-unstyled mb-0">
-                    <li class="d-flex align-items-center mb-2">
-                      <span class="me-2 text-primary">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
-                          viewBox="0 0 24 24">
-                          <path
-                            d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z" />
-                        </svg>
-                      </span>
-                      <span class="fw-bold">نام و نام خانوادگی:</span>
-                      <span class="ms-2">{{ $selectedPatient['full_name'] }}</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-2">
-                      <span class="me-2 text-info">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                          viewBox="0 0 24 24">
-                          <path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3" />
-                          <rect width="16" height="12" x="4" y="7" rx="2" />
-                          <path d="M8 11h8M8 15h6" />
-                        </svg>
-                      </span>
-                      <span class="fw-bold">کد ملی:</span>
-                      <span class="ms-2">{{ $selectedPatient['national_code'] }}</span>
-                    </li>
-                    <li class="d-flex align-items-center mb-2">
-                      <span class="me-2 text-success">
-                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                          viewBox="0 0 24 24">
-                          <path
-                            d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5v-13z" />
-                          <path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M12 14h.01M17 14h.01" />
-                        </svg>
-                      </span>
-                      <span class="fw-bold">شماره موبایل:</span>
-                      <span class="ms-2">{{ $selectedPatient['mobile'] }}</span>
-                    </li>
-                    @if ($selectedPatient['date_of_birth'])
-                      <li class="d-flex align-items-center mb-2">
-                        <span class="me-2 text-warning">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                            viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 6v6l4 2" />
-                          </svg>
-                        </span>
-                        <span class="fw-bold">تاریخ تولد:</span>
-                        <span class="ms-2">{{ $selectedPatient['date_of_birth'] }}</span>
-                      </li>
-                    @endif
-                    @if ($selectedPatient['sex'])
-                      <li class="d-flex align-items-center mb-2">
-                        <span class="me-2 text-secondary">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                            viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 8v4" />
-                            <path d="M12 16h.01" />
-                          </svg>
-                        </span>
-                        <span class="fw-bold">جنسیت:</span>
-                        <span
-                          class="ms-2">{{ $selectedPatient['sex'] == 'male' ? 'مرد' : ($selectedPatient['sex'] == 'female' ? 'زن' : $selectedPatient['sex']) }}</span>
-                      </li>
-                    @endif
-                    @if ($selectedPatient['province'] || $selectedPatient['city'])
-                      <li class="d-flex align-items-center mb-2">
-                        <span class="me-2 text-primary">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                            viewBox="0 0 24 24">
-                            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-                            <circle cx="12" cy="9" r="2.5" />
-                          </svg>
-                        </span>
-                        <span class="fw-bold">استان/شهر:</span>
-                        <span
-                          class="ms-2">{{ $selectedPatient['province'] }}{{ $selectedPatient['province'] && $selectedPatient['city'] ? ' / ' : '' }}{{ $selectedPatient['city'] }}</span>
-                      </li>
-                    @endif
-                    @if ($selectedPatient['address'])
-                      <li class="d-flex align-items-center mb-2">
-                        <span class="me-2 text-dark">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                            viewBox="0 0 24 24">
-                            <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
-                            <circle cx="12" cy="7" r="4" />
-                          </svg>
-                        </span>
-                        <span class="fw-bold">آدرس:</span>
-                        <span class="ms-2">{{ $selectedPatient['address'] }}</span>
-                      </li>
-                    @endif
-                    @if ($selectedPatient['email'])
-                      <li class="d-flex align-items-center mb-2">
-                        <span class="me-2 text-danger">
-                          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
-                            viewBox="0 0 24 24">
-                            <rect x="2" y="4" width="20" height="16" rx="2" />
-                            <path d="M22 6 12 13 2 6" />
-                          </svg>
-                        </span>
-                        <span class="fw-bold">ایمیل:</span>
-                        <span class="ms-2">{{ $selectedPatient['email'] }}</span>
-                      </li>
-                    @endif
-                  </ul>
-                </div>
-              @else
-                <div class="text-danger">اطلاعاتی برای این بیمار یافت نشد.</div>
+      <x-custom-modal id="patientInfoModal" title="اطلاعات بیمار" size="md">
+        @if ($selectedPatient)
+          <div class="bg-light rounded-3 p-3 mb-2 border" style="font-size:1.04em;">
+            <ul class="list-unstyled mb-0">
+              <li class="d-flex align-items-center mb-2">
+                <span class="me-2 text-primary">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7"
+                    viewBox="0 0 24 24">
+                    <path
+                      d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v2h20v-2c0-3.3-6.7-5-10-5z" />
+                  </svg>
+                </span>
+                <span class="fw-bold">نام و نام خانوادگی:</span>
+                <span class="ms-2">{{ $selectedPatient['full_name'] }}</span>
+              </li>
+              <li class="d-flex align-items-center mb-2">
+                <span class="me-2 text-info">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                    viewBox="0 0 24 24">
+                    <path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3" />
+                    <rect width="16" height="12" x="4" y="7" rx="2" />
+                    <path d="M8 11h8M8 15h6" />
+                  </svg>
+                </span>
+                <span class="fw-bold">کد ملی:</span>
+                <span class="ms-2">{{ $selectedPatient['national_code'] }}</span>
+              </li>
+              <li class="d-flex align-items-center mb-2">
+                <span class="me-2 text-success">
+                  <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                    viewBox="0 0 24 24">
+                    <path
+                      d="M3 5.5A2.5 2.5 0 0 1 5.5 3h13A2.5 2.5 0 0 1 21 5.5v13A2.5 2.5 0 0 1 18.5 21h-13A2.5 2.5 0 0 1 3 18.5v-13z" />
+                    <path d="M7 10h.01M12 10h.01M17 10h.01M7 14h.01M12 14h.01M17 14h.01" />
+                  </svg>
+                </span>
+                <span class="fw-bold">شماره موبایل:</span>
+                <span class="ms-2">{{ $selectedPatient['mobile'] }}</span>
+              </li>
+              @if ($selectedPatient['date_of_birth'])
+                <li class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-warning">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                      viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 6v6l4 2" />
+                    </svg>
+                  </span>
+                  <span class="fw-bold">تاریخ تولد:</span>
+                  <span class="ms-2">{{ $selectedPatient['date_of_birth'] }}</span>
+                </li>
               @endif
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>
-            </div>
+              @if ($selectedPatient['sex'])
+                <li class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-secondary">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                      viewBox="0 0 24 24">
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 8v4" />
+                      <path d="M12 16h.01" />
+                    </svg>
+                  </span>
+                  <span class="fw-bold">جنسیت:</span>
+                  <span
+                    class="ms-2">{{ $selectedPatient['sex'] == 'male' ? 'مرد' : ($selectedPatient['sex'] == 'female' ? 'زن' : $selectedPatient['sex']) }}</span>
+                </li>
+              @endif
+              @if ($selectedPatient['province'] || $selectedPatient['city'])
+                <li class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-primary">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                      viewBox="0 0 24 24">
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                      <circle cx="12" cy="9" r="2.5" />
+                    </svg>
+                  </span>
+                  <span class="fw-bold">استان/شهر:</span>
+                  <span
+                    class="ms-2">{{ $selectedPatient['province'] }}{{ $selectedPatient['province'] && $selectedPatient['city'] ? ' / ' : '' }}{{ $selectedPatient['city'] }}</span>
+                </li>
+              @endif
+              @if ($selectedPatient['address'])
+                <li class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-dark">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                      viewBox="0 0 24 24">
+                      <path d="M3 21v-2a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                  </span>
+                  <span class="fw-bold">آدرس:</span>
+                  <span class="ms-2">{{ $selectedPatient['address'] }}</span>
+                </li>
+              @endif
+              @if ($selectedPatient['email'])
+                <li class="d-flex align-items-center mb-2">
+                  <span class="me-2 text-danger">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7"
+                      viewBox="0 0 24 24">
+                      <rect x="2" y="4" width="20" height="16" rx="2" />
+                      <path d="M22 6 12 13 2 6" />
+                    </svg>
+                  </span>
+                  <span class="fw-bold">ایمیل:</span>
+                  <span class="ms-2">{{ $selectedPatient['email'] }}</span>
+                </li>
+              @endif
+            </ul>
           </div>
+        @else
+          <div class="text-danger">اطلاعاتی برای این بیمار یافت نشد.</div>
+        @endif
+        <div class="mt-3">
+          <button type="button" class="btn btn-secondary w-100" onclick="closeXModal('patientInfoModal')">بستن</button>
         </div>
-      </div>
+      </x-custom-modal>
       <script>
         document.addEventListener('livewire:init', function() {
           Livewire.on('showPatientInfoModal', () => {
             setTimeout(function() {
-              if (typeof bootstrap !== 'undefined') {
-                var modal = new bootstrap.Modal(document.getElementById('patientInfoModal'));
-                modal.show();
-              }
+              openXModal('patientInfoModal');
             }, 100);
           });
           Livewire.on('hidePatientInfoModal', () => {
-            if (typeof bootstrap !== 'undefined') {
-              var modal = bootstrap.Modal.getInstance(document.getElementById('patientInfoModal'));
-              if (modal) modal.hide();
-            }
+            closeXModal('patientInfoModal');
           });
         });
       </script>
