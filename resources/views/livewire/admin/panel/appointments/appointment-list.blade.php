@@ -1,6 +1,6 @@
 <div class="appointments-container">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadAppointments">
-    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+    <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
@@ -14,7 +14,7 @@
             <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">
               <!-- جستجو -->
               <div class="search-container position-relative flex-grow-1 mb-2 mb-md-0 w-100">
-      <input type="text"
+                <input type="text"
                   class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start w-100"
                   wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی..."
                   style="padding-right: 20px; text-align: right; direction: rtl; width: 100%; max-width: 400px; min-width: 200px;">
@@ -23,26 +23,26 @@
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                     stroke-width="2">
                     <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-        </svg>
-      </span>
-    </div>
+                  </svg>
+                </span>
+              </div>
               <!-- دکمه افزودن نوبت -->
-      <a href="{{ route('admin.panel.appointments.create') }}"
+              <a href="{{ route('admin.panel.appointments.create') }}"
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 w-100 w-md-auto justify-content-center justify-content-md-start">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                   stroke-width="2">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
                 <span>افزودن </span>
-      </a>
-    </div>
-  </div>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  <div class="container-fluid px-0">
+    <div class="container-fluid px-0">
       <div class="card shadow-sm rounded-2">
-      <div class="card-body p-0">
+        <div class="card-body p-0">
           <!-- Group Actions -->
           <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
             x-show="$wire.selectedAppointments.length > 0 || $wire.applyToAllFiltered">
@@ -63,7 +63,7 @@
               </button>
             </div>
           </div>
-                <!-- Desktop Table View -->
+          <!-- Desktop Table View -->
           <div class="table-responsive text-nowrap d-none d-md-block">
             <table class="table table-hover w-100 m-0">
               <thead>
@@ -82,9 +82,9 @@
                   <th class="align-middle">بیمه</th>
                   <th class="align-middle">قیمت نهایی</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                </tr>
+              </thead>
+              <tbody>
                 @if ($readyToLoad)
                   @php $rowIndex = 0; @endphp
                   @foreach ($doctors as $doctor)
@@ -110,8 +110,8 @@
                 </tr>
                 @foreach ($doctor['appointments'] as $appointment)
                   <tr x-show="open" x-transition style="border-bottom: 1px solid #e3e6ea; background: #fff;">
-                          <td class="text-center align-middle">
-                            <input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
+                    <td class="text-center align-middle">
+                      <input type="checkbox" wire:model.live="selectedAppointments" value="{{ $appointment->id }}"
                         class="form-check-input m-0 align-middle">
                     </td>
                     <td class="text-center align-middle">{{ ++$rowIndex }}</td>
@@ -119,43 +119,43 @@
                     <td class="align-middle">
                       {{ $appointment->patientable ? $appointment->patientable->full_name : '-' }}</td>
                     <td class="align-middle">{{ $appointment->patientable ? $appointment->patientable->phone : '-' }}
-                          </td>
+                    </td>
                     <td class="align-middle">
                       {{ $appointment->patientable ? $appointment->patientable->national_code : '-' }}</td>
                     <td class="align-middle">
-                            {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
-                            {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}
-                          </td>
-                          <td class="align-middle">
+                      {{ \Morilog\Jalali\Jalalian::fromDateTime($appointment->appointment_date)->format('Y/m/d') }}
+                      {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') }}
+                    </td>
+                    <td class="align-middle">
                       <span class="badge bg-success">{{ number_format($appointment->deposit) }} تومان</span>
-                          </td>
-                          <td class="align-middle">
+                    </td>
+                    <td class="align-middle">
                       <span class="badge {{ $appointment->payment_status === 'paid' ? 'bg-success' : 'bg-danger' }}">
-                              {{ $appointment->payment_status === 'paid' ? 'پرداخت شده' : 'پرداخت نشده' }}
-                            </span>
-                          </td>
+                        {{ $appointment->payment_status === 'paid' ? 'پرداخت شده' : 'پرداخت نشده' }}
+                      </span>
+                    </td>
                     <td class="align-middle">{{ $appointment->insurance_type ?? 'بدون بیمه' }}</td>
                     <td class="align-middle">{{ number_format($appointment->fee) }} تومان</td>
                     <td class="text-center align-middle">
-                            <div class="d-flex justify-content-center gap-2">
-                              <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
+                      <div class="d-flex justify-content-center gap-2">
+                        <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
                           class="btn btn-gradient-primary rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
+                            stroke="currentColor" stroke-width="2">
                             <path
                               d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                                </svg>
-                              </a>
-                              <button wire:click="confirmDelete({{ $appointment->id }})"
+                          </svg>
+                        </a>
+                        <button wire:click="confirmDelete({{ $appointment->id }})"
                           class="btn btn-gradient-danger rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
+                            stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                                </svg>
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 @endforeach
               </tbody>
               @endforeach
@@ -165,8 +165,8 @@
                     <div class="d-flex justify-content-center align-items-center flex-column">
                       <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                         stroke-width="2" class="text-muted mb-2">
-                                <path d="M5 12h14M12 5l7 7-7 7" />
-                              </svg>
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                      </svg>
                       <p class="text-muted fw-medium">هیچ نوبتی یافت نشد.</p>
                     </div>
                   </td>
@@ -177,13 +177,13 @@
                 <td colspan="12" class="text-center py-4">
                   <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">در حال بارگذاری...</span>
-                            </div>
-                          </td>
-                        </tr>
+                  </div>
+                </td>
+              </tr>
               @endif
-                    </tbody>
-                  </table>
-                </div>
+              </tbody>
+            </table>
+          </div>
           <!-- Mobile Card View -->
           <div class="appointments-cards d-md-none">
             @if ($readyToLoad)
@@ -204,7 +204,7 @@
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
                       <path d="M6 9l6 6 6-6" />
                     </svg>
-                          </div>
+                  </div>
                   <div x-show="open" x-transition>
                     @foreach ($doctor['appointments'] as $appointment)
                       <div class="appointment-card mb-2 p-2 rounded-2"
@@ -214,7 +214,7 @@
                           style="cursor:pointer;">
                           <span class="fw-bold">
                             {{ $appointment->patientable ? $appointment->patientable->full_name : '-' }}
-                          <span
+                            <span
                               class="text-muted">({{ $doctor['doctor'] ? $doctor['doctor']->full_name : '-' }})</span>
                           </span>
                         </div>
@@ -266,74 +266,74 @@
                           <div class="appointment-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="appointment-card-label">قیمت نهایی:</span>
                             <span class="appointment-card-value">{{ number_format($appointment->fee) }} تومان</span>
-                        </div>
+                          </div>
                           <div class="appointment-card-item d-flex justify-content-between align-items-center py-1">
                             <span class="appointment-card-label">عملیات:</span>
                             <div class="d-flex gap-2">
-                          <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
+                              <a href="{{ route('admin.panel.appointments.edit', $appointment->id) }}"
                                 class="btn btn-gradient-primary rounded-pill px-3">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                              stroke="currentColor" stroke-width="2">
+                                  stroke="currentColor" stroke-width="2">
                                   <path
                                     d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                            </svg>
-                          </a>
-                          <button wire:click="confirmDelete({{ $appointment->id }})"
+                                </svg>
+                              </a>
+                              <button wire:click="confirmDelete({{ $appointment->id }})"
                                 class="btn btn-gradient-danger rounded-pill px-3">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                              stroke="currentColor" stroke-width="2">
-                              <path
-                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                            </svg>
-                          </button>
+                                  stroke="currentColor" stroke-width="2">
+                                  <path
+                                    d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
                       </div>
                     @endforeach
                   </div>
-            </div>
+                </div>
               @endforeach
-        @else
+            @else
               <div class="text-center py-4">
-            <div class="spinner-border text-primary" role="status">
-              <span class="visually-hidden">در حال بارگذاری...</span>
-            </div>
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
+              </div>
+            @endif
           </div>
-        @endif
-      </div>
           <!-- Pagination & Counter -->
           <div class="d-flex justify-content-between align-items-center px-4 flex-wrap gap-3">
             <div class="text-muted">تعداد کل: {{ collect($doctors)->sum('totalAppointments') }}</div>
             {{-- صفحه‌بندی اگر نیاز بود اضافه شود --}}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
-<script>
+    <script>
       document.addEventListener('livewire:init', function() {
         Livewire.on('show-alert', (event) => {
           toastr[event.type](event.message);
         });
 
-    Livewire.on('confirm-delete', (event) => {
-      Swal.fire({
+        Livewire.on('confirm-delete', (event) => {
+          Swal.fire({
             title: 'حذف نوبت',
             text: 'آیا مطمئن هستید که می‌خواهید این نوبت را حذف کنید؟',
-        icon: 'warning',
-        showCancelButton: true,
+            icon: 'warning',
+            showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
-        confirmButtonText: 'بله، حذف کن',
+            confirmButtonText: 'بله، حذف کن',
             cancelButtonText: 'خیر'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Livewire.dispatch('deleteAppointmentConfirmed', {
-            id: event.id
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('deleteAppointmentConfirmed', {
+                id: event.id
+              });
+            }
           });
-        }
-      });
-    });
+        });
 
         Livewire.on('confirm-delete-selected', function(data) {
           let text = data.allFiltered ?
@@ -354,10 +354,10 @@
               } else {
                 Livewire.dispatch('deleteSelected');
               }
-        }
+            }
+          });
+        });
       });
-    });
-  });
-</script>
+    </script>
   </div>
 </div>

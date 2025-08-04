@@ -27,7 +27,7 @@
     --gradient-header: linear-gradient(90deg, #1b6fa6 0%, #2e86c1 100%);
     --radius-button: 0.375rem; /* کاهش برای موبایل */
     --radius-card: 0.75rem; /* کاهش برای موبایل */
-    --radius-nav: 1rem; /* کاهش برای موبایل */
+    --radius-nav: 0.25rem; /* کاهش برای موبایل */
     --radius-circle: 9999px;
 }
 /* استایل‌های عمومی */

@@ -18,7 +18,7 @@
   <div class="blocking_users_container mt-3" dir="rtl">
     <div class="container px-0">
       <!-- هدر -->
-      <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+      <div class="glass-header text-white p-2  shadow-lg">
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
           <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">

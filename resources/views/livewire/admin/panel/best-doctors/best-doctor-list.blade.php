@@ -1,6 +1,6 @@
 <div class="doctor-notes-container">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadBestDoctors">
-    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+    <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
@@ -37,7 +37,7 @@
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                <span>افزودن  </span>
+                <span>افزودن </span>
               </a>
             </div>
           </div>
@@ -202,8 +202,7 @@
                           class="btn btn-gradient-danger btn-sm rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
-                            <path
-                              d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
                         </button>
                       </div>

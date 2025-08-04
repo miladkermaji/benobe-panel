@@ -15,7 +15,7 @@
 
 <div class="doctor-clinics-container">
   <div class="container py-2 mt-3" dir="rtl">
-    <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+    <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3">
@@ -522,7 +522,7 @@
 
     function addDepositItem(deposit) {
       const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-      'ویزیت آنلاین';
+        'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Desktop table row
@@ -589,7 +589,7 @@
 
     function updateDepositItem(deposit) {
       const clinicName = deposit.medical_center_id ? clinics[deposit.medical_center_id] || 'نامشخص' :
-      'ویزیت آنلاین';
+        'ویزیت آنلاین';
       const amountText = deposit.deposit_amount ? Number(deposit.deposit_amount).toLocaleString() : 'بدون بیعانه';
 
       // Update desktop table row

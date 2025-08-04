@@ -1,5 +1,5 @@
 <div class="container-fluid py-2 mt-3" dir="rtl" wire:init="loadFees">
-  <div class="glass-header text-white p-2 rounded-2 mb-4 shadow-lg">
+  <div class="glass-header text-white p-2  shadow-lg">
     <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
       <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center gap-3">

@@ -885,7 +885,7 @@ body {
     --gradient-header: linear-gradient(90deg, #1b6fa6 0%, #2e86c1 100%);
     --radius-button: 0.375rem; /* کاهش برای موبایل */
     --radius-card: 0.75rem; /* کاهش برای موبایل */
-    --radius-nav: 1rem; /* کاهش برای موبایل */
+    --radius-nav: 0.25rem; /* کاهش برای موبایل */
     --radius-circle: 9999px;
 }
 
@@ -1592,8 +1592,6 @@ body {
     }
 }
 
-
-
 /* استایل کارت‌های موبایل برای یادداشت‌ها */
 .notes-cards {
     display: none;
@@ -2056,27 +2054,27 @@ body {
         width: 100%;
     }
 }
- @media (max-width: 768px) {
+@media (max-width: 768px) {
     .add-btn-responsive {
-      height: 44px !important;
-      font-size: 1rem !important;
-      padding: 0.5rem 1.5rem !important;
-      border-radius: 10px !important;
+        height: 44px !important;
+        font-size: 1rem !important;
+        padding: 0.5rem 1.5rem !important;
+        border-radius: 10px !important;
     }
-  }
-   .service-row-main {
+}
+.service-row-main {
     background: #e6f0fa !important;
     border-radius: 8px;
     font-weight: bold;
-  }
+}
 
-  .service-row-child {
+.service-row-child {
     background: #fff !important;
-  }
+}
 
-  @media (max-width: 991px) {
+@media (max-width: 991px) {
     .service-row-main {
-      border-radius: 6px;
-      font-size: 1rem;
+        border-radius: 6px;
+        font-size: 1rem;
     }
-  }
+}
