@@ -589,6 +589,20 @@ class MedicalCentersController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      *
+     * @queryParam province_id integer آیدی استان (اختیاری)
+     * @queryParam city_id integer آیدی شهر (اختیاری)
+     * @queryParam center_type string نوع مرکز درمانی (اختیاری)
+     * @queryParam tariff_type string نوع تعرفه (اختیاری)
+     * @queryParam specialty_id integer آیدی تخصص (اختیاری، می‌تواند از specialty_ids هم استفاده شود)
+     * @queryParam specialty_ids integer آیدی تخصص (اختیاری، جایگزین specialty_id)
+     * @queryParam service_id integer آیدی خدمت (اختیاری، می‌تواند از service_ids هم استفاده شود)
+     * @queryParam service_ids integer آیدی خدمت (اختیاری، جایگزین service_id)
+     * @queryParam insurance_id integer آیدی بیمه (اختیاری، می‌تواند از insurance_ids هم استفاده شود)
+     * @queryParam insurance_ids integer آیدی بیمه (اختیاری، جایگزین insurance_id)
+     * @queryParam sort_by string فیلد مرتب‌سازی (اختیاری)
+     * @queryParam sort_dir string جهت مرتب‌سازی (asc/desc، اختیاری)
+     * @queryParam per_page integer تعداد آیتم در هر صفحه (پیش‌فرض: 20)
+     *
      * @response 200 {
      *   "status": "success",
      *   "message": "عملیات با موفقیت انجام شد",
@@ -667,16 +681,19 @@ class MedicalCentersController extends Controller
                 $query->where('Center_tariff_type', $request->input('tariff_type'));
             }
             // فیلتر تخصص
-            if ($request->filled('specialty_id')) {
-                $query->whereJsonContains('specialty_ids', (string)$request->input('specialty_id'));
+            if ($request->filled('specialty_id') || $request->filled('specialty_ids')) {
+                $specialtyId = $request->input('specialty_ids', $request->input('specialty_id'));
+                $query->whereJsonContains('specialty_ids', (string)$specialtyId);
             }
             // فیلتر خدمات
-            if ($request->filled('service_id')) {
-                $query->whereJsonContains('service_ids', (string)$request->input('service_id'));
+            if ($request->filled('service_id') || $request->filled('service_ids')) {
+                $serviceId = $request->input('service_ids', $request->input('service_id'));
+                $query->whereJsonContains('service_ids', (string)$serviceId);
             }
             // فیلتر بیمه
-            if ($request->filled('insurance_id')) {
-                $query->whereJsonContains('insurance_ids', (string)$request->input('insurance_id'));
+            if ($request->filled('insurance_id') || $request->filled('insurance_ids')) {
+                $insuranceId = $request->input('insurance_ids', $request->input('insurance_id'));
+                $query->whereJsonContains('insurance_ids', (string)$insuranceId);
             }
 
             // مرتب‌سازی
