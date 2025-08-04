@@ -751,7 +751,7 @@ class MoshavereWaitingController extends Controller
             $query->where('attendance_status', $attendanceStatus);
         }
         // دریافت نوبت‌ها به همراه اطلاعات بیمار، پزشک و کلینیک
-        $appointments = $query->with(['patient', 'doctor', 'clinic', 'insurance'])->get();
+        $appointments = $query->with(['patient', 'doctor', 'medicalCenter', 'insurance'])->get();
         return response()->json([
             'success'      => true,
             'appointments' => $appointments,

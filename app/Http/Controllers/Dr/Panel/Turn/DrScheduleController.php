@@ -42,7 +42,7 @@ class DrScheduleController extends Controller
         $filterType = $request->input('type');
         $now = Carbon::now()->format('Y-m-d');
 
-        $appointments = Appointment::with(['doctor', 'patientable', 'insurance', 'clinic'])
+        $appointments = Appointment::with(['doctor', 'patientable', 'insurance', 'medicalCenter'])
             ->where('doctor_id', $doctor->id)
             ->where('appointment_date', $now);
 
@@ -302,7 +302,7 @@ class DrScheduleController extends Controller
             $query->where('attendance_status', $attendanceStatus);
         }
 
-        $appointments = $query->with(['patientable', 'doctor', 'clinic', 'insurance'])->paginate(10);
+        $appointments = $query->with(['patientable', 'doctor', 'medicalCenter', 'insurance'])->paginate(10);
 
         return response()->json([
             'success' => true,
