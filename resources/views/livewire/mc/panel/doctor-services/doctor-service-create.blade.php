@@ -139,14 +139,13 @@
   <x-custom-modal id="discountModal" title="محاسبه تخفیف" size="md">
     <div class="mb-4 position-relative mt-2">
       <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
-      <input type="number" wire:model="discountPercent" wire:input="calculateDiscountPercent($event.target.value)"
-        class="form-control position-relative" id="discountPercent" placeholder="درصد را وارد کنید" min="0"
-        max="100">
+      <input type="number" wire:model="discountPercent" class="form-control position-relative" id="discountPercent"
+        placeholder="درصد را وارد کنید" min="0" max="100">
     </div>
     <div class="mb-4 position-relative mt-2">
       <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
-      <input type="number" wire:model="discountAmount" wire:input="calculateDiscountAmount($event.target.value)"
-        class="form-control position-relative" id="discountAmount" placeholder="مبلغ را وارد کنید" min="0">
+      <input type="number" wire:model="discountAmount" class="form-control position-relative" id="discountAmount"
+        placeholder="مبلغ را وارد کنید" min="0">
     </div>
     <div class="mt-3 d-flex gap-2">
       <button type="button" class="btn btn-secondary flex-grow-1" wire:click="closeDiscountModal">لغو</button>
@@ -216,6 +215,19 @@
       Livewire.on('openDiscountModal', () => {
         setTimeout(() => {
           openXModal('discountModal');
+
+          // اضافه کردن event handlers برای مودال تخفیف بعد از باز شدن
+          $('#discountPercent').off('input keyup change').on('input keyup change', function() {
+            const value = $(this).val();
+            @this.set('discountPercent', value);
+            @this.call('calculateDiscountPercent', value);
+          });
+
+          $('#discountAmount').off('input keyup change').on('input keyup change', function() {
+            const value = $(this).val();
+            @this.set('discountAmount', value);
+            @this.call('calculateDiscountAmount', value);
+          });
         }, 100);
       });
 
@@ -225,6 +237,19 @@
           closeXModal('discountModal');
         }, 50);
       });
+
+      // اضافه کردن event handlers برای مودال تخفیف
+      // $(document).on('input', '#discountPercent', function() {
+      //   const value = $(this).val();
+      //   @this.set('discountPercent', value);
+      //   @this.call('calculateDiscountPercent', value);
+      // });
+
+      // $(document).on('input', '#discountAmount', function() {
+      //   const value = $(this).val();
+      //   @this.set('discountAmount', value);
+      //   @this.call('calculateDiscountAmount', value);
+      // });
 
       Livewire.on('confirm-edit', (data) => {
         Swal.fire({
@@ -248,6 +273,27 @@
         initializeSelect2();
         $('#selected_service').val(currentService).trigger('change');
       });
+    });
+
+    // --- AutoSave Debounce ---
+    let autoSaveTimeout = null;
+
+    function triggerAutoSave() {
+      if (autoSaveTimeout) clearTimeout(autoSaveTimeout)
+      autoSaveTimeout = setTimeout(function() {
+        window.Livewire && window.Livewire.dispatch('autoSave');
+      }, 1200); // 1.2 ثانیه تاخیر
+    }
+
+    // روی همه input و select های قابل ویرایش (به جز readonly و دکمه‌ها و مودال تخفیف)
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll(
+          'input:not([readonly]):not([type=button]):not([type=submit]):not(#discountPercent):not(#discountAmount), textarea, select'
+        )
+        .forEach(function(el) {
+          el.addEventListener('input', triggerAutoSave);
+          el.addEventListener('change', triggerAutoSave);
+        });
     });
   </script>
 </div>
