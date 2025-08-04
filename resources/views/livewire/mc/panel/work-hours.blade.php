@@ -86,7 +86,7 @@
                 style="display: none;">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-8">
-                  <div class="input-group position-relative  rounded bg-white mt-1">
+                  <div class="input-group position-relative  rounded bg-white mt-2">
                     <label class="floating-label bg-white px-2 fw-bold"
                       style="position: absolute; top: -10px; right: -4px; font-size: 0.7rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
                       تعداد روز‌های باز تقویم
