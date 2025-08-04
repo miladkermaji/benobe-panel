@@ -197,8 +197,8 @@ function initializeRescheduleCalendar(appointmentId = null) {
                 const appointments = response.data || [];
                 const holidays =
                     window.holidaysData && window.holidaysData.status
-                    ? window.holidaysData.holidays
-                    : [];
+                        ? window.holidaysData.holidays
+                        : [];
 
                 const data = { holidays, appointments };
                 calendarDataCache.set(cacheKey, data);
@@ -900,4 +900,122 @@ async function handleDayClick(dayElement) {
 
             const result = await Swal.fire({
                 title: "تایید جابجایی",
-                html: `
+                html: `آیا از جابجایی ${
+                    selectedIds.length
+                } نوبت به تاریخ ${jalaliDate} اطمینان دارید؟<br><br>
+                      <small>نوبت‌های فعلی و زمان‌های جدید:<br>${timeMapping
+                          .map(
+                              (m) =>
+                                  `${m.from.time} تاریخ ${m.from.date} → ${m.to.time} تاریخ ${m.to.date}`
+                          )
+                          .join("<br>")}</small>`,
+                icon: "question",
+                showCancelButton: true,
+                confirmButtonText: "بله",
+                cancelButtonText: "خیر",
+            });
+
+            if (result.isConfirmed) {
+                // Create a map of appointment IDs to their new times
+                const appointmentTimeMap = selectedIds.reduce(
+                    (map, id, index) => {
+                        map[id] = sortedTimes[index];
+                        return map;
+                    },
+                    {}
+                );
+
+                console.log(
+                    "Sending appointment time map:",
+                    appointmentTimeMap
+                );
+
+                // Send reschedule request with mapped times
+                Livewire.dispatchTo(
+                    "dr.panel.turn.schedule.appointments-list",
+                    "rescheduleAppointment",
+                    {
+                        appointmentIds: selectedIds,
+                        newDate: date,
+                        selectedTime: sortedTimes[0], // Assuming the first selected time is the new one for multiple
+                        isMultiple: true, // Add flag to indicate multiple appointments
+                    }
+                );
+
+                // Close the modal after sending the request
+                window.dispatchEvent(
+                    new CustomEvent("close-modal", {
+                        detail: {
+                            name: "reschedule-modal",
+                        },
+                    })
+                );
+            }
+        } catch (error) {
+            console.error("Error in handleDayClick:", error);
+            Swal.fire({
+                title: "خطا",
+                text: "خطایی در دریافت اطلاعات رخ داد. لطفاً دوباره تلاش کنید.",
+                icon: "error",
+                confirmButtonText: "باشه",
+            });
+        }
+    }
+}
+
+// مدیریت رویدادهای باز و بسته شدن مودال
+document.addEventListener("livewire:initialized", () => {
+    window.holidaysData = window.holidaysData || {
+        status: false,
+        holidays: [],
+    };
+    window.appointmentsData = window.appointmentsData || {
+        status: false,
+        data: [],
+    };
+
+    const clinicId = localStorage.getItem("selectedClinicId") || "default";
+    if (clinicId !== "default") {
+        Livewire.dispatch("setSelectedClinicId", { clinicId });
+    }
+
+    // اضافه کردن لیسنر برای موفقیت جابجایی نوبت
+    window.addEventListener("appointment-rescheduled", (event) => {
+        console.log("Appointment rescheduled successfully:", event.detail);
+
+        // نمایش توستر موفقیت
+        if (typeof Toastify === "function") {
+            Toastify({
+                text: event.detail.message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#4CAF50",
+                },
+            }).showToast();
+        } else if (typeof toastr !== "undefined") {
+            toastr.success(event.detail.message);
+        }
+    });
+
+    // اضافه کردن لیسنر برای خطا در جابجایی نوبت
+    window.addEventListener("appointment-reschedule-error", (event) => {
+        console.error("Appointment reschedule error:", event.detail);
+
+        // نمایش توستر خطا
+        if (typeof Toastify === "function") {
+            Toastify({
+                text: event.detail.message,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                    background: "#f44336",
+                },
+            }).showToast();
+        } else if (typeof toastr !== "undefined") {
+            toastr.error(event.detail.message);
+        }
+    });
+});
