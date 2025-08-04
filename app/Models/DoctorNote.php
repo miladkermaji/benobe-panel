@@ -23,4 +23,9 @@ class DoctorNote extends Model
     {
         return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
+
+    public function clinic()
+    {
+        return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
+    }
 }
