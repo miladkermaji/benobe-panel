@@ -36,7 +36,8 @@
                     <!-- تأیید دو مرحله‌ای نوبت‌های دستی -->
                     <div class="col-md-6 col-12">
                       <div class="mb-3 position-relative">
-                        <label class="form-label">آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟</label>
+                        <label class="form-label">تأیید دو مرحله‌ای نوبت‌های دستی
+                        </label>
                         <select class="form-control" name="status">
                           <option value="0" {{ isset($settings) && $settings->is_active == 0 ? 'selected' : '' }}>
                             خیر</option>

@@ -30,7 +30,8 @@
                     <div class="p-1 rounded bg-white"
                       style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
                       <x-my-toggle-yes-no :isChecked="$manualNobatActive" id="manual-nobat-active" model="manualNobatActive"
-                        day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" />
+                        day="تأیید دو مرحله‌ای نوبت‌های دستی
+" />
                     </div>
                     <div class="p-1 rounded bg-white"
                       style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
@@ -44,14 +45,15 @@
                   <div class="p-1 rounded bg-white"
                     style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
                     <x-my-toggle-yes-no :isChecked="$manualNobatActive" id="manual-nobat-active" model="manualNobatActive"
-                      day="آیا تأیید دو مرحله‌ای نوبت‌های دستی فعال باشد؟" />
+                      day="تأیید دو مرحله‌ای نوبت‌های دستی
+" />
                   </div>
                 </div>
               @endif
               <!-- زمان ارسال لینک تأیید و مدت اعتبار لینک در یک ردیف (فقط وقتی toggle فعال باشد) -->
-              <div class="col-12 mb-3 mt-3 {{ $manualNobatActive ? '' : 'd-none' }} position-relative">
-                <div class="d-flex flex-column flex-md-row gap-3">
-                  <div class="flex-fill">
+              <div class="col-12 {{ $manualNobatActive ? '' : 'd-none' }} ">
+                <div class="d-flex flex-column flex-md-row gap-2">
+                  <div class="flex-fill position-relative">
                     <label class="label-top-input-special-takhasos mb-2">زمان ارسال لینک تأیید:</label>
                     <div class="input-group position-relative">
                       <input class="form-control ltr text-center position-relative" type="number" min="1"
@@ -60,7 +62,7 @@
                       <span class="input-group-text">ساعت قبل</span>
                     </div>
                   </div>
-                  <div class="flex-fill">
+                  <div class="flex-fill mt-sm-3 mt-md-0 mb-sm-2 mb-md-0 position-relative">
                     <label class="label-top-input-special-takhasos mb-2">مدت زمان اعتبار لینک:</label>
                     <div class="input-group position-relative">
                       <input class="form-control ltr text-center position-relative" type="number" min="1"
@@ -86,7 +88,7 @@
                 <div class="col-8">
                   <div class="input-group position-relative  rounded bg-white mt-1">
                     <label class="floating-label bg-white px-2 fw-bold"
-                      style="position: absolute; top: -10px; right: -4px; font-size: 0.85rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
+                      style="position: absolute; top: -10px; right: -4px; font-size: 0.7rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
                       تعداد روز‌های باز تقویم
                     </label>
                     <input type="text" inputmode="numeric" pattern="[0-9]*"
