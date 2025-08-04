@@ -221,10 +221,10 @@ class DoctorLoginConfirm extends Component
             'session_id' => session()->getId()
         ]);
 
-        // حفظ الـ session قبل إعادة التوجيه
+
         session()->save();
 
-        $this->redirect($redirectRoute, navigate: true);
+        $this->redirect($redirectRoute);
     }
 
     public function resendOtp()
