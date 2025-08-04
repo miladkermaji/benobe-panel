@@ -307,13 +307,13 @@ body {
 
 @media screen and (max-width: 768px) {
     .notification-box {
-        width: 93vw !important;
+        width: 450px !important;
         right: inherit !important;
-        left: -20px !important;
+        top: 70px !important;
+        left: 20px !important;
+        position: fixed !important;
     }
-    .header{
-        padding: 5px !important;
-    }
+
     .top-details-sicks-cards .rounded-lg span {
         font-size: 13px;
     }
@@ -394,7 +394,15 @@ body {
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
         top: 42px;
-        z-index: 45;
+        z-index: 9999 !important; /* افزایش z-index */
+        left: 0 !important; /* تنظیم موقعیت */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 }
 
@@ -457,12 +465,10 @@ body {
         display: flex;
         justify-content: center;
     }
-  .px-3{
-    padding-left: .3rem !important;
-    padding-right: .3rem !important;
-
-  }
-  
+    .px-3 {
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
+    }
 }
 
 @media screen and (max-width: 488px) {
@@ -471,7 +477,14 @@ body {
         left: 2px !important;
         top: 327px !important;
     }
-   /* .myPanelOption .dropdown-trigger{
+     .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 11px !important;
+        position: fixed !important;
+    }
+    /* .myPanelOption .dropdown-trigger{
         width: 200px;
     }
         */
@@ -485,6 +498,11 @@ body {
     }
 }
 
+@media screen and (max-width: 456px) {
+    .dropdown-trigger {
+        width: 250px !important;
+    }
+}
 @media screen and (max-width: 430px) {
     .top-dr-panel {
         width: 100%;
@@ -493,15 +511,22 @@ body {
     }
 
     .my-dropdown-menu {
-        width: 370px;
+        width: 90vw !important;
         min-height: 87px;
         background-color: #fff;
         border-radius: 5px;
         box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
         position: absolute;
-        right: -112px;
+        right: -90px !important;
         top: 42px;
-        z-index: 45;
+        z-index: 9999 !important; /* افزایش z-index */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 }
 
@@ -510,11 +535,6 @@ body {
         width: 100%;
         display: flex;
         flex-wrap: wrap;
-    }
-
-    .my-tooltip.mx-2 {
-        margin-right: 0 !important;
-        margin-left: 0 !important;
     }
 
     .my-dropdown-menu {
@@ -526,9 +546,19 @@ body {
         position: absolute;
         right: -60px;
         top: 42px;
-        z-index: 45;
+        z-index: 9999 !important; /* افزایش z-index */
     }
 
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .dropdown-trigger {
+        width: 220px !important;
+    }
     .svg-help {
         display: none;
     }
@@ -540,7 +570,15 @@ body {
         display: flex;
         flex-wrap: wrap;
     }
-
+    .dropdown-trigger {
+        width: 190px !important;
+    }
+    .logout {
+        margin-right: 0 !important;
+    }
+    .notif-option {
+        padding: 0 2px !important;
+    }
     .my-dropdown-menu {
         width: 306px !important;
         min-height: 87px;
@@ -550,7 +588,14 @@ body {
         position: absolute;
         right: -60px;
         top: 42px;
-        z-index: 45;
+        z-index: 9999 !important; /* افزایش z-index */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
     .svg-help {
@@ -575,6 +620,11 @@ body {
     }
 }
 
+@media screen and (max-width: 389px) {
+    .myPanelOption .dropdown-trigger {
+        max-width: 210px;
+    }
+}
 @media screen and (max-width: 432px) {
     .top-details-sicks-cards .rounded-lg span {
         font-size: 12px;
@@ -620,9 +670,7 @@ body {
     .selectDate_datepicker__xkZeS {
         border: 1px solid #ddd;
     }
-    .my-tooltip {
-        display: none !important;
-    }
+
     .my-form-control {
         width: 92vw;
         background-color: #ebeff8;
@@ -1160,6 +1208,13 @@ img {
     animation: slideDown 0.3s ease-out;
 }
 
+/* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+.my-dropdown-menu:not(.d-none) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 /* Dropdown animation */
 @keyframes slideDown {
     0% {
@@ -1575,7 +1630,7 @@ img {
     border-radius: var(--radius-card); /* گوشه‌های گرد */
     box-shadow: 0 4px 12px var(--shadow); /* سایه ملایم */
 }
-.spinner-border{
+.spinner-border {
     border-radius: 50% !important;
 }
 /* Custom Spinner */
@@ -1814,23 +1869,185 @@ img {
 }
 
 /* پاسخ‌گویی به سایزهای مختلف */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .myPanelOption {
         padding: 8px !important;
         display: flex;
         justify-content: end;
     }
-    
-    .myPanelOption .dropdown-trigger {
-        max-width: 200px;
+    .row > * {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
     }
-    .myPanelOption .dropdown{
+    .myPanelOption .dropdown {
         display: flex;
-  justify-content: end;
+        justify-content: end;
     }
-    
+
     .myPanelOption .dropdown-menu {
         width: 100%;
         max-width: 100%;
     }
+
+    /* بهبود نمایش هدر در سایز موبایل */
+    .header__left {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        overflow: hidden !important;
+    }
+
+    .header__left > div {
+        margin: 0 !important;
+    }
+
+    .dropdown-trigger {
+        width: 300px;
+        min-width: 150px;
+        max-width: 400px;
+    }
+
+    .notif-option {
+        padding: 0 5px !important;
+    }
+
+    /* تنظیم فاصله بین آیکون‌ها */
+    .logout {
+        margin-right: 5px;
+    }
+
+    /* اضافه کردن استایل برای دراپ‌داون در موبایل */
+    .my-dropdown-menu {
+        width: 350px !important;
+        background: #ffffff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08) !important;
+        position: absolute !important;
+        top: 55px !important;
+        left: 10px !important;
+        z-index: 9999 !important; /* افزایش z-index برای نمایش روی همه چیز */
+        padding: 0.375rem 0 !important;
+        animation: slideDown 0.3s ease-out !important;
+        display: block !important; /* اطمینان از نمایش */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* استایل کلی برای اطمینان از نمایش دراپ‌داون در همه سایزهای موبایل */
+@media (max-width: 768px) {
+    .dropdown .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 9999 !important;
+    }
+
+    /* اضافه کردن استایل برای اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu {
+        position: absolute !important;
+        z-index: 9999 !important;
+        background: #ffffff !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        min-width: 300px !important;
+        right: auto !important;
+        top: 71px !important;
+    }
+
+    /* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* تنظیم موقعیت دراپ‌داون برای سایزهای مختلف */
+    @media (max-width: 556px) {
+        .my-dropdown-menu {
+            width: 350px !important;
+            right: auto !important;
+        }
+    }
+
+    @media (max-width: 430px) {
+        .my-dropdown-menu {
+            width: 94vw !important;
+            right: inherit;
+        }
+    }
+
+    @media (max-width: 391px) {
+        .my-dropdown-menu {
+            width: 94vw !important;
+            left: 10px !important;
+        }
+    }
+
+    @media (max-width: 346px) {
+        .my-dropdown-menu {
+            width: 93vw !important;
+        }
+        .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 9px !important;
+        position: fixed !important;
+    }
+    }
+}
+
+/* استایل کلی برای دراپ‌داون */
+.dropdown {
+    position: relative !important;
+}
+
+/* استایل اصلی دراپ‌داون */
+.my-dropdown-menu {
+    position: fixed !important;
+    top: 80px;
+    
+    right: auto;
+    width: 400px;
+    background: #ffffff !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+    z-index: 10000 !important;
+    padding: 1rem 0 !important;
+    min-height: 200px !important;
+    height: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+    max-height: none !important;
+}
+
+/* نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+.my-dropdown-menu:not(.d-none) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* پنهان کردن دراپ‌داون وقتی کلاس d-none دارد */
+.my-dropdown-menu.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* اطمینان از نمایش دراپ‌داون */
+.my-dropdown-menu[style*="display: block"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }

@@ -1822,6 +1822,11 @@ span.tagRemove:hover {
     color: #222222;
 }
 
+@media (max-width: 768px) {
+    .header{
+        padding: 5px 10px !important;
+    }
+}
 @media (max-width: 414px) {
     .tab__item {
         width: 100%;
