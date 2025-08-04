@@ -10,6 +10,7 @@ use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Zone;
 
 class DoctorListingController extends Controller
 {
@@ -120,7 +121,17 @@ class DoctorListingController extends Controller
 
                 // فیلتر کردن بر اساس province و specialty
                 if ($provinceId) {
-                    $query->where('province_id', $provinceId);
+                    // پیدا کردن شهرهای مربوط به استان
+                    $cityIds = Zone::where('level', 2)
+                        ->where('parent_id', $provinceId)
+                        ->pluck('id')
+                        ->toArray();
+
+                    // فیلتر کردن بر اساس استان یا شهرهای مربوط به آن
+                    $query->where(function ($q) use ($provinceId, $cityIds) {
+                        $q->where('province_id', $provinceId)
+                          ->orWhereIn('city_id', $cityIds);
+                    });
                 }
                 if ($specialtyId) {
                     $query->where('specialty_id', $specialtyId);
@@ -133,12 +144,13 @@ class DoctorListingController extends Controller
 
                 // فیلتر کردن بر اساس نوبت باز
                 if ($hasAvailableAppointments) {
-                    $query->whereHas('appointments', function ($q) use ($today, $calendarDays) {
-                        $q->where('status', 'scheduled')
-                            ->where('appointment_date', '>=', $today->toDateString())
-                            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString());
-                    })->whereHas('workSchedules', function ($q) use ($today, $calendarDays) {
+                    $query->whereHas('workSchedules', function ($q) {
                         $q->where('is_working', true);
+                    })->where(function ($q) use ($today, $calendarDays) {
+                        // پزشکانی که در 30 روز آینده حداقل یک روز کاری دارند
+                        $q->whereHas('workSchedules', function ($scheduleQuery) {
+                            $scheduleQuery->where('is_working', true);
+                        });
                     });
                 }
 
@@ -418,6 +430,88 @@ class DoctorListingController extends Controller
             'slots'               => $slots,
             'max_appointments'    => $maxAppointments,
         ];
+    }
+
+    /**
+     * بررسی اینکه آیا پزشک نوبت خالی دارد یا نه
+     */
+    private function hasAvailableAppointments($doctor, $clinicId = null)
+    {
+        $doctorId        = $doctor->id;
+        $today           = Carbon::today('Asia/Tehran');
+        $now             = Carbon::now('Asia/Tehran');
+        $daysOfWeek      = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+        $currentDayIndex = $today->dayOfWeek;
+
+        $appointmentConfig = $doctor->appointmentConfig;
+        $calendarDays      = $appointmentConfig ? ($appointmentConfig->calendar_days ?? 30) : 30;
+
+        $schedules = $doctor->workSchedules;
+        if ($schedules->isEmpty()) {
+            return false;
+        }
+
+        $bookedAppointments = Appointment::where('doctor_id', $doctorId)
+            ->when($clinicId, function ($query) use ($clinicId) {
+                return $query->where('medical_center_id', $clinicId);
+            })
+            ->where('status', 'scheduled')
+            ->where('appointment_date', '>=', $today->toDateString())
+            ->where('appointment_date', '<=', $today->copy()->addDays($calendarDays)->toDateString())
+            ->get()
+            ->groupBy('appointment_date');
+
+        for ($i = 0; $i < $calendarDays; $i++) {
+            $checkDayIndex = ($currentDayIndex + $i) % 7;
+            $dayName       = $daysOfWeek[$checkDayIndex];
+            $checkDate     = $today->copy()->addDays($i);
+
+            $dayAppointments = $bookedAppointments->get($checkDate->toDateString(), collect());
+
+            foreach ($schedules as $schedule) {
+                if ($schedule->day !== $dayName) {
+                    continue;
+                }
+
+                $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
+                if (! is_array($workHours) || empty($workHours)) {
+                    continue;
+                }
+                $workHour = $workHours[0];
+
+                $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
+                $duration = $this->getAppointmentDuration($appointmentSettings, $dayName, 15);
+
+                $startTime = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['start'], 'Asia/Tehran');
+                $endTime   = Carbon::parse($checkDate->toDateString() . ' ' . $workHour['end'], 'Asia/Tehran');
+
+                $currentTime = $startTime->copy();
+                while ($currentTime->lessThan($endTime)) {
+                    $nextTime = (clone $currentTime)->addMinutes($duration);
+                    $slotTime = $currentTime->format('H:i');
+
+                    $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
+                        $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
+                        $apptEnd   = (clone $apptStart)->addMinutes($duration);
+                        return $currentTime->lt($apptEnd) && $nextTime->gt($apptStart);
+                    });
+
+                    if ($checkDate->isToday()) {
+                        if (!$isBooked && $currentTime->gt($now)) {
+                            return true; // نوبت خالی پیدا شد
+                        }
+                    } else {
+                        if (!$isBooked) {
+                            return true; // نوبت خالی پیدا شد
+                        }
+                    }
+
+                    $currentTime->addMinutes($duration);
+                }
+            }
+        }
+
+        return false; // هیچ نوبت خالی پیدا نشد
     }
 
     /**
