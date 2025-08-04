@@ -237,6 +237,7 @@
     doctorSpecialties: @json($doctorSpecialties),
     appointmentsTrend: @json($appointmentsTrend),
     medicalCenterComparison: @json($medicalCenterComparison),
+    clinicComparison: @json($medicalCenterComparison),
     paymentStatus: @json($paymentStatus),
     visitorStats: @json($visitorStats),
     monthlyRevenue: @json($monthlyRevenue),

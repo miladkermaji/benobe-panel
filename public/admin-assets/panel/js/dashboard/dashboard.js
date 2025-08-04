@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     // نمودار مقایسه کلینیک‌ها
     const clinicComparisonData = chartData.clinicComparison;
-    new Chart(document.getElementById("clinicComparisonChart"), {
+    new Chart(document.getElementById("medicalCenterComparisonChart"), {
         type: "bar",
         data: {
             labels: Object.keys(clinicComparisonData),
