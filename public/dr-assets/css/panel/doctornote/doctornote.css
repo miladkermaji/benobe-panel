@@ -1036,6 +1036,7 @@ body {
     box-shadow: 0 2px 8px var(--shadow);
     overflow: hidden;
     border: 1px solid var(--border-neutral);
+    border-radius: 0.5rem !important;
 }
 
 .note-card-header {
@@ -1047,7 +1048,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     transition: background-color 0.2s ease;
-    border-radius: 0;
+    border-radius: 0 !important;
 }
 
 .note-card-header:hover {
