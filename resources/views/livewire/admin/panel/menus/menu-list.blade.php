@@ -263,7 +263,7 @@
         Swal.fire({
           title: 'حذف منو',
           text: 'آیا مطمئن هستید که می‌خواهید این منو را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -281,7 +281,7 @@
         Swal.fire({
           title: 'حذف منوهای انتخاب‌شده',
           text: 'آیا مطمئن هستید که می‌خواهید منوهای انتخاب‌شده را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

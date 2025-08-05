@@ -200,7 +200,7 @@
         Swal.fire({
           title: 'حذف نظر',
           text: 'مطمئن هستید که می‌خواهید این نظر را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#707070',

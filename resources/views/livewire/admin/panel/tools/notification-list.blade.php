@@ -216,7 +216,7 @@
         Swal.fire({
           title: 'حذف اعلان',
           text: 'آیا مطمئن هستید که می‌خواهید این اعلان را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -234,7 +234,7 @@
         Swal.fire({
           title: 'حذف گروهی اعلان‌ها',
           text: 'آیا مطمئن هستید که می‌خواهید همه اعلان‌های انتخاب‌شده حذف شوند؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

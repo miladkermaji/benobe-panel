@@ -330,7 +330,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: `آیا می‌خواهید عملیات "${$('#groupActionSelect option:selected').text()}" را روی ${selectedUsers.length} کاربر اجرا کنید؟`,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، اجرا کن',
         cancelButtonText: 'لغو',
@@ -624,7 +624,7 @@
 
       let swalConfig = {
         title: 'آیا مطمئن هستید؟',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
@@ -679,7 +679,7 @@
       Swal.fire({
         title: 'تغییر وضعیت',
         text: `آیا می‌خواهید وضعیت این کاربر را به "${statusText}" تغییر دهید؟`,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، تغییر بده',
         cancelButtonText: 'لغو',
@@ -729,7 +729,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این پیام برای همیشه حذف خواهد شد!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، حذف کن',
         cancelButtonText: 'لغو',

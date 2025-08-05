@@ -273,7 +273,7 @@
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: 'این عملیات قابل بازگشت نیست!',
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonText: 'بله',
       cancelButtonText: 'لغو',

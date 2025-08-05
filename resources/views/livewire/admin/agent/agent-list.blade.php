@@ -145,7 +145,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "این نمایندگان حذف خواهند شد و قابل بازگشت نیستند!",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#dc3545',
         cancelButtonColor: '#6c757d',

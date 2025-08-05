@@ -262,7 +262,7 @@
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: 'این عمل قابل بازگشت نیست!',
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',

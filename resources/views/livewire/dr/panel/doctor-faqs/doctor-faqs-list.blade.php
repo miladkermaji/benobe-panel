@@ -234,7 +234,7 @@
         Swal.fire({
           title: 'حذف سوال متداول',
           text: 'آیا مطمئن هستید که می‌خواهید این سوال متداول را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

@@ -1596,7 +1596,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "تمام نوبت‌های این روز لغو خواهند شد.",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، لغو کن!',
         cancelButtonText: 'لغو'
@@ -2122,7 +2122,7 @@
     Swal.fire({
       title: 'لغو نوبت‌ها؟',
       text: `${appointmentIds.length} نوبت لغو می‌شود.`,
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonText: 'بله',
       cancelButtonText: 'لغو'

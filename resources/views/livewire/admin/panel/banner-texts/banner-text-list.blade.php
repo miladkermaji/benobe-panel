@@ -259,7 +259,7 @@
         Swal.fire({
           title: 'حذف بنر',
           text: 'آیا مطمئن هستید که می‌خواهید این بنر را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -277,7 +277,7 @@
         Swal.fire({
           title: 'حذف بنرهای انتخاب‌شده',
           text: 'آیا مطمئن هستید که می‌خواهید بنرهای انتخاب‌شده را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

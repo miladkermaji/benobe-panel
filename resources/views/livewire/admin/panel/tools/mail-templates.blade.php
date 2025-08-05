@@ -290,7 +290,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'قالب‌های انتخاب‌شده حذف خواهند شد و قابل بازگشت نیستند!',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#d1d5db',
@@ -327,7 +327,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این قالب حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#d1d5db',

@@ -236,7 +236,7 @@
         Swal.fire({
           title: 'حذف تخصص',
           text: 'آیا مطمئن هستید که می‌خواهید این تخصص را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -257,7 +257,7 @@
         Swal.fire({
           title: 'تایید حذف گروهی',
           text: text,
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonText: 'بله، حذف شود',
           cancelButtonText: 'لغو',

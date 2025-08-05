@@ -1,8 +1,8 @@
 $(document).ready(function () {
- // ابتدا همه دراپ‌تاگل‌ها را مخفی کن
- $('.drop-toggle-styles').hide();
- // باز کردن اولین دراپ‌تاگل به صورت خودکار
- /*const $firstCard = $(".option-card-box-shodow").first(); // انتخاب اولین کارت
+    // ابتدا همه دراپ‌تاگل‌ها را مخفی کن
+    $(".drop-toggle-styles").hide();
+    // باز کردن اولین دراپ‌تاگل به صورت خودکار
+    /*const $firstCard = $(".option-card-box-shodow").first(); // انتخاب اولین کارت
   const $firstToggle = $firstCard.find(".drop-toggle-styles");
   const $firstIcon = $firstCard.find("svg.chevron_bottom__M8fF9");
   $firstToggle.find(".loading-spinner").removeClass("d-none");
@@ -15,35 +15,38 @@ $(document).ready(function () {
   });
   */
 
- // هنگامی که بر روی عنوان کلیک می‌شود
- $('.d-flex.justify-content-between.align-items-center').on(
-  'click',
-  function () {
-   const $currentCard = $(this)
-    .closest('.option-card-box-shodow')
-    .find('.drop-toggle-styles');
-   const $icon = $(this).find('svg.chevron_bottom__M8fF9');
+    // هنگامی که بر روی عنوان کلیک می‌شود
+    $(".d-flex.justify-content-between.align-items-center").on(
+        "click",
+        function () {
+            const $currentCard = $(this)
+                .closest(".option-card-box-shodow")
+                .find(".drop-toggle-styles");
+            const $icon = $(this).find("svg.chevron_bottom__M8fF9");
 
-   // اگر دراپ‌تاگل فعلی باز نیست، آن را باز کن
-   if ($currentCard.is(':hidden')) {
-    $currentCard.find('.loading-spinner').removeClass('d-none');
-    $currentCard.slideDown(300, function () {
-     $currentCard.find('.loading-spinner').addClass('d-none');
-    });
-    $icon.css({
-     transform: 'rotate(-90deg)',
-     transition: 'transform 0.3s',
-    });
-   } else {
-    // در غیر این صورت، آن را ببند
-    $currentCard.slideUp(300);
-    $icon.css({ transform: 'rotate(90deg)', transition: 'transform 0.3s' });
-   }
-  },
- );
+            // اگر دراپ‌تاگل فعلی باز نیست، آن را باز کن
+            if ($currentCard.is(":hidden")) {
+                $currentCard.find(".loading-spinner").removeClass("d-none");
+                $currentCard.slideDown(300, function () {
+                    $currentCard.find(".loading-spinner").addClass("d-none");
+                });
+                $icon.css({
+                    transform: "rotate(-90deg)",
+                    transition: "transform 0.3s",
+                });
+            } else {
+                // در غیر این صورت، آن را ببند
+                $currentCard.slideUp(300);
+                $icon.css({
+                    transform: "rotate(90deg)",
+                    transition: "transform 0.3s",
+                });
+            }
+        }
+    );
 
- // هنگامی که کاربر در جایی خارج از دراپ‌تاگل کلیک می‌کند
- /*$(document).on("click", function (event) {
+    // هنگامی که کاربر در جایی خارج از دراپ‌تاگل کلیک می‌کند
+    /*$(document).on("click", function (event) {
     if (!$(event.target).closest(".option-card-box-shodow").length) {
       $(".drop-toggle-styles").slideUp(300);
       $("svg.chevron_bottom__M8fF9").css({
@@ -53,20 +56,20 @@ $(document).ready(function () {
     }
   });*/
 
- // تابع برای حذف یک عنصر با تأییدیه SweetAlert
+    // تابع برای حذف یک عنصر با تأییدیه SweetAlert
 });
 $(document).ready(function () {
- const addButton = document.getElementById('addButton');
- const additionalInputs = document.getElementById('additionalInputs');
- let inputCount = 0; // شمارش ورودی‌های اضافی
+    const addButton = document.getElementById("addButton");
+    const additionalInputs = document.getElementById("additionalInputs");
+    let inputCount = 0; // شمارش ورودی‌های اضافی
 
- addButton.addEventListener('click', () => {
-  if (inputCount < 5) {
-   // حداکثر 5 ورودی اضافی
-   inputCount++;
-   const newInputGroup = document.createElement('div');
-   newInputGroup.classList.add('w-100', 'mt-3');
-   newInputGroup.innerHTML = `
+    addButton.addEventListener("click", () => {
+        if (inputCount < 5) {
+            // حداکثر 5 ورودی اضافی
+            inputCount++;
+            const newInputGroup = document.createElement("div");
+            newInputGroup.classList.add("w-100", "mt-3");
+            newInputGroup.innerHTML = `
         <div>
           <div class="text-left mt-3 remove-form-item" onclick="removeInput(this)">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,34 +112,34 @@ $(document).ready(function () {
           </div>
         </div>
       `;
-   additionalInputs.appendChild(newInputGroup);
-  } else {
-   alert('حداکثر 5 ورودی اضافی مجاز است.');
-  }
- });
+            additionalInputs.appendChild(newInputGroup);
+        } else {
+            alert("حداکثر 5 ورودی اضافی مجاز است.");
+        }
+    });
 
- window.removeInput = function (button) {
-  const inputGroup = button.parentElement.parentElement;
+    window.removeInput = function (button) {
+        const inputGroup = button.parentElement.parentElement;
 
-  Swal.fire({
-   title: 'آیا مطمئن هستید؟',
-   text: 'این عمل قابل بازگشت نیست!',
-   icon: 'warning',
-   showCancelButton: true,
-   confirmButtonColor: '#3085d6',
-   cancelButtonColor: '#d33',
-   confirmButtonText: 'بله، حذف کن!',
-   cancelButtonText: 'خیر، انصراف',
-  })
-   .then((result) => {
-    if (result.isConfirmed) {
-     additionalInputs.removeChild(inputGroup);
-     inputCount--; // کاهش شمارش ورودی‌های اضافی
-     Swal.fire('حذف شد!', 'عنصر با موفقیت حذف شد.', 'success');
-    }
-   })
-   .catch((error) => {
-    console.error('خطایی در نمایش SweetAlert رخ داد:', error);
-   });
- };
+        Swal.fire({
+            title: "آیا مطمئن هستید؟",
+            text: "این عمل قابل بازگشت نیست!",
+
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "بله، حذف کن!",
+            cancelButtonText: "خیر، انصراف",
+        })
+            .then((result) => {
+                if (result.isConfirmed) {
+                    additionalInputs.removeChild(inputGroup);
+                    inputCount--; // کاهش شمارش ورودی‌های اضافی
+                    Swal.fire("حذف شد!", "عنصر با موفقیت حذف شد.", "success");
+                }
+            })
+            .catch((error) => {
+                console.error("خطایی در نمایش SweetAlert رخ داد:", error);
+            });
+    };
 });

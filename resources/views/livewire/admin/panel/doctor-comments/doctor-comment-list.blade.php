@@ -426,7 +426,7 @@
           Swal.fire({
             title: 'حذف نظر',
             text: 'آیا مطمئن هستید که می‌خواهید این نظر را حذف کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -445,7 +445,7 @@
           Swal.fire({
             title: event.action + ' نظر',
             text: 'آیا مطمئن هستید که می‌خواهید وضعیت نظر ' + event.name + ' را ' + event.action + ' کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#1deb3c',
             cancelButtonColor: '#6b7280',
@@ -467,7 +467,7 @@
           Swal.fire({
             title: 'تایید حذف گروهی',
             text: text,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، حذف شود',
             cancelButtonText: 'لغو',

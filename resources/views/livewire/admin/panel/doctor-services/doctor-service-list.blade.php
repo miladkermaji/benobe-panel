@@ -274,7 +274,7 @@
         Swal.fire({
           title: 'حذف خدمت پزشک',
           text: 'آیا مطمئن هستید که می‌خواهید این خدمت را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

@@ -490,7 +490,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این بیعانه حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#dc2626',
         cancelButtonColor: '#6b7280',

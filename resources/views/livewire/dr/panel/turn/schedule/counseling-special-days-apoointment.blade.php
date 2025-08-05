@@ -457,7 +457,7 @@
           Swal.fire({
             title: 'آیا مطمئن هستید؟',
             text: 'این تنظیم زمان‌بندی حذف خواهد شد!',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، حذف کن',
             cancelButtonText: 'خیر',
@@ -654,7 +654,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'این بازه زمانی حذف خواهد شد!',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonText: 'بله، حذف کن',
           cancelButtonText: 'خیر',
@@ -678,7 +678,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'این تنظیم زمان‌بندی حذف خواهد شد!',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonText: 'بله، حذف کن',
           cancelButtonText: 'خیر',

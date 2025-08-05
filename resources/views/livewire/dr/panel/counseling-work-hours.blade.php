@@ -658,7 +658,7 @@
           Swal.fire({
             title: 'آیا مطمئن هستید؟',
             text: 'این اسلات حذف خواهد شد و قابل بازگشت نیست!',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -1046,7 +1046,7 @@
           Swal.fire({
             title: 'آیا مطمئن هستید؟',
             text: 'این تنظیم زمان‌بندی حذف خواهد شد و قابل بازگشت نیست!',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
@@ -1147,7 +1147,7 @@
           Swal.fire({
             title: 'تداخل در کپی برنامه کاری',
             html: conflictMessage,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',

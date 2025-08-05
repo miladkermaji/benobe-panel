@@ -54,7 +54,7 @@
   <div class="mt-3 w-100">
     <div class="card border-0 shadow-sm rounded-3">
       <div class="card-header bg-white p-4 border-bottom">
-        <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center justify-content-between w-100">
           <div class="d-flex align-items-center">
             <span class="fw-bold">درخواست‌های من</span>
             <span class="ms-2" data-bs-toggle="tooltip" data-bs-placement="top"

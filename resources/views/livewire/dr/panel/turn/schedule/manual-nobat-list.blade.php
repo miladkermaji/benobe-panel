@@ -961,7 +961,7 @@
           Swal.fire({
             title: 'تأیید جابجایی ناقص',
             text: message,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، منتقل کن',
             cancelButtonText: 'خیر',
@@ -1247,7 +1247,7 @@
           Swal.fire({
             title: 'تأیید لغو نوبت',
             text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، لغو کن',
             cancelButtonText: 'خیر',
@@ -1297,7 +1297,7 @@
             Swal.fire({
               title: 'تأیید لغو نوبت',
               text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
-              icon: 'warning',
+
               showCancelButton: true,
               confirmButtonText: 'بله، لغو کن',
               cancelButtonText: 'خیر',
@@ -1391,7 +1391,7 @@
           Swal.fire({
             title: 'نتیجه‌ای یافت نشد',
             text: 'هیچ نتیجه‌ای برای جستجوی شما یافت نشد. آیا می‌خواهید در همه سوابق و نوبت‌ها جستجو کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'جستجوی همه',
             cancelButtonText: 'لغو',

@@ -385,7 +385,7 @@
                 Swal.fire({
                     title: 'آیا مطمئن هستید؟',
                     text: 'تنظیمات این روز حذف خواهد شد!',
-                    icon: 'warning',
+    
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
                     cancelButtonColor: '#d33',
@@ -501,7 +501,7 @@
                               <x-custom-tooltip title="حذف تنظیمات" placement="top">
                                 <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
-                                  @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!', icon: 'warning', showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
+                                  @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!',  showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
                                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                                     style="width: 14px; height: 14px;">
@@ -1005,7 +1005,7 @@
             Swal.fire({
               title: 'آیا مطمئن هستید؟',
               text: 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!',
-              icon: 'warning',
+
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
@@ -1145,7 +1145,7 @@
             Swal.fire({
               title: 'تداخل در کپی تنظیمات زمان‌بندی',
               html: conflictMessage,
-              icon: 'warning',
+
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
@@ -1221,7 +1221,7 @@
             Swal.fire({
               title: 'تداخل در کپی برنامه کاری',
               html: conflictMessage,
-              icon: 'warning',
+
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',

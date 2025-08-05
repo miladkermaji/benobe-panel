@@ -254,7 +254,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این آیتم حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#d1d5db',

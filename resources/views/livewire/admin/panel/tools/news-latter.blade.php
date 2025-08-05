@@ -293,7 +293,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'اعضای انتخاب‌شده از خبرنامه حذف خواهند شد و قابل بازگشت نیستند!',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#d1d5db',
@@ -311,7 +311,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این عضو از خبرنامه حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#d1d5db',

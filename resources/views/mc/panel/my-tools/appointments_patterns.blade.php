@@ -235,7 +235,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این الگو حذف خواهد شد و قابل بازگشت نیست! توجه داشته باشید که روز هایی که الگوی خودکار برای آنها  غیر فعال شده نیز پاک خواهد شد !!!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -435,7 +435,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "این عمل غیرقابل بازگشت است!",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
@@ -486,7 +486,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این نوبت حذف خواهد شد و قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',

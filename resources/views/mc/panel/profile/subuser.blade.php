@@ -558,7 +558,7 @@
         Swal.fire({
           title: 'حذف گروهی',
           text: 'آیا مطمئن هستید که می‌خواهید همه موارد انتخاب شده حذف شوند؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -771,7 +771,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این عمل قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله',
         cancelButtonText: 'لغو',

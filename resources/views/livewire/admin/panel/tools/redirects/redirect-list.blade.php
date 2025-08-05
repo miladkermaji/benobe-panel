@@ -231,7 +231,7 @@
         Swal.fire({
           title: 'حذف ریدایرکت',
           text: 'آیا مطمئن هستید که می‌خواهید این ریدایرکت را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -249,7 +249,7 @@
         Swal.fire({
           title: 'حذف گروهی ریدایرکت‌ها',
           text: 'آیا مطمئن هستید که می‌خواهید ریدایرکت‌های انتخاب‌شده را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

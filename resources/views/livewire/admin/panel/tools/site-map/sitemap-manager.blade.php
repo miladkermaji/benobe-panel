@@ -419,7 +419,7 @@
         Swal.fire({
           title: 'حذف مسیر',
           text: 'آیا مطمئن هستید که می‌خواهید این مسیر را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -437,7 +437,7 @@
         Swal.fire({
           title: 'حذف مسیرهای انتخاب‌شده',
           text: 'آیا مطمئن هستید که می‌خواهید مسیرهای انتخاب‌شده را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

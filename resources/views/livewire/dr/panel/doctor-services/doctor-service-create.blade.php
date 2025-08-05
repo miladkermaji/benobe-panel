@@ -344,7 +344,7 @@
         Swal.fire({
           title: 'تأیید ویرایش',
           html: `برای خدمت «${data.serviceName}» و بیمه «${data.insuranceName}» اطلاعاتی از قبل ثبت شده است.<br>آیا مایل هستید با قیمت و اطلاعات جدید، این مورد را ویرایش کنید؟`,
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonText: 'بله، ویرایش شود',
           cancelButtonText: 'خیر، لغو',

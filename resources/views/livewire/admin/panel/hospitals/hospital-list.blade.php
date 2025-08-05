@@ -372,7 +372,7 @@
         Swal.fire({
           title: 'حذف بیمارستان',
           text: 'آیا مطمئن هستید که می‌خواهید این بیمارستان را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

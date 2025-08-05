@@ -724,7 +724,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "تمام نوبت‌های این روز لغو خواهند شد.",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، لغو کن!',
         cancelButtonText: 'لغو'

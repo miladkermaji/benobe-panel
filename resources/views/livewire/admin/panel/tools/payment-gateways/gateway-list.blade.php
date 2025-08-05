@@ -14,8 +14,7 @@
         <!-- Search and Actions -->
         <div class="d-flex flex-column flex-md-row align-items-center gap-2 w-100 w-md-auto">
           <div class="search-box position-relative">
-            <input type="text" wire:model.live="search" class="form-control ps-5 "
-              placeholder="جستجو...">
+            <input type="text" wire:model.live="search" class="form-control ps-5 " placeholder="جستجو...">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               class="search-icon">
               <circle cx="11" cy="11" r="8" />
@@ -240,7 +239,7 @@
         Swal.fire({
           title: 'حذف درگاه',
           text: 'آیا مطمئن هستید که می‌خواهید این درگاه را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

@@ -315,7 +315,7 @@
         Swal.fire({
           title: 'حذف خدمت',
           text: 'آیا مطمئن هستید که می‌خواهید این خدمت را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',
@@ -337,7 +337,7 @@
         Swal.fire({
           title: 'حذف گروهی خدمات',
           text: 'آیا مطمئن هستید که می‌خواهید همه خدمات انتخاب‌شده را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

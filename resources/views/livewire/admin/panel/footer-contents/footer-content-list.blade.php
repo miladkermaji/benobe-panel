@@ -318,7 +318,7 @@
         Swal.fire({
           title: 'حذف آیتم فوتر',
           text: 'آیا مطمئن هستید که می‌خواهید این آیتم را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

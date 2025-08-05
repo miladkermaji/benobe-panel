@@ -182,7 +182,7 @@
               Swal.fire({
                 title: 'پزشک گرامی، شما بیش از 2 تیکت باز یا پاسخ‌نشده دارید!',
                 text: 'لطفاً ابتدا تیکت‌های موجود را تکمیل یا بررسی کنید تا بتوانید تیکت جدید ثبت کنید.',
-                icon: 'warning',
+
                 confirmButtonText: 'متوجه شدم',
                 confirmButtonColor: '#2E86C1',
                 timer: 5000,
@@ -213,7 +213,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این عمل قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، حذف شود',
         cancelButtonText: 'لغو'

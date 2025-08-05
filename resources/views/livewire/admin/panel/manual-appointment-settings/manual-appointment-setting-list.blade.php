@@ -207,7 +207,7 @@
         Swal.fire({
           title: 'حذف تنظیمات نوبت دستی',
           text: 'آیا مطمئن هستید که می‌خواهید این تنظیمات را حذف کنید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#ef4444',
           cancelButtonColor: '#6b7280',

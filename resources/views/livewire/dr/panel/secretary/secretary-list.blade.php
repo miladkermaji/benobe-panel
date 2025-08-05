@@ -242,7 +242,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: 'آیا از حذف منشی‌های انتخاب شده اطمینان دارید؟',
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#d33',
           cancelButtonColor: '#3085d6',

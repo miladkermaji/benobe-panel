@@ -388,7 +388,7 @@
           Swal.fire({
             title: 'حذف مدرک',
             text: 'آیا مطمئن هستید که می‌خواهید این مدرک را حذف کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#ef4444',
             cancelButtonColor: '#6b7280',
@@ -408,7 +408,7 @@
             title: event.action + ' مدرک',
             text: 'آیا مطمئن هستید که می‌خواهید وضعیت تأیید مدرک ' + event.name + ' را ' + event.action +
               ' کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonColor: '#1deb3c',
             cancelButtonColor: '#6b7280',
@@ -430,7 +430,7 @@
           Swal.fire({
             title: 'تایید حذف گروهی',
             text: text,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، حذف شود',
             cancelButtonText: 'لغو',

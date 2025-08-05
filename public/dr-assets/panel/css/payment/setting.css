@@ -1,5 +1,5 @@
 .payment-setting-content-wrapper {
- width: 650px;
+ max-width: 650px;
  background-color: #fff;
  border-radius: 10px;
  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
@@ -13,4 +13,17 @@
 .gozaresh-mali-card-bg {
  background: linear-gradient(#4f4f8f, #1a1d4e);
  border-radius: 12px;
+}
+@media screen and (max-width: 768px) {
+  .payment-setting-content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .wallet-charge-content-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .wallet-charge-wrapper.p-4.bg-white.rounded.shadow{
+    padding: 5px 10px !important;
+  }
 }

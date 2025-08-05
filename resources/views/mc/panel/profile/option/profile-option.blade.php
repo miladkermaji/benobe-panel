@@ -233,7 +233,7 @@
           Swal.fire({
             title: 'لطفاً ردیف فعلی را کامل کنید',
             text: 'تمام فیلدها (درجه علمی، تخصص و عنوان تخصص) باید پر شوند.',
-            icon: 'warning',
+
           });
           return; // اگر ردیف آخر پر نشده، از ادامه جلوگیری می‌کنیم
         }
@@ -419,7 +419,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این ردیف حذف خواهد شد.',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -439,7 +439,7 @@
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: 'این عمل قابل بازگشت نیست!',
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
@@ -1820,7 +1820,7 @@
       Swal.fire({
         title: 'حذف سوال متداول',
         text: 'آیا مطمئن هستید که می‌خواهید این سوال متداول را حذف کنید؟',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#6b7280',

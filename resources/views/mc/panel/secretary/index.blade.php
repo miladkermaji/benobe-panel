@@ -76,7 +76,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: `آیا می‌خواهید عملیات "${$('#groupActionSelect option:selected').text()}" را روی ${selectedSecretaries.length} منشی اجرا کنید؟`,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، اجرا کن',
         cancelButtonText: 'لغو',
@@ -317,7 +317,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: 'این عمل قابل بازگشت نیست!',
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله',
         cancelButtonText: 'لغو',
@@ -356,7 +356,7 @@
       Swal.fire({
         title: 'تغییر وضعیت',
         text: `آیا می‌خواهید وضعیت این منشی را به "${statusText}" تغییر دهید؟`,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، تغییر کن',
         cancelButtonText: 'لغو',

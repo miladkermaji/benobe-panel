@@ -223,7 +223,7 @@
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: "این شماره تماس حذف خواهد شد!",
-          icon: 'warning',
+
           showCancelButton: true,
           confirmButtonColor: '#d33',
           cancelButtonColor: '#3085d6',
@@ -377,7 +377,7 @@
     function addPhone() {
       if (phoneCount >= 3) {
         Swal.fire({
-          icon: 'warning',
+
           title: 'حداکثر تعداد شماره تلفن',
           text: 'شما نمی‌توانید بیشتر از ۳ شماره تلفن مطب اضافه کنید.'
         });
@@ -405,7 +405,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "این شماره تلفن حذف خواهد شد!",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',

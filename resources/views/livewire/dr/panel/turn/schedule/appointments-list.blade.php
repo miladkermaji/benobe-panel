@@ -15,7 +15,8 @@
           <input type="text" class="my-form-control" placeholder="نام بیمار، شماره موبایل یا کد ملی ..."
             wire:model.live.debounce.500ms="searchQuery">
         </div>
-        <button class="btn-primary" x-data @click="$dispatch('openAddSickModal'); $dispatch('open-modal', { name: 'add-sick-modal' })">
+        <button class="btn-primary" x-data
+          @click="$dispatch('openAddSickModal'); $dispatch('open-modal', { name: 'add-sick-modal' })">
           ثبت نوبت دستی
         </button>
       </div>
@@ -85,16 +86,16 @@
             $isFutureDate = \Carbon\Carbon::parse($selectedDate)->isFuture();
             $isToday = \Carbon\Carbon::parse($selectedDate)->isToday();
             $showReport = !$isFutureDate;
-            
+
             if ($showReport) {
                 $visitedCount = collect($appointments)->where('status', 'attended')->count();
                 $totalCount = collect($appointments)->count();
                 $totalIncome = collect($appointments)->where('status', 'attended')->sum('final_price');
                 $jDate = \Morilog\Jalali\Jalalian::fromCarbon(\Carbon\Carbon::parse($selectedDate));
-                
+
                 // تعیین متن نمایشی بر اساس فیلتر فعال
                 $dateDisplay = $jDate->format('d F Y');
-                
+
                 // متن فیلترهای تاریخ و وضعیت
                 $filters = [
                     // فیلترهای تاریخ
@@ -106,9 +107,9 @@
                     'scheduled' => 'در انتظار',
                     'cancelled' => 'لغو شده',
                     'attended' => 'ویزیت شده',
-                    'manual' => 'نوبت‌های دستی'
+                    'manual' => 'نوبت‌های دستی',
                 ];
-                
+
                 if (isset($filters[$dateFilter])) {
                     $dateDisplay = 'فیلتر: ' . $filters[$dateFilter];
                 } elseif (isset($filters[$filterStatus])) {
@@ -116,36 +117,36 @@
                 }
             }
           @endphp
-          
-          @if($showReport)
-          <!-- گزارش مالی دسکتاپ -->
-          <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm " 
-               wire:key="financial-report-desktop-{{ $selectedDate }}">
-            <div class="d-flex align-items-center">
+
+          @if ($showReport)
+            <!-- گزارش مالی دسکتاپ -->
+            <div class="d-none d-md-flex align-items-center mx-3 px-3 py-1 rounded-3 bg-white border shadow-sm "
+              wire:key="financial-report-desktop-{{ $selectedDate }}">
               <div class="d-flex align-items-center">
-                <span class="text-sm text-muted ms-1">تاریخ:</span>
-                <span class="fw-bold me-1">{{ $dateDisplay ?? $dateFilter ?? $jDate->format('d F Y') }}</span>
-              </div>
-              <div class="vr mx-2"></div>
-              <div class="d-flex align-items-center">
-                <span class="text-sm text-muted ms-1">کل:</span>
-                <span class="fw-bold text-primary ms-1">{{ number_format($totalCount) }}</span>
-              </div>
-              <div class="vr mx-2"></div>
-              <div class="d-flex align-items-center">
-                <span class="text-sm text-muted ms-1">ویزیت:</span>
-                <span class="fw-bold text-success ms-1">{{ number_format($visitedCount) }}</span>
-              </div>
-              <div class="vr mx-2"></div>
-              <div class="d-flex align-items-center">
-                <span class="text-sm text-muted ms-1">درآمد:</span>
-                <span class="fw-bold text-success ms-1">{{ number_format($totalIncome) }}</span>
-                <span class="text-xs text-muted me-1">تومان</span>
+                <div class="d-flex align-items-center">
+                  <span class="text-sm text-muted ms-1">تاریخ:</span>
+                  <span class="fw-bold me-1">{{ $dateDisplay ?? ($dateFilter ?? $jDate->format('d F Y')) }}</span>
+                </div>
+                <div class="vr mx-2"></div>
+                <div class="d-flex align-items-center">
+                  <span class="text-sm text-muted ms-1">کل:</span>
+                  <span class="fw-bold text-primary ms-1">{{ number_format($totalCount) }}</span>
+                </div>
+                <div class="vr mx-2"></div>
+                <div class="d-flex align-items-center">
+                  <span class="text-sm text-muted ms-1">ویزیت:</span>
+                  <span class="fw-bold text-success ms-1">{{ number_format($visitedCount) }}</span>
+                </div>
+                <div class="vr mx-2"></div>
+                <div class="d-flex align-items-center">
+                  <span class="text-sm text-muted ms-1">درآمد:</span>
+                  <span class="fw-bold text-success ms-1">{{ number_format($totalIncome) }}</span>
+                  <span class="text-xs text-muted me-1">تومان</span>
+                </div>
               </div>
             </div>
-          </div>
           @endif
-          
+
           <div class="d-flex">
             <button id="block-users-btn" x-data @click="$dispatch('open-modal', { name: 'block-user-modal' })"
               class="btn btn-light h-30 fs-13 d-flex align-items-center justify-content-center shadow-sm" disabled>
@@ -165,56 +166,56 @@
           </div>
         </div>
       </div>
-      
+
       <!-- گزارش مالی موبایل و تبلت -->
-      @if($showReport)
-      <div class="md:hidden my-2 mx-2 p-2 bg-white rounded-lg border border-gray-100 shadow-sm" 
-           wire:key="mobile-financial-report-{{ $selectedDate }}">
-        <div class="flex items-center justify-between text-xs">
-          <div class="flex items-center">
-            <span class="text-gray-500 ml-1">تاریخ:</span>
-            <span class="font-medium">
-              @php
-                $filters = [
-                    // فیلترهای تاریخ
-                    'all' => 'همه نوبت ها',
-                    'current_year' => 'سال جاری',
-                    'current_month' => 'ماه جاری',
-                    'current_week' => 'هفته جاری',
-                    // فیلترهای وضعیت
-                    'scheduled' => 'در انتظار',
-                    'cancelled' => 'لغو شده',
-                    'attended' => 'ویزیت شده',
-                    'manual' => 'نوبت‌های دستی'
-                ];
-                
-                if (isset($filters[$dateFilter])) {
-                    echo 'فیلتر: ' . $filters[$dateFilter];
-                } elseif (isset($filters[$filterStatus])) {
-                    echo 'فیلتر: ' . $filters[$filterStatus];
-                } else {
-                    echo $jDate->format('d F');
-                }
-              @endphp
-            </span>
-          </div>
-          <div class="flex items-center">
-            <span class="text-gray-500 ml-1">کل:</span>
-            <span class="font-bold text-blue-600 mr-1">{{ $totalCount }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="text-gray-500 ml-1">ویزیت:</span>
-            <span class="font-bold text-green-600 mr-1">{{ $visitedCount }}</span>
-          </div>
-          <div class="flex items-center">
-            <span class="text-gray-500 ml-1">درآمد:</span>
-            <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
-            <span class="text-2xs text-gray-500">تومان</span>
+      @if ($showReport)
+        <div class="md:hidden my-2 mx-2 p-2 bg-white rounded-lg border border-gray-100 shadow-sm"
+          wire:key="mobile-financial-report-{{ $selectedDate }}">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center">
+              <span class="text-gray-500 ml-1">تاریخ:</span>
+              <span class="font-medium">
+                @php
+                  $filters = [
+                      // فیلترهای تاریخ
+                      'all' => 'همه نوبت ها',
+                      'current_year' => 'سال جاری',
+                      'current_month' => 'ماه جاری',
+                      'current_week' => 'هفته جاری',
+                      // فیلترهای وضعیت
+                      'scheduled' => 'در انتظار',
+                      'cancelled' => 'لغو شده',
+                      'attended' => 'ویزیت شده',
+                      'manual' => 'نوبت‌های دستی',
+                  ];
+
+                  if (isset($filters[$dateFilter])) {
+                      echo 'فیلتر: ' . $filters[$dateFilter];
+                  } elseif (isset($filters[$filterStatus])) {
+                      echo 'فیلتر: ' . $filters[$filterStatus];
+                  } else {
+                      echo $jDate->format('d F');
+                  }
+                @endphp
+              </span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-gray-500 ml-1">کل:</span>
+              <span class="font-bold text-blue-600 mr-1">{{ $totalCount }}</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-gray-500 ml-1">ویزیت:</span>
+              <span class="font-bold text-green-600 mr-1">{{ $visitedCount }}</span>
+            </div>
+            <div class="flex items-center">
+              <span class="text-gray-500 ml-1">درآمد:</span>
+              <span class="font-bold text-green-700 mr-1">{{ number_format($totalIncome) }}</span>
+              <span class="text-2xs text-gray-500">تومان</span>
+            </div>
           </div>
         </div>
-      </div>
       @endif
-      
+
       <div class="appointments-container">
         <div wire:loading wire:target="loadAppointments" class="loading-overlay-custom">
           <div class="spinner-custom"></div>
@@ -368,8 +369,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center gap-2">
                     <input type="checkbox" class="appointment-checkbox form-check-input"
-                      value="{{ $appointment->id }}" 
-                      data-status="{{ $appointment->status }}"
+                      value="{{ $appointment->id }}" data-status="{{ $appointment->status }}"
                       data-mobile="{{ $appointment->patientable->mobile ?? '' }}"
                       wire:model="cancelIds.{{ $appointment->id }}">
                     <span class="fw-bold text-end">
@@ -540,7 +540,7 @@
             </div>
 
             <!-- فرم اطلاعات بیمار (فقط وقتی که بیمار انتخاب شده باشد نمایش داده می‌شود) -->
-            @if($showPatientForm && $selectedUserId)
+            @if ($showPatientForm && $selectedUserId)
               <div class="col-12">
                 <div class="border p-3 rounded">
                   <h6 class="fw-bold mb-3">اطلاعات بیمار</h6>
@@ -1111,7 +1111,7 @@
           Swal.fire({
             title: 'تأیید جابجایی ناقص',
             text: message,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، منتقل کن',
             cancelButtonText: 'خیر',
@@ -1368,7 +1368,7 @@
           Swal.fire({
             title: 'تأیید لغو نوبت',
             text: 'آیا مطمئن هستید که می‌خواهید این نوبت را لغو کنید؟',
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، لغو کن',
             cancelButtonText: 'خیر',
@@ -1414,7 +1414,7 @@
             Swal.fire({
               title: 'تأیید لغو نوبت',
               text: `آیا مطمئن هستید که می‌خواهید ${selected.length} نوبت را لغو کنید؟`,
-              icon: 'warning',
+
               showCancelButton: true,
               confirmButtonText: 'بله، لغو کن',
               cancelButtonText: 'خیر',
@@ -1523,37 +1523,37 @@
         });
         // Handle available times loaded event
         /*
-                                                                                                                                                                                                            Livewire.on('available-times-loaded', (event) => {
-                                                                                                                                                                                                              console.log('Available times loaded:', event);
-                                                                                                                                                                                                              const times = event.times || [];
-                                                                                                                                                                                                              const $container = $('#available-times');
-                                                                                                                                                                                                              $container.empty();
-                                                                                                                                                                                                              if (times.length === 0) {
-                                                                                                                                                                                                                $container.html(
-                                                                                                                                                                                                                  '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
-                                                                                                                                                                                                                return;
-                                                                                                                                                                                                              }
-                                                                                                                                                                                                              times.forEach(time => {
-                                                                                                                                                                                                                const $button = $(
-                                                                                                                                                                                                                  `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
+                                                                                                                                                                                                                Livewire.on('available-times-loaded', (event) => {
+                                                                                                                                                                                                                  console.log('Available times loaded:', event);
+                                                                                                                                                                                                                  const times = event.times || [];
+                                                                                                                                                                                                                  const $container = $('#available-times');
+                                                                                                                                                                                                                  $container.empty();
+                                                                                                                                                                                                                  if (times.length === 0) {
+                                                                                                                                                                                                                    $container.html(
+                                                                                                                                                                                                                      '<div class="alert alert-info text-center w-100">هیچ ساعت خالی برای این تاریخ یافت نشد</div>');
+                                                                                                                                                                                                                    return;
+                                                                                                                                                                                                                  }
+                                                                                                                                                                                                                  times.forEach(time => {
+                                                                                                                                                                                                                    const $button = $(
+                                                                                                                                                                                                                      `<button type="button" class="btn btn-sm time-slot-btn btn-outline-primary m-1" data-time="${time}">
         ${time}
       </button>`
-                                                                                                                                                                                                                );
-                                                                                                                                                                                                                $container.append($button);
-                                                                                                                                                                                                              });
-                                                                                                                                                                                                              // Handle time selection
-                                                                                                                                                                                                              $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
-                                                                                                                                                                                                                const $btn = $(this);
-                                                                                                                                                                                                                const time = $btn.data('time');
-                                                                                                                                                                                                                // Remove selection from other buttons
-                                                                                                                                                                                                                $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
-                                                                                                                                                                                                                // Select this button
-                                                                                                                                                                                                                $btn.removeClass('btn-outline-primary').addClass('btn-primary');
-                                                                                                                                                                                                                // Update Livewire component
-                                                                                                                                                                                                                @this.set('appointmentTime', time);
-                                                                                                                                                                                                              });
-                                                                                                                                                                                                            });
-                                                                                                                                                                                                            */
+                                                                                                                                                                                                                    );
+                                                                                                                                                                                                                    $container.append($button);
+                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                  // Handle time selection
+                                                                                                                                                                                                                  $container.off('click', '.time-slot-btn').on('click', '.time-slot-btn', function() {
+                                                                                                                                                                                                                    const $btn = $(this);
+                                                                                                                                                                                                                    const time = $btn.data('time');
+                                                                                                                                                                                                                    // Remove selection from other buttons
+                                                                                                                                                                                                                    $('.time-slot-btn').removeClass('btn-primary').addClass('btn-outline-primary');
+                                                                                                                                                                                                                    // Select this button
+                                                                                                                                                                                                                    $btn.removeClass('btn-outline-primary').addClass('btn-primary');
+                                                                                                                                                                                                                    // Update Livewire component
+                                                                                                                                                                                                                    @this.set('appointmentTime', time);
+                                                                                                                                                                                                                  });
+                                                                                                                                                                                                                });
+                                                                                                                                                                                                                */
         // Handle modal close
         Livewire.on('close-modal', (event) => {
           const modalId = event?.name || (event && event[0]?.name) || null;

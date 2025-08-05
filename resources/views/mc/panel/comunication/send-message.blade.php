@@ -134,7 +134,7 @@
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: 'این پیام برای همیشه حذف خواهد شد!',
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonText: 'بله، حذف کن',
       cancelButtonText: 'لغو',
@@ -431,7 +431,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: `می‌خواهید ${selectedIds.length} پیام را حذف کنید؟`,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، حذف کن',
         cancelButtonText: 'لغو',

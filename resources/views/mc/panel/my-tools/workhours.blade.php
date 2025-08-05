@@ -194,7 +194,7 @@
           Swal.fire({
             title: 'تداخل بازه‌های زمانی',
             html: conflictMessage,
-            icon: 'warning',
+
             showCancelButton: true,
             confirmButtonText: 'بله، جایگزین شود',
             cancelButtonText: 'لغو',
@@ -493,7 +493,7 @@
       Swal.fire({
         title: 'تداخل بازه‌های زمانی',
         html: conflictMessage,
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonText: 'بله، جایگزین شود',
         cancelButtonText: 'خیر',
@@ -970,7 +970,7 @@
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: "این عمل قابل بازگشت نیست!",
-      icon: 'warning',
+
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
@@ -1870,7 +1870,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "این تنظیمات حذف خواهد شد!",
-        icon: 'warning',
+
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',

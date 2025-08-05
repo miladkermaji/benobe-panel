@@ -23,7 +23,7 @@
             Swal.fire({
               title: 'تغییر به حالت نوبت دهی دستی',
               text: 'آیا مایلید نوبت‌دهی را به حالت دستی تغییر دهید؟ با این تغییر، نوبت‌دهی آنلاین شما غیرفعال شده و تمامی نوبت‌ها بر اساس ساعت کاری تعریف شده و به صورت دستی توسط منشی یا پزشک ثبت خواهد شد.',
-              icon: 'warning',
+              
               showCancelButton: true,
               confirmButtonText: 'بله، تغییر به دستی',
               cancelButtonText: 'انصراف',
@@ -358,7 +358,7 @@
   }
 
   @media (max-width: 640px) {
- 
+
 
     .toggle-appointment-label {
       justify-content: center;
