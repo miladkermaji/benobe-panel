@@ -1,343 +1,411 @@
-<div class="container-fluid py-4" dir="rtl">
-  <!-- هدر -->
-  <header class="glass-header p-4 rounded-xl mb-5 shadow-lg animate__animated animate__fadeIn">
-    <div class="d-flex align-items-center justify-content-start gap-3 flex-nowrap">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
-        class="animate-pulse">
-        <path d="M4 4h16v12H4z" />
-        <path d="M4 8l8 4 8-4" />
-      </svg>
-      <h4 class="mb-0 fw-bold text-white tracking-tight">مدیریت قالب‌های ایمیل</h4>
-    </div>
-  </header>
-  <!-- فرم و سلکت قالب -->
-  <div class="row g-4 mb-5">
-    <div class="col-lg-3 col-md-4 col-sm-12">
-      <div class="card shadow-sm border-0 rounded-xl animate__animated animate__fadeInUp">
-        <div class="card-header bg-gradient-light text-dark fw-bold py-3 px-4 rounded-top-xl">انتخاب قالب</div>
-        <div class="card-body p-4">
-          <label class="fw-bold mb-2 text-dark">انتخاب:</label>
-          <select class="form-control input-modern w-100" wire:model.live="selectedTemplateId">
-            <option value="">-- انتخاب کنید --</option>
-            @foreach ($allTemplates as $template)
-              <option value="{{ $template->id }}">{{ $template->subject }}</option>
-            @endforeach
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="col-lg-9 col-md-8 col-sm-12">
-      <div class="card shadow-sm border-0 rounded-xl animate__animated animate__fadeInUp">
-        <div class="card-header bg-gradient-light text-dark fw-bold py-3 px-4 rounded-top-xl">ایجاد یا ویرایش قالب</div>
-        <div class="card-body p-4">
-          <div class="form-group mb-4">
-            <label class="fw-bold mb-2 text-dark">عنوان قالب</label>
-            <input type="text" class="form-control input-modern w-100" wire:model="newSubject"
-              placeholder="مثال: بازگردانی رمزعبور">
-            @if ($errors->has('newSubject'))
-              <span class="text-danger d-block mt-2 text-sm">{{ $errors->first('newSubject') }}</span>
-            @endif
-          </div>
-          <div class="form-group mb-4">
-            <label class="fw-bold mb-2 text-dark">محتوای قالب</label>
-            <textarea class="form-control input-modern w-100" wire:model="newTemplate" rows="10" id="newTemplateEditor"
-              dir="ltr"></textarea>
-            @if ($errors->has('newTemplate'))
-              <span class="text-danger d-block mt-2 text-sm">{{ $errors->first('newTemplate') }}</span>
-            @endif
-          </div>
-          <button wire:click="{{ $editId ? 'updateTemplate' : 'addTemplate' }}"
-            class="btn btn-gradient-success w-100  rounded-xl shadow-sm d-flex align-items-center justify-content-center h-50">
-            {{ $editId ? 'ویرایش' : 'ذخیره' }}
+<div class="mail-templates-container" x-data="{ mobileSearchOpen: false }">
+  <div class="container py-2 mt-3" dir="rtl" wire:init="loadMailTemplates">
+    <!-- Header -->
+    <header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
+        <!-- Title Section -->
+        <div class="d-flex align-items-center gap-2 flex-shrink-0 w-md-100 justify-content-between">
+          <h2 class="mb-0 fw-bold fs-5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="header-icon">
+              <path d="M4 4h16v12H4z" />
+              <path d="M4 8l8 4 8-4" />
+            </svg>
+            مدیریت قالب‌های ایمیل
+          </h2>
+          <!-- Mobile Toggle Button -->
+          <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+            @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
           </button>
         </div>
-      </div>
-    </div>
-  </div>
-  <!-- ابزارها و جستجو -->
-  <div class="container-fluid px-0 mb-5">
-    <div class="bg-light p-4 rounded-xl shadow-sm animate__animated animate__fadeInUp">
-      <div class="row g-4 align-items-center">
-        <div class="col-md-6 col-sm-12">
-          <div class="input-group align-items-center">
-            <span class="input-group-text bg-white border-0 rounded-start-xl flex-shrink-0"
-              style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+        <!-- Mobile Collapsible Section -->
+        <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform -translate-y-2"
+          x-transition:enter-end="opacity-100 transform translate-y-0"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 transform translate-y-0"
+          x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-none w-100">
+          <div class="d-flex flex-column gap-2">
+            <div class="search-box position-relative">
+              <input type="text" wire:model.live="search" class="form-control ps-5"
+                placeholder="جستجو در قالب‌ها...">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="search-icon">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
-            </span>
-            <input type="text" class="form-control input-modern border-0 rounded-end-xl shadow-none flex-grow-1"
-              wire:model.live="search" placeholder="جستجو در قالب‌ها...">
+            </div>
+            <div class="d-flex align-items-center gap-2 justify-content-between">
+              <button onclick="openXModal('addTemplateModal')"
+                class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span class="text-white">قالب جدید</span>
+              </button>
+              <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+                {{ $readyToLoad ? $templates->total() : 0 }}
+              </span>
+            </div>
           </div>
         </div>
-        <div class="col-md-6 col-sm-12 d-flex justify-content-md-end justify-content-center">
-          <button wire:click="deleteSelected"
-            class="btn btn-gradient-danger rounded-xl px-4 py-3 d-flex align-items-center gap-2 shadow-sm"
-            @if (empty($selectedTemplates)) disabled @endif>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-              <path d="M3 6h18" />
-              <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+        <!-- Desktop Search and Actions -->
+        <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
+          <div class="search-box position-relative">
+            <input type="text" wire:model.live="search" class="form-control ps-5" placeholder="جستجو در قالب‌ها...">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
             </svg>
-            حذف انتخاب‌شده‌ها
+          </div>
+          <button onclick="openXModal('addTemplateModal')"
+            class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" stroke="#fff" stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span class="text-white">قالب جدید</span>
           </button>
+          <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+            {{ $readyToLoad ? $templates->total() : 0 }}
+          </span>
         </div>
       </div>
-    </div>
-  </div>
-  <!-- لیست قالب‌ها -->
-  <div class="container-fluid px-0">
-    <div class="card shadow-sm border-0 rounded-xl animate__animated animate__fadeInUp">
-      <div class="card-body p-0">
-        <!-- نمایش جدول در دسکتاپ -->
-        <div class="d-none d-lg-block">
-          <div class="table-responsive text-nowrap">
-            <table class="table table-bordered table-hover w-100 m-0 rounded-xl">
-              <thead class="">
+    </header>
+
+    <div class="container-fluid px-0">
+      <div class="card shadow-sm rounded-2">
+        <div class="card-body p-0">
+          <!-- Group Actions -->
+          <div class="group-actions p-2 border-bottom" x-data="{ show: false }"
+            x-show="$wire.selectedTemplates.length > 0">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <select class="form-select form-select-sm" style="max-width: 200px;" wire:model="groupAction">
+                <option value="">عملیات گروهی</option>
+                <option value="delete">حذف انتخاب شده‌ها</option>
+                <option value="status_active">فعال کردن</option>
+                <option value="status_inactive">غیرفعال کردن</option>
+              </select>
+              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+                <span wire:loading.remove>اجرا</span>
+                <span wire:loading>در حال اجرا...</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0">
+              <thead>
                 <tr>
-                  <th class="text-center align-middle py-3"><input type="checkbox" wire:model.live="selectAll"
-                      class="py-2">
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                    </div>
                   </th>
-                  <th class="text-center align-middle py-3">ردیف</th>
-                  <th class="text-center align-middle py-3">عنوان</th>
-                  <th class="text-center align-middle py-3">وضعیت</th>
-                  <th class="text-center align-middle py-3">عملیات</th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                  <th class="align-middle">عنوان</th>
+                  <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                  <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse ($templates as $index => $template)
-                  <tr class="animate__animated animate__fadeIn">
-                    <td class="align-middle text-center"><input type="checkbox" wire:model.live="selectedTemplates"
-                        value="{{ $template->id }}" class="py-2"></td>
-                    <td class="align-middle text-center">{{ $templates->firstItem() + $index }}</td>
-                    <td class="align-middle text-center">{{ $template->subject }}</td>
-                    <td class="align-middle text-center">
-                      <button wire:click="toggleStatus({{ $template->id }})"
-                        class="badge {{ $template->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer text-white py-2 px-3 rounded-lg">
-                        {{ $template->is_active ? 'فعال' : 'غیرفعال' }}
-                      </button>
-                    </td>
-                    <td class="align-middle text-center">
-                      <div class="d-flex gap-3 justify-content-center flex-wrap">
-                        <button wire:click="startEdit({{ $template->id }})"
-                          class="btn btn-gradient-primary rounded-xl px-3 py-2 d-flex align-items-center gap-2 shadow-sm">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                            stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                @if ($readyToLoad)
+                  @forelse ($templates as $index => $template)
+                    <tr class="align-middle">
+                      <td class="text-center">
+                        <div class="d-flex justify-content-center align-items-center">
+                          <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
+                            class="form-check-input m-0 align-middle">
+                        </div>
+                      </td>
+                      <td class="text-center">{{ $templates->firstItem() + $index }}</td>
+                      <td>
+                        <div class="text-truncate" style="max-width: 300px;" title="{{ $template->subject }}">
+                          {{ $template->subject }}
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <div class="form-check form-switch d-flex justify-content-center">
+                          <input class="form-check-input" type="checkbox" role="switch"
+                            wire:click="toggleStatus({{ $template->id }})" @checked($template->is_active)
+                            style="width: 3em; height: 1.5em; margin-top: 0;">
+                        </div>
+                      </td>
+                      <td class="text-center">
+                        <div class="d-flex justify-content-center gap-1">
+                          <button wire:click="startEdit({{ $template->id }})"
+                            class="btn btn-sm btn-gradient-success px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </button>
+                          <button wire:click="previewTemplate({{ $template->id }})"
+                            class="btn btn-sm btn-gradient-primary px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                              <circle cx="12" cy="12" r="3" />
+                            </svg>
+                          </button>
+                          <button wire:click="confirmDelete({{ $template->id }})"
+                            class="btn btn-sm btn-gradient-danger px-2 py-1">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="5" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                            <path d="M4 4h16v12H4z" />
+                            <path d="M4 8l8 4 8-4" />
                           </svg>
-                        </button>
-                        <button wire:click="previewTemplate({{ $template->id }})"
-                          class="btn btn-gradient-primary rounded-xl px-3 py-2 d-flex align-items-center gap-2 shadow-sm">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                            stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        </button>
-                        <button onclick="confirmDelete({{ $template->id }})"
-                          class="btn btn-gradient-danger rounded-xl px-3 py-2 d-flex align-items-center gap-2 shadow-sm">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                            stroke-width="2">
-                            <path d="M3 6h18" />
-                            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                @empty
+                          <p class="text-muted fw-medium">هیچ قالبی یافت نشد.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
                   <tr>
-                    <td colspan="5" class="text-center py-5">
-                      <div class="d-flex justify-content-center align-items-center flex-column">
-                        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                          stroke-width="2" class="mb-3">
-                          <path d="M4 4h16v12H4z" />
-                          <path d="M4 8l8 4 8-4" />
-                        </svg>
-                        <p class="text-muted fw-medium text-lg">هیچ قالبی یافت نشد.</p>
+                    <td colspan="5" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
                     </td>
                   </tr>
-                @endforelse
+                @endif
               </tbody>
             </table>
           </div>
-        </div>
 
-        <!-- نمایش کارت در تبلت و موبایل -->
-        <div class="d-lg-none card-view">
-          @forelse ($templates as $index => $template)
-            <div class="card">
-              <div class="card-header">
-                <div class="d-flex align-items-center gap-2">
-                  <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
-                    class="form-check-input">
-                  <h5 class="template-title mb-0">{{ $template->subject }}</h5>
-                </div>
-                <button wire:click="toggleStatus({{ $template->id }})"
-                  class="template-status badge {{ $template->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer text-white">
-                  {{ $template->is_active ? 'فعال' : 'غیرفعال' }}
-                </button>
-              </div>
-              <div class="card-body">
-                <div class="template-preview">
-                  {{ Str::limit(strip_tags($template->template), 150) }}
-                </div>
-              </div>
-              <div class="card-footer">
-                <div class="template-actions">
-                  <button wire:click="startEdit({{ $template->id }})" class="btn btn-gradient-primary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                      stroke-width="2">
-                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($templates as $index => $template)
+                <div class="note-card mb-2" x-data="{ open: false }">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
+                        class="form-check-input m-0 align-middle" @click.stop>
+                      <span class="fw-bold">{{ $template->subject }}</span>
+                    </div>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
                     </svg>
-                  </button>
-                  <button wire:click="previewTemplate({{ $template->id }})" class="btn btn-gradient-primary">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                      stroke-width="2">
-                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                      <circle cx="12" cy="12" r="3" />
+                  </div>
+                  <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">عنوان:</span>
+                      <span class="note-card-value">{{ $template->subject }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">وضعیت:</span>
+                      <div class="form-check form-switch d-inline-block">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                          wire:click="toggleStatus({{ $template->id }})" @checked($template->is_active)
+                          style="width: 3em; height: 1.5em; margin-top: 0;">
+                      </div>
+                    </div>
+                    <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top">
+                      <button wire:click="startEdit({{ $template->id }})"
+                        class="btn btn-sm btn-gradient-success px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </button>
+                      <button wire:click="previewTemplate({{ $template->id }})"
+                        class="btn btn-sm btn-gradient-primary px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                      </button>
+                      <button wire:click="confirmDelete({{ $template->id }})"
+                        class="btn btn-sm btn-gradient-danger px-2 py-1">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M4 4h16v12H4z" />
+                      <path d="M4 8l8 4 8-4" />
                     </svg>
-                  </button>
-                  <button onclick="confirmDelete({{ $template->id }})" class="btn btn-gradient-danger">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white"
-                      stroke-width="2">
-                      <path d="M3 6h18" />
-                      <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                    </svg>
-                  </button>
+                    <p class="text-muted fw-medium">هیچ قالبی یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
+            @else
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
                 </div>
               </div>
-            </div>
-          @empty
-            <div class="card">
-              <div class="card-body text-center">
-                <div class="d-flex justify-content-center align-items-center flex-column">
-                  <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                    stroke-width="2" class="mb-3">
-                    <path d="M4 4h16v12H4z" />
-                    <path d="M4 8l8 4 8-4" />
-                  </svg>
-                  <p class="text-muted fw-medium text-lg">هیچ قالبی یافت نشد.</p>
-                </div>
-              </div>
-            </div>
-          @endforelse
-        </div>
+            @endif
+          </div>
 
-        <div class="d-flex justify-content-between mt-4 px-4 flex-wrap gap-3">
-          <div class="text-muted">نمایش {{ $templates->firstItem() }} تا {{ $templates->lastItem() }} از
-            {{ $templates->total() }} ردیف</div>
-          {{ $templates->links() }}
+          <div class="d-flex justify-content-between align-items-center mt-3 px-3 flex-wrap gap-2">
+            @if ($readyToLoad)
+              <div class="text-muted">
+                نمایش {{ $templates->firstItem() }} تا {{ $templates->lastItem() }}
+                از {{ $templates->total() }} ردیف
+              </div>
+              @if ($templates->hasPages())
+                {{ $templates->links('livewire::bootstrap') }}
+              @endif
+            @endif
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- نکته راهنما -->
-  <div
-    class="alert alert-warning help-block mt-5 p-4 rounded-xl shadow-sm d-flex align-items-center gap-3 mb-2 animate__animated animate__fadeInUp">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M12 16v-4" />
-      <path d="M12 8h.01" />
-    </svg>
-    <span class="text-dark text-sm leading-relaxed">کاربر گرامی، برای تغییر و جایگزینی هر گونه محتوا ابتدا یک پشتیبان
-      از
-      آن دریافت کنید و سپس اقدام به تغییر اطلاعات نمایید. همچنین توجه داشته باشید که عباراتی مثل [_sitename_] حاوی
-      اطلاعات هستند که پس از ارسال ایمیل در ایمیل کاربران قابل مشاهده می‌شوند.</span>
-  </div>
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/tools/mail-template/mail-template.css') }}">
-  <!-- استایل‌ها -->
-  <!-- اسکریپت‌ها (بدون تغییر) -->
-  <script>
-    document.addEventListener('livewire:init', () => {
-      let editor = CodeMirror.fromTextArea(document.getElementById('newTemplateEditor'), {
-        mode: 'htmlmixed',
-        lineNumbers: true,
-        dragDrop: false,
-        indentWithTabs: false,
-        lineWrapping: true,
-        indentUnit: 4,
-        theme: 'default'
-      });
-      // اطمینان از اینکه مقدار همیشه یک رشته باشد
-      Livewire.on('updateEditor', (template) => {
-        const safeTemplate = (template && typeof template === 'string') ? template : '';
-        editor.setValue(safeTemplate);
-      });
-      Livewire.on('toast', (message, options = {}) => {
-        if (typeof toastr === 'undefined') {
-          console.error('Toastr is not loaded!');
-          return;
-        }
-        const type = options.type || 'info';
-        const toastOptions = {
-          positionClass: options.position || 'toast-top-right',
-          timeOut: options.timeOut || 3000,
-          progressBar: options.progressBar || false,
-        };
-        if (type === 'success') toastr.success(message, '', toastOptions);
-        else if (type === 'error') toastr.error(message, '', toastOptions);
-        else if (type === 'warning') toastr.warning(message, '', toastOptions);
-        else toastr.info(message, '', toastOptions);
-      });
-      Livewire.on('confirmDeleteSelected', () => {
-        Swal.fire({
-          title: 'آیا مطمئن هستید؟',
-          text: 'قالب‌های انتخاب‌شده حذف خواهند شد و قابل بازگشت نیستند!',
 
-          showCancelButton: true,
-          confirmButtonColor: '#ef4444',
-          cancelButtonColor: '#d1d5db',
-          confirmButtonText: 'بله، حذف کن',
-          cancelButtonText: 'خیر',
-        }).then((result) => {
-          if (result.isConfirmed) {
-            @this.confirmDeleteSelected();
+    <!-- Add Template Modal -->
+    <x-custom-modal id="addTemplateModal" title="افزودن قالب جدید" size="lg">
+      <div class="space-y-4" wire:ignore>
+        <div>
+          <label for="newSubject" class="block text-sm font-medium text-gray-700 mb-2">عنوان قالب</label>
+          <input type="text" id="newSubject" wire:model="newSubject"
+            class="form-control w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="مثال: بازگردانی رمزعبور" style="direction: rtl; text-align: right;">
+          @error('newSubject')
+            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <div>
+          <label for="newTemplate" class="block text-sm font-medium text-gray-700 mb-2">محتوای قالب</label>
+          <textarea id="newTemplate" wire:model="newTemplate" rows="10"
+            class="form-control w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="محتوای HTML قالب را وارد کنید..." style="direction: ltr; text-align: left;"></textarea>
+          @error('newTemplate')
+            <span class="text-red-500 text-sm mt-1">{{ $message }}</span>
+          @enderror
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeXModal('addTemplateModal')"
+            class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+            لغو
+          </button>
+          <button type="button" onclick="validateAndAddTemplate() ? $wire.addTemplate() : null"
+            class="btn btn-primary px-4 py-2 rounded-lg transition-colors">
+            {{ $editId ? 'ویرایش' : 'افزودن' }}
+          </button>
+        </div>
+      </div>
+    </x-custom-modal>
+
+    <script>
+      function validateAndAddTemplate() {
+        const subjectInput = document.getElementById('newSubject');
+        const templateInput = document.getElementById('newTemplate');
+        const subject = subjectInput.value.trim();
+        const template = templateInput.value.trim();
+
+        let isValid = true;
+
+        if (!subject) {
+          // Show error message for subject
+          const errorSpan = subjectInput.parentNode.querySelector('.text-red-500');
+          if (errorSpan) {
+            errorSpan.textContent = 'لطفاً عنوان قالب را وارد کنید.';
+          } else {
+            const newErrorSpan = document.createElement('span');
+            newErrorSpan.className = 'text-red-500 text-sm mt-1';
+            newErrorSpan.textContent = 'لطفاً عنوان قالب را وارد کنید.';
+            subjectInput.parentNode.appendChild(newErrorSpan);
           }
+          isValid = false;
+        }
+
+        if (!template) {
+          // Show error message for template
+          const errorSpan = templateInput.parentNode.querySelector('.text-red-500');
+          if (errorSpan) {
+            errorSpan.textContent = 'لطفاً محتوای قالب را وارد کنید.';
+          } else {
+            const newErrorSpan = document.createElement('span');
+            newErrorSpan.className = 'text-red-500 text-sm mt-1';
+            newErrorSpan.textContent = 'لطفاً محتوای قالب را وارد کنید.';
+            templateInput.parentNode.appendChild(newErrorSpan);
+          }
+          isValid = false;
+        }
+
+        // Clear any existing error messages if validation passes
+        if (isValid) {
+          const errorSpans = document.querySelectorAll('.text-red-500');
+          errorSpans.forEach(span => span.remove());
+        }
+
+        return isValid;
+      }
+
+      document.addEventListener('livewire:init', function() {
+        Livewire.on('show-alert', (event) => {
+          toastr[event.type](event.message);
+        });
+        Livewire.on('confirm-delete', (event) => {
+          Swal.fire({
+            title: 'حذف قالب',
+            text: 'آیا مطمئن هستید که می‌خواهید این قالب را حذف کنید؟',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'بله، حذف کن',
+            cancelButtonText: 'خیر'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              Livewire.dispatch('deleteTemplateConfirmed', {
+                id: event.id
+              });
+            }
+          });
+        });
+        Livewire.on('close-modal', (event) => {
+          closeXModal(event.modalId);
+        });
+        Livewire.on('openPreview', (template) => {
+          const safePreview = (template && typeof template === 'string') ?
+            template :
+            (Array.isArray(template) && template[0] && typeof template[0] === 'string') ?
+            template[0] :
+            '<p>محتوای پیش‌نمایش در دسترس نیست.</p>';
+          let x = screen.width / 2 - 700 / 2;
+          let y = screen.height / 2 - 450 / 2;
+          let previewWindow = window.open('', 'Preview', 'height=500,width=600,left=' + x + ',top=' + y);
+          previewWindow.document.open();
+          previewWindow.document.write(safePreview);
+          previewWindow.document.close();
+          if (previewWindow.focus) previewWindow.focus();
         });
       });
-      Livewire.on('openPreview', (template) => {
-        // لاگ برای دیباگ
-        // اگر template آرایه باشد، اولین عنصر آن را بگیریم یا مقدار پیش‌فرضを設定 کنیم
-        const safePreview = (template && typeof template === 'string') ?
-          template :
-          (Array.isArray(template) && template[0] && typeof template[0] === 'string') ?
-          template[0] :
-          '<p>محتوای پیش‌نمایش در دسترس نیست.</p>';
-        let x = screen.width / 2 - 700 / 2;
-        let y = screen.height / 2 - 450 / 2;
-        let previewWindow = window.open('', 'Preview', 'height=500,width=600,left=' + x + ',top=' + y);
-        previewWindow.document.open();
-        previewWindow.document.write(safePreview);
-        previewWindow.document.close();
-        if (previewWindow.focus) previewWindow.focus();
-      });
-      editor.on('change', (cm) => {
-        @this.set('newTemplate', cm.getValue());
-      });
-    });
-
-    function confirmDelete(id) {
-      Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: 'این قالب حذف خواهد شد و قابل بازگشت نیست!',
-
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#d1d5db',
-        confirmButtonText: 'بله، حذف کن',
-        cancelButtonText: 'خیر',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          @this.deleteTemplate(id);
-        }
-      });
-    }
-  </script>
+    </script>
+  </div>
 </div>

@@ -11,14 +11,24 @@ class MailTemplates extends Component
 {
     use WithPagination;
 
-    public $search             = '';
-    public $newSubject         = '';
-    public $newTemplate        = ''; // مقدار اولیه رشته خالی
-    public $editId             = null;
+    protected $paginationTheme = 'bootstrap';
+
+    protected $listeners = ['deleteTemplateConfirmed' => 'deleteTemplate'];
+
+    public $search = '';
+    public $newSubject = '';
+    public $newTemplate = '';
+    public $editId = null;
     public $selectedTemplateId = null;
-    public $perPage            = 10;
-    public $selectedTemplates  = [];
-    public $selectAll          = false;
+    public $perPage = 100;
+    public $selectedTemplates = [];
+    public $selectAll = false;
+    public $readyToLoad = false;
+    public $groupAction = '';
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+    ];
 
     protected $rules = [
         'newSubject'  => 'required|string|max:255|unique:mail_templates,subject',
@@ -34,9 +44,68 @@ class MailTemplates extends Component
         'newTemplate.string'   => 'محتوای قالب باید یک متن باشد.',
     ];
 
+    public function mount()
+    {
+        $this->perPage = max($this->perPage, 1);
+    }
+
+    public function loadMailTemplates()
+    {
+        $this->readyToLoad = true;
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedSelectAll($value)
+    {
+        $currentPageIds = $this->getMailTemplatesQuery()->pluck('id')->toArray();
+        $this->selectedTemplates = $value ? $currentPageIds : [];
+    }
+
+    public function updatedSelectedTemplates()
+    {
+        $currentPageIds = $this->getMailTemplatesQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedTemplates) && count(array_diff($currentPageIds, $this->selectedTemplates)) === 0;
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedTemplates)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ قالبی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        MailTemplate::whereIn('id', $this->selectedTemplates)
+            ->update(['is_active' => $status]);
+
+        $this->selectedTemplates = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت قالب‌های انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function updatedSelectedTemplateId($value)
@@ -47,33 +116,12 @@ class MailTemplates extends Component
                 $this->newSubject  = $template->subject ?? '';
                 $this->newTemplate = $template->template ?? '';
                 $this->editId      = $template->id;
-                $this->dispatch('updateEditor', $this->newTemplate);
             } else {
                 $this->resetInputFields();
             }
         } else {
             $this->resetInputFields();
         }
-    }
-
-    public function updatedSelectAll($value)
-    {
-        $currentPageIds = MailTemplate::where('subject', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage)
-            ->pluck('id')
-            ->toArray();
-
-        $this->selectedTemplates = $value ? $currentPageIds : [];
-    }
-
-    public function updatedSelectedTemplates()
-    {
-        $currentPageIds = MailTemplate::where('subject', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage)
-            ->pluck('id')
-            ->toArray();
-
-        $this->selectAll = ! empty($this->selectedTemplates) && count(array_diff($currentPageIds, $this->selectedTemplates)) === 0;
     }
 
     public function addTemplate()
@@ -87,10 +135,11 @@ class MailTemplates extends Component
                 'is_active' => true,
             ]);
             $this->resetInputFields();
-            $this->dispatch('toast', 'قالب جدید با موفقیت اضافه شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'قالب جدید با موفقیت اضافه شد.');
+            $this->dispatch('close-modal', modalId: 'addTemplateModal');
         } catch (\Exception $e) {
             Log::error('Error adding mail template: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در اضافه کردن قالب: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در اضافه کردن قالب: ' . $e->getMessage());
         }
     }
 
@@ -100,7 +149,6 @@ class MailTemplates extends Component
         $this->editId      = $id;
         $this->newSubject  = $template->subject ?? '';
         $this->newTemplate = $template->template ?? '';
-        $this->dispatch('updateEditor', $this->newTemplate);
         $this->resetValidation();
     }
 
@@ -116,10 +164,11 @@ class MailTemplates extends Component
                 'template' => $this->newTemplate,
             ]);
             $this->resetInputFields();
-            $this->dispatch('toast', 'قالب با موفقیت ویرایش شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'قالب با موفقیت ویرایش شد.');
+            $this->dispatch('close-modal', modalId: 'addTemplateModal');
         } catch (\Exception $e) {
             Log::error('Error updating mail template: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در ویرایش قالب: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در ویرایش قالب: ' . $e->getMessage());
         }
     }
 
@@ -133,13 +182,18 @@ class MailTemplates extends Component
     {
         try {
             $template            = MailTemplate::findOrFail($id);
-            $template->is_active = ! $template->is_active;
+            $template->is_active = !$template->is_active;
             $template->save();
-            $this->dispatch('toast', 'وضعیت قالب با موفقیت تغییر کرد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'وضعیت قالب با موفقیت تغییر کرد.');
         } catch (\Exception $e) {
             Log::error('Error toggling mail template status: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در تغییر وضعیت: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در تغییر وضعیت: ' . $e->getMessage());
         }
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->dispatch('confirm-delete', id: $id);
     }
 
     public function deleteTemplate($id)
@@ -148,34 +202,24 @@ class MailTemplates extends Component
             $template = MailTemplate::findOrFail($id);
             $template->delete();
             $this->selectedTemplates = array_diff($this->selectedTemplates, [$id]);
-            $this->dispatch('toast', 'قالب با موفقیت حذف شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'قالب با موفقیت حذف شد.');
         } catch (\Exception $e) {
             Log::error('Error deleting mail template: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در حذف قالب: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در حذف قالب: ' . $e->getMessage());
         }
     }
 
     public function deleteSelected()
     {
         if (empty($this->selectedTemplates)) {
-            $this->dispatch('toast', 'هیچ قالبی انتخاب نشده است.', ['type' => 'warning']);
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ قالبی انتخاب نشده است.');
             return;
         }
 
-        $this->dispatch('confirmDeleteSelected');
-    }
-
-    public function confirmDeleteSelected()
-    {
-        try {
-            MailTemplate::whereIn('id', $this->selectedTemplates)->delete();
-            $this->selectedTemplates = [];
-            $this->selectAll         = false;
-            $this->dispatch('toast', 'قالب‌های انتخاب‌شده با موفقیت حذف شدند.', ['type' => 'success']);
-        } catch (\Exception $e) {
-            Log::error('Error deleting selected mail templates: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در حذف قالب‌ها: ' . $e->getMessage(), ['type' => 'error']);
-        }
+        MailTemplate::whereIn('id', $this->selectedTemplates)->delete();
+        $this->selectedTemplates = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'قالب‌های انتخاب‌شده با موفقیت حذف شدند.');
     }
 
     public function export()
@@ -195,8 +239,6 @@ class MailTemplates extends Component
         $template        = MailTemplate::findOrFail($id);
         $templateContent = $template->template ?? '<p>محتوای قالب خالی است.</p>';
 
-        // لاگ برای دیباگ
-
         $this->dispatch('openPreview', $templateContent);
     }
 
@@ -206,17 +248,21 @@ class MailTemplates extends Component
         $this->newSubject         = '';
         $this->newTemplate        = '';
         $this->selectedTemplateId = null;
-        $this->dispatch('updateEditor', '');
+    }
+
+    private function getMailTemplatesQuery()
+    {
+        return MailTemplate::where('subject', 'like', '%' . $this->search . '%')
+            ->paginate($this->perPage);
     }
 
     public function render()
     {
-        $templates = MailTemplate::where('subject', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage);
+        $templates = $this->readyToLoad ? $this->getMailTemplatesQuery() : null;
 
         return view('livewire.admin.panel.tools.mail-templates', [
             'templates'    => $templates,
-            'allTemplates' => MailTemplate::all(),
-        ])->layout('admin.content.layouts.layoutMaster');
+            'allTemplates' => $this->readyToLoad ? MailTemplate::all() : collect(),
+        ]);
     }
 }
