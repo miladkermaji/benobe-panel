@@ -38,7 +38,7 @@
               </div>
               <button
                 class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
-                data-bs-toggle="modal" data-bs-target="#depositModal">
+                onclick="openXModal('depositModal')">
                 <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2">
                   <path d="M12 5v14M5 12h14" />
@@ -137,45 +137,39 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="depositModal" tabindex="-1" aria-labelledby="depositModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="depositModalLabel">افزودن بیعانه</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form id="depositForm">
-          @csrf
-          <input type="hidden" name="id" id="depositId">
-          <input type="hidden" name="selectedClinicId" value="{{ $selectedClinicId }}">
-          <input type="hidden" name="is_custom_price" id="isCustomPrice" value="0">
-          <div class="mb-3 position-relative">
-            <label for="depositAmount" class="label-top-input-special-takhasos">مبلغ بیعانه</label>
-            <select name="deposit_amount" id="depositAmount" class="form-select h-50 position-relative">
-              <option value="">انتخاب کنید</option>
-              <option value="50000">50,000 تومان</option>
-              <option value="100000">100,000 تومان</option>
-              <option value="150000">150,000 تومان</option>
-              <option value="custom">قیمت دلخواه</option>
-            </select>
-          </div>
-          <div class="mb-3 position-relative" id="customPriceContainer" style="display: none;">
-            <label for="customPrice" class="label-top-input-special-takhasos">مبلغ دلخواه (تومان)</label>
-            <input type="text" name="custom_price" id="customPrice" class="form-control h-50"
-              placeholder="مبلغ را وارد کنید" pattern="[0-9]*" inputmode="numeric" required>
-          </div>
-          <div class="form-check mb-3 position-relative">
-            <input class="form-check-input position-relative" type="checkbox" name="no_deposit" id="noDeposit"
-              value="1">
-            <label class="form-check-label" for="noDeposit">بدون بیعانه</label>
-          </div>
-          <button type="button" class="btn my-btn-primary h-50 w-100" id="submitDepositBtn">ذخیره</button>
-        </form>
-      </div>
+<x-custom-modal id="depositModal" title="افزودن بیعانه" size="md">
+  <form id="depositForm">
+    @csrf
+    <input type="hidden" name="id" id="depositId">
+    <input type="hidden" name="selectedClinicId" value="{{ $selectedClinicId }}">
+    <input type="hidden" name="is_custom_price" id="isCustomPrice" value="0">
+    <div class="mb-3 position-relative">
+      <label for="depositAmount" class="label-top-input-special-takhasos">مبلغ بیعانه</label>
+      <select name="deposit_amount" id="depositAmount" class="form-select h-50 position-relative">
+        <option value="">انتخاب کنید</option>
+        <option value="50000">50,000 تومان</option>
+        <option value="100000">100,000 تومان</option>
+        <option value="150000">150,000 تومان</option>
+        <option value="custom">قیمت دلخواه</option>
+      </select>
     </div>
-  </div>
-</div>
+    <div class="mb-3 position-relative" id="customPriceContainer" style="display: none;">
+      <label for="customPrice" class="label-top-input-special-takhasos">مبلغ دلخواه (تومان)</label>
+      <input type="text" name="custom_price" id="customPrice" class="form-control h-50"
+        placeholder="مبلغ را وارد کنید" pattern="[0-9]*" inputmode="numeric" required>
+    </div>
+    <div class="form-check mb-3 position-relative">
+      <input class="form-check-input position-relative" type="checkbox" name="no_deposit" id="noDeposit"
+        value="1">
+      <label class="form-check-label" for="noDeposit">بدون بیعانه</label>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button type="button" class="btn btn-secondary flex-grow-1"
+        onclick="closeXModal('depositModal')">انصراف</button>
+      <button type="button" class="btn my-btn-primary h-50 flex-grow-1" id="submitDepositBtn">ذخیره</button>
+    </div>
+  </form>
+</x-custom-modal>
 @endsection
 
 @section('scripts')
@@ -183,13 +177,11 @@
 <script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
 <script>
   $(document).ready(function() {
-    const modal = $('#depositModal');
     const form = $('#depositForm');
     const depositSelect = $('#depositAmount');
     const customPriceContainer = $('#customPriceContainer');
     const customPriceInput = $('#customPrice');
     const noDepositCheckbox = $('#noDeposit');
-    const modalTitle = $('#depositModalLabel');
     const isCustomPrice = $('#isCustomPrice');
     const clinics = @json($clinics->pluck('name', 'id')->toArray());
 
@@ -218,7 +210,7 @@
     depositSelect.on('change', function() {
       const isCustom = this.value === 'custom';
       customPriceContainer.toggle(isCustom);
-      isCustomPrice.val(isCustom ? '1' : '0');
+      $('#isCustomPrice').val(isCustom ? '1' : '0');
       customPriceInput.prop('required', isCustom);
       if (isCustom) {
         // Don't clear the select value when custom is selected
@@ -236,7 +228,7 @@
       if (isChecked) {
         depositSelect.val('');
         customPriceInput.val('');
-        isCustomPrice.val('0');
+        $('#isCustomPrice').val('0');
         customPriceContainer.hide();
       } else {
         // Re-enable and show custom price container if it was custom before
@@ -349,7 +341,7 @@
         isNoDeposit,
         selectedAmount,
         customPrice,
-        isCustomPrice: isCustomPrice.val(),
+        isCustomPrice: $('#isCustomPrice').val(),
         customPriceValue
       });
 
@@ -414,7 +406,7 @@
             addDepositItem(data.deposit);
           }
           resetForm();
-          modal.modal('hide');
+          closeXModal('depositModal');
         } else {
           toastr.error(data.message || 'خطایی رخ داد');
           if (data.errors) {
@@ -447,7 +439,6 @@
         amount = amountText === 'بدون بیعانه' ? '' : amountText.replace(/,/g, '');
       }
 
-      modalTitle.text('ویرایش بیعانه');
       $('#depositId').val(id);
 
       // Determine if it's a custom price
@@ -456,19 +447,19 @@
       if (isCustomPrice) {
         depositSelect.val('custom');
         customPriceInput.val(amount);
-        isCustomPrice.val('1');
+        $('#isCustomPrice').val('1');
         customPriceContainer.show();
       } else {
         depositSelect.val(amount);
         customPriceInput.val('');
-        isCustomPrice.val('0');
+        $('#isCustomPrice').val('0');
         customPriceContainer.hide();
       }
 
       noDepositCheckbox.prop('checked', amount === '');
       depositSelect.prop('disabled', noDepositCheckbox.prop('checked'));
       customPriceInput.prop('disabled', noDepositCheckbox.prop('checked'));
-      modal.modal('show');
+      openXModal('depositModal');
     });
 
     $(document).on('click', '.delete-btn', function() {
@@ -511,11 +502,10 @@
     function resetForm() {
       form[0].reset();
       $('#depositId').val('');
-      modalTitle.text('افزودن بیعانه');
       customPriceContainer.hide();
       depositSelect.prop('disabled', false);
       customPriceInput.prop('disabled', false);
-      isCustomPrice.val('0');
+      $('#isCustomPrice').val('0');
       noDepositCheckbox.prop('checked', false);
       customPriceValue = ''; // Reset the stored custom price value
     }
@@ -631,9 +621,14 @@
       });
     }
 
-    // Reset form when modal is hidden
-    modal.on('hidden.bs.modal', function() {
-      resetForm();
+    // Reset form when modal is closed
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('depositModal');
+      if (modal) {
+        modal.addEventListener('x-modal-closed', function() {
+          resetForm();
+        });
+      }
     });
   });
 </script>
