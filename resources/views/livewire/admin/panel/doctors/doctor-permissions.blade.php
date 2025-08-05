@@ -1,17 +1,62 @@
-<div class="container-fluid py-4" dir="rtl">
-  <div class="glass-header p-4  mb-6 shadow-lg d-flex justify-content-between align-items-center flex-wrap gap-4">
-    <h1 class="m-0 h3 font-light flex-grow-1" style="min-width: 200px; color: var(--text-primary);">دسترسی‌های پزشکان</h1>
-    <div class="input-group flex-grow-1 position-relative" style="max-width: 450px;">
-      <input type="text"
-        class="form-control border-0 shadow-none bg-background-card text-text-primary ps-5 rounded-full h-12"
-        wire:model.live="search" placeholder="جستجو در پزشکان...">
-      <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-4 text-text-secondary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-        </svg>
-      </span>
+<div class="container-fluid py-4" dir="rtl" x-data="{ mobileSearchOpen: false }">
+  <!-- Header -->
+  <header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
+    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
+      <!-- Title Section -->
+      <div class="d-flex align-items-center gap-2 flex-shrink-0 w-md-100 justify-content-between">
+        <h2 class="mb-0 fw-bold fs-5">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="header-icon">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          دسترسی‌های پزشکان
+        </h2>
+        <!-- Mobile Toggle Button -->
+        <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+          @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile Collapsible Section -->
+      <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform -translate-y-2"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-none w-100">
+        <div class="d-flex flex-column gap-2">
+          <div class="search-box position-relative">
+            <input type="text" wire:model.live="search" class="form-control ps-5" placeholder="جستجو در پزشکان...">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+          </div>
+          <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+            {{ $doctors->total() }}
+          </span>
+        </div>
+      </div>
+      <!-- Desktop Search and Actions -->
+      <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
+        <div class="search-box position-relative">
+          <input type="text" wire:model.live="search" class="form-control ps-5" placeholder="جستجو در پزشکان...">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="search-icon">
+            <circle cx="11" cy="11" r="8" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+        </div>
+        <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+          {{ $doctors->total() }}
+        </span>
+      </div>
     </div>
-  </div>
+  </header>
 
   <div class="container-fluid px-0">
     <div class="card shadow-xl rounded-2xl overflow-hidden bg-background-card">
@@ -94,8 +139,8 @@
             <tr>
               <td colspan="2" class="text-center py-4">
                 <div class="d-flex flex-column align-items-center justify-content-center">
-                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)"
-                    stroke-width="2" class="mb-3 custom-animate-bounce">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
+                    stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                   <p class="text-text-secondary font-medium m-0">پزشکی مطابق جستجو یافت نشد.</p>
@@ -123,8 +168,8 @@
                     ({{ $doctor->national_code }})
                   @endif
                 </span>
-                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                  stroke="#0d6efd" stroke-width="2" style="transition: transform 0.2s;">
+                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                  fill="none" stroke="#0d6efd" stroke-width="2" style="transition: transform 0.2s;">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </div>
