@@ -1279,19 +1279,18 @@ body {
 /* استایل شیک برای نتایج جستجوی زنده کاربران */
 .search-results-list {
     position: absolute;
-    z-index: 1000;
-    background: #fff;
-    border: 1px solid var(--primary-light);
-    width: 100%;
-    max-height: 260px;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 8px 24px 0 rgba(46, 134, 193, 0.1),
-        0 1.5px 4px 0 rgba(46, 134, 193, 0.08);
-    border-radius: 10px;
-    margin-top: 2px;
-    padding: 4px 0;
+    z-index: 9999;
     display: none;
-    animation: fadeInSearchList 0.2s;
+    animation: fadeInSearchList 0.2s ease-in-out;
 }
 @keyframes fadeInSearchList {
     from {
@@ -1304,31 +1303,32 @@ body {
     }
 }
 .search-result-item {
-    padding: 10px 18px;
+    padding: 8px 12px;
     cursor: pointer;
-    transition: background 0.18s, color 0.18s;
+    transition: background-color 0.2s ease;
+    border-bottom: 1px solid #f3f4f6;
     font-size: 14px;
-    color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    color: #374151;
+    background: white;
+    position: relative;
+    z-index: 1;
 }
+
 .search-result-item:not(:last-child) {
     border-bottom: 1px solid #f3f4f6;
 }
+
 .search-result-item:hover,
-.search-result-item.active {
-    background: var(--primary-light);
-    color: #fff;
+.search-result-item:focus {
+    background-color: #f9fafb;
+    outline: none;
 }
+
 .search-result-item .text-muted {
-    font-size: 13px;
     color: #6b7280 !important;
-    margin-right: 6px;
 }
+
 .search-result-item.text-muted,
 .search-result-item.text-danger {
-    color: #b91c1c !important;
-    background: #fff0f0;
     cursor: default;
 }

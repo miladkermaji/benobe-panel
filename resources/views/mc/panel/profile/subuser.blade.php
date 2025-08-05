@@ -29,107 +29,68 @@
 @section('bread-crumb-title', 'مدیریت کاربران زیرمجموعه')
 
 <!-- مودال افزودن کاربر زیرمجموعه -->
-<div class="modal fade" id="addSubUserModal" tabindex="-1" role="dialog" aria-labelledby="addSubUserModalTitle"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content border-radius-6">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addSubUserModalTitle">افزودن کاربر زیرمجموعه</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="add-subuser-form" method="post">
-          @csrf
-          <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
-            <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
-            <input type="text" id="add-user-search" class="form-control h-50 w-100" autocomplete="off"
-              placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
-            <input type="hidden" name="user_id" id="add-user-id">
-            <div id="add-user-search-results" class="search-results-list"></div>
-            <small class="text-danger error-user_id mt-1"></small>
-          </div>
-          <div class="w-100 mt-2">
-            <button type="submit"
-              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-              <span class="button_text">ذخیره تغییرات</span>
-              <div class="loader"></div>
-            </button>
-          </div>
-        </form>
-      </div>
+<x-custom-modal id="addSubUserModal" title="افزودن کاربر زیرمجموعه" size="md">
+  <form id="add-subuser-form" method="post">
+    @csrf
+    <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
+      <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
+      <input type="text" id="add-user-search" class="form-control h-50 w-100" autocomplete="off"
+        placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
+      <input type="hidden" name="user_id" id="add-user-id">
+      <div id="add-user-search-results" class="search-results-list"></div>
+      <small class="text-danger error-user_id mt-1"></small>
     </div>
-  </div>
-</div>
+    <div class="w-100 mt-2">
+      <button type="submit"
+        class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+        <span class="button_text">ذخیره تغییرات</span>
+        <div class="loader"></div>
+      </button>
+    </div>
+  </form>
+</x-custom-modal>
 
 <!-- مودال ویرایش کاربر زیرمجموعه -->
-<div class="modal fade" id="editSubUserModal" tabindex="-1" role="dialog" aria-labelledby="editSubUserModalTitle"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content border-radius-6">
-      <div class="modal-header">
-        <h5 class="modal-title" id="editSubUserModalTitle">ویرایش کاربر زیرمجموعه</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="edit-subuser-form" method="post">
-          @csrf
-          <input type="hidden" name="id" id="edit-subuser-id">
-          <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
-            <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
-            <input type="text" id="edit-user-search" class="form-control h-50 w-100" autocomplete="off"
-              placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
-            <input type="hidden" name="user_id" id="edit-user-id">
-            <div id="edit-user-search-results" class="search-results-list"></div>
-            <small class="text-danger error-user_id mt-1"></small>
-          </div>
-          <div class="w-100 mt-2">
-            <button type="submit"
-              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-              <span class="button_text">ذخیره تغییرات</span>
-              <div class="loader"></div>
-            </button>
-          </div>
-        </form>
-      </div>
+<x-custom-modal id="editSubUserModal" title="ویرایش کاربر زیرمجموعه" size="md">
+  <form id="edit-subuser-form" method="post">
+    @csrf
+    <input type="hidden" name="id" id="edit-subuser-id">
+    <div class="w-100 position-relative mt-4 field-wrapper field-user_id">
+      <label class="label-top-input-special-takhasos">جستجوی کاربر:</label>
+      <input type="text" id="edit-user-search" class="form-control h-50 w-100" autocomplete="off"
+        placeholder="نام، نام خانوادگی یا کدملی را وارد کنید...">
+      <input type="hidden" name="user_id" id="edit-user-id">
+      <div id="edit-user-search-results" class="search-results-list"></div>
+      <small class="text-danger error-user_id mt-1"></small>
     </div>
-  </div>
-</div>
+    <div class="w-100 mt-2">
+      <button type="submit"
+        class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+        <span class="button_text">ذخیره تغییرات</span>
+        <div class="loader"></div>
+      </button>
+    </div>
+  </form>
+</x-custom-modal>
 
 <!-- مودال افزودن سریع کاربر جدید -->
-<div class="modal fade" id="quickAddUserModal" tabindex="-1" role="dialog" aria-labelledby="quickAddUserModalTitle"
-  aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content border-radius-6">
-      <div class="modal-header">
-        <h5 class="modal-title" id="quickAddUserModalTitle">افزودن کاربر جدید</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="quick-add-user-form">
-          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="first_name"
-              placeholder="نام" required></div>
-          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="last_name"
-              placeholder="نام خانوادگی" required></div>
-          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="mobile"
-              placeholder="موبایل" required></div>
-          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="national_code"
-              placeholder="کدملی" required></div>
-          <div class="quick-user-error text-danger mt-1"></div>
-          <div class="mt-3 d-flex justify-content-between align-items-center">
-            <button type="submit" class="btn btn-success btn-sm">ذخیره کاربر</button>
-            <button type="button" class="btn btn-link btn-sm" data-bs-dismiss="modal">انصراف</button>
-          </div>
-        </form>
-      </div>
+<x-custom-modal id="quickAddUserModal" title="افزودن کاربر جدید" size="md">
+  <form id="quick-add-user-form">
+    <div class="mb-2"><input type="text" class="form-control form-control-sm" name="first_name" placeholder="نام"
+        required></div>
+    <div class="mb-2"><input type="text" class="form-control form-control-sm" name="last_name"
+        placeholder="نام خانوادگی" required></div>
+    <div class="mb-2"><input type="text" class="form-control form-control-sm" name="mobile" placeholder="موبایل"
+        required></div>
+    <div class="mb-2"><input type="text" class="form-control form-control-sm" name="national_code"
+        placeholder="کدملی" required></div>
+    <div class="quick-user-error text-danger mt-1"></div>
+    <div class="mt-3 d-flex justify-content-between align-items-center">
+      <button type="submit" class="btn btn-success btn-sm">ذخیره کاربر</button>
+      <button type="button" class="btn btn-link btn-sm" onclick="closeXModal('quickAddUserModal')">انصراف</button>
     </div>
-  </div>
-</div>
+  </form>
+</x-custom-modal>
 
 <!-- بخش محتوا با جدول بوت‌استرپ -->
 <div class="container subuser-content w-100 d-flex justify-content-center mt-4">
@@ -229,6 +190,21 @@
     return null;
   }
   // --- End TomSelect Safe Init ---
+
+  // Function to handle user selection
+  function selectUser(type, id, name) {
+    console.log('selectUser called:', type, id, name);
+    if (type === 'add') {
+      $('#add-user-search').val(name);
+      $('#add-user-id').val(id);
+      $('#add-user-search-results').empty().hide();
+    } else if (type === 'edit') {
+      $('#edit-user-search').val(name);
+      $('#edit-user-id').val(id);
+      $('#edit-user-search-results').empty().hide();
+    }
+  }
+
   function renderSubUserLoading() {
     $('#subuser-list-tbody').html(
       `<tr><td colspan="6" class="text-center py-4">
@@ -258,7 +234,7 @@
           <td>${subUser.subuserable?.first_name ?? ''} ${subUser.subuserable?.last_name ?? ''}</td>
           <td>${subUser.subuserable?.mobile ?? ''}</td>
           <td>${subUser.subuserable?.national_code ?? ''}</td>
-          <td class="text-center">
+          <td class="text-center d-flex gap-2">
             <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
               <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
             </button>
@@ -388,7 +364,7 @@
             let html = '';
             res.forEach(function(user) {
               html +=
-                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
+                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})" onclick="selectUser('add', '${user.id}', '${user.first_name} ${user.last_name} (${user.national_code})')">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
             });
             $results.html(html).show();
           }
@@ -398,23 +374,59 @@
         }
       });
     });
-    $(document).on('click', '#add-user-search-results .search-result-item', function() {
-      const id = $(this).data('id');
-      const name = $(this).data('name');
-      $('#add-user-search').val(name);
-      $('#add-user-id').val(id);
-      $('#add-user-search-results').empty().hide();
+
+    // Event delegation for search results
+    $(document).on('click', '.search-result-item', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const $item = $(this);
+      const id = $item.data('id');
+      const name = $item.data('name');
+
+      if (id && name) {
+        console.log('Search result clicked:', id, name); // Debug
+        const $results = $item.closest('.search-results-list');
+        const $input = $results.siblings('input[type="text"]');
+        const $hidden = $results.siblings('input[type="hidden"]');
+
+        $input.val(name);
+        $hidden.val(id);
+        $results.empty().hide();
+      }
     });
+
     // بستن لیست نتایج با کلیک بیرون
     $(document).on('click', function(e) {
       if (!$(e.target).closest('#add-user-search, #add-user-search-results').length) {
         $('#add-user-search-results').empty().hide();
       }
+      if (!$(e.target).closest('#edit-user-search, #edit-user-search-results').length) {
+        $('#edit-user-search-results').empty().hide();
+      }
+    });
+
+    // Simple click handlers for each modal
+    $(document).on('click', '#add-user-search-results .search-result-item', function() {
+      const id = $(this).data('id');
+      const name = $(this).data('name');
+      console.log('Add modal clicked:', id, name);
+      $('#add-user-search').val(name);
+      $('#add-user-id').val(id);
+      $('#add-user-search-results').empty().hide();
+    });
+
+    $(document).on('click', '#edit-user-search-results .search-result-item', function() {
+      const id = $(this).data('id');
+      const name = $(this).data('name');
+      console.log('Edit modal clicked:', id, name);
+      $('#edit-user-search').val(name);
+      $('#edit-user-id').val(id);
+      $('#edit-user-search-results').empty().hide();
     });
 
     // نمایش فرم افزودن سریع کاربر
     $(document).on('click', '.add-quick-user-btn', function() {
-      $('#quickAddUserModal').modal('show');
+      openXModal('quickAddUserModal');
       $('#quick-add-user-form')[0].reset();
       $('#quick-add-user-form .quick-user-error').text('');
     });
@@ -434,7 +446,7 @@
             $('#add-user-search').val(res.full_name);
             $('#add-user-id').val(res.id);
             $('#add-user-search-results').empty().hide();
-            $('#quickAddUserModal').modal('hide');
+            closeXModal('quickAddUserModal');
           } else {
             $form.find('.quick-user-error').text('خطا در ذخیره کاربر جدید!');
           }
@@ -450,7 +462,7 @@
     $(document).on('click', '.edit-btn', function() {
       const id = $(this).data('id');
       editingUserId = id;
-      $('#editSubUserModal').modal('show');
+      openXModal('editSubUserModal');
       $('#edit-user-search').val('');
       $('#edit-user-id').val('');
       $('#edit-user-search-results').empty().hide();
@@ -488,7 +500,7 @@
             let html = '';
             res.forEach(function(user) {
               html +=
-                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
+                `<div class="search-result-item" data-id="${user.id}" data-name="${user.first_name} ${user.last_name} (${user.national_code})" onclick="selectUser('edit', '${user.id}', '${user.first_name} ${user.last_name} (${user.national_code})')">${user.first_name} ${user.last_name} <span class="text-muted">(${user.national_code})</span></div>`;
             });
             $results.html(html).show();
           }
@@ -497,18 +509,6 @@
           $results.html('<div class="search-result-item text-danger">خطا در جستجو</div>').show();
         }
       });
-    });
-    $(document).on('click', '#edit-user-search-results .search-result-item', function() {
-      const id = $(this).data('id');
-      const name = $(this).data('name');
-      $('#edit-user-search').val(name);
-      $('#edit-user-id').val(id);
-      $('#edit-user-search-results').empty().hide();
-    });
-    $(document).on('click', function(e) {
-      if (!$(e.target).closest('#edit-user-search, #edit-user-search-results').length) {
-        $('#edit-user-search-results').empty().hide();
-      }
     });
   });
 
@@ -596,7 +596,7 @@
       const id = $(this).data('id');
       const $btn = $(this);
       $btn.prop('disabled', true);
-      $('#editSubUserModal').modal('show');
+      openXModal('editSubUserModal');
       $('#edit-user-select').html('<option>در حال بارگذاری...</option>');
       $.ajax({
         url: "{{ route('mc-sub-users-edit', ':id') }}".replace(':id', id),
@@ -650,7 +650,7 @@
         },
         error: function() {
           toastr.error('خطا در دریافت اطلاعات کاربر!');
-          $('#editSubUserModal').modal('hide');
+          closeXModal('editSubUserModal');
         },
         complete: function() {
           $btn.prop('disabled', false);
@@ -659,94 +659,8 @@
     });
 
     $('#add-subuser-btn').on('click', function() {
-      $('#addSubUserModal').modal('show');
+      openXModal('addSubUserModal');
     });
-
-    function updateSubUserList(subUsers) {
-      const container = $('#subuser-list tbody');
-      container.empty();
-
-      // آپدیت جدول دسکتاپ
-      if (subUsers.length === 0) {
-        container.append(
-          `<tr><td colspan="5" class="text-center">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`
-        );
-      } else {
-        subUsers.forEach((subUser, index) => {
-          const row = `
-            <tr>
-              <td>${index + 1}</td>
-              <td>${subUser.subuserable.first_name} ${subUser.subuserable.last_name}</td>
-              <td>${subUser.subuserable.mobile}</td>
-              <td>${subUser.subuserable.national_code}</td>
-              <td>
-                <button class="btn btn-light btn-sm rounded-circle edit-btn" data-id="${subUser.id}" title="ویرایش">
-                  <img src="{{ asset('mc-assets/icons/edit.svg') }}" alt="ویرایش">
-                </button>
-                <button class="btn btn-light btn-sm rounded-circle delete-btn" data-id="${subUser.id}" title="حذف">
-                  <img src="{{ asset('mc-assets/icons/trash.svg') }}" alt="حذف">
-                </button>
-              </td>
-            </tr>`;
-          container.append(row);
-        });
-      }
-
-      // آپدیت کارت‌های موبایل
-      const mobileContainer = $('.notes-cards');
-      mobileContainer.empty();
-      if (subUsers.length === 0) {
-        mobileContainer.append(`
-          <div class="text-center py-4">
-            <div class="d-flex justify-content-center align-items-center flex-column">
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-muted mb-2">
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
-              <p class="text-muted fw-medium">شما کاربر زیرمجموعه‌ای ندارید</p>
-            </div>
-          </div>
-        `);
-      } else {
-        subUsers.forEach((subUser, index) => {
-          const card = `
-            <div class="note-card mb-3" data-id="${subUser.id}">
-              <div class="note-card-header d-flex justify-content-between align-items-center">
-                <div class="d-flex align-items-center gap-2">
-                  <span class="badge bg-primary-subtle text-primary">${subUser.subuserable.national_code ?? ''}</span>
-                </div>
-                <div class="d-flex gap-1">
-                  <button class="btn btn-sm btn-gradient-success px-2 py-1 edit-btn" data-id="${subUser.id}" title="ویرایش">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                    </svg>
-                  </button>
-                  <button class="btn btn-sm btn-gradient-danger px-2 py-1 delete-btn" data-id="${subUser.id}" title="حذف">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="note-card-body">
-                <div class="note-card-item">
-                  <span class="note-card-label">نام و نام خانوادگی:</span>
-                  <span class="note-card-value">${subUser.subuserable.first_name ?? ''} ${subUser.subuserable.last_name ?? ''}</span>
-                </div>
-                <div class="note-card-item">
-                  <span class="note-card-label">شماره موبایل:</span>
-                  <span class="note-card-value">${subUser.subuserable.mobile ?? ''}</span>
-                </div>
-                <div class="note-card-item">
-                  <span class="note-card-label">کدملی:</span>
-                  <span class="note-card-value">${subUser.subuserable.national_code ?? ''}</span>
-                </div>
-              </div>
-            </div>
-          `;
-          mobileContainer.append(card);
-        });
-      }
-    }
 
     $('#add-subuser-form').on('submit', function(e) {
       e.preventDefault();
@@ -774,9 +688,7 @@
         data: form.serialize(),
         success: function(response) {
           toastr.success('کاربر زیرمجموعه با موفقیت اضافه شد!');
-          $('#addSubUserModal').modal('hide');
-          $('body').removeClass('modal-open');
-          $('.modal-backdrop').remove();
+          closeXModal('addSubUserModal');
           fetchSubUsers();
           // ریست اینپوت‌ها
           $('#add-user-search').val('');
@@ -828,9 +740,7 @@
         data: form.serialize(),
         success: function(response) {
           toastr.success('کاربر زیرمجموعه با موفقیت ویرایش شد!');
-          $('#editSubUserModal').modal('hide');
-          $('body').removeClass('modal-open');
-          $('.modal-backdrop').remove();
+          closeXModal('editSubUserModal');
           fetchSubUsers();
           // ریست اینپوت‌ها
           $('#edit-user-search').val('');
