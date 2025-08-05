@@ -1136,7 +1136,7 @@
           // به‌روزرسانی المان‌های موبایل در صفحه
           $('input[name="mobile"]').val(response.mobile);
           // بستن مودال
-          $('#mobileEditModal').modal('hide');
+          closeXModal('mobileEditModal');
           // رفرش صفحه برای اطمینان
           setTimeout(() => {
             location.reload();
@@ -2260,6 +2260,16 @@
           }, 1000); // کمی تاخیر برای نمایش پیام موفقیت
         });
       }
+    }
+  });
+
+  // فوکوس روی اولین اینپوت از سمت چپ در مرحله OTP
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('mobileEditModal');
+    if (modal) {
+      modal.addEventListener('x-modal-opened', function() {
+        otpInputs[0].focus();
+      });
     }
   });
 </script>

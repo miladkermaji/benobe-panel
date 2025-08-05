@@ -108,7 +108,7 @@
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
-                type="button" id="editButton" data-bs-toggle="modal" data-bs-target="#mobileEditModal">
+                type="button" id="editButton" onclick="openXModal('mobileEditModal')">
 
                 <img src="{{ asset('mc-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
 
@@ -162,55 +162,43 @@
       </div>
     </div>
     {{-- mobileedit modal --}}
-    <div class="modal fade" id="mobileEditModal" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content border-radius-6">
-          <div class="modal-header">
-            <h5 class="modal-title">ویرایش شماره موبایل</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body position-relative">
-            <div id="mobileInputStep1">
-              <label class="label-top-input-modal">شماره موبایل جدید</label>
-              <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right"
-                name="mobile">
-              <div class="d-flex mt-2">
-                <button onclick="sendOtpCode()"
-                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ارسال کد تایید</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-            </div>
-            <div id="otpInputStep" style="display:none;">
-              <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
-              <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
-              </div>
-              <div class="d-flex mt-3">
-                <button onclick="verifyOtpCode()"
-                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                  <span class="button_text">تایید کد</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-              <div class="text-center mt-2">
-                <small id="resendOtpTimer"></small>
-              </div>
-            </div>
-          </div>
+    <x-custom-modal id="mobileEditModal" title="ویرایش شماره موبایل" size="md">
+      <div id="mobileInputStep1">
+        <label class="label-top-input-modal">شماره موبایل جدید</label>
+        <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right position-relative"
+          name="mobile">
+        <div class="d-flex mt-2">
+          <button onclick="sendOtpCode()"
+            class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+            <span class="button_text">ارسال کد تایید</span>
+            <div class="loader"></div>
+          </button>
         </div>
       </div>
-    </div>
+      <div id="otpInputStep" style="display:none;">
+        <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
+        <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px" autocomplete="one-time-code" pattern="[0-9]*" name="otpCode[]">
+        </div>
+        <div class="d-flex mt-3">
+          <button onclick="verifyOtpCode()"
+            class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+            <span class="button_text">تایید کد</span>
+            <div class="loader"></div>
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <small id="resendOtpTimer"></small>
+        </div>
+      </div>
+    </x-custom-modal>
     {{-- mobileedit modal --}}
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="specialty-section"
       style="position:relative; overflow:visible;">

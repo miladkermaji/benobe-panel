@@ -111,7 +111,7 @@
                 disabled>
               <button
                 class="btn btn-dark h-50 col-lg-1 col-xs-2 col-md-1 col-sm-1 d-flex justify-content-center align-items-center fs-6 add-form-item"
-                type="button" id="editButton" data-bs-toggle="modal" data-bs-target="#mobileEditModal">
+                type="button" id="editButton" onclick="openXModal('mobileEditModal')">
 
                 <img src="{{ asset('dr-assets/icons/pencil-edit.svg') }}" alt="" srcset="">
 
@@ -163,55 +163,43 @@
       </div>
     </div>
     {{-- mobileedit modal --}}
-    <div class="modal fade" id="mobileEditModal" tabindex="-1" role="dialog" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content border-radius-6">
-          <div class="modal-header">
-            <h5 class="modal-title">ویرایش شماره موبایل</h5>
-            <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body position-relative">
-            <div id="mobileInputStep1">
-              <label class="label-top-input-modal">شماره موبایل جدید</label>
-              <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right"
-                name="mobile">
-              <div class="d-flex mt-2">
-                <button onclick="sendOtpCode()"
-                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ارسال کد تایید</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-            </div>
-            <div id="otpInputStep" style="display:none;">
-              <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
-              <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
-                <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
-                  style="width:70px;height:60px">
-              </div>
-              <div class="d-flex mt-3">
-                <button onclick="verifyOtpCode()"
-                  class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                  <span class="button_text">تایید کد</span>
-                  <div class="loader"></div>
-                </button>
-              </div>
-              <div class="text-center mt-2">
-                <small id="resendOtpTimer"></small>
-              </div>
-            </div>
-          </div>
+    <x-custom-modal id="mobileEditModal" title="ویرایش شماره موبایل" size="md">
+      <div id="mobileInputStep1">
+        <label class="label-top-input-modal">شماره موبایل جدید</label>
+        <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right position-relative"
+          name="mobile">
+        <div class="d-flex mt-2">
+          <button onclick="sendOtpCode()"
+            class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+            <span class="button_text">ارسال کد تایید</span>
+            <div class="loader"></div>
+          </button>
         </div>
       </div>
-    </div>
+      <div id="otpInputStep" style="display:none;">
+        <label class="label-top fw-bold">کد تایید 4 رقمی را وارد کنید</label>
+        <div class="d-flex justify-content-center gap-10 mt-2" dir="ltr">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px">
+          <input type="text" maxlength="1" inputmode="numeric" class="form-control otp-input text-center"
+            style="width:70px;height:60px">
+        </div>
+        <div class="d-flex mt-3">
+          <button onclick="verifyOtpCode()"
+            class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+            <span class="button_text">تایید کد</span>
+            <div class="loader"></div>
+          </button>
+        </div>
+        <div class="text-center mt-2">
+          <small id="resendOtpTimer"></small>
+        </div>
+      </div>
+    </x-custom-modal>
     {{-- mobileedit modal --}}
     <div class="option-card-box-shodow p-3 col-xs-12 col-sm-12  col-md-12 col-lg-8" id="specialty-section"
       style="position:relative; overflow:visible;">
@@ -420,7 +408,8 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-warning mt-2 text-center">
-            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا، تلگرام یا نام کاربری اینستاگرام خود را وارد کنید (اختیاری).</span>
+            <span class="text-sm fw-bold d-block font-size-15">لطفا شماره و نام کاربری پیام رسان ایتا، تلگرام یا نام
+              کاربری اینستاگرام خود را وارد کنید (اختیاری).</span>
             <span class="font-size-15 mt-1">اطلاعات پیام‌رسان‌ها در صورت نیاز در دسترس بیمار قرار می‌گیرد.</span>
           </div>
           <form id="messengersForm">
@@ -642,26 +631,31 @@
         <div class="loading-spinner d-none"></div>
         <div>
           <div class="alert alert-info mt-2 text-center">
-            <span class="text-sm fw-bold d-block font-size-15">سوالات متداول شما در پروفایل عمومی نمایش داده می‌شود.</span>
+            <span class="text-sm fw-bold d-block font-size-15">سوالات متداول شما در پروفایل عمومی نمایش داده
+              می‌شود.</span>
             <span class="font-size-15 mt-1">این بخش به بیماران کمک می‌کند تا سوالات رایج را مشاهده کنند.</span>
           </div>
-          
+
           <!-- بخش افزودن سوال جدید - Dropdown -->
           <div class="mt-4">
             <div class="faq-add-toggle">
               <div class="d-flex align-items-center justify-content-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="me-2">
-                  <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg" class="me-2">
+                  <path d="M12 5V19M5 12H19" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
                 <span class="fw-bold text-primary">افزودن سوال متداول جدید</span>
               </div>
               <div class="faq-add-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="#6b7280" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
               </div>
             </div>
-            
+
             <!-- فرم افزودن سوال جدید - مخفی شده -->
             <div class="faq-add-form">
               <form id="faqForm" class="mt-3 p-3">
@@ -669,24 +663,27 @@
                 <div class="row">
                   <div class="col-md-6">
                     <label for="question" class="label-top-input">سوال</label>
-                    <input type="text" id="question" name="question" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           placeholder="سوال خود را وارد کنید..." maxlength="255">
+                    <input type="text" id="question" name="question"
+                      class="form-control h-50 w-100 border-radius-6 mt-3" placeholder="سوال خود را وارد کنید..."
+                      maxlength="255">
                     <div class="text-danger validation-error mt-1 font-size-13"></div>
                   </div>
                   <div class="col-md-6">
                     <label for="order" class="label-top-input">ترتیب نمایش</label>
-                    <input type="number" id="order" name="order" class="form-control h-50 w-100 border-radius-6 mt-3" 
-                           placeholder="0" min="0" value="0">
+                    <input type="number" id="order" name="order"
+                      class="form-control h-50 w-100 border-radius-6 mt-3" placeholder="0" min="0"
+                      value="0">
                     <div class="text-danger validation-error mt-1 font-size-13"></div>
                   </div>
                 </div>
                 <div class="mt-3">
-                  <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" 
-                            rows="3" placeholder="پاسخ خود را وارد کنید..."></textarea>
+                  <textarea id="answer" name="answer" class="form-control w-100 border-radius-6 mt-3" rows="3"
+                    placeholder="پاسخ خود را وارد کنید..."></textarea>
                   <div class="text-danger validation-error mt-1 font-size-13"></div>
                 </div>
                 <div class="mt-3 d-flex gap-2">
-                  <button type="submit" class="btn my-btn-primary flex-grow-1 h-50 border-radius-4 d-flex justify-content-center align-items-center">
+                  <button type="submit"
+                    class="btn my-btn-primary flex-grow-1 h-50 border-radius-4 d-flex justify-content-center align-items-center">
                     <span class="button_text">افزودن سوال متداول</span>
                     <div class="loader"></div>
                   </button>
@@ -704,7 +701,7 @@
               <h6 class="text-right fw-bold d-block font-size-13 mb-0">سوالات متداول شما</h6>
               <span class="badge bg-primary">{{ count($doctorFaqs) }} سوال</span>
             </div>
-            
+
             <div id="faqsList" class="faqs-container">
               @forelse($doctorFaqs as $faq)
                 <div class="faq-item-compact" data-faq-id="{{ $faq->id }}">
@@ -720,13 +717,15 @@
                         </div>
                       </div>
                       <div class="faq-item-actions-compact">
-                        <button type="button" class="btn btn-sm btn-light edit-faq-btn" 
-                                data-faq-id="{{ $faq->id }}" title="ویرایش">
-                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش" style="width: 14px; height: 14px;">
+                        <button type="button" class="btn btn-sm btn-light edit-faq-btn"
+                          data-faq-id="{{ $faq->id }}" title="ویرایش">
+                          <img src="{{ asset('dr-assets/icons/edit.svg') }}" alt="ویرایش"
+                            style="width: 14px; height: 14px;">
                         </button>
-                        <button type="button" class="btn btn-sm btn-light delete-faq-btn" 
-                                data-faq-id="{{ $faq->id }}" title="حذف">
-                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف" style="width: 14px; height: 14px;">
+                        <button type="button" class="btn btn-sm btn-light delete-faq-btn"
+                          data-faq-id="{{ $faq->id }}" title="حذف">
+                          <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
+                            style="width: 14px; height: 14px;">
                         </button>
                       </div>
                     </div>

@@ -136,6 +136,7 @@
         });
     }
   });
+
   function updateAlert() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
@@ -308,6 +309,7 @@
       }
     });
   });
+
   function updateAddButtonState() {
     const addButton = document.getElementById('addButton');
     const additionalInputs = document.getElementById('additionalInputs');
@@ -407,6 +409,7 @@
     checkInitialProfileCompleteness();
   });
   const deleteSpecialtyRoute = "{{ route('dr-delete-specialty', ['id' => '__ID__']) }}";
+
   function removeInput(button) {
     // پیدا کردن المان والد که ممکنه دارای data-specialty-id باشه
     const inputGroup = button.closest('.specialty-item');
@@ -495,6 +498,7 @@
       ...options
     });
   }
+
   function initAllTomSelects() {
     // درجه علمی
     initTomSelect('#academic_degree_id', {
@@ -657,6 +661,7 @@
       }
     }
   }
+
   function autoSaveSpecialty(id) {
     const container = document.querySelector(`[data-specialty-id='${id}']`);
     if (!container) return;
@@ -809,6 +814,7 @@
       }
     });
   });
+
   function updateSpecialties(specialties) {
     if (!specialties || !Array.isArray(specialties)) {
       console.error('داده‌های تخصص‌ها نامعتبر است:', specialties);
@@ -970,7 +976,7 @@
     for (let i = 0; i < persianNumbers.length; i++) {
       convertedMobile = convertedMobile.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
     }
-    
+
     const mobileRegex =
       /^(?!09{1}(\d)\1{8}$)09(?:01|02|03|12|13|14|15|16|18|19|20|21|22|30|33|35|36|38|39|90|91|92|93|94)\d{7}$/;
     if (!mobileRegex.test(convertedMobile)) {
@@ -980,7 +986,7 @@
       loader.style.display = 'none';
       return;
     }
-    
+
     // استفاده از شماره تبدیل شده برای ارسال به سرور
     $.ajax({
       url: "{{ route('dr-send-mobile-otp') }}",
@@ -1015,143 +1021,143 @@
   // تابع تایید کد OTP
   function verifyOtpCode() {
     const otpInputs = document.querySelectorAll('.otp-input');
-    
+
     // تبدیل اعداد فارسی به انگلیسی
     const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
     const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    
+
     // جمع‌آوری مقادیر از input fields با تبدیل اعداد فارسی
     const otpValues = Array.from(otpInputs).map(input => {
       let value = input.value.trim();
-      
+
       // تبدیل اعداد فارسی به انگلیسی
       for (let i = 0; i < persianNumbers.length; i++) {
         value = value.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
       }
-      
+
       // بررسی اینکه مقدار خالی نباشد
       if (value === '' || value === null || value === undefined) {
         return null;
       }
-      
+
       // بررسی اینکه فقط اعداد انگلیسی باشد
       if (!/^[0-9]$/.test(value)) {
         return null;
       }
-      
+
       return value;
     });
-    
+
     // بررسی اینکه تمام مقادیر وارد شده‌اند
     if (otpValues.some(value => value === null)) {
       toastr.error("لطفاً تمام ارقام کد را وارد کنید");
       return;
     }
-    
+
     const otpCode = otpValues.join('');
     const newMobile = $('#newMobileNumber').val();
     const verifyButton = document.querySelector('#otpInputStep button');
     const loader = verifyButton.querySelector('.loader');
     const buttonText = verifyButton.querySelector('.button_text');
-    
+
     // بررسی کامل بودن کد
     if (otpCode.length !== 4) {
       toastr.error("لطفاً تمام ارقام کد را وارد کنید");
       return;
     }
-    
+
     // بررسی اینکه تمام ارقام عددی هستند
     if (!/^\d{4}$/.test(otpCode)) {
       toastr.error("کد تأیید باید فقط شامل اعداد باشد");
       return;
     }
-    
+
     // اطمینان از وجود otpToken
     if (!otpToken) {
       toastr.error("توکن OTP در دسترس نیست. لطفاً دوباره کد را درخواست کنید.");
       return;
     }
-    
+
     // تبدیل اعداد فارسی به انگلیسی برای موبایل
     let convertedMobile = newMobile;
     for (let i = 0; i < persianNumbers.length; i++) {
       convertedMobile = convertedMobile.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
     }
-    
+
     // تبدیل کد OTP به آرایه‌ای از اعداد صحیح
     const otpArray = otpCode.split('').map(digit => {
       const num = parseInt(digit, 10);
       return isNaN(num) ? null : num;
     }).filter(digit => digit !== null);
-    
+
     // بررسی اینکه آرایه OTP معتبر است
     if (otpArray.length !== 4 || otpArray.some(digit => digit < 0 || digit > 9)) {
       toastr.error("کد تأیید نامعتبر است. لطفاً تمام ارقام را وارد کنید.");
       return;
     }
-    
+
     // Debug: نمایش داده‌های ارسالی
     console.log('Original OTP Values:', Array.from(otpInputs).map(input => input.value));
     console.log('Converted OTP Values:', otpValues);
     console.log('OTP Code:', otpCode);
     console.log('OTP Array:', otpArray);
     console.log('Mobile:', convertedMobile);
-    
+
     // مخفی کردن متن دکمه و نمایش لودینگ
     buttonText.style.display = 'none';
     loader.style.display = 'block';
-    
+
     // تولید URL با استفاده از route و otpToken
     fetch("{{ route('dr-mobile-confirm', ':token') }}".replace(':token', otpToken), {
-      method: 'POST',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest'
-      },
-      body: JSON.stringify({
-        otp: otpArray,
-        mobile: convertedMobile
+        method: 'POST',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({
+          otp: otpArray,
+          mobile: convertedMobile
+        })
       })
-    })
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(errorData => {
-          throw new Error(errorData.message || 'خطای نامشخص');
-        });
-      }
-      return response.json();
-    })
-    .then(response => {
-      // بررسی دقیق پاسخ موفقیت
-      if (response.success) {
-        toastr.success(response.message);
-        // به‌روزرسانی المان‌های موبایل در صفحه
-        $('input[name="mobile"]').val(response.mobile);
-        // بستن مودال
-        $('#mobileEditModal').modal('hide');
-        // رفرش صفحه برای اطمینان
-        setTimeout(() => {
-          location.reload();
-        }, 1000);
-      } else {
-        toastr.error(response.message || "خطا در تغییر شماره موبایل");
-      }
-    })
-    .catch(error => {
-      // مدیریت خطاهای سرور
-      let errorMessage = "خطا در تایید کد";
-      if (error.message) {
-        errorMessage = error.message;
-      }
-      toastr.error(errorMessage);
-    })
-    .finally(() => {
-      // بازگردانی دکمه به حالت اولیه
-      buttonText.style.display = 'block';
-      loader.style.display = 'none';
-    });
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            throw new Error(errorData.message || 'خطای نامشخص');
+          });
+        }
+        return response.json();
+      })
+      .then(response => {
+        // بررسی دقیق پاسخ موفقیت
+        if (response.success) {
+          toastr.success(response.message);
+          // به‌روزرسانی المان‌های موبایل در صفحه
+          $('input[name="mobile"]').val(response.mobile);
+          // بستن مودال
+          closeXModal('mobileEditModal');
+          // رفرش صفحه برای اطمینان
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+        } else {
+          toastr.error(response.message || "خطا در تغییر شماره موبایل");
+        }
+      })
+      .catch(error => {
+        // مدیریت خطاهای سرور
+        let errorMessage = "خطا در تایید کد";
+        if (error.message) {
+          errorMessage = error.message;
+        }
+        toastr.error(errorMessage);
+      })
+      .finally(() => {
+        // بازگردانی دکمه به حالت اولیه
+        buttonText.style.display = 'block';
+        loader.style.display = 'none';
+      });
   }
   // تابع شروع تایمر ارسال مجدد
   function startResendTimer() {
@@ -1181,63 +1187,63 @@
         const persianNumbers = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
         const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         let value = this.value;
-        
+
         // تبدیل اعداد فارسی به انگلیسی
         for (let i = 0; i < persianNumbers.length; i++) {
           value = value.replace(new RegExp(persianNumbers[i], 'g'), englishNumbers[i]);
         }
-        
+
         // محدود کردن به یک کاراکتر عددی انگلیسی
         value = value.replace(/[^0-9]/g, '');
-        
+
         // محدود کردن به یک کاراکتر
         this.value = value.substring(0, 1);
-        
+
         // حرکت از چپ به راست برای RTL
         if (this.value.length === 1 && index < otpInputs.length - 1) {
           otpInputs[index + 1].focus();
         }
       });
-      
+
       input.addEventListener('keydown', function(e) {
         // اجازه دادن به کلیدهای Backspace, Delete, Tab, Arrow keys
         if ([8, 9, 37, 38, 39, 40, 46].includes(e.keyCode)) {
           return;
         }
-        
+
         // اجازه دادن فقط به اعداد 0-9
         if (e.keyCode >= 48 && e.keyCode <= 57) {
           return;
         }
-        
+
         // اجازه دادن به اعداد از numpad
         if (e.keyCode >= 96 && e.keyCode <= 105) {
           return;
         }
-        
+
         // جلوگیری از سایر کلیدها
         e.preventDefault();
       });
-      
+
       // مدیریت Backspace برای حرکت به اینپوت قبلی
       input.addEventListener('keyup', function(e) {
         if (e.key === 'Backspace' && this.value.length === 0 && index > 0) {
           otpInputs[index - 1].focus();
         }
       });
-      
+
       input.addEventListener('paste', function(e) {
         e.preventDefault();
         const pastedText = (e.clipboardData || window.clipboardData).getData('text');
         const numbers = pastedText.replace(/[^0-9]/g, '').split('');
-        
+
         // پر کردن اینپوت‌ها با اعداد paste شده
         otpInputs.forEach((input, i) => {
           if (numbers[i]) {
             input.value = numbers[i];
           }
         });
-        
+
         // فوکوس روی آخرین اینپوت پر شده یا اولین اینپوت خالی
         const lastFilledIndex = Math.min(numbers.length - 1, otpInputs.length - 1);
         if (lastFilledIndex < otpInputs.length - 1) {
@@ -1512,6 +1518,7 @@
     }
     // همین‌طور برای سایر بخش‌ها
   });
+
   function checkProfileCompleteness() {
     fetch("{{ route('dr-check-profile-completeness') }}", {
         method: 'GET',
@@ -1540,6 +1547,7 @@
         toastr.error("خطا در دریافت اطلاعات پروفایل");
       });
   }
+
   function updateProfileSections(data) {
     console.log('Update Profile Sections Called');
     fetch("{{ route('dr-check-profile-completeness') }}", {
@@ -1598,6 +1606,7 @@
   }
   // فراخوانی در زمان بارگذاری اولیه صفحه
   document.addEventListener('DOMContentLoaded', checkProfileCompleteness);
+
   function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     const icon = input.parentElement.querySelector('.show-pass');
@@ -1726,36 +1735,36 @@
         buttonText.style.display = 'none';
         loader.style.display = 'block';
         fetch("{{ route('dr-faqs-store') }}", {
-          method: 'POST',
-          headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-            'Accept': 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            question: formData.get('question'),
-            answer: formData.get('answer'),
-            order: formData.get('order') || 0,
-            is_active: true
+            method: 'POST',
+            headers: {
+              'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              question: formData.get('question'),
+              answer: formData.get('answer'),
+              order: formData.get('order') || 0,
+              is_active: true
+            })
           })
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            toastr.success(data.message);
-            refreshFaqList(); // بروزرسانی کامل لیست از سرور
-            faqForm.reset();
-          } else {
-            toastr.error(data.message || 'خطا در افزودن سوال متداول');
-          }
-        })
-        .catch(error => {
-          toastr.error('خطا در برقراری ارتباط با سرور');
-        })
-        .finally(() => {
-          buttonText.style.display = 'block';
-          loader.style.display = 'none';
-        });
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              toastr.success(data.message);
+              refreshFaqList(); // بروزرسانی کامل لیست از سرور
+              faqForm.reset();
+            } else {
+              toastr.error(data.message || 'خطا در افزودن سوال متداول');
+            }
+          })
+          .catch(error => {
+            toastr.error('خطا در برقراری ارتباط با سرور');
+          })
+          .finally(() => {
+            buttonText.style.display = 'block';
+            loader.style.display = 'none';
+          });
       });
     }
   });
@@ -1763,13 +1772,13 @@
   function addFaqToList(faq) {
     const faqsList = document.getElementById('faqsList');
     if (!faqsList) return;
-    
+
     // حذف پیام خالی اگر وجود دارد
     const emptyMessage = faqsList.querySelector('.text-center');
     if (emptyMessage) {
       emptyMessage.remove();
     }
-    
+
     const faqHtml = `
       <div class="faq-item" data-faq-id="${faq.id}">
         <div class="faq-item-header">
@@ -1824,27 +1833,28 @@
       });
     }
   });
+
   function deleteFaq(faqId) {
     fetch(`{{ route('dr-faqs-delete', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
-      method: 'DELETE',
-      headers: {
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'Accept': 'application/json',
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        toastr.success(data.message);
-        refreshFaqList(); // بروزرسانی کامل لیست از سرور
-      } else {
-        toastr.error(data.message || 'خطا در حذف سوال متداول');
-      }
-    })
-    .catch(error => {
-      console.error('Error deleting FAQ:', error);
-      toastr.error('خطا در برقراری ارتباط با سرور');
-    });
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'Accept': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          toastr.success(data.message);
+          refreshFaqList(); // بروزرسانی کامل لیست از سرور
+        } else {
+          toastr.error(data.message || 'خطا در حذف سوال متداول');
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting FAQ:', error);
+        toastr.error('خطا در برقراری ارتباط با سرور');
+      });
   }
   // ویرایش سوال متداول
   document.addEventListener('click', function(e) {
@@ -1853,40 +1863,42 @@
       editFaq(faqId);
     }
   });
+
   function editFaq(faqId) {
     fetch(`{{ route('dr-faqs-get', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        showEditFaqModal(data.faq);
-      } else {
-        toastr.error(data.message || 'خطا در دریافت اطلاعات سوال متداول');
-      }
-    })
-    .catch(error => {
-      console.error('Error fetching FAQ:', error);
-      toastr.error('خطا در برقراری ارتباط با سرور');
-    });
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          showEditFaqModal(data.faq);
+        } else {
+          toastr.error(data.message || 'خطا در دریافت اطلاعات سوال متداول');
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching FAQ:', error);
+        toastr.error('خطا در برقراری ارتباط با سرور');
+      });
   }
+
   function showEditFaqModal(faq) {
     // حذف modal قبلی اگر وجود دارد
     const existingModal = document.getElementById('editFaqModal');
     if (existingModal) {
       existingModal.remove();
     }
-    
+
     const modalHtml = `
       <div class="modal-overlay" id="editFaqModal">
         <div class="modal-container">
@@ -1939,14 +1951,14 @@
         </div>
       </div>
     `;
-    
+
     // اضافه کردن modal جدید
     document.body.insertAdjacentHTML('beforeend', modalHtml);
-    
+
     // نمایش modal
     const modalElement = document.getElementById('editFaqModal');
     modalElement.classList.add('show');
-    
+
     // اضافه کردن event listener برای فرم ویرایش
     document.getElementById('editFaqForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -1955,52 +1967,52 @@
       const buttonText = button.querySelector('.button_text');
       const loader = button.querySelector('.loader');
       const faqId = document.getElementById('edit_faq_id').value;
-      
+
       // نمایش لودینگ
       buttonText.style.display = 'none';
       loader.style.display = 'block';
-      
+
       fetch(`{{ route('dr-faqs-update', ['id' => '__ID__']) }}`.replace('__ID__', faqId), {
-        method: 'PUT',
-        headers: {
-          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify({
-          question: formData.get('question'),
-          answer: formData.get('answer'),
-          order: formData.get('order') || 0,
-          is_active: document.getElementById('edit_is_active').checked
+          method: 'PUT',
+          headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            question: formData.get('question'),
+            answer: formData.get('answer'),
+            order: formData.get('order') || 0,
+            is_active: document.getElementById('edit_is_active').checked
+          })
         })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.success) {
-          toastr.success(data.message);
-          refreshFaqList(); // بروزرسانی کامل لیست از سرور
-          closeEditFaqModal();
-        } else {
-          toastr.error(data.message || 'خطا در ویرایش سوال متداول');
-        }
-      })
-      .catch(error => {
-        console.error('Error updating FAQ:', error);
-        toastr.error('خطا در برقراری ارتباط با سرور');
-      })
-      .finally(() => {
-        buttonText.style.display = 'block';
-        loader.style.display = 'none';
-      });
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            toastr.success(data.message);
+            refreshFaqList(); // بروزرسانی کامل لیست از سرور
+            closeEditFaqModal();
+          } else {
+            toastr.error(data.message || 'خطا در ویرایش سوال متداول');
+          }
+        })
+        .catch(error => {
+          console.error('Error updating FAQ:', error);
+          toastr.error('خطا در برقراری ارتباط با سرور');
+        })
+        .finally(() => {
+          buttonText.style.display = 'block';
+          loader.style.display = 'none';
+        });
     });
   }
-  
+
   function closeEditFaqModal() {
     const modalElement = document.getElementById('editFaqModal');
     if (modalElement) {
@@ -2010,7 +2022,7 @@
       }, 300);
     }
   }
-  
+
   function updateFaqInList(faq) {
     const faqItem = document.querySelector(`[data-faq-id="${faq.id}"]`);
     if (faqItem) {
@@ -2018,34 +2030,34 @@
       const orderBadge = faqItem.querySelector('.order-badge');
       const question = faqItem.querySelector('.faq-question');
       const answer = faqItem.querySelector('.faq-answer');
-      
+
       if (statusBadge) {
         statusBadge.className = `status-badge ${faq.is_active ? 'active' : 'inactive'}`;
         statusBadge.textContent = faq.is_active ? 'فعال' : 'غیرفعال';
       }
-      
+
       if (orderBadge) {
         orderBadge.textContent = `ترتیب: ${faq.order}`;
       }
-      
+
       if (question) {
         question.textContent = faq.question;
       }
-      
+
       if (answer) {
         answer.textContent = faq.answer.length > 150 ? faq.answer.substring(0, 150) + '...' : faq.answer;
       }
     }
   }
-  
+
   // ==================== سوالات متداول ====================
-  
+
   // تابع مدیریت باز و بسته شدن بخش FAQ
   document.addEventListener('DOMContentLoaded', function() {
     const faqSection = document.getElementById('faq-section');
     const faqHeader = faqSection?.querySelector('.faq-section-clicked');
     const faqContent = faqSection?.querySelector('.faq-section-drop-toggle');
-    
+
     if (faqHeader && faqContent) {
       faqHeader.addEventListener('click', function() {
         // تغییر وضعیت نمایش محتوا
@@ -2065,7 +2077,7 @@
           }
         }
       });
-      
+
       // تنظیم اولیه آیکون caret
       const caretIcon = faqHeader.querySelector('img[src*="caret"]');
       if (caretIcon) {
@@ -2074,13 +2086,13 @@
       }
     }
   });
-  
+
   // فرم افزودن سوال متداول
   // تابع بروزرسانی لیست سوالات متداول از سرور
   function refreshFaqList() {
     const faqsList = document.getElementById('faqsList');
     if (!faqsList) return;
-    
+
     // نمایش لودینگ
     faqsList.innerHTML = `
       <div class="text-center py-4">
@@ -2088,42 +2100,42 @@
         <p class="text-muted mt-2">در حال بارگذاری...</p>
       </div>
     `;
-    
+
     // دریافت لیست جدید از سرور
     fetch("{{ route('dr-faqs-index') }}", {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        'X-Requested-With': 'XMLHttpRequest'
-      }
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && data.faqs) {
-        renderFaqList(data.faqs);
-      } else {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success && data.faqs) {
+          renderFaqList(data.faqs);
+        } else {
+          showEmptyFaqList();
+        }
+      })
+      .catch(error => {
+        console.error('Error refreshing FAQ list:', error);
         showEmptyFaqList();
-      }
-    })
-    .catch(error => {
-      console.error('Error refreshing FAQ list:', error);
-      showEmptyFaqList();
-    });
+      });
   }
-  
+
   // تابع نمایش لیست سوالات متداول
   function renderFaqList(faqs) {
     const faqsList = document.getElementById('faqsList');
     if (!faqsList) return;
-    
+
     if (!faqs || faqs.length === 0) {
       showEmptyFaqList();
       return;
     }
-    
+
     faqsList.innerHTML = '';
-    
+
     faqs.forEach(faq => {
       const faqHtml = `
         <div class="faq-item-compact" data-faq-id="${faq.id}">
@@ -2158,12 +2170,12 @@
       faqsList.insertAdjacentHTML('beforeend', faqHtml);
     });
   }
-  
+
   // تابع نمایش لیست خالی
   function showEmptyFaqList() {
     const faqsList = document.getElementById('faqsList');
     if (!faqsList) return;
-    
+
     faqsList.innerHTML = `
       <div class="faq-empty-state">
         <img src="{{ asset('dr-assets/icons/help.svg') }}" alt="" class="faq-empty-icon">
@@ -2171,23 +2183,23 @@
       </div>
     `;
   }
-  
+
   // افزودن سوال جدید به لیست
-  
+
   // ==================== مدیریت Dropdown افزودن FAQ ====================
   document.addEventListener('DOMContentLoaded', function() {
     const faqAddToggle = document.querySelector('.faq-add-toggle');
     const faqAddForm = document.querySelector('.faq-add-form');
     const faqAddIcon = document.querySelector('.faq-add-icon svg');
     const faqAddCancel = document.querySelector('.faq-add-cancel');
-    
+
     if (faqAddToggle && faqAddForm) {
       // کلیک روی دکمه افزودن
       faqAddToggle.addEventListener('click', function(event) {
         event.stopPropagation(); // جلوگیری از انتشار رویداد به والدین
-        
+
         const isOpen = faqAddForm.classList.contains('open');
-        
+
         if (isOpen) {
           // بستن فرم
           faqAddForm.classList.remove('open');
@@ -2202,17 +2214,17 @@
           faqAddToggle.style.borderColor = '#3b82f6';
         }
       });
-      
+
       // دکمه انصراف
       if (faqAddCancel) {
         faqAddCancel.addEventListener('click', function(event) {
           event.stopPropagation(); // جلوگیری از انتشار رویداد به والدین
-          
+
           faqAddForm.classList.remove('open');
           faqAddIcon.style.transform = 'rotate(0deg)';
           faqAddToggle.style.background = '#f8fafc';
           faqAddToggle.style.borderColor = '#e5e7eb';
-          
+
           // پاک کردن فرم
           const form = document.getElementById('faqForm');
           if (form) {
@@ -2223,7 +2235,7 @@
           }
         });
       }
-      
+
       // بستن فرم بعد از افزودن موفق
       const faqForm = document.getElementById('faqForm');
       if (faqForm) {
@@ -2231,14 +2243,14 @@
         faqForm.addEventListener('click', function(event) {
           event.stopPropagation();
         });
-        
+
         const originalSubmitHandler = faqForm.onsubmit;
         faqForm.addEventListener('submit', function(e) {
           // اگر فرم قبلاً submit handler داشته، آن را حفظ کن
           if (originalSubmitHandler) {
             originalSubmitHandler.call(this, e);
           }
-          
+
           // بعد از submit موفق، فرم را ببند
           setTimeout(() => {
             faqAddForm.classList.remove('open');
@@ -2250,6 +2262,14 @@
       }
     }
   });
+
+  // فوکوس روی اولین اینپوت از سمت چپ در مرحله OTP
+  document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('mobileEditModal');
+    if (modal) {
+      modal.addEventListener('x-modal-opened', function() {
+        otpInputs[0].focus();
+      });
+    }
+  });
 </script>
-
-

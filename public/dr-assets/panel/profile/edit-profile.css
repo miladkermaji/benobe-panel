@@ -251,7 +251,8 @@ textarea:focus {
     font-weight: bold;
     right: 18px;
     font-size: 12px;
-    top: 0;
+    top: 55px;
+    bottom: inherit;
 }
 
 .label-top-input-special {
