@@ -204,7 +204,7 @@
                           @if (isset($doctors) && $doctors->count() > 0)
                             @foreach ($doctors as $doctor)
                               <div
-                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
                                 wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
                                 data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}"
                                 data-name="{{ strtolower($doctor->first_name . ' ' . $doctor->last_name) }}"
@@ -242,9 +242,40 @@
                                 </div>
                               </div>
                             @endforeach
-                          @else
-                            <!-- No Doctors Found Message -->
-                            <div class="text-center py-5" id="noDoctorsMessage">
+                          @endif
+
+                          <!-- No Doctors Found Message - همیشه موجود اما مخفی -->
+                          <div class="text-center py-5 d-none" id="noDoctorsMessage">
+                            <div class="mb-3">
+                              <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                  d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
+                                  fill="#E5E7EB" />
+                              </svg>
+                            </div>
+                            <h6 class="text-gray-500 mb-2">پزشکی یافت نشد</h6>
+                            <p class="text-gray-400 mb-0" style="font-size: 14px;">
+                              هیچ پزشکی با این نام یافت نشد
+                            </p>
+                            <div class="mt-4">
+                              <button
+                                class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+                                onclick="window.location.href='{{ route('mc.panel.clinics.create') }}'"
+                                style="font-size: 14px; border-radius: 8px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                  xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                افزودن پزشک جدید
+                              </button>
+                            </div>
+                          </div>
+
+                          <!-- No Doctors Message - وقتی اصلاً پزشکی وجود ندارد -->
+                          @if (!isset($doctors) || $doctors->count() === 0)
+                            <div class="text-center py-5" id="noDoctorsAtAll">
                               <div class="mb-3">
                                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
                                   xmlns="http://www.w3.org/2000/svg">
@@ -436,6 +467,35 @@
           // اضافه کردن event listener جدید به صورت global
           document.addEventListener('input', globalSearchHandler);
           document.addEventListener('keyup', globalSearchHandler);
+
+          // تنظیم کلاس‌های اولیه
+          initializeActiveStates();
+        }
+
+        // تابع تنظیم کلاس‌های اولیه
+        function initializeActiveStates() {
+          const selectedDoctorId = '{{ $selectedDoctorId }}';
+          const doctorItems = document.querySelectorAll('.doctor-item');
+          const defaultOption = document.querySelector('[data-id="default"]');
+
+          // تنظیم آیتم پیش‌فرض
+          if (defaultOption) {
+            if (!selectedDoctorId || selectedDoctorId === 'null') {
+              defaultOption.classList.add('card-active');
+            } else {
+              defaultOption.classList.remove('card-active');
+            }
+          }
+
+          // تنظیم پزشکان
+          doctorItems.forEach((item) => {
+            const doctorId = item.getAttribute('data-id') || '';
+            if (doctorId === selectedDoctorId) {
+              item.classList.add('card-active');
+            } else {
+              item.classList.remove('card-active');
+            }
+          });
         }
 
         // Global search handler
@@ -446,18 +506,34 @@
           const searchTerm = e.target.value.toLowerCase().trim();
           const doctorItems = document.querySelectorAll('.doctor-item');
           const noDoctorsMessage = document.getElementById('noDoctorsMessage');
+          const noDoctorsAtAll = document.getElementById('noDoctorsAtAll');
           const defaultOption = document.querySelector('[data-id="default"]');
 
+          // پیدا کردن ID پزشک انتخاب‌شده فعلی
+          const selectedDoctorId = '{{ $selectedDoctorId }}';
+
           let visibleCount = 0;
+
+          // مخفی کردن پیام "هیچ پزشکی وجود ندارد" در زمان جستجو
+          if (noDoctorsAtAll) {
+            noDoctorsAtAll.style.display = 'none';
+          }
 
           // مدیریت آیتم پیش‌فرض
           if (defaultOption) {
             if (searchTerm === '') {
               defaultOption.style.display = 'flex';
               defaultOption.classList.remove('d-none');
+              // اگر هیچ پزشکی انتخاب نشده، آیتم پیش‌فرض فعال باشد
+              if (!selectedDoctorId || selectedDoctorId === 'null') {
+                defaultOption.classList.add('card-active');
+              } else {
+                defaultOption.classList.remove('card-active');
+              }
             } else {
               defaultOption.style.display = 'none';
               defaultOption.classList.add('d-none');
+              defaultOption.classList.remove('card-active');
             }
           }
 
@@ -466,25 +542,27 @@
             const doctorName = item.getAttribute('data-name') || '';
             const doctorSpecialty = item.getAttribute('data-specialty') || '';
             const doctorId = item.getAttribute('data-id') || '';
-            const isActive = item.getAttribute('data-active') === '1';
 
             const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
 
             if (shouldShow) {
               item.style.display = 'flex';
               item.classList.remove('d-none');
-              item.classList.add('search-match');
               visibleCount++;
 
               // اگر جستجو خالی است، کلاس‌های اصلی را برگردان
               if (searchTerm === '') {
                 item.classList.remove('search-match');
-                // فقط پزشک فعال کلاس card-active را بگیرد
-                if (isActive) {
+                // فقط پزشک انتخاب‌شده کلاس card-active را بگیرد
+                if (doctorId === selectedDoctorId) {
                   item.classList.add('card-active');
                 } else {
                   item.classList.remove('card-active');
                 }
+              } else {
+                // در زمان جستجو، فقط کلاس search-match اعمال شود
+                item.classList.add('search-match');
+                item.classList.remove('card-active');
               }
             } else {
               item.style.display = 'none';
@@ -499,10 +577,6 @@
             if (visibleCount === 0 && searchTerm !== '') {
               noDoctorsMessage.style.display = 'block';
               noDoctorsMessage.classList.remove('d-none');
-              const messageText = noDoctorsMessage.querySelector('p');
-              if (messageText) {
-                messageText.textContent = 'هیچ پزشکی با این نام یافت نشد';
-              }
             } else {
               noDoctorsMessage.style.display = 'none';
               noDoctorsMessage.classList.add('d-none');
