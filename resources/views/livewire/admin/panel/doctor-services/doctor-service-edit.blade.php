@@ -1,12 +1,12 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden" style="background: #ffffff;">
     <div class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between  gap-3">
-      <div class="d-flex align-items-center gap-3 mb-2">
+      <div class="d-flex align-items-center mb-2">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        <h5 class="mb-0 fw-bold text-shadow">ویرایش خدمت پزشک</h5>
+        <h5 class="mb-0 fw-bold text-shadow">ویرایش پزشک</h5>
       </div>
       <a href="{{ route('admin.panel.doctor-services.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">

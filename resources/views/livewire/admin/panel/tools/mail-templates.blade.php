@@ -48,7 +48,7 @@
           </div>
           <button wire:click="{{ $editId ? 'updateTemplate' : 'addTemplate' }}"
             class="btn btn-gradient-success w-100  rounded-xl shadow-sm d-flex align-items-center justify-content-center h-50">
-            {{ $editId ? 'ویرایش' : 'ذخیره تغییرات' }}
+            {{ $editId ? 'ویرایش' : 'ذخیره' }}
           </button>
         </div>
       </div>

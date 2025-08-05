@@ -1942,7 +1942,7 @@
               <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeEditFaqModal()">انصراف</button>
                 <button type="submit" class="btn btn-primary">
-                  <span class="button_text">ذخیره تغییرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
               </div>

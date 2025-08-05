@@ -294,13 +294,13 @@
               </div>
             </div>
           </div>
-          <!-- دکمه ذخیره تغییرات (همیشه نمایش داده می‌شود) -->
+          <!-- دکمه ذخیره (همیشه نمایش داده می‌شود) -->
           @if ($showSaveButton)
             <div class="d-flex w-100 justify-content-end mt-3">
               <button type="button"
                 class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                 id="save-work-schedule" wire:click="saveWorkSchedule">
-                <span class="button_text">ذخیره تغییرات</span>
+                <span class="button_text">ذخیره</span>
                 <div class="loader"></div>
               </button>
             </div>
@@ -368,7 +368,7 @@
             <button type="button" id="saveEmergencyTimesBtn"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
               wire:click="saveEmergencyTimes">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>
@@ -632,7 +632,7 @@
           <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
             <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
               id="saveSelectionCalculator" style="height: 50px;">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>
@@ -662,7 +662,7 @@
           </div>
           <div class="mt-3">
             <button type="button" class="btn my-btn-primary h-50 w-100" wire:click="copySchedule">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>

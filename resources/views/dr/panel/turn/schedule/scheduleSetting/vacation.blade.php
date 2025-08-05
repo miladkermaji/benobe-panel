@@ -147,13 +147,13 @@
           <div class="d-flex justify-content-between gap-4 mt-3">
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">از ساعت:</label>
-              <input data-timepicker id="edit-start-time" type="text" name="start_time" class="form-control w-100 h-50"
-                style="width: 100% !important">
+              <input data-timepicker id="edit-start-time" type="text" name="start_time"
+                class="form-control w-100 h-50" style="width: 100% !important">
             </div>
             <div class="mt-3 position-relative timepicker-ui w-100">
               <label class="label-top-input-special-takhasos">تا ساعت:</label>
-              <input data-timepicker id="edit-end-time" type="text" name="end_time" class="form-control w-100 h-50"
-                style="width: 100% !important">
+              <input data-timepicker id="edit-end-time" type="text" name="end_time"
+                class="form-control w-100 h-50" style="width: 100% !important">
             </div>
           </div>
           <div class="form-check mt-3">
@@ -185,7 +185,7 @@
 </script>
 <script>
   $(document).ready(function() {
-   
+
 
     const now = new Date();
     const jalaliMoment = moment(now).locale('fa');
@@ -415,7 +415,7 @@
         } else if (response && response.message) {
           toastr.error(response.message); // نمایش پیام خطای سرور مثل "تداخل زمانی"
         } else {
-          toastr.error("خطا در ذخیره تغییرات!");
+          toastr.error("خطا در ذخیره!");
         }
       },
       complete: function() {

@@ -76,7 +76,7 @@
               <polyline points="17 21 17 13 7 13 7 21" />
               <polyline points="7 3 7 8 15 8" />
             </svg>
-            <span class="ms-2">ذخیره تغییرات</span>
+            <span class="ms-2">ذخیره</span>
           </button>
         </div>
       </form>

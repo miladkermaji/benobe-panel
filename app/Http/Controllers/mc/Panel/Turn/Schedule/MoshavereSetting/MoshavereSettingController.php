@@ -997,13 +997,13 @@ class MoshavereSettingController extends Controller
                 ], 404);
             }
 
-            // ذخیره تغییرات در `doctor_work_schedules`
+            // ذخیره در `doctor_work_schedules`
             $workSchedule->work_hours = empty($filteredWorkHours) ? null : json_encode(array_values($filteredWorkHours));
 
             if (! $workSchedule->save()) {
-                Log::error('❌ خطا در ذخیره تغییرات در پایگاه داده');
+                Log::error('❌ خطا در ذخیره در پایگاه داده');
                 return response()->json([
-                    'message' => 'خطا در ذخیره تغییرات',
+                    'message' => 'خطا در ذخیره',
                     'status'  => false,
                 ], 500);
             }

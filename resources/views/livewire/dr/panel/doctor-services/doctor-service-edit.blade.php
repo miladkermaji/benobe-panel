@@ -1,12 +1,12 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div class="card-header text-white p-4 d-flex align-items-center justify-content-between  gap-3">
-      <div class="d-flex align-items-center gap-3 mb-2">
+      <div class="d-flex align-items-center  mb-2">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        <h5 class="mb-0 fw-bold text-shadow">ویرایش خدمت</h5>
+        <h5 class="mb-0 fw-bold text-shadow">ویرایش</h5>
         @if ($isSaving)
           <span class="spinner-border spinner-border-sm text-light" role="status" aria-hidden="true"></span>
           <span class="text-light ms-2">در حال ذخیره...</span>
@@ -19,7 +19,7 @@
             <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
             <path d="M17 21v-8H7v8M7 3v5h8" />
           </svg>
-          ذخیره تغییرات
+          ذخیره
         </button>
         <a href="{{ route('dr.panel.doctor-services.index') }}"
           class="btn btn-outline-light btn-sm rounded-pill  d-flex align-items-center hover:shadow-lg transition-all">

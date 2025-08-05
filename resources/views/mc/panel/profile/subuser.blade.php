@@ -43,7 +43,7 @@
     <div class="w-100 mt-2">
       <button type="submit"
         class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-        <span class="button_text">ذخیره تغییرات</span>
+        <span class="button_text">ذخیره</span>
         <div class="loader"></div>
       </button>
     </div>
@@ -66,7 +66,7 @@
     <div class="w-100 mt-2">
       <button type="submit"
         class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-        <span class="button_text">ذخیره تغییرات</span>
+        <span class="button_text">ذخیره</span>
         <div class="loader"></div>
       </button>
     </div>

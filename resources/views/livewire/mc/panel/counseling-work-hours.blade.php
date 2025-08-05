@@ -313,7 +313,7 @@
             <button type="button"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
               id="save-work-schedule" wire:click="saveWorkSchedule">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>
@@ -385,7 +385,7 @@
             <button type="button"
               class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
               wire:click="saveEmergencyTimes">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>
@@ -450,7 +450,7 @@
                 <button type="button"
                   class="btn my-btn-primary d-flex justify-content-center align-items-center save-schedule-btn"
                   id="saveSchedule">
-                  <span class="button_text">ذخیره تغییرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
               </div>
@@ -560,7 +560,7 @@
           <div class="w-100 d-flex justify-content-end p-1 gap-4 mt-3">
             <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
               wire:click="saveCalculator" id="saveSelectionCalculator" style="height: 50px;">
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader"></div>
             </button>
           </div>

@@ -322,15 +322,18 @@ textarea.form-control {
     }
 }
 @media (max-width: 544px) {
-    .card-header {
+    /* .card-header {
         flex-direction: column;
-        
+
+    } */
+    .card-header.text-white.p-4.d-flex.align-items-center.justify-content-between.gap-3{
+        padding: 8px !important;
     }
 
 }
 @media (max-width: 425px) {
     .card-body {
-        padding: 4px 0 !important;
+        padding: 4px 5px !important;
         margin-bottom: 15px !important;
     }
     .select2-container {

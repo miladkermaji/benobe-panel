@@ -415,7 +415,7 @@
         } else if (response && response.message) {
           toastr.error(response.message); // نمایش پیام خطای سرور مثل "تداخل زمانی"
         } else {
-          toastr.error("خطا در ذخیره تغییرات!");
+          toastr.error("خطا در ذخیره!");
         }
       },
       complete: function() {

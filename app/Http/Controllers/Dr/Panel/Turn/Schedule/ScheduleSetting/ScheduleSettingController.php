@@ -1838,12 +1838,12 @@ class ScheduleSettingController extends Controller
                 ], 404);
             }
 
-            // ذخیره تغییرات در `doctor_work_schedules`
+            // ذخیره در `doctor_work_schedules`
             $workSchedule->work_hours = empty($filteredWorkHours) ? null : json_encode(array_values($filteredWorkHours));
 
             if (! $workSchedule->save()) {
                 return response()->json([
-                    'message' => 'خطا در ذخیره تغییرات',
+                    'message' => 'خطا در ذخیره',
                     'status'  => false,
                 ], 500);
             }

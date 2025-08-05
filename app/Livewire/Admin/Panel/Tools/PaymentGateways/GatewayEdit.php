@@ -67,7 +67,7 @@ class GatewayEdit extends Component
             $this->dispatch('show-alert', type: 'success', message: 'تغییرات با موفقیت ذخیره شد!');
             return redirect()->route('admin.panel.tools.payment_gateways.index');
         } else {
-            $this->dispatch('show-alert', type: 'error', message: 'خطا در ذخیره تغییرات!');
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در ذخیره!');
         }
     }
 

@@ -139,7 +139,7 @@
         <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
           wire:click="saveCalculator" id="saveSelectionCalculator" style="height: 50px;"
           @if ($isProcessing) disabled @endif>
-          <span class="button_text">ذخیره تغییرات</span>
+          <span class="button_text">ذخیره</span>
           <div class="loader" style="display: none;"></div>
         </button>
       </div>
@@ -170,7 +170,7 @@
       <div class="w-100 d-flex justify-content-end mt-3">
         <button type="button" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
           wire:click="saveEmergencyTimes" @if ($isProcessing) disabled @endif>
-          <span class="button_text">ذخیره تغییرات</span>
+          <span class="button_text">ذخیره</span>
           <div class="loader" style="display: none;"></div>
         </button>
       </div>
@@ -218,7 +218,7 @@
             </div>
             <button type="button" class="btn my-btn-primary d-flex justify-content-center align-items-center"
               id="saveSchedule" wire:click="saveSchedule" @if ($isProcessing) disabled @endif>
-              <span class="button_text">ذخیره تغییرات</span>
+              <span class="button_text">ذخیره</span>
               <div class="loader" style="display: none;"></div>
             </button>
           </div>

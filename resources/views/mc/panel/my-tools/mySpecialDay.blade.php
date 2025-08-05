@@ -1,5 +1,4 @@
 <script>
-
   let selectedDay = null;
 
   function generateCalendar(year, month) {
@@ -60,7 +59,7 @@
         }
       },
       error: function() {
-        Swal.fire("خطا", "مشکلی در ذخیره تغییرات وجود دارد.", "error");
+        Swal.fire("خطا", "مشکلی در ذخیره وجود دارد.", "error");
       }
     });
 
@@ -1076,7 +1075,7 @@
     });
 
 
-    // ذخیره تغییرات ساعات کاری
+    // ذخیره ساعات کاری
 
 
 

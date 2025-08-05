@@ -78,7 +78,7 @@
                   <div class="mt-3">
                     <button type="submit"
                       class="w-100 btn btn-primary d-flex justify-content-center align-items-center gap-2 h-50">
-                      <span class="button_text">ذخیره تغییرات</span>
+                      <span class="button_text">ذخیره</span>
                       <div class="loader" style="display: none;"></div>
                     </button>
                   </div>

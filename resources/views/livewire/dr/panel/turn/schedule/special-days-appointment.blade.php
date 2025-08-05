@@ -215,7 +215,7 @@
         <button type="button" class="btn my-btn-primary w-100 d-flex justify-content-center align-items-center"
           wire:click="saveCalculator" id="saveSelectionCalculator" style="height: 50px;"
           @if ($isProcessing) disabled @endif>
-          <span class="button_text">ذخیره تغییرات</span>
+          <span class="button_text">ذخیره</span>
           <div class="loader" style="display: none;"></div>
         </button>
       </div>
@@ -247,7 +247,7 @@
       <div class="w-100 d-flex justify-content-end mt-3">
         <button type="button" class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
           wire:click="saveEmergencyTimes" @if ($isProcessing) disabled @endif>
-          <span class="button_text">ذخیره تغییرات</span>
+          <span class="button_text">ذخیره</span>
           <div class="loader" style="display: none;"></div>
         </button>
       </div>
@@ -336,8 +336,7 @@
                       </div>
                       <div class="form-group position-relative">
                         <x-custom-tooltip title="کپی تنظیمات" placement="top">
-                          <button class="my-btn btn-light btn-sm copy-schedule-setting p-1"
-                            x-data="{ day: '{{ $day }}', index: '{{ $scheduleModalIndex }}' }"
+                          <button class="my-btn btn-light btn-sm copy-schedule-setting p-1" x-data="{ day: '{{ $day }}', index: '{{ $scheduleModalIndex }}' }"
                             @click="$dispatch('open-modal', { name: 'copy-schedule-modal', day: day, index: index })"
                             {{ empty($scheduleSettings[$day]['start_time']) || empty($scheduleSettings[$day]['end_time']) ? 'disabled' : '' }}>
                             <img src="{{ asset('dr-assets/icons/copy.svg') }}" alt="کپی"

@@ -577,7 +577,7 @@
                 <button type="submit"
                   class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                   id="btn-save-pass" {{ $doctor->static_password_enabled ? '' : 'disabled' }}>
-                  <span class="button_text">ذخیره تغییرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
               </div>
