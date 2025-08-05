@@ -150,7 +150,8 @@ body {
     gap: 0.5rem;
     transition: all 0.3s ease;
     position: relative;
-    overflow: hidden;
+    text-wrap: nowrap;
+    white-space: nowrap;
 }
 
 .summary-card::before {
@@ -463,10 +464,6 @@ body {
     .filters-toggle {
         display: block;
     }
-
-    .summary-container {
-        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    }
 }
 
 @media (max-width: 768px) {
@@ -479,27 +476,22 @@ body {
     }
 
     .top-section-actions {
-        flex-direction: column;
         align-items: stretch;
         width: 100%;
     }
 
     .search-box {
         max-width: 100%;
-        width: 100%;
+        width: 40vw;
     }
 
     .btn-export {
-        width: 100%;
+        width: 60px;
         justify-content: center;
     }
 
     .filters-body.active {
         grid-template-columns: 1fr;
-    }
-
-    .summary-container {
-        grid-template-columns: 1fr 1fr;
     }
 }
 
@@ -517,7 +509,7 @@ body {
     }
 
     .search-input {
-        padding: 0.4rem 1.8rem 0.4rem 0.6rem;
+        padding: 0.4rem 2.1rem 0.4rem 0.6rem;
     }
 
     .summary-container {
@@ -527,15 +519,23 @@ body {
 
 @media (max-width: 1400px) {
     .summary-container {
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(5, 1fr);
+        overflow-x: scroll;
+    }
+    .summary-card {
+        width: 250px;
     }
 }
 
 @media (max-width: 768px) {
     .summary-container {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(5, 1fr) !important;
+        flex-wrap: nowrap !important;
+        overflow-x: scroll;
     }
-
+    .summary-card {
+        width: 200px;
+    }
     .filters-body {
         grid-template-columns: 1fr;
     }
@@ -571,8 +571,6 @@ body {
 .total-card {
     animation: fadeIn 0.3s ease-out;
 }
-
-
 
 /* Filters */
 .filters-card {
