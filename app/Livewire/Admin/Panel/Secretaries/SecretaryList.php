@@ -282,6 +282,7 @@ class SecretaryList extends Component
 
         return view('livewire.admin.panel.secretaries.secretary-list', [
             'doctors' => $doctors,
+            'secretaries' => $secretaries,
             'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
