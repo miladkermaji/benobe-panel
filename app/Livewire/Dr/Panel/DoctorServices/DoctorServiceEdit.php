@@ -8,6 +8,7 @@ use App\Models\Insurance;
 use App\Models\DoctorService;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Models\MedicalCenter;
 
@@ -56,7 +57,9 @@ class DoctorServiceEdit extends Component
     {
         $this->currentPricingIndex = $index;
         $this->showDiscountModal = true;
+
         if ($index !== null && isset($this->pricing[$index])) {
+            // Set discount percentage from the pricing array
             $this->discountPercent = $this->pricing[$index]['discount'] ?? 0;
 
             // Clean price value by removing commas
@@ -64,11 +67,31 @@ class DoctorServiceEdit extends Component
                 (float) str_replace(',', '', $this->pricing[$index]['price']) :
                 (float) $this->pricing[$index]['price'];
 
-            $this->discountAmount = $cleanPrice && $this->discountPercent
-                ? ($cleanPrice * $this->discountPercent / 100)
-                : 0;
+            // Calculate discount amount based on percentage
+            if ($cleanPrice > 0 && $this->discountPercent > 0) {
+                $this->discountAmount = round($cleanPrice * $this->discountPercent / 100, 0);
+            } else {
+                $this->discountAmount = 0;
+            }
+
+            // Debug: Log the values
+            Log::info('Discount Modal Opened', [
+                'index' => $index,
+                'price' => $cleanPrice,
+                'discountPercent' => $this->discountPercent,
+                'discountAmount' => $this->discountAmount
+            ]);
+        } else {
+            // Reset values if no valid index
+            $this->discountPercent = 0;
+            $this->discountAmount = 0;
         }
+
         $this->dispatch('openDiscountModal');
+        $this->dispatch('updateDiscountValues', [
+            'discountPercent' => $this->discountPercent,
+            'discountAmount' => $this->discountAmount
+        ]);
     }
 
     public function closeDiscountModal()
@@ -86,13 +109,18 @@ class DoctorServiceEdit extends Component
                 (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
-            if ($cleanPrice && $value) {
+            if ($cleanPrice > 0 && $value > 0) {
                 $this->discountAmount = round($cleanPrice * $value / 100, 0);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $this->discountAmount;
             } else {
                 $this->discountAmount = 0;
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice;
             }
+
+            $this->dispatch('discountCalculated', [
+                'discountPercent' => $this->discountPercent,
+                'discountAmount' => $this->discountAmount
+            ]);
         }
     }
 
@@ -104,13 +132,18 @@ class DoctorServiceEdit extends Component
                 (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
-            if ($cleanPrice && $value) {
+            if ($cleanPrice > 0 && $value > 0) {
                 $this->discountPercent = round(($value / $cleanPrice) * 100, 2);
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - $value;
             } else {
                 $this->discountPercent = 0;
                 $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice;
             }
+
+            $this->dispatch('discountCalculated', [
+                'discountPercent' => $this->discountPercent,
+                'discountAmount' => $this->discountAmount
+            ]);
         }
     }
 
@@ -124,13 +157,28 @@ class DoctorServiceEdit extends Component
                 (float) $this->pricing[$index]['price'];
 
             $this->pricing[$index]['final_price'] = $cleanPrice - ($cleanPrice * ($this->pricing[$index]['discount'] ?? 0) / 100);
-            $this->save();
+
+            // If discount modal is open for this pricing row, recalculate discount amount
+            if ($this->showDiscountModal && $this->currentPricingIndex == $index) {
+                // Recalculate discount amount based on current percentage
+                if ($cleanPrice > 0 && $this->discountPercent > 0) {
+                    $this->discountAmount = round($cleanPrice * $this->discountPercent / 100, 0);
+                } else {
+                    $this->discountAmount = 0;
+                }
+
+                $this->dispatch('discountCalculated', [
+                    'discountPercent' => $this->discountPercent,
+                    'discountAmount' => $this->discountAmount
+                ]);
+            }
         }
     }
 
     public function applyDiscount()
     {
         if ($this->currentPricingIndex !== null && isset($this->pricing[$this->currentPricingIndex])) {
+            // Set the discount percentage
             $this->pricing[$this->currentPricingIndex]['discount'] = $this->discountPercent;
 
             // Clean price value by removing commas
@@ -138,8 +186,17 @@ class DoctorServiceEdit extends Component
                 (float) str_replace(',', '', $this->pricing[$this->currentPricingIndex]['price']) :
                 (float) $this->pricing[$this->currentPricingIndex]['price'];
 
+            // Calculate final price
             $this->pricing[$this->currentPricingIndex]['final_price'] = $cleanPrice - ($cleanPrice * $this->discountPercent / 100);
-            $this->save();
+
+            // Debug: Log the applied discount
+            Log::info('Discount Applied', [
+                'index' => $this->currentPricingIndex,
+                'price' => $cleanPrice,
+                'discountPercent' => $this->discountPercent,
+                'discountAmount' => $this->discountAmount,
+                'finalPrice' => $this->pricing[$this->currentPricingIndex]['final_price']
+            ]);
         }
         $this->showDiscountModal = false;
         $this->currentPricingIndex = null;
