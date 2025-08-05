@@ -28,7 +28,7 @@
                   class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
                   wire:model.live="search" placeholder="جستجو در خدمات..."
                   style="padding-right: 20px; text-align: right; direction: rtl;">
-                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                <span class="search-icon position-absolute top-40 start-0 translate-middle-y ms-2"
                   style="z-index: 5; top: 50%; right: 8px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                     stroke-width="2">

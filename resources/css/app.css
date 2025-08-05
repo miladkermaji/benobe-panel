@@ -136,7 +136,9 @@ button {
     font-size: 12px;
     font-weight: bold;
 }
-
+.top-40 {
+    top: 40% !important;
+}
 .calendar-day {
     position: relative;
     min-height: 40px;
