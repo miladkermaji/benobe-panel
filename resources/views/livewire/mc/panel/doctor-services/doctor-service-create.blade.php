@@ -140,7 +140,7 @@
     <div class="mb-4 position-relative mt-2">
       <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
       <input type="number" wire:model="discountPercent" class="form-control position-relative" id="discountPercent"
-        placeholder="درصد را وارد کنید" min="0" max="100">
+        placeholder="درصد را وارد کنید" min="0" max="100" step="0.01">
     </div>
     <div class="mb-4 position-relative mt-2">
       <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
@@ -202,6 +202,28 @@
         const index = $(this).attr('id').replace('insurance_id_', '');
         @this.set(`pricing.${index}.insurance_id`, null);
       });
+
+      // رویداد تغییر قیمت برای به‌روزرسانی تخفیف
+      $(document).on('input change', '[id^="price_"]', function() {
+        const index = $(this).attr('id').replace('price_', '');
+        const value = $(this).val().replace(/,/g, '');
+        @this.set(`pricing.${index}.price`, value);
+        
+        // اگر مودال تخفیف باز است و این همان ردیف است، تخفیف را به‌روزرسانی کن
+        if (@this.showDiscountModal && @this.currentPricingIndex == index) {
+          const cleanPrice = parseFloat(value) || 0;
+          const discountPercent = @this.discountPercent || 0;
+          if (cleanPrice > 0 && discountPercent > 0) {
+            const discountAmount = Math.round(cleanPrice * discountPercent / 100);
+            @this.set('discountAmount', discountAmount);
+            $('#discountAmount').val(discountAmount);
+          } else {
+            @this.set('discountAmount', 0);
+            $('#discountAmount').val(0);
+          }
+        }
+      });
+
       Livewire.on('update-select2', ({
         clinicId
       }) => {
@@ -211,89 +233,84 @@
         toastr[event.type](event.message);
       });
 
+      // به‌روزرسانی مقادیر تخفیف در مودال
+      Livewire.on('updateDiscountValues', (data) => {
+        if (data.discountPercent !== undefined) {
+          $('#discountPercent').val(data.discountPercent);
+        }
+        if (data.discountAmount !== undefined) {
+          $('#discountAmount').val(data.discountAmount);
+        }
+      });
+
+      // به‌روزرسانی مقادیر تخفیف بعد از محاسبه
+      Livewire.on('discountCalculated', (data) => {
+        if (data.discountPercent !== undefined) {
+          $('#discountPercent').val(data.discountPercent);
+        }
+        if (data.discountAmount !== undefined) {
+          $('#discountAmount').val(data.discountAmount);
+        }
+      });
+
       // باز کردن مودال تخفیف
       Livewire.on('openDiscountModal', () => {
         setTimeout(() => {
           openXModal('discountModal');
 
-          // اضافه کردن event handlers برای مودال تخفیف بعد از باز شدن
+          // تنظیم مقادیر اولیه بعد از باز شدن مودال
+          setTimeout(() => {
+            $('#discountPercent').val(@this.discountPercent || 0);
+            $('#discountAmount').val(@this.discountAmount || 0);
+          }, 100);
+
+          // اضافه کردن event handlers برای محاسبه real-time
           $('#discountPercent').off('input keyup change').on('input keyup change', function() {
-            const value = $(this).val();
+            const value = parseFloat($(this).val()) || 0;
             @this.set('discountPercent', value);
             @this.call('calculateDiscountPercent', value);
+
+            // به‌روزرسانی مستقیم input مبلغ تخفیف
+            const cleanPrice = parseFloat(@this.pricing[@this.currentPricingIndex].price.toString()
+              .replace(/,/g, '')) || 0;
+            if (cleanPrice > 0 && value > 0) {
+              const discountAmount = Math.round(cleanPrice * value / 100);
+              $('#discountAmount').val(discountAmount);
+            } else {
+              $('#discountAmount').val(0);
+            }
           });
 
           $('#discountAmount').off('input keyup change').on('input keyup change', function() {
-            const value = $(this).val();
+            const value = parseFloat($(this).val()) || 0;
             @this.set('discountAmount', value);
             @this.call('calculateDiscountAmount', value);
+
+            // به‌روزرسانی مستقیم input درصد تخفیف
+            const cleanPrice = parseFloat(@this.pricing[@this.currentPricingIndex].price.toString()
+              .replace(/,/g, '')) || 0;
+            if (cleanPrice > 0 && value > 0) {
+              const discountPercent = Math.round((value / cleanPrice) * 100 * 100) / 100;
+              $('#discountPercent').val(discountPercent);
+            } else {
+              $('#discountPercent').val(0);
+            }
           });
-        }, 100);
+        }, 200);
       });
 
       // بستن مودال تخفیف
       Livewire.on('closeDiscountModal', () => {
         setTimeout(() => {
           closeXModal('discountModal');
-        }, 50);
+
+          // پاک کردن event handlers
+          $('#discountPercent').off('input keyup change');
+          $('#discountAmount').off('input keyup change');
+        }, 100);
       });
-
-      // اضافه کردن event handlers برای مودال تخفیف
-      // $(document).on('input', '#discountPercent', function() {
-      //   const value = $(this).val();
-      //   @this.set('discountPercent', value);
-      //   @this.call('calculateDiscountPercent', value);
-      // });
-
-      // $(document).on('input', '#discountAmount', function() {
-      //   const value = $(this).val();
-      //   @this.set('discountAmount', value);
-      //   @this.call('calculateDiscountAmount', value);
-      // });
 
       Livewire.on('confirm-edit', (data) => {
         Swal.fire({
           title: 'تأیید ویرایش',
-          html: `برای خدمت «${data.serviceName}» و بیمه «${data.insuranceName}» اطلاعاتی از قبل ثبت شده است.<br>آیا مایل هستید با قیمت و اطلاعات جدید، این مورد را ویرایش کنید؟`,
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonText: 'بله، ویرایش شود',
-          cancelButtonText: 'خیر، لغو',
-          reverseButtons: true
-        }).then((result) => {
-          if (result.isConfirmed) {
-            Livewire.call('confirmEditInsurance');
-          } else {
-            Livewire.call('cancelEditInsurance');
-          }
-        });
-      });
-      document.addEventListener('livewire:updated', function() {
-        const currentService = $('#selected_service').val();
-        initializeSelect2();
-        $('#selected_service').val(currentService).trigger('change');
-      });
-    });
-
-    // --- AutoSave Debounce ---
-    let autoSaveTimeout = null;
-
-    function triggerAutoSave() {
-      if (autoSaveTimeout) clearTimeout(autoSaveTimeout)
-      autoSaveTimeout = setTimeout(function() {
-        window.Livewire && window.Livewire.dispatch('autoSave');
-      }, 1200); // 1.2 ثانیه تاخیر
-    }
-
-    // روی همه input و select های قابل ویرایش (به جز readonly و دکمه‌ها و مودال تخفیف)
-    document.addEventListener('DOMContentLoaded', function() {
-      document.querySelectorAll(
-          'input:not([readonly]):not([type=button]):not([type=submit]):not(#discountPercent):not(#discountAmount), textarea, select'
-        )
-        .forEach(function(el) {
-          el.addEventListener('input', triggerAutoSave);
-          el.addEventListener('change', triggerAutoSave);
-        });
-    });
-  </script>
-</div>
+          html: `

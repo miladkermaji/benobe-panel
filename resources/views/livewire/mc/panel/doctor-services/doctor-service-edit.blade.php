@@ -131,7 +131,7 @@
     <div class="mb-4 position-relative mt-2">
       <label for="discountPercent" class="label-top-input-special-takhasos fw-bold mb-2">درصد تخفیف:</label>
       <input type="number" wire:model="discountPercent" class="form-control position-relative" id="discountPercent"
-        placeholder="درصد را وارد کنید" min="0" max="100">
+        placeholder="درصد را وارد کنید" min="0" max="100" step="0.01">
     </div>
     <div class="mb-4 position-relative mt-2">
       <label for="discountAmount" class="label-top-input-special-takhasos fw-bold mb-2">مبلغ تخفیف (تومان):</label>
@@ -224,32 +224,88 @@
       Livewire.on('openDiscountModal', () => {
         setTimeout(() => {
           openXModal('discountModal');
-
-          // اضافه کردن event handlers برای مودال تخفیف بعد از باز شدن
+          setTimeout(() => {
+            $('#discountPercent').val(@this.discountPercent || 0);
+            $('#discountAmount').val(@this.discountAmount || 0);
+          }, 100);
           $('#discountPercent').off('input keyup change').on('input keyup change', function() {
-            const value = $(this).val();
+            const value = parseFloat($(this).val()) || 0;
             @this.set('discountPercent', value);
             @this.call('calculateDiscountPercent', value);
+            const cleanPrice = parseFloat(@this.pricing[@this.currentPricingIndex].price.toString()
+              .replace(/,/g, '')) || 0;
+            if (cleanPrice > 0 && value > 0) {
+              const discountAmount = Math.round(cleanPrice * value / 100);
+              $('#discountAmount').val(discountAmount);
+            } else {
+              $('#discountAmount').val(0);
+            }
           });
-
           $('#discountAmount').off('input keyup change').on('input keyup change', function() {
-            const value = $(this).val();
+            const value = parseFloat($(this).val()) || 0;
             @this.set('discountAmount', value);
             @this.call('calculateDiscountAmount', value);
+            const cleanPrice = parseFloat(@this.pricing[@this.currentPricingIndex].price.toString()
+              .replace(/,/g, '')) || 0;
+            if (cleanPrice > 0 && value > 0) {
+              const discountPercent = Math.round((value / cleanPrice) * 100 * 100) / 100;
+              $('#discountPercent').val(discountPercent);
+            } else {
+              $('#discountPercent').val(0);
+            }
           });
-        }, 100);
+        }, 200);
       });
 
       // بستن مودال تخفیف
       Livewire.on('closeDiscountModal', () => {
         setTimeout(() => {
           closeXModal('discountModal');
-        }, 50);
+          $('#discountPercent').off('input keyup change');
+          $('#discountAmount').off('input keyup change');
+        }, 100);
       });
 
       // بازسازی Select2 بعد از به‌روزرسانی Livewire
       document.addEventListener('livewire:updated', function() {
         initializeSelect2();
+      });
+
+      // به‌روزرسانی مقادیر تخفیف در مودال
+      Livewire.on('updateDiscountValues', (data) => {
+        if (data.discountPercent !== undefined) {
+          $('#discountPercent').val(data.discountPercent);
+        }
+        if (data.discountAmount !== undefined) {
+          $('#discountAmount').val(data.discountAmount);
+        }
+      });
+      // به‌روزرسانی مقادیر تخفیف بعد از محاسبه
+      Livewire.on('discountCalculated', (data) => {
+        if (data.discountPercent !== undefined) {
+          $('#discountPercent').val(data.discountPercent);
+        }
+        if (data.discountAmount !== undefined) {
+          $('#discountAmount').val(data.discountAmount);
+        }
+      });
+      // رویداد تغییر قیمت برای به‌روزرسانی تخفیف
+      $(document).on('input change', '[id^="price_"]', function() {
+        const index = $(this).attr('id').replace('price_', '');
+        const value = $(this).val().replace(/,/g, '');
+        @this.set(`pricing.${index}.price`, value);
+        if (@this.showDiscountModal && @this.currentPricingIndex == index) {
+          const cleanPrice = parseFloat(value) || 0;
+          const discountPercent = @this.discountPercent || 0;
+          if (cleanPrice > 0 && discountPercent > 0) {
+            const discountAmount = Math.round(cleanPrice * discountPercent / 100);
+            @this.set('discountAmount', discountAmount);
+            $('#discountAmount').val(discountAmount);
+          } else {
+            @this.set('discountAmount', 0);
+            $('#discountAmount').val(0);
+          }
+        }
       });
     });
 
