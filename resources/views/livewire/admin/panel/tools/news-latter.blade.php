@@ -73,7 +73,7 @@
         <!-- جدول - فقط در دسکتاپ -->
         <div class="table-responsive text-nowrap d-none d-lg-block">
           <table class="table w-100 m-0 ">
-            <thead class="glass-header text-white">
+            <thead class="">
               <tr>
                 <th class="text-center align-middle py-3"><input type="checkbox" wire:model.live="selectAll"
                     class="py-2">

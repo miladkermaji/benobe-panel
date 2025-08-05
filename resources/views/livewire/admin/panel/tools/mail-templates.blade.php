@@ -94,7 +94,7 @@
         <div class="d-none d-lg-block">
           <div class="table-responsive text-nowrap">
             <table class="table table-bordered table-hover w-100 m-0 rounded-xl">
-              <thead class="glass-header text-white">
+              <thead class="">
                 <tr>
                   <th class="text-center align-middle py-3"><input type="checkbox" wire:model.live="selectAll"
                       class="py-2">

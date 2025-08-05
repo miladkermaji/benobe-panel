@@ -41,7 +41,9 @@ body {
     direction: rtl;
     font-family: "Vazir", sans-serif;
 }
-
+.form-switch .form-check-input{
+    width: 3em !important;
+}
 /* هدر شیشه‌ای */
 .glass-header {
     background: var(--gradient-primary);
