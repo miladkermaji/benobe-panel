@@ -5,56 +5,94 @@
     });
   </script>
 @endif
-<div class="transaction-list-container">
+<div class="transaction-list-container" x-data="{ mobileSearchOpen: false }">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadTransactions">
-    <div class="glass-header text-white p-2  shadow-lg">
-      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
-        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
-          <div class="d-flex align-items-center gap-3 mb-2">
-            <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">مدیریت تراکنش‌ها</h1>
-          </div>
-          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 w-100">
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-column flex-md-row">
-              <div class="search-container position-relative flex-grow-1 mb-2 mb-md-0 w-100">
-                <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start w-100"
-                  wire:model.live="search" placeholder="جستجو بر اساس نام، موبایل، مبلغ، درگاه..."
-                  style="padding-right: 20px; text-align: right; direction: rtl; width: 100%; max-width: 400px; min-width: 200px;">
-                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
-                  style="z-index: 5; top: 50%; right: 8px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                    stroke-width="2">
-                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
-                  </svg>
-                </span>
-              </div>
-              <select class="form-select form-select-sm w-100 mb-2 mb-md-0 h-50" style="min-width: 0;"
-                wire:model.live="statusFilter">
-                <option value="">همه وضعیت‌ها</option>
-                <option value="paid">پرداخت‌شده</option>
-                <option value="failed">ناموفق</option>
-                <option value="pending">در انتظار</option>
-              </select>
-              <select class="form-select form-select-sm w-100 mb-2 mb-md-0 h-50" style="min-width: 0;"
-                wire:model.live="entityTypeFilter">
-                <option value="all">همه نوع‌ها</option>
-                <option value="user">کاربران</option>
-                <option value="doctor">پزشکان</option>
-                <option value="secretary">منشی‌ها</option>
-              </select>
-              {{--   <a href="{{ route('admin.panel.transactions.create') }}"
-                class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 h-50 w-100 w-md-auto justify-content-center justify-content-md-start h-50">
-                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <span>افزودن</span>
-              </a> --}}
+    <!-- Header -->
+    <header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
+        <!-- Title Section -->
+        <div class="d-flex align-items-center gap-2 flex-shrink-0 w-md-100 justify-content-between">
+          <h2 class="mb-0 fw-bold fs-5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="header-icon">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+            مدیریت تراکنش‌ها
+          </h2>
+          <!-- Mobile Toggle Button -->
+          <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+            @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+        </div>
+        <!-- Mobile Collapsible Section -->
+        <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform -translate-y-2"
+          x-transition:enter-end="opacity-100 transform translate-y-0"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 transform translate-y-0"
+          x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-none w-100">
+          <div class="d-flex flex-column gap-2">
+            <div class="search-box position-relative">
+              <input type="text" wire:model.live="search" class="form-control ps-5"
+                placeholder="جستجو بر اساس نام، موبایل، مبلغ، درگاه...">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="search-icon">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </div>
+            <select class="form-select form-select-sm" wire:model.live="statusFilter">
+              <option value="">همه وضعیت‌ها</option>
+              <option value="paid">پرداخت‌شده</option>
+              <option value="failed">ناموفق</option>
+              <option value="pending">در انتظار</option>
+            </select>
+            <select class="form-select form-select-sm" wire:model.live="entityTypeFilter">
+              <option value="all">همه نوع‌ها</option>
+              <option value="user">کاربران</option>
+              <option value="doctor">پزشکان</option>
+              <option value="secretary">منشی‌ها</option>
+            </select>
+            <div class="d-flex align-items-center gap-2 justify-content-between">
+              <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+                {{ $readyToLoad ? $totalFilteredCount : 0 }}
+              </span>
             </div>
           </div>
         </div>
+        <!-- Desktop Search and Actions -->
+        <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
+          <div class="search-box position-relative">
+            <input type="text" wire:model.live="search" class="form-control ps-5"
+              placeholder="جستجو بر اساس نام، موبایل، مبلغ، درگاه...">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="search-icon">
+              <circle cx="11" cy="11" r="8" />
+              <path d="M21 21l-4.35-4.35" />
+            </svg>
+          </div>
+          <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="statusFilter">
+            <option value="">همه وضعیت‌ها</option>
+            <option value="paid">پرداخت‌شده</option>
+            <option value="failed">ناموفق</option>
+            <option value="pending">در انتظار</option>
+          </select>
+          <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="entityTypeFilter">
+            <option value="all">همه نوع‌ها</option>
+            <option value="user">کاربران</option>
+            <option value="doctor">پزشکان</option>
+            <option value="secretary">منشی‌ها</option>
+          </select>
+          <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+            {{ $readyToLoad ? $totalFilteredCount : 0 }}
+          </span>
+        </div>
       </div>
-    </div>
+    </header>
     <div class="container-fluid px-0">
       <div class="card shadow-sm rounded-2">
         <div class="card-body p-0">
@@ -70,7 +108,8 @@
                 <option value="status_pending">تغییر به در انتظار</option>
               </select>
               <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" id="applyToAllFiltered" wire:model="applyToAllFiltered">
+                <input class="form-check-input" type="checkbox" id="applyToAllFiltered"
+                  wire:model="applyToAllFiltered">
                 <label class="form-check-label" for="applyToAllFiltered">
                   اعمال روی همه نتایج فیلترشده ({{ $totalFilteredCount ?? 0 }})
                 </label>
