@@ -1,6 +1,6 @@
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
-    <div class="card-header text-white p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div class="card-header text-white p-4 d-flex align-items-center justify-content-between  gap-3">
       <div class="d-flex align-items-center gap-3 mb-2">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
           class="custom-animate-bounce">
@@ -14,7 +14,7 @@
       </div>
       <div class="d-flex gap-2">
         <button wire:click="saveAndRedirect"
-          class="btn btn-success btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
+          class="btn btn-success btn-sm rounded-pill  d-flex align-items-center hover:shadow-lg transition-all">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
             <path d="M17 21v-8H7v8M7 3v5h8" />
@@ -22,7 +22,7 @@
           ذخیره تغییرات
         </button>
         <a href="{{ route('mc.panel.doctor-services.index') }}"
-          class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center hover:shadow-lg transition-all">
+          class="btn btn-outline-light btn-sm rounded-pill  d-flex align-items-center hover:shadow-lg transition-all">
           <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2">
             <path d="M10 19l-7-7m0 0l7-7m-7 7h18" />

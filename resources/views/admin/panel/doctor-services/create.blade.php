@@ -9,6 +9,6 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'افزودن خدمت جدید')
+@section('bread-crumb-title', 'افزودن خدمت')
 @livewire('admin.panel.doctor-services.doctor-service-create')
 @endsection

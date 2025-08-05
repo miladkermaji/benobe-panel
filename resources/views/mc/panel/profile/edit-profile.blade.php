@@ -153,7 +153,7 @@
             <div class="w-100">
               <button type="submit"
                 class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                <span class="button_text">ذخیره تغیرات</span>
+                <span class="button_text">ذخیره</span>
                 <div class="loader"></div>
               </button>
             </div>
@@ -165,8 +165,8 @@
     <x-custom-modal id="mobileEditModal" title="ویرایش شماره موبایل" size="md">
       <div id="mobileInputStep1">
         <label class="label-top-input-modal">شماره موبایل جدید</label>
-        <input type="text" id="newMobileNumber" maxlength="11" class="form-control w-100 h-50 text-right position-relative"
-          name="mobile">
+        <input type="text" id="newMobileNumber" maxlength="11"
+          class="form-control w-100 h-50 text-right position-relative" name="mobile">
         <div class="d-flex mt-2">
           <button onclick="sendOtpCode()"
             class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
@@ -318,7 +318,7 @@
               <div class="d-flex justify-content-between mt-2 gap-4">
                 <button type="submit" id="saveChangesButton"
                   class="btn my-btn-primary h-50 col-lg-11 col-xs-10 col-md-11 col-sm-11 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ذخیره تغیرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
                 <button
@@ -379,7 +379,7 @@
                   <div class="w-100">
                     <button type="submit" id="uuid-btn"
                       class="w-100 btn my-btn-primary h-50 col-lg-12 col-xs-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
-                      <span class="button_text">ذخیره تغیرات</span>
+                      <span class="button_text">ذخیره</span>
                       <div class="loader"></div>
                     </button>
                   </div>

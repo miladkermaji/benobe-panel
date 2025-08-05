@@ -43,7 +43,7 @@
     --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
     --radius-card: 1.125rem; /* 18px - کارت‌ها */
     --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
-    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-nav: 0.45rem !important; /* 20px - نوار ناوبری */
     --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
 }
 
@@ -196,7 +196,11 @@ button {
     }
 }
 @media (max-width: 992px) {
-    .container {
+    .container,
+    .container-fluid {
         max-width: 100% !important;
+    }
+    .card {
+        margin: 0 !important;
     }
 }

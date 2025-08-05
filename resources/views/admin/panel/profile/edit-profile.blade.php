@@ -131,7 +131,7 @@
             <div class="w-100">
               <button type="submit"
                 class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                <span class="button_text">ذخیره تغیرات</span>
+                <span class="button_text">ذخیره</span>
                 <div class="loader"></div>
               </button>
             </div>
@@ -320,7 +320,7 @@
               <div class="d-flex justify-content-between mt-2 gap-4">
                 <button type="submit" id="saveChangesButton"
                   class="btn my-btn-primary h-50 col-lg-11 col-xs-10 col-md-11 col-sm-11 d-flex justify-content-center align-items-center">
-                  <span class="button_text">ذخیره تغیرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
                 <button
@@ -393,7 +393,7 @@
                   <div class="w-100">
                     <button type="submit" id="uuid-btn"
                       class="w-100 btn my-btn-primary h-50 col-lg-12 col-xs-12 col-md-12 col-sm-12 d-flex justify-content-center align-items-center">
-                      <span class="button_text">ذخیره تغیرات</span>
+                      <span class="button_text">ذخیره</span>
                       <div class="loader"></div>
                     </button>
                   </div>
@@ -599,7 +599,7 @@
                 <button type="submit"
                   class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                   id="btn-save-pass" {{ Auth::guard('doctor')->user()->static_password_enabled ? '' : 'disabled' }}>
-                  <span class="button_text">ذخیره تغیرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
               </div>
@@ -661,7 +661,7 @@
                   class="btn my-btn-primary h-50 col-12 d-flex justify-content-center align-items-center"
                   id="btn-save-two-factor"
                   {{ Auth::guard('doctor')->user()->two_factor_secret_enabled ? '' : 'disabled' }}>
-                  <span class="button_text">ذخیره تغیرات</span>
+                  <span class="button_text">ذخیره</span>
                   <div class="loader"></div>
                 </button>
               </div>

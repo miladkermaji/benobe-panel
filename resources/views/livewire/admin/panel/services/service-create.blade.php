@@ -6,7 +6,7 @@
           class="custom-animate-bounce">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
-        <h5 class="mb-0 fw-bold text-shadow">افزودن خدمت جدید</h5>
+        <h5 class="mb-0 fw-bold text-shadow">افزودن خدمت</h5>
       </div>
       <a href="{{ route('admin.panel.services.index') }}"
         class="btn btn-outline-light btn-sm rounded-pill px-4 d-flex align-items-center gap-2 hover:shadow-lg transition-all">

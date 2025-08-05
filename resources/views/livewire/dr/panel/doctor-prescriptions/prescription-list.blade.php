@@ -1,28 +1,45 @@
-<div class="doctor-prescriptions-container">
+<div class="doctor-prescriptions-container" x-data="{ mobileSearchOpen: false }">
   <div class="py-2" dir="rtl">
     <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3 mb-2">
             <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">نسخه‌های من</h1>
+            <!-- Mobile Toggle Button -->
+            <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+              @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
           </div>
-          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 search-filter-bar">
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-row-reverse flex-md-row">
-              <div class="search-container position-relative flex-grow-1">
-                <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
-                  wire:model.live="search" placeholder="جستجو در نام بیمار، کد ملی یا کد رهگیری..."
-                  style="padding-right: 36px; text-align: right; direction: rtl; max-width: 100%; min-width: 0;">
-                <span class="search-icon position-absolute top-50 end-0 translate-middle-y pe-2">
-                  <i class="bi bi-search"></i>
-                </span>
+          <!-- Mobile Collapsible Section -->
+          <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-block" id="mobileSearchSection">
+            <div
+              class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2 search-filter-bar">
+              <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-row-reverse flex-md-row">
+                <div class="search-container position-relative flex-grow-1">
+                  <input type="text"
+                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                    wire:model.live="search" placeholder="جستجو در نام بیمار، کد ملی یا کد رهگیری..."
+                    style="padding-right: 36px; text-align: right; direction: rtl; max-width: 100%; min-width: 0;">
+                  <span class="search-icon position-absolute top-50 end-0 translate-middle-y pe-2">
+                    <i class="bi bi-search"></i>
+                  </span>
+                </div>
+                <select class="form-select flex-shrink-0 filter-select-mobile" wire:model.live="status"
+                  style="max-width: 140px; min-width: 100px;">
+                  <option value="">همه وضعیت‌ها</option>
+                  <option value="pending">در انتظار</option>
+                  <option value="completed">پایان یافته</option>
+                </select>
               </div>
-              <select class="form-select flex-shrink-0 filter-select-mobile" wire:model.live="status"
-                style="max-width: 140px; min-width: 100px;">
-                <option value="">همه وضعیت‌ها</option>
-                <option value="pending">در انتظار</option>
-                <option value="completed">پایان یافته</option>
-              </select>
             </div>
           </div>
         </div>
