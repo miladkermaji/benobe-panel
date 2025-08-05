@@ -174,7 +174,7 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="6" class="text-center py-4">
+                      <td colspan="12" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" class="text-muted mb-2">
@@ -187,7 +187,7 @@
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="6" class="text-center py-4">
+                    <td colspan="12" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>

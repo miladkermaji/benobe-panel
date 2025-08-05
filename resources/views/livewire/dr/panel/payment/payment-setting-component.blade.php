@@ -125,7 +125,7 @@
                   </tr>
                 @empty
                   <tr>
-                    <td colspan="6" class="text-center text-muted py-4">موردی ثبت نشده است</td>
+                    <td colspan="12" class="text-center text-muted py-4">موردی ثبت نشده است</td>
                   </tr>
                 @endforelse
               </tbody>

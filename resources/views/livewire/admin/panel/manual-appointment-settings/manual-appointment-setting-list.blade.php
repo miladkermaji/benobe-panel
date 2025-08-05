@@ -92,7 +92,7 @@
                         </tr>
                       @empty
                         <tr>
-                          <td colspan="6" class="text-center py-5">
+                          <td colspan="12" class="text-center py-5">
                             <div class="d-flex flex-column align-items-center justify-content-center">
                               <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
                                 stroke="currentColor" stroke-width="2" class="text-muted mb-3">

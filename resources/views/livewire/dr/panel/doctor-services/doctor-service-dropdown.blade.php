@@ -46,7 +46,7 @@
 <!-- زیرمجموعه‌ها به‌صورت دراپ‌داون -->
 @if ($service->children->isNotEmpty())
   <tr id="children-{{ $service->id }}" class="d-none nested-row">
-    <td colspan="6" class="p-0">
+    <td colspan="12" class="p-0">
       <table class="table table-bordered w-100 m-0">
         <tbody>
           @foreach ($service->children as $child)

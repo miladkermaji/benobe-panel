@@ -223,7 +223,7 @@
 
   function renderSubUserLoading() {
     $('#subuser-list-tbody').html(
-      `<tr><td colspan="6" class="text-center py-4">
+      `<tr><td colspan="12" class="text-center py-4">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">در حال بارگذاری...</span>
         </div>
@@ -241,7 +241,7 @@
   function renderSubUserTable(subUsers, from) {
     let html = '';
     if (!subUsers.length) {
-      html = `<tr><td colspan="6" class="text-center py-4">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`;
+      html = `<tr><td colspan="12" class="text-center py-4">شما کاربر زیرمجموعه‌ای ندارید</td></tr>`;
     } else {
       subUsers.forEach(function(subUser, idx) {
         html += `<tr>
@@ -348,7 +348,7 @@
       },
       error: function() {
         $('#subuser-list-tbody').html(
-          '<tr><td colspan="6" class="text-center text-danger">خطا در دریافت داده‌ها</td></tr>');
+          '<tr><td colspan="12" class="text-center text-danger">خطا در دریافت داده‌ها</td></tr>');
         $('#subuser-notes-cards').html('<div class="text-center text-danger">خطا در دریافت داده‌ها</div>');
         $('#subuser-pagination-container').html('');
       }
