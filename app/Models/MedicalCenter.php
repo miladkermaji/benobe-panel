@@ -191,12 +191,16 @@ class MedicalCenter extends Authenticatable
      */
     public function setSelectedDoctor($doctorId = null)
     {
+        // حذف رکورد قبلی
+        $this->selectedDoctor()->delete();
+
+        // ایجاد رکورد جدید
         if ($doctorId) {
-            $this->selected_doctor_id = $doctorId;
-        } else {
-            $this->selected_doctor_id = null;
+            MedicalCenterSelectedDoctor::create([
+                'medical_center_id' => $this->id,
+                'doctor_id' => $doctorId,
+            ]);
         }
-        $this->save();
     }
 
     public function otps()

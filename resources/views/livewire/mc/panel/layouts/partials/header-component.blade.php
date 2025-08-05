@@ -1,4 +1,5 @@
 <div>
+  <div>
   <style>
     .inactive-doctor {
       opacity: 0.6;
@@ -17,6 +18,57 @@
       height: 8px;
       background-color: #dc3545;
       border-radius: 50%;
+    }
+
+    /* Custom scrollbar for doctors list */
+    .doctors-list-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .doctors-list-container::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    .doctors-list-container::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+
+    .doctors-list-container::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+
+    /* Search input focus styles */
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      border-color: #80bdff;
+    }
+
+    /* Option card hover effects */
+    .option-card {
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .option-card:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .option-card.card-active {
+      background-color: #e3f2fd;
+      border-left: 4px solid #2196f3;
+    }
+
+    /* No results styling */
+    .text-gray-500 {
+      color: #6b7280 !important;
+    }
+
+    .text-gray-400 {
+      color: #9ca3af !important;
     }
   </style>
 
@@ -55,7 +107,7 @@
               <div class="dropdown">
                 <div
                   class="dropdown-trigger btn h-40 w-md-300 bg-light-blue text-left d-flex justify-content-between align-items-center"
-                  aria-haspopup="true" aria-expanded="false">
+                  aria-haspopup="true" aria-expanded="false" wire:click="toggleDropdown">
                   <div class="text-truncate">
                     <span class="dropdown-label">{{ $selectedDoctorName }}</span>
                   </div>
@@ -68,8 +120,29 @@
                     </svg>
                   </div>
                 </div>
-                <div class="my-dropdown-menu d-none">
+                <div class="my-dropdown-menu {{ $dropdownOpen ? '' : 'd-none' }}">
                   <div class="" aria-hidden="true">
+                    <!-- Search Input -->
+                    <div class="p-3 border-bottom" wire:ignore>
+                      <div class="position-relative">
+                        <input type="text" wire:model.live="searchDoctor" placeholder="جستجوی پزشک..."
+                          class="form-control border-0 bg-light rounded-pill px-4 py-2" style="font-size: 14px;">
+                        <div class="position-absolute top-50 end-0 translate-middle-y pe-3">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                              d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z"
+                              stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M21 21L16.65 16.65" stroke="#6B7280" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Doctors List Container with Fixed Height -->
+                  <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;">
                     <div class="{{ Route::is('medical-centers.doctor.deposit') ? 'd-none' : '' }}" aria-hidden="true">
                       <div
                         class="d-flex align-items-center p-3 option-card {{ $selectedDoctorId === null ? 'card-active' : '' }}"
@@ -95,147 +168,180 @@
                         </div>
                       </div>
                     </div>
-                    @foreach ($doctors as $doctor)
-                      <div
-                        class="d-flex justify-content-between align-items-center option-card {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
-                        wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
-                        data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}">
-                        <div class="d-flex align-items-center p-3 position-relative">
-                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+
+                    @if (isset($filteredDoctors) && $filteredDoctors->count() > 0)
+                      @foreach ($filteredDoctors as $doctor)
+                        <div
+                          class="d-flex justify-content-between align-items-center option-card {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                          wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
+                          data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}">
+                          <div class="d-flex align-items-center p-3 position-relative">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                              xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
+                                fill="#3F3F79"></path>
+                            </svg>
+                            <div class="d-flex flex-column mx-3">
+                              <span class="fw-bold d-block fs-15">{{ $doctor->first_name ?? '' }}
+                                {{ $doctor->last_name ?? '' }}</span>
+                              <span class="fw-bold d-block fs-13">
+                                @if ($doctor->specialties && $doctor->specialties->count() > 0)
+                                  {{ $doctor->specialties->first()->name ?? '' }}
+                                @else
+                                  پزشک عمومی
+                                @endif
+                              </span>
+                            </div>
+                            @if (!($doctor->is_active ?? false))
+                              <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
+                              </div>
+                            @endif
+                          </div>
+                          <div class="mx-2">
+                            @if (!($doctor->is_active ?? false))
+                              <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
+                                onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
+                              </button>
+                            @endif
+                          </div>
+                        </div>
+                      @endforeach
+                    @else
+                      <!-- No Doctors Found Message -->
+                      <div class="text-center py-5">
+                        <div class="mb-3">
+                          <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
                             <path
                               d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
-                              fill="#3F3F79"></path>
+                              fill="#E5E7EB" />
                           </svg>
-                          <div class="d-flex flex-column mx-3">
-                            <span class="fw-bold d-block fs-15">{{ $doctor->first_name ?? '' }}
-                              {{ $doctor->last_name ?? '' }}</span>
-                            <span class="fw-bold d-block fs-13">
-                              @if ($doctor->specialties && $doctor->specialties->count() > 0)
-                                {{ $doctor->specialties->first()->name ?? '' }}
-                              @else
-                                پزشک عمومی
-                              @endif
-                            </span>
-                          </div>
-                          @if (!($doctor->is_active ?? false))
-                            <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
-                            </div>
-                          @endif
                         </div>
-                        <div class="mx-2">
-                          @if (!($doctor->is_active ?? false))
-                            <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
-                              onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
-                            </button>
+                        <h6 class="text-gray-500 mb-2">پزشکی تعریف نشده</h6>
+                        <p class="text-gray-400 mb-3" style="font-size: 14px;">
+                          @if ($searchDoctor)
+                            هیچ پزشکی با این نام یافت نشد
+                          @else
+                            هنوز پزشکی به مرکز درمانی اضافه نشده است
                           @endif
-                        </div>
+                        </p>
+                        <button class="btn btn-primary btn-sm px-4 py-2"
+                          onclick="window.location.href='{{ route('mc.panel.clinics.create') }}'"
+                          style="font-size: 14px;">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            xmlns="http://www.w3.org/2000/svg" class="me-2">
+                            <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                              stroke-linejoin="round" />
+                          </svg>
+                          افزودن پزشک
+                        </button>
                       </div>
-                    @endforeach
+                    @endif
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
 
-        <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
-        <div class="d-flex notif-option px-2 px-md-3">
-          <div class="position-relative">
-            <!-- آیکون زنگوله -->
-            <span
-              class="absolute -top-3 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white shadow-lg"
-              x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
-            <svg xmlns="http://www.w3.org/2000/svg"
-              class="cursor-pointer hover:text-gray-600 transition-colors duration-200" fill="none"
-              viewBox="0 0 24 24" height="24px" role="img"
-              x-on:click="$refs.notificationBox.classList.toggle('d-none')">
-              <path
-                d="M12.02 2.91c-3.31 0-6 2.69-6 6v2.89c0 .61-.26 1.54-.57 2.06L4.3 15.77c-.71 1.18-.22 2.49 1.08 2.93 4.31 1.44 8.96 1.44 13.27 0 1.21-.4 1.74-1.83 1.08-2.93l-1.15-1.91c-.3-.52-.56-1.45-.56-2.06V8.91c0-3.3-2.7-6-6-6z"
-                stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path>
-              <path d="M13.87 3.2a6.754 6.754 0 00-3.7 0c.29-.74 1.01-1.26 1.85-1.26.84 0 1.56.52 1.85 1.26z"
-                stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
-                stroke-linejoin="round"></path>
-              <path d="M15.02 19.06c0 1.65-1.35 3-3 3-.82 0-1.58-.34-2.12-.88a3.01 3.01 0 01-.88-2.12"
-                stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
-            </svg>
-            <!-- باکس اعلان‌ها -->
-            <div x-ref="notificationBox"
-              class="notification-box d-none position-absolute bg-white shadow-lg rounded-3 p-3"
-              style="width: 500px; top: 40px; left: 0; z-index: 1000;">
-              <div class="d-flex justify-content-between align-items-center mb-4">
-                <h6 class="mb-0 fw-bold text-gray-800" style="font-size: 18px;">اعلان‌ها</h6>
-                <span class="badge bg-primary text-white">{{ $unreadCount }} جدید</span>
-              </div>
-              <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
-                @forelse ($notifications as $recipient)
-                  @if ($recipient->notification)
-                    <div class="notification-item d-flex justify-content-between align-items-start border-bottom py-3">
-                      <div class="notification-content">
-                        <p class="mb-1 fw-medium text-gray-800" style="font-size: 16px;">
-                          {{ $recipient->notification->title }}</p>
-                        <p class="mb-0 text-gray-600" style="font-size: 14px;">
-                          {{ $recipient->notification->message }}
-                        </p>
-                      </div>
-                      <button wire:click="markAsRead({{ $recipient->id }})" class="btn-read rounded-circle p-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
-                          viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                          stroke-linejoin="round">
-                          <path d="M20 6L9 17l-5-5"></path>
-                        </svg>
-                      </button>
+      <!-- اسکریپت برای مدیریت باز و بسته شدن پنل -->
+      <div class="d-flex notif-option px-2 px-md-3">
+        <div class="position-relative">
+          <!-- آیکون زنگوله -->
+          <span
+            class="absolute -top-3 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white shadow-lg"
+            x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
+          <svg xmlns="http://www.w3.org/2000/svg"
+            class="cursor-pointer hover:text-gray-600 transition-colors duration-200" fill="none"
+            viewBox="0 0 24 24" height="24px" role="img"
+            x-on:click="$refs.notificationBox.classList.toggle('d-none')">
+            <path
+              d="M12.02 2.91c-3.31 0-6 2.69-6 6v2.89c0 .61-.26 1.54-.57 2.06L4.3 15.77c-.71 1.18-.22 2.49 1.08 2.93 4.31 1.44 8.96 1.44 13.27 0 1.21-.4 1.74-1.83 1.08-2.93l-1.15-1.91c-.3-.52-.56-1.45-.56-2.06V8.91c0-3.3-2.7-6-6-6z"
+              stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path>
+            <path d="M13.87 3.2a6.754 6.754 0 00-3.7 0c.29-.74 1.01-1.26 1.85-1.26.84 0 1.56.52 1.85 1.26z"
+              stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"
+              stroke-linejoin="round"></path>
+            <path d="M15.02 19.06c0 1.65-1.35 3-3 3-.82 0-1.58-.34-2.12-.88a3.01 3.01 0 01-.88-2.12"
+              stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
+          </svg>
+          <!-- باکس اعلان‌ها -->
+          <div x-ref="notificationBox"
+            class="notification-box d-none position-absolute bg-white shadow-lg rounded-3 p-3"
+            style="width: 500px; top: 40px; left: 0; z-index: 1000;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <h6 class="mb-0 fw-bold text-gray-800" style="font-size: 18px;">اعلان‌ها</h6>
+              <span class="badge bg-primary text-white">{{ $unreadCount }} جدید</span>
+            </div>
+            <div class="notification-list" style="max-height: 400px; overflow-y: auto;">
+              @forelse ($notifications as $recipient)
+                @if ($recipient->notification)
+                  <div class="notification-item d-flex justify-content-between align-items-start border-bottom py-3">
+                    <div class="notification-content">
+                      <p class="mb-1 fw-medium text-gray-800" style="font-size: 16px;">
+                        {{ $recipient->notification->title }}</p>
+                      <p class="mb-0 text-gray-600" style="font-size: 14px;">
+                        {{ $recipient->notification->message }}
+                      </p>
                     </div>
-                  @endif
-                @empty
-                  <div class="text-center py-4">
-                    <p class="text-gray-500 mb-0" style="font-size: 16px;">اعلانی برای نمایش وجود ندارد.</p>
+                    <button wire:click="markAsRead({{ $recipient->id }})" class="btn-read rounded-circle p-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M20 6L9 17l-5-5"></path>
+                      </svg>
+                    </button>
                   </div>
-                @endforelse
-              </div>
+                @endif
+              @empty
+                <div class="text-center py-4">
+                  <p class="text-gray-500 mb-0" style="font-size: 16px;">اعلانی برای نمایش وجود ندارد.</p>
+                </div>
+              @endforelse
             </div>
           </div>
-          <div style="display: none !important" class="mx-3 cursor-pointer d-flex"
-            onclick="location.href='{{ route('mc-wallet-charge') }}'">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor"
-              stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
-              viewBox="0 0 24 24" role="img">
-              <path
-                d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1">
-              </path>
-              <path d="M3 5v14a2 2 0 002 2h15a1 1 0 001-1v-4"></path>
-            </svg>
-            <span>{{ number_format($walletBalance) }} تومان</span>
-          </div>
         </div>
-        <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
-        <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
-          class="logout ms-2" title="خروج"></a>
+        <div style="display: none !important" class="mx-3 cursor-pointer d-flex"
+          onclick="location.href='{{ route('mc-wallet-charge') }}'">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" width="24px" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="plasmic-default__svg plasmic_all__FLoMj PlasmicQuickAccessWallet_svg__4uUbY lucide lucide-wallet"
+            viewBox="0 0 24 24" role="img">
+            <path d="M19 7V4a1 1 0 00-1-1H5a2 2 0 000 4h15a1 1 0 011 1v4h-3a2 2 0 000 4h3a1 1 0 001-1v-2a1 1 0 00-1-1">
+            </path>
+            <path d="M3 5v14a2 2 0 002 2h15a1 1 0 001-1v-4"></path>
+          </svg>
+          <span>{{ number_format($walletBalance) }} تومان</span>
+        </div>
       </div>
+      <!-- تغییر لینک لاگ‌اوت به نویگیشن Livewire -->
+      <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
+        class="logout ms-2" title="خروج"></a>
     </div>
-    <script>
-      document.addEventListener('livewire:init', function() {
-        // بستن باکس اعلان‌ها با کلیک خارج از آن
-        document.addEventListener('click', function(event) {
-          const notificationBox = document.querySelector('.notification-box');
-          const bellIcon = document.querySelector('.notif-option svg');
-          if (!notificationBox || !bellIcon) return;
-          if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
-            notificationBox.classList.add('d-none');
-          }
-        });
+  </div>
+  <script>
+    document.addEventListener('livewire:init', function() {
+      // بستن باکس اعلان‌ها با کلیک خارج از آن
+      document.addEventListener('click', function(event) {
+        const notificationBox = document.querySelector('.notification-box');
+        const bellIcon = document.querySelector('.notif-option svg');
+        if (!notificationBox || !bellIcon) return;
+        if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
+          notificationBox.classList.add('d-none');
+        }
+      });
 
-        // گوش دادن به رویداد ریلود صفحه بعد از انتخاب پزشک
-        Livewire.on('reloadPageAfterDelay', (data) => {
-          const delay = data.delay || 3000; // پیش‌فرض 3 ثانیه
+      // گوش دادن به رویداد ریلود صفحه بعد از انتخاب پزشک
+      Livewire.on('reloadPageAfterDelay', (data) => {
+        const delay = data.delay || 3000; // پیش‌فرض 3 ثانیه
 
-          // نمایش پیام به کاربر
-          const message = document.createElement('div');
-          message.className = 'alert alert-info position-fixed';
-          message.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-          message.innerHTML = `
+        // نمایش پیام به کاربر
+        const message = document.createElement('div');
+        message.className = 'alert alert-info position-fixed';
+        message.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        message.innerHTML = `
             <div class="d-flex align-items-center">
               <div class="spinner-border spinner-border-sm me-2" role="status">
                 <span class="visually-hidden">در حال بارگذاری...</span>
@@ -243,122 +349,140 @@
               <span>پزشک تغییر کرد. صفحه در حال بروزرسانی...</span>
             </div>
           `;
-          document.body.appendChild(message);
+        document.body.appendChild(message);
 
-          // ریلود صفحه بعد از تاخیر
-          setTimeout(() => {
-            window.location.reload();
-          }, delay);
-        });
+        // ریلود صفحه بعد از تاخیر
+        setTimeout(() => {
+          window.location.reload();
+        }, delay);
       });
 
-      // عملکرد دراپ‌داون - خارج از livewire:init
-      document.addEventListener('DOMContentLoaded', function() {
-        initializeDropdown();
-      });
-
-      // همچنین بعد از هر بار ریلود Livewire
-      document.addEventListener('livewire:navigated', function() {
-        setTimeout(initializeDropdown, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
-      });
-
-      function initializeDropdown() {
-        const dropdownTrigger = document.querySelector('.dropdown-trigger');
+      // گوش دادن به تغییرات dropdown state
+      Livewire.on('dropdownStateChanged', (data) => {
         const dropdownMenu = document.querySelector('.my-dropdown-menu');
+        if (dropdownMenu) {
+          if (data.open) {
+            dropdownMenu.classList.remove('d-none');
+            dropdownMenu.style.display = 'block';
+            dropdownMenu.style.visibility = 'visible';
+            dropdownMenu.style.opacity = '1';
+          } else {
+            dropdownMenu.classList.add('d-none');
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.style.visibility = 'hidden';
+            dropdownMenu.style.opacity = '0';
+          }
+        }
+      });
+    });
 
-        if (dropdownTrigger && dropdownMenu) {
-          // حذف event listener های قبلی
-          dropdownTrigger.removeEventListener('click', handleDropdownClick);
+    // عملکرد دراپ‌داون - خارج از livewire:init
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeDropdown();
+    });
 
-          // اضافه کردن event listener جدید
-          dropdownTrigger.addEventListener('click', handleDropdownClick);
+    // همچنین بعد از هر بار ریلود Livewire
+    document.addEventListener('livewire:navigated', function() {
+      setTimeout(initializeDropdown, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
+    });
 
-          function handleDropdownClick(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
+    function initializeDropdown() {
+      const dropdownTrigger = document.querySelector('.dropdown-trigger');
+      const dropdownMenu = document.querySelector('.my-dropdown-menu');
 
-            // تغییر وضعیت aria-expanded
-            const isExpanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', !isExpanded);
+      if (dropdownTrigger && dropdownMenu) {
+        // حذف event listener های قبلی
+        dropdownTrigger.removeEventListener('click', handleDropdownClick);
 
-            // باز/بسته کردن دراپ‌داون
-            if (isExpanded) {
-              dropdownMenu.classList.add('d-none');
-              dropdownMenu.style.display = 'none';
-              dropdownMenu.style.visibility = 'hidden';
-              dropdownMenu.style.opacity = '0';
-            } else {
-              dropdownMenu.classList.remove('d-none');
+        // اضافه کردن event listener جدید
+        dropdownTrigger.addEventListener('click', handleDropdownClick);
+
+        function handleDropdownClick(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          e.stopImmediatePropagation();
+
+          // تغییر وضعیت aria-expanded
+          const isExpanded = this.getAttribute('aria-expanded') === 'true';
+          this.setAttribute('aria-expanded', !isExpanded);
+
+          // باز/بسته کردن دراپ‌داون
+          if (isExpanded) {
+            dropdownMenu.classList.add('d-none');
+            dropdownMenu.style.display = 'none';
+            dropdownMenu.style.visibility = 'hidden';
+            dropdownMenu.style.opacity = '0';
+          } else {
+            dropdownMenu.classList.remove('d-none');
+            dropdownMenu.style.display = 'block';
+            dropdownMenu.style.visibility = 'visible';
+            dropdownMenu.style.opacity = '1';
+            dropdownMenu.style.position = 'fixed';
+            dropdownMenu.style.top = '80px';
+            dropdownMenu.style.left = '20px';
+            dropdownMenu.style.right = 'auto';
+            dropdownMenu.style.minHeight = '200px';
+            dropdownMenu.style.height = 'auto';
+            dropdownMenu.style.background = '#ffffff';
+            dropdownMenu.style.border = '2px solid #e5e7eb';
+            dropdownMenu.style.borderRadius = '12px';
+            dropdownMenu.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            dropdownMenu.style.zIndex = '10000';
+            dropdownMenu.style.padding = '1rem 0';
+            dropdownMenu.style.overflow = 'visible';
+            dropdownMenu.style.transform = 'none';
+            dropdownMenu.style.maxHeight = 'none';
+
+            // اطمینان از نمایش
+            setTimeout(() => {
               dropdownMenu.style.display = 'block';
               dropdownMenu.style.visibility = 'visible';
               dropdownMenu.style.opacity = '1';
-              dropdownMenu.style.position = 'fixed';
-              dropdownMenu.style.top = '80px';
-              dropdownMenu.style.left = '20px';
-              dropdownMenu.style.right = 'auto';
-              dropdownMenu.style.minHeight = '200px';
-              dropdownMenu.style.height = 'auto';
-              dropdownMenu.style.background = '#ffffff';
+
+              // حذف border قرمز تست
               dropdownMenu.style.border = '2px solid #e5e7eb';
-              dropdownMenu.style.borderRadius = '12px';
-              dropdownMenu.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
-              dropdownMenu.style.zIndex = '10000';
-              dropdownMenu.style.padding = '1rem 0';
-              dropdownMenu.style.overflow = 'visible';
-              dropdownMenu.style.transform = 'none';
-              dropdownMenu.style.maxHeight = 'none';
+              dropdownMenu.style.background = '#ffffff';
+            }, 10);
+          }
+        }
 
-              // اطمینان از نمایش
-              setTimeout(() => {
-                dropdownMenu.style.display = 'block';
-                dropdownMenu.style.visibility = 'visible';
-                dropdownMenu.style.opacity = '1';
+        // بستن دراپ‌داون با کلیک خارج از آن
+        document.removeEventListener('click', handleOutsideClick);
 
-                // حذف border قرمز تست
-                dropdownMenu.style.border = '2px solid #e5e7eb';
-                dropdownMenu.style.background = '#ffffff';
-              }, 10);
-            }
+        // اضافه کردن event listener با تاخیر برای جلوگیری از تداخل
+        setTimeout(() => {
+          document.addEventListener('click', handleOutsideClick);
+        }, 100);
+
+        function handleOutsideClick(e) {
+          // اگر کلیک روی trigger یا dropdown باشد، کاری نکن
+          if (dropdownTrigger.contains(e.target) || dropdownMenu.contains(e.target)) {
+            return;
           }
 
-          // بستن دراپ‌داون با کلیک خارج از آن
-          document.removeEventListener('click', handleOutsideClick);
+          // فقط اگر کلیک خارج از هر دو باشد، ببند
+          dropdownMenu.classList.add('d-none');
+          dropdownMenu.style.display = 'none';
+          dropdownMenu.style.visibility = 'hidden';
+          dropdownMenu.style.opacity = '0';
+          dropdownTrigger.setAttribute('aria-expanded', 'false');
+        }
 
-          // اضافه کردن event listener با تاخیر برای جلوگیری از تداخل
-          setTimeout(() => {
-            document.addEventListener('click', handleOutsideClick);
-          }, 100);
+        // بستن دراپ‌داون با کلیک روی ESC
+        document.removeEventListener('keydown', handleEscapeKey);
+        document.addEventListener('keydown', handleEscapeKey);
 
-          function handleOutsideClick(e) {
-            // اگر کلیک روی trigger یا dropdown باشد، کاری نکن
-            if (dropdownTrigger.contains(e.target) || dropdownMenu.contains(e.target)) {
-              return;
-            }
-
-            // فقط اگر کلیک خارج از هر دو باشد، ببند
+        function handleEscapeKey(e) {
+          if (e.key === 'Escape') {
             dropdownMenu.classList.add('d-none');
             dropdownMenu.style.display = 'none';
             dropdownMenu.style.visibility = 'hidden';
             dropdownMenu.style.opacity = '0';
             dropdownTrigger.setAttribute('aria-expanded', 'false');
           }
-
-          // بستن دراپ‌داون با کلیک روی ESC
-          document.removeEventListener('keydown', handleEscapeKey);
-          document.addEventListener('keydown', handleEscapeKey);
-
-          function handleEscapeKey(e) {
-            if (e.key === 'Escape') {
-              dropdownMenu.classList.add('d-none');
-              dropdownMenu.style.display = 'none';
-              dropdownMenu.style.visibility = 'hidden';
-              dropdownMenu.style.opacity = '0';
-              dropdownTrigger.setAttribute('aria-expanded', 'false');
-            }
-          }
         }
       }
-    </script>
-  </div>
+    }
+  </script>
+</div>
 </div>
