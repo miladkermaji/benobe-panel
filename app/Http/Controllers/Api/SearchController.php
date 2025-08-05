@@ -21,15 +21,27 @@ class SearchController extends Controller
         $limit = 15;
 
         $token = $request->bearerToken() ?: $request->cookie('auth_token');
+        $userId = null;
+
         if ($token) {
             try {
                 app(\App\Http\Middleware\JwtMiddleware::class)->handle($request, function () {});
+                $user = \Illuminate\Support\Facades\Auth::user();
+                // Validate that the user actually exists in the database
+                if ($user && \App\Models\User::find($user->id)) {
+                    $userId = $user->id;
+                    \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
+                } else {
+                    \Illuminate\Support\Facades\Log::warning("JWT token contains user ID that doesn't exist in database: " . ($user ? $user->id : 'null'));
+                }
             } catch (\Exception $e) {
-                // اگر توکن نامعتبر بود، userId همچنان null می‌ماند و خطا نمی‌دهیم
+                // If JWT authentication fails, userId remains null
+                \Illuminate\Support\Facades\Log::warning('JWT authentication failed in search: ' . $e->getMessage());
             }
+        } else {
+            \Illuminate\Support\Facades\Log::info("Search request from unauthenticated user");
         }
-        $user = \Illuminate\Support\Facades\Auth::user();
-        $userId = $user ? $user->id : null;
+
         // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان
         if (mb_strlen($searchText) > 0 && mb_strlen($searchText) <= 2) {
             return response()->json([
@@ -194,22 +206,27 @@ class SearchController extends Controller
 
         $specialtyId = $request->input('specialty_id');
         // ذخیره جستجوی پرتکرار (نمونه پیاده‌سازی)
-        if ($searchText && mb_strlen($searchText) > 2) {
-            $frequentSearch = FrequentSearch::where('search_text', $searchText)
-                ->where('user_id', $userId)
-                ->when($specialtyId, function ($q) use ($specialtyId) {
-                    $q->where('specialty_id', $specialtyId);
-                })
-                ->first();
-            if ($frequentSearch) {
-                $frequentSearch->increment('search_count');
+        if ($searchText && mb_strlen($searchText) > 2 && $userId) {
+            // Double-check that the user exists before creating the record
+            if (\App\Models\User::find($userId)) {
+                $frequentSearch = FrequentSearch::where('search_text', $searchText)
+                    ->where('user_id', $userId)
+                    ->when($specialtyId, function ($q) use ($specialtyId) {
+                        $q->where('specialty_id', $specialtyId);
+                    })
+                    ->first();
+                if ($frequentSearch) {
+                    $frequentSearch->increment('search_count');
+                } else {
+                    FrequentSearch::create([
+                        'search_text' => $searchText,
+                        'user_id' => $userId,
+                        'specialty_id' => $specialtyId,
+                        'search_count' => 1,
+                    ]);
+                }
             } else {
-                FrequentSearch::create([
-                    'search_text' => $searchText,
-                    'user_id' => $userId,
-                    'specialty_id' => $specialtyId,
-                    'search_count' => 1,
-                ]);
+                \Illuminate\Support\Facades\Log::warning("Attempted to create frequent search for non-existent user ID: {$userId}");
             }
         }
 
