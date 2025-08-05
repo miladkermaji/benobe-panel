@@ -52,7 +52,7 @@
                   </span>
                 </div>
                 <button
-                  class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1"
+                  class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 h-50"
                   onclick="openXModal('depositModal')">
                   <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="2">

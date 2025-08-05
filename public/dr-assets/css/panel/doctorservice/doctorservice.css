@@ -1802,8 +1802,6 @@ body {
 }
 
 @media (max-width: 767px) {
-   
-
     .note-card {
         margin-bottom: 0.75rem;
     }
@@ -1819,8 +1817,6 @@ body {
 }
 
 @media (max-width: 575px) {
-   
-
     .note-card {
         margin-bottom: 0.5rem;
     }
@@ -2036,15 +2032,6 @@ body {
     .search-input {
         height: 36px;
         font-size: 0.8125rem;
-    }
-
-    .glass-header .d-flex.gap-2 {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .glass-header .d-flex.gap-2 > * {
-        width: 100%;
     }
 }
 @media (max-width: 768px) {

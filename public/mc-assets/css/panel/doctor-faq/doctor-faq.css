@@ -1425,13 +1425,4 @@ body {
         height: 36px;
         font-size: 0.8125rem;
     }
-
-    .glass-header .d-flex.gap-2 {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .glass-header .d-flex.gap-2 > * {
-        width: 100%;
-    }
 }
