@@ -26,7 +26,7 @@
               <div class="d-flex gap-2 flex-shrink-0 justify-content-center w-100 flex-row-reverse flex-md-row">
                 <div class="search-container position-relative flex-grow-1">
                   <input type="text"
-                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50"
                     wire:model.live="search" placeholder="جستجو در نام بیمار، کد ملی یا کد رهگیری..."
                     style="padding-right: 36px; text-align: right; direction: rtl; max-width: 100%; min-width: 0;">
                   <span class="search-icon position-absolute top-50 end-0 translate-middle-y pe-2">

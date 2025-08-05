@@ -15,10 +15,10 @@
               <!-- جستجو -->
               <div class="search-container position-relative flex-grow-1 mb-2 mb-md-0 w-100">
                 <input type="text"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start w-100"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50 w-100"
                   wire:model.live="search" placeholder="جستجو بر اساس نام، نام خانوادگی یا کد ملی..."
                   style="padding-right: 20px; text-align: right; direction: rtl; width: 100%; max-width: 400px; min-width: 200px;">
-                <span class="search-icon position-absolute top-40 start-0 translate-middle-y ms-2"
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
                   style="z-index: 5; top: 50%; right: 8px;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
                     stroke-width="2">

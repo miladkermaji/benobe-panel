@@ -126,7 +126,7 @@
                       <td>
                         @if ($editId === $member->id)
                           <input type="email"
-                            class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                            class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50"
                             wire:model.live="editEmail"
                             style="padding-right: 20px; text-align: right; direction: rtl;">
                         @else
@@ -230,7 +230,7 @@
                       <span class="note-card-label">ایمیل:</span>
                       @if ($editId === $member->id)
                         <input type="email"
-                          class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                          class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50"
                           wire:model.live="editEmail" style="padding-right: 20px; text-align: right; direction: rtl;">
                       @else
                         <span class="note-card-value">{{ $member->email }}</span>
