@@ -1,39 +1,78 @@
 <div>
-  <div class="container-fluid py-3" wire:init="loadGateways">
+  <div class="container-fluid py-3" wire:init="loadGateways" x-data="{ mobileSearchOpen: false }">
     <!-- Header -->
     <header class="glass-header text-white p-3 rounded-3 mb-3 shadow-lg">
-      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
+      <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
         <!-- Title Section -->
-        <div class="d-flex align-items-center gap-2 flex-shrink-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            class="header-icon">
-            <path d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
-          </svg>
-          <h2 class="mb-0 fw-bold fs-5">پنل‌های پیامکی</h2>
+        <div class="d-flex align-items-center gap-2 flex-shrink-0 w-md-100 justify-content-between">
+          <h2 class="mb-0 fw-bold fs-5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="header-icon">
+              <path d="M3 10h18M3 14h18M5 6h14a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2z" />
+            </svg>
+            پنل‌های پیامکی
+          </h2>
+          <!-- Mobile Toggle Button -->
+          <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+            @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
         </div>
-        <!-- Search and Actions -->
-        <div class="d-flex flex-column flex-md-row align-items-center gap-2 w-100 w-md-auto">
+        <!-- Mobile Collapsible Section -->
+        <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+          x-transition:enter-start="opacity-0 transform -translate-y-2"
+          x-transition:enter-end="opacity-100 transform translate-y-0"
+          x-transition:leave="transition ease-in duration-200"
+          x-transition:leave-start="opacity-100 transform translate-y-0"
+          x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-none w-100">
+          <div class="d-flex flex-column gap-2">
+            <div class="search-box position-relative">
+              <input type="text" wire:model.live="search" class="form-control ps-5" placeholder="جستجو...">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="search-icon">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </div>
+            <div class="d-flex align-items-center gap-2 justify-content-between">
+              <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
+                class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>پنل جدید</span>
+              </a>
+              <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+                {{ $readyToLoad ? $gateways->total() : 0 }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- Desktop Search and Actions -->
+        <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
           <div class="search-box position-relative">
-            <input type="text" wire:model.live="search" class="form-control  ps-5" placeholder="جستجو...">
+            <input type="text" wire:model.live="search" class="form-control ps-5" placeholder="جستجو...">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               class="search-icon">
               <circle cx="11" cy="11" r="8" />
               <path d="M21 21l-4.35-4.35" />
             </svg>
           </div>
-          <div class="d-flex align-items-center gap-2 w-100 w-md-auto justify-content-end">
-            <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
-              class="btn btn-success  px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
-                <path d="M12 5v14M5 12h14" />
-              </svg>
-              <span>پنل جدید</span>
-            </a>
-            <span class="badge bg-white text-primary  px-2 py-1 fw-medium flex-shrink-0">
-              {{ $readyToLoad ? $gateways->total() : 0 }}
-            </span>
-          </div>
+          <a href="{{ route('admin.panel.tools.sms_gateways.create') }}"
+            class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            <span>پنل جدید</span>
+          </a>
+          <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
+            {{ $readyToLoad ? $gateways->total() : 0 }}
+          </span>
         </div>
       </div>
     </header>
