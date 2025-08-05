@@ -93,37 +93,53 @@
 </x-custom-modal>
 
 <!-- بخش محتوا با جدول بوت‌استرپ -->
-<div class="container subuser-content w-100 d-flex justify-content-center mt-4">
+<div class="container subuser-content w-100 d-flex justify-content-center mt-4" x-data="{ mobileSearchOpen: false }">
   <div class="subuser-content-wrapper w-100">
     <div class="glass-header text-white p-2  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
         <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
           <div class="d-flex align-items-center gap-3 mb-2">
             <h1 class="m-0 h4 font-thin text-nowrap  mb-md-0">کاربران زیرمجموعه من</h1>
+            <!-- Mobile Toggle Button -->
+            <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+              @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
           </div>
-          <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
-              <div class="search-container position-relative" style="max-width: 100%;">
-                <input type="text" id="subuser-search-input"
-                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
-                  placeholder="جستجو در کاربران..." style="padding-right: 20px; text-align: right; direction: rtl;">
-                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
-                  style="z-index: 5; top: 50%; right: 8px;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                    stroke-width="2">
-                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+          <!-- Mobile Collapsible Section -->
+          <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2" class="d-md-block">
+            <div class="d-flex flex-column flex-md-row align-items-stretch align-items-md-center gap-2">
+              <div class="d-flex gap-2 flex-shrink-0 justify-content-center">
+                <div class="search-container position-relative" style="max-width: 100%;">
+                  <input type="text" id="subuser-search-input"
+                    class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start"
+                    placeholder="جستجو در کاربران..." style="padding-right: 20px; text-align: right; direction: rtl;">
+                  <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                    style="z-index: 5; top: 50%; right: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                      stroke-width="2">
+                      <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                    </svg>
+                  </span>
+                </div>
+                <button
+                  class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1 add-subuser-btn"
+                  id="add-subuser-btn">
+                  <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
                   </svg>
-                </span>
+                  <span>افزودن</span>
+                </button>
               </div>
-              <button
-                class="btn btn-gradient-success rounded-1 px-3 py-1 d-flex align-items-center gap-1 add-subuser-btn"
-                id="add-subuser-btn">
-                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24"
-                  fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M12 5v14M5 12h14" />
-                </svg>
-                <span>افزودن</span>
-              </button>
             </div>
           </div>
         </div>

@@ -17,24 +17,40 @@
 @section('content')
 @section('bread-crumb-title', 'امنیت')
 
-<div class="subuser-content d-flex w-100 justify-content-center">
+<div class="subuser-content d-flex w-100 justify-content-center" x-data="{ secretaryOpen: false, doctorOpen: false }">
   <div class="subuser-content-wrapper">
     <!-- تاریخچه ورود منشی -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <span>📜 تاریخچه ورود منشی</span>
+        <!-- Mobile Toggle Button -->
+        <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+          @click="secretaryOpen = !secretaryOpen" :aria-expanded="secretaryOpen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="toggle-icon" :class="{ 'rotate-180': secretaryOpen }">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
       </div>
-      <div class="card-body" id="secretaryLogsContainer">
+      <div class="card-body d-md-block" x-show="secretaryOpen" x-transition id="secretaryLogsContainer">
         @include('dr.panel.profile.partials.secretary_logs')
       </div>
     </div>
 
     <!-- تاریخچه ورود دکتر -->
     <div class="card">
-      <div class="card-header">
+      <div class="card-header d-flex justify-content-between align-items-center">
         <span>📜 تاریخچه ورود دکتر</span>
+        <!-- Mobile Toggle Button -->
+        <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+          @click="doctorOpen = !doctorOpen" :aria-expanded="doctorOpen">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            class="toggle-icon" :class="{ 'rotate-180': doctorOpen }">
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </button>
       </div>
-      <div class="card-body" id="doctorLogsContainer">
+      <div class="card-body d-md-block" x-show="doctorOpen" x-transition id="doctorLogsContainer">
         @include('dr.panel.profile.partials.doctor_logs')
       </div>
     </div>
@@ -68,16 +84,16 @@
     $(document).on('click', '.delete-log', function() {
       let logId = $(this).data('id');
       let row = $(this).closest('tr');
+      let card = $(this).closest('.note-card');
 
       Swal.fire({
-        title: 'آیا مطمئن هستید؟',
-        text: "این عمل قابل بازگشت نیست!",
-
+        title: 'حذف لاگ',
+        text: 'آیا مطمئن هستید که می‌خواهید این لاگ را حذف کنید؟',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'بله، حذف شود!',
-        cancelButtonText: 'لغو'
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'بله، حذف کن',
+        cancelButtonText: 'خیر'
       }).then((result) => {
         if (result.isConfirmed) {
           $.ajax({
@@ -88,6 +104,7 @@
             },
             success: function() {
               row.remove();
+              card.remove();
               loadLogs();
               toastr.success('تاریخچه مورد نظر با موفقیت حذف شد.');
             }
