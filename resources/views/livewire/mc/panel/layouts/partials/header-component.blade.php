@@ -70,6 +70,35 @@
       .text-gray-400 {
         color: #9ca3af !important;
       }
+
+      /* Search result styling */
+      .doctor-item {
+        transition: all 0.3s ease;
+      }
+
+      .doctor-item[style*="display: none"] {
+        display: none !important;
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      .doctor-item[style*="display: flex"] {
+        display: flex !important;
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* Highlight search results */
+      .doctor-item.search-match {
+        background-color: #f0f8ff !important;
+        border-left: 4px solid #007bff !important;
+      }
+
+      /* Search input focus */
+      #doctorSearchInput:focus {
+        border-color: #007bff !important;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+      }
     </style>
 
     <div class="header d-flex item-center bg-white width-100 custom-border-bottom">
@@ -122,12 +151,12 @@
                       </svg>
                     </div>
                   </div>
-                  <div class="my-dropdown-menu {{ $dropdownOpen ? '' : 'd-none' }}">
+                  <div class="my-dropdown-menu {{ $dropdownOpen ? '' : 'd-none' }}" wire:ignore.self>
                     <div class="" aria-hidden="true">
                       <!-- Search Input -->
                       <div class="p-3 border-bottom" wire:ignore>
                         <div class="position-relative">
-                          <input type="text" wire:model.live="searchDoctor" placeholder="جستجوی پزشک..."
+                          <input type="text" id="doctorSearchInput" placeholder="جستجوی پزشک..."
                             class="form-control border-0 bg-light rounded-pill px-4 py-2" style="font-size: 14px;">
                           <div class="position-absolute top-50 end-0 translate-middle-y pe-3">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -143,7 +172,7 @@
                       </div>
 
                       <!-- Doctors List Container with Fixed Height -->
-                      <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;">
+                      <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;" wire:ignore>
                         <div class="{{ Route::is('medical-centers.doctor.deposit') ? 'd-none' : '' }}"
                           aria-hidden="true">
                           <div
@@ -171,78 +200,79 @@
                           </div>
                         </div>
 
-                        @if (isset($filteredDoctors) && $filteredDoctors->count() > 0)
-                          @foreach ($filteredDoctors as $doctor)
-                            <div
-                              class="d-flex justify-content-between align-items-center option-card {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
-                              wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
-                              data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}">
-                              <div class="d-flex align-items-center p-3 position-relative">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        <div id="doctorsListContainer">
+                          @if (isset($doctors) && $doctors->count() > 0)
+                            @foreach ($doctors as $doctor)
+                              <div
+                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                                wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
+                                data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}"
+                                data-name="{{ strtolower($doctor->first_name . ' ' . $doctor->last_name) }}"
+                                data-specialty="{{ strtolower($doctor->specialties && $doctor->specialties->count() > 0 ? $doctor->specialties->first()->name : 'پزشک عمومی') }}">
+                                <div class="d-flex align-items-center p-3 position-relative">
+                                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path
+                                      d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
+                                      fill="#3F3F79"></path>
+                                  </svg>
+                                  <div class="d-flex flex-column mx-3">
+                                    <span class="fw-bold d-block fs-15">{{ $doctor->first_name ?? '' }}
+                                      {{ $doctor->last_name ?? '' }}</span>
+                                    <span class="fw-bold d-block fs-13">
+                                      @if ($doctor->specialties && $doctor->specialties->count() > 0)
+                                        {{ $doctor->specialties->first()->name ?? '' }}
+                                      @else
+                                        پزشک عمومی
+                                      @endif
+                                    </span>
+                                  </div>
+                                  @if (!($doctor->is_active ?? false))
+                                    <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
+                                    </div>
+                                  @endif
+                                </div>
+                                <div class="mx-2">
+                                  @if (!($doctor->is_active ?? false))
+                                    <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0"
+                                      type="button"
+                                      onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
+                                    </button>
+                                  @endif
+                                </div>
+                              </div>
+                            @endforeach
+                          @else
+                            <!-- No Doctors Found Message -->
+                            <div class="text-center py-5" id="noDoctorsMessage">
+                              <div class="mb-3">
+                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
                                   xmlns="http://www.w3.org/2000/svg">
                                   <path
                                     d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
-                                    fill="#3F3F79"></path>
+                                    fill="#E5E7EB" />
                                 </svg>
-                                <div class="d-flex flex-column mx-3">
-                                  <span class="fw-bold d-block fs-15">{{ $doctor->first_name ?? '' }}
-                                    {{ $doctor->last_name ?? '' }}</span>
-                                  <span class="fw-bold d-block fs-13">
-                                    @if ($doctor->specialties && $doctor->specialties->count() > 0)
-                                      {{ $doctor->specialties->first()->name ?? '' }}
-                                    @else
-                                      پزشک عمومی
-                                    @endif
-                                  </span>
-                                </div>
-                                @if (!($doctor->is_active ?? false))
-                                  <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
-                                  </div>
-                                @endif
                               </div>
-                              <div class="mx-2">
-                                @if (!($doctor->is_active ?? false))
-                                  <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0" type="button"
-                                    onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
-                                  </button>
-                                @endif
-                              </div>
-                            </div>
-                          @endforeach
-                        @else
-                          <!-- No Doctors Found Message -->
-                          <div class="text-center py-5">
-                            <div class="mb-3">
-                              <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                  d="M20.83 8.01002L14.28 2.77002C13 1.75002 11 1.74002 9.73002 2.76002L3.18002 8.01002C2.24002 8.76002 1.67002 10.26 1.87002 11.44L3.13002 18.98C3.42002 20.67 4.99002 22 6.70002 22H17.3C18.99 22 20.59 20.64 20.88 18.97L22.14 11.43C22.32 10.26 21.75 8.76002 20.83 8.01002Z"
-                                  fill="#E5E7EB" />
-                              </svg>
-                            </div>
-                            <h6 class="text-gray-500 mb-2">پزشکی تعریف نشده</h6>
-                            <p class="text-gray-400 mb-0" style="font-size: 14px;">
-                              @if ($searchDoctor)
-                                هیچ پزشکی با این نام یافت نشد
-                              @else
+                              <h6 class="text-gray-500 mb-2">پزشکی تعریف نشده</h6>
+                              <p class="text-gray-400 mb-0" style="font-size: 14px;">
                                 هنوز پزشکی به مرکز درمانی اضافه نشده است
-                              @endif
-                            </p>
-                            <div class="mt-4">
-                              <button
-                                class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2"
-                                onclick="window.location.href='{{ route('mc.panel.clinics.create') }}'"
-                                style="font-size: 14px; border-radius: 8px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                                  xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round" />
-                                </svg>
-                                افزودن پزشک جدید
-                              </button>
+                              </p>
+                              <div class="mt-4">
+                                <button
+                                  class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2 py-2"
+                                  onclick="window.location.href='{{ route('mc.panel.clinics.create') }}'"
+                                  style="font-size: 14px; border-radius: 8px;">
+                                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2"
+                                      stroke-linecap="round" stroke-linejoin="round" />
+                                  </svg>
+                                  افزودن پزشک جدید
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        @endif
+                          @endif
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -386,12 +416,99 @@
         // عملکرد دراپ‌داون - خارج از livewire:init
         document.addEventListener('DOMContentLoaded', function() {
           initializeDropdown();
+          initializeSearch();
         });
 
         // همچنین بعد از هر بار ریلود Livewire
         document.addEventListener('livewire:navigated', function() {
-          setTimeout(initializeDropdown, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
+          setTimeout(() => {
+            initializeDropdown();
+            initializeSearch();
+          }, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
         });
+
+        // تابع جستجوی پزشکان - نسخه ساده‌شده
+        function initializeSearch() {
+          // حذف event listener های قبلی
+          document.removeEventListener('input', globalSearchHandler);
+          document.removeEventListener('keyup', globalSearchHandler);
+
+          // اضافه کردن event listener جدید به صورت global
+          document.addEventListener('input', globalSearchHandler);
+          document.addEventListener('keyup', globalSearchHandler);
+        }
+
+        // Global search handler
+        function globalSearchHandler(e) {
+          // فقط اگر روی input جستجو باشد
+          if (e.target.id !== 'doctorSearchInput') return;
+
+          const searchTerm = e.target.value.toLowerCase().trim();
+          const doctorItems = document.querySelectorAll('.doctor-item');
+          const noDoctorsMessage = document.getElementById('noDoctorsMessage');
+          const defaultOption = document.querySelector('[data-id="default"]');
+
+          let visibleCount = 0;
+
+          // مدیریت آیتم پیش‌فرض
+          if (defaultOption) {
+            if (searchTerm === '') {
+              defaultOption.style.display = 'flex';
+              defaultOption.classList.remove('d-none');
+            } else {
+              defaultOption.style.display = 'none';
+              defaultOption.classList.add('d-none');
+            }
+          }
+
+          // مدیریت آیتم‌های پزشک
+          doctorItems.forEach((item, index) => {
+            const doctorName = item.getAttribute('data-name') || '';
+            const doctorSpecialty = item.getAttribute('data-specialty') || '';
+            const doctorId = item.getAttribute('data-id') || '';
+            const isActive = item.getAttribute('data-active') === '1';
+
+            const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
+
+            if (shouldShow) {
+              item.style.display = 'flex';
+              item.classList.remove('d-none');
+              item.classList.add('search-match');
+              visibleCount++;
+
+              // اگر جستجو خالی است، کلاس‌های اصلی را برگردان
+              if (searchTerm === '') {
+                item.classList.remove('search-match');
+                // فقط پزشک فعال کلاس card-active را بگیرد
+                if (isActive) {
+                  item.classList.add('card-active');
+                } else {
+                  item.classList.remove('card-active');
+                }
+              }
+            } else {
+              item.style.display = 'none';
+              item.classList.add('d-none');
+              item.classList.remove('search-match');
+              item.classList.remove('card-active');
+            }
+          });
+
+          // مدیریت پیام "پزشکی یافت نشد"
+          if (noDoctorsMessage) {
+            if (visibleCount === 0 && searchTerm !== '') {
+              noDoctorsMessage.style.display = 'block';
+              noDoctorsMessage.classList.remove('d-none');
+              const messageText = noDoctorsMessage.querySelector('p');
+              if (messageText) {
+                messageText.textContent = 'هیچ پزشکی با این نام یافت نشد';
+              }
+            } else {
+              noDoctorsMessage.style.display = 'none';
+              noDoctorsMessage.classList.add('d-none');
+            }
+          }
+        }
 
         function initializeDropdown() {
           const dropdownTrigger = document.querySelector('.dropdown-trigger');

@@ -23,15 +23,12 @@ class HeaderComponent extends Component
     public $selectedDoctorId = null;
     public $selectedDoctorName = 'انتخاب پزشک';
     public $doctors;
-    public $searchDoctor = '';
-    public $filteredDoctors;
     public $dropdownOpen = false;
 
     public function mount()
     {
         $this->notifications = new Collection();
         $this->doctors = new Collection(); // Initialize doctors
-        $this->filteredDoctors = new Collection(); // Initialize filtered doctors
 
         if (Auth::guard('medical_center')->check()) {
             /** @var MedicalCenter $medicalCenter */
@@ -59,16 +56,6 @@ class HeaderComponent extends Component
         }
 
         $this->unreadCount = $this->notifications->count();
-        $this->updateFilteredDoctors();
-    }
-
-    /**
-     * Watcher برای تغییرات جستجو
-     */
-    public function updatedSearchDoctor()
-    {
-        $this->updateFilteredDoctors();
-        $this->dropdownOpen = true; // نگه داشتن دراپ‌داون باز
     }
 
     /**
@@ -81,34 +68,6 @@ class HeaderComponent extends Component
             ->where('doctors.is_active', true)
             ->with(['specialties'])
                 ->get();
-    }
-
-    /**
-     * به‌روزرسانی لیست فیلتر شده پزشکان
-     */
-    public function updateFilteredDoctors()
-    {
-        if (!$this->doctors || $this->doctors->isEmpty()) {
-            $this->filteredDoctors = collect();
-            return;
-        }
-
-        if (empty($this->searchDoctor)) {
-            $this->filteredDoctors = $this->doctors;
-            return;
-        }
-
-        $this->filteredDoctors = $this->doctors->filter(function ($doctor) {
-            $searchTerm = strtolower($this->searchDoctor);
-            $fullName = strtolower($doctor->first_name . ' ' . $doctor->last_name);
-            $specialty = '';
-
-            if ($doctor->specialties && $doctor->specialties->count() > 0) {
-                $specialty = strtolower($doctor->specialties->first()->name ?? '');
-            }
-
-            return str_contains($fullName, $searchTerm) || str_contains($specialty, $searchTerm);
-        });
     }
 
     /**
@@ -125,8 +84,6 @@ class HeaderComponent extends Component
     public function closeDropdown()
     {
         $this->dropdownOpen = false;
-        $this->searchDoctor = ''; // پاک کردن جستجو
-        $this->updateFilteredDoctors();
     }
 
     /**
@@ -135,10 +92,6 @@ class HeaderComponent extends Component
     public function toggleDropdown()
     {
         $this->dropdownOpen = !$this->dropdownOpen;
-        if (!$this->dropdownOpen) {
-            $this->searchDoctor = '';
-            $this->updateFilteredDoctors();
-        }
     }
 
     /**
@@ -214,8 +167,6 @@ class HeaderComponent extends Component
 
             // بستن دراپ‌داون
             $this->dropdownOpen = false;
-            $this->searchDoctor = '';
-            $this->updateFilteredDoctors();
 
             // اطلاع‌رسانی به سایر کامپوننت‌ها
             $this->dispatch('doctorSelected', ['doctorId' => $doctorId]);
