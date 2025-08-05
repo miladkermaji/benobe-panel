@@ -63,12 +63,12 @@ class LaboratoryEdit extends Component
         $this->specialty_ids = $this->laboratory->specialty_ids ? array_map('strval', $this->laboratory->specialty_ids) : [];
         $this->insurance_ids = $this->laboratory->insurance_ids ? array_map('strval', $this->laboratory->insurance_ids) : [];
 
-        $this->Center_tariff_type = $this->hospital->Center_tariff_type;
-        $this->Daycare_centers = $this->hospital->Daycare_centers;
+        $this->Center_tariff_type = $this->laboratory->Center_tariff_type;
+        $this->Daycare_centers = $this->laboratory->Daycare_centers;
 
         $this->services = \App\Models\Service::all();
 
-        $this->service_ids = $this->hospital->service_ids ? array_map('strval', $this->hospital->service_ids) : [];
+        $this->service_ids = $this->laboratory->service_ids ? array_map('strval', $this->laboratory->service_ids) : [];
 
         // تنظیم روزهای کاری
         $workingDays = $this->laboratory->working_days ?? [];
