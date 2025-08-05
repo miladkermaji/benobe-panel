@@ -204,8 +204,12 @@
                 <div class="note-card mb-2" x-data="{ open: false }">
                   <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
                     @click="open = !open" style="cursor:pointer;">
-                    <span class="fw-bold">{{ $userGroup->name }} <span
-                        class="text-muted">({{ $userGroup->description ?? '-' }})</span></span>
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedUserGroups" value="{{ $userGroup->id }}"
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">{{ $userGroup->name }} <span
+                          class="text-muted">({{ $userGroup->description ?? '-' }})</span></span>
+                    </div>
                     <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
                       <path d="M6 9l6 6 6-6" />

@@ -225,16 +225,20 @@
                 <div class="note-card mb-2" x-data="{ open: false }">
                   <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
                     @click="open = !open" style="cursor:pointer;">
-                    <span class="fw-bold">
-                      @if ($item->user)
-                        {{ $item->user->first_name . ' ' . $item->user->last_name }}
-                      @elseif ($item->doctor)
-                        {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
-                      @else
-                        نامشخص
-                      @endif
-                      <span class="text-muted">({{ $item->reason ?? '-' }})</span>
-                    </span>
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedUserBlockings" value="{{ $item->id }}"
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">
+                        @if ($item->user)
+                          {{ $item->user->first_name . ' ' . $item->user->last_name }}
+                        @elseif ($item->doctor)
+                          {{ $item->doctor->first_name . ' ' . $item->doctor->last_name }}
+                        @else
+                          نامشخص
+                        @endif
+                        <span class="text-muted">({{ $item->reason ?? '-' }})</span>
+                      </span>
+                    </div>
                     <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
                       <path d="M6 9l6 6 6-6" />

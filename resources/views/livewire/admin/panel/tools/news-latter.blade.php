@@ -216,8 +216,9 @@
                     @click="open = !open" style="cursor:pointer;">
                     <div class="d-flex align-items-center gap-2">
                       <input type="checkbox" wire:model.live="selectedMembers" value="{{ $member->id }}"
-                        class="form-check-input m-0 align-middle" @click.stop>
-                      <span class="fw-bold">{{ $member->email }}</span>
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">{{ $member->email }} <span
+                          class="text-muted">({{ $member->status ? 'فعال' : 'غیرفعال' }})</span></span>
                     </div>
                     <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">

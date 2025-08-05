@@ -201,8 +201,9 @@
                     @click="open = !open" style="cursor:pointer;">
                     <div class="d-flex align-items-center gap-2">
                       <input type="checkbox" wire:model.live="selectedTemplates" value="{{ $template->id }}"
-                        class="form-check-input m-0 align-middle" @click.stop>
-                      <span class="fw-bold">{{ $template->subject }}</span>
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">{{ $template->subject }} <span
+                          class="text-muted">({{ $template->type }})</span></span>
                     </div>
                     <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
                       fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
