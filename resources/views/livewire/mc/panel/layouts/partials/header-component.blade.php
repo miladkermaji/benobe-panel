@@ -151,10 +151,10 @@
                       </svg>
                     </div>
                   </div>
-                  <div class="my-dropdown-menu {{ $dropdownOpen ? '' : 'd-none' }}" wire:ignore.self>
+                  <div class="my-dropdown-menu {{ $dropdownOpen ? '' : 'd-none' }}">
                     <div class="" aria-hidden="true">
                       <!-- Search Input -->
-                      <div class="p-3 border-bottom" wire:ignore>
+                      <div class="p-3 border-bottom">
                         <div class="position-relative">
                           <input type="text" id="doctorSearchInput" placeholder="جستجوی پزشک..."
                             class="form-control border-0 bg-light rounded-pill px-4 py-2" style="font-size: 14px;">
@@ -172,7 +172,7 @@
                       </div>
 
                       <!-- Doctors List Container with Fixed Height -->
-                      <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;" wire:ignore>
+                      <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;">
                         <div class="{{ Route::is('medical-centers.doctor.deposit') ? 'd-none' : '' }}"
                           aria-hidden="true">
                           <div
@@ -204,7 +204,7 @@
                           @if (isset($doctors) && $doctors->count() > 0)
                             @foreach ($doctors as $doctor)
                               <div
-                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
                                 wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
                                 data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}"
                                 data-name="{{ strtolower($doctor->first_name . ' ' . $doctor->last_name) }}"
@@ -458,128 +458,94 @@
           }, 100); // تاخیر کوتاه برای اطمینان از بارگذاری
         });
 
-        // تابع جستجوی پزشکان - نسخه ساده‌شده
+        // تابع جستجوی ساده و مستقیم
         function initializeSearch() {
+          const searchInput = document.getElementById('doctorSearchInput');
+          if (!searchInput) return;
+
           // حذف event listener های قبلی
-          document.removeEventListener('input', globalSearchHandler);
-          document.removeEventListener('keyup', globalSearchHandler);
+          searchInput.removeEventListener('input', handleSearch);
+          searchInput.removeEventListener('keyup', handleSearch);
 
-          // اضافه کردن event listener جدید به صورت global
-          document.addEventListener('input', globalSearchHandler);
-          document.addEventListener('keyup', globalSearchHandler);
+          // اضافه کردن event listener جدید
+          searchInput.addEventListener('input', handleSearch);
+          searchInput.addEventListener('keyup', handleSearch);
 
-          // تنظیم کلاس‌های اولیه
-          initializeActiveStates();
-        }
+          function handleSearch(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            const doctorItems = document.querySelectorAll('.doctor-item');
+            const noDoctorsMessage = document.getElementById('noDoctorsMessage');
+            const noDoctorsAtAll = document.getElementById('noDoctorsAtAll');
+            const defaultOption = document.querySelector('[data-id="default"]');
+            const selectedDoctorId = '{{ $selectedDoctorId }}';
 
-        // تابع تنظیم کلاس‌های اولیه
-        function initializeActiveStates() {
-          const selectedDoctorId = '{{ $selectedDoctorId }}';
-          const doctorItems = document.querySelectorAll('.doctor-item');
-          const defaultOption = document.querySelector('[data-id="default"]');
+            let visibleCount = 0;
 
-          // تنظیم آیتم پیش‌فرض
-          if (defaultOption) {
-            if (!selectedDoctorId || selectedDoctorId === 'null') {
-              defaultOption.classList.add('card-active');
-            } else {
-              defaultOption.classList.remove('card-active');
+            // مخفی کردن پیام "هیچ پزشکی وجود ندارد"
+            if (noDoctorsAtAll) {
+              noDoctorsAtAll.style.display = 'none';
             }
-          }
 
-          // تنظیم پزشکان
-          doctorItems.forEach((item) => {
-            const doctorId = item.getAttribute('data-id') || '';
-            if (doctorId === selectedDoctorId) {
-              item.classList.add('card-active');
-            } else {
-              item.classList.remove('card-active');
-            }
-          });
-        }
-
-        // Global search handler
-        function globalSearchHandler(e) {
-          // فقط اگر روی input جستجو باشد
-          if (e.target.id !== 'doctorSearchInput') return;
-
-          const searchTerm = e.target.value.toLowerCase().trim();
-          const doctorItems = document.querySelectorAll('.doctor-item');
-          const noDoctorsMessage = document.getElementById('noDoctorsMessage');
-          const noDoctorsAtAll = document.getElementById('noDoctorsAtAll');
-          const defaultOption = document.querySelector('[data-id="default"]');
-
-          // پیدا کردن ID پزشک انتخاب‌شده فعلی
-          const selectedDoctorId = '{{ $selectedDoctorId }}';
-
-          let visibleCount = 0;
-
-          // مخفی کردن پیام "هیچ پزشکی وجود ندارد" در زمان جستجو
-          if (noDoctorsAtAll) {
-            noDoctorsAtAll.style.display = 'none';
-          }
-
-          // مدیریت آیتم پیش‌فرض
-          if (defaultOption) {
-            if (searchTerm === '') {
-              defaultOption.style.display = 'flex';
-              defaultOption.classList.remove('d-none');
-              // اگر هیچ پزشکی انتخاب نشده، آیتم پیش‌فرض فعال باشد
-              if (!selectedDoctorId || selectedDoctorId === 'null') {
-                defaultOption.classList.add('card-active');
+            // مدیریت آیتم پیش‌فرض
+            if (defaultOption) {
+              if (searchTerm === '') {
+                defaultOption.style.display = 'flex';
+                defaultOption.classList.remove('d-none');
+                if (!selectedDoctorId || selectedDoctorId === 'null') {
+                  defaultOption.classList.add('card-active');
+                } else {
+                  defaultOption.classList.remove('card-active');
+                }
               } else {
+                defaultOption.style.display = 'none';
+                defaultOption.classList.add('d-none');
                 defaultOption.classList.remove('card-active');
               }
-            } else {
-              defaultOption.style.display = 'none';
-              defaultOption.classList.add('d-none');
-              defaultOption.classList.remove('card-active');
             }
-          }
 
-          // مدیریت آیتم‌های پزشک
-          doctorItems.forEach((item, index) => {
-            const doctorName = item.getAttribute('data-name') || '';
-            const doctorSpecialty = item.getAttribute('data-specialty') || '';
-            const doctorId = item.getAttribute('data-id') || '';
+            // مدیریت آیتم‌های پزشک
+            doctorItems.forEach((item) => {
+              const doctorName = item.getAttribute('data-name') || '';
+              const doctorSpecialty = item.getAttribute('data-specialty') || '';
+              const doctorId = item.getAttribute('data-id') || '';
 
-            const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
+              const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
 
-            if (shouldShow) {
-              item.style.display = 'flex';
-              item.classList.remove('d-none');
-              visibleCount++;
+              if (shouldShow) {
+                item.style.display = 'flex';
+                item.classList.remove('d-none');
+                visibleCount++;
 
-              // اگر جستجو خالی است، کلاس‌های اصلی را برگردان
-              if (searchTerm === '') {
-                item.classList.remove('search-match');
-                // فقط پزشک انتخاب‌شده کلاس card-active را بگیرد
-                if (doctorId === selectedDoctorId) {
-                  item.classList.add('card-active');
+                if (searchTerm === '') {
+                  // جستجو خالی - کلاس‌های اصلی
+                  item.classList.remove('search-match');
+                  if (doctorId === selectedDoctorId) {
+                    item.classList.add('card-active');
+                  } else {
+                    item.classList.remove('card-active');
+                  }
                 } else {
+                  // جستجو فعال - فقط search-match
+                  item.classList.add('search-match');
                   item.classList.remove('card-active');
                 }
               } else {
-                // در زمان جستجو، فقط کلاس search-match اعمال شود
-                item.classList.add('search-match');
+                item.style.display = 'none';
+                item.classList.add('d-none');
+                item.classList.remove('search-match');
                 item.classList.remove('card-active');
               }
-            } else {
-              item.style.display = 'none';
-              item.classList.add('d-none');
-              item.classList.remove('search-match');
-              item.classList.remove('card-active');
-            }
-          });
+            });
 
-          // مدیریت پیام "پزشکی یافت نشد"
-          if (noDoctorsMessage) {
-            if (visibleCount === 0 && searchTerm !== '') {
-              noDoctorsMessage.style.display = 'block';
-              noDoctorsMessage.classList.remove('d-none');
-            } else {
-              noDoctorsMessage.style.display = 'none';
-              noDoctorsMessage.classList.add('d-none');
+            // مدیریت پیام "پزشکی یافت نشد"
+            if (noDoctorsMessage) {
+              if (visibleCount === 0 && searchTerm !== '') {
+                noDoctorsMessage.style.display = 'block';
+                noDoctorsMessage.classList.remove('d-none');
+              } else {
+                noDoctorsMessage.style.display = 'none';
+                noDoctorsMessage.classList.add('d-none');
+              }
             }
           }
         }
@@ -636,8 +602,6 @@
                   dropdownMenu.style.display = 'block';
                   dropdownMenu.style.visibility = 'visible';
                   dropdownMenu.style.opacity = '1';
-
-                  // حذف border قرمز تست
                   dropdownMenu.style.border = '2px solid #e5e7eb';
                   dropdownMenu.style.background = '#ffffff';
                 }, 10);
