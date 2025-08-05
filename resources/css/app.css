@@ -190,6 +190,16 @@ button {
     position: relative;
     min-height: 400px;
 }
+@media (max-width: 768px) {
+    :root {
+        --radius-nav: 0 !important;
+        --radius-button: 0.2rem; /* 8px - دکمه‌های کوچک */
+        --radius-button-large: 0.4rem; /* 16px - دکمه‌های بزرگ */
+        --radius-button-xl: 0.5rem; /* 20px - دکمه‌های خیلی بزرگ */
+        --radius-card: 0.3rem; /* 18px - کارت‌ها */
+        --radius-footer: 0.3rem; /* 30px - فوتر و برخی بخش‌ها */
+    }
+}
 @media (min-width: 768px) {
     .notes-cards.d-md-none {
         display: none !important;

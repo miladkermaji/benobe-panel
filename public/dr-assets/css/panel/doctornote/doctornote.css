@@ -896,7 +896,6 @@ body {
 
     .notes-cards {
         display: block !important;
-        padding: 1rem;
     }
 
     .note-card {
@@ -947,9 +946,7 @@ body {
 }
 
 @media (max-width: 767px) {
-    .notes-cards {
-        padding: 0.75rem;
-    }
+  
 
     .note-card {
         margin-bottom: 0.75rem;
@@ -966,9 +963,7 @@ body {
 }
 
 @media (max-width: 575px) {
-    .notes-cards {
-        padding: 0.5rem;
-    }
+  
 
     .note-card {
         margin-bottom: 0.5rem;
