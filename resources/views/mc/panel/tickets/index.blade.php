@@ -20,8 +20,7 @@
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h4 class="card-title">تیکت‌های من</h4>
-          <button type="button" class="btn btn-light btn-custom h-50" data-bs-toggle="modal"
-            data-bs-target="#add-ticket-modal">
+          <button type="button" class="btn btn-light btn-custom h-50" onclick="openXModal('add-ticket-modal')">
             <i class="fas fa-plus mr-2"></i> افزودن تیکت جدید
           </button>
         </div>
@@ -78,39 +77,25 @@
 </div>
 
 <!-- مودال افزودن تیکت -->
-<div class="modal fade" id="add-ticket-modal" tabindex="-1" role="dialog" aria-labelledby="add-ticket-modal-label"
-  aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="add-ticket-modal-label">ایجاد تیکت جدید</h5>
-        <button type="button" class="close text-dark" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="add-ticket-form">
-          @csrf
-          <div class="form-group">
-            <label for="title">عنوان تیکت</label>
-            <input type="text" class="form-control" id="title" name="title"
-              placeholder="عنوان تیکت را وارد کنید">
-            <small class="error-message error-title"></small>
-          </div>
-          <div class="form-group mt-2">
-            <label for="description">توضیحات</label>
-            <textarea class="form-control" id="description" name="description" placeholder="توضیحات تیکت را وارد کنید"></textarea>
-            <small class="error-message error-description"></small>
-          </div>
-          <button type="submit" class="btn modal-footer-btn w-100 d-flex justify-content-center align-items-center">
-            <span class="button_text">ارسال تیکت</span>
-            <div class="loader"></div>
-          </button>
-        </form>
-      </div>
+<x-custom-modal id="add-ticket-modal" title="ایجاد تیکت جدید" size="md">
+  <form id="add-ticket-form">
+    @csrf
+    <div class="form-group">
+      <label for="title">عنوان تیکت</label>
+      <input type="text" class="form-control" id="title" name="title" placeholder="عنوان تیکت را وارد کنید">
+      <small class="error-message error-title"></small>
     </div>
-  </div>
-</div>
+    <div class="form-group mt-2">
+      <label for="description">توضیحات</label>
+      <textarea class="form-control" id="description" name="description" placeholder="توضیحات تیکت را وارد کنید"></textarea>
+      <small class="error-message error-description"></small>
+    </div>
+    <button type="submit" class="btn modal-footer-btn w-100 d-flex justify-content-center align-items-center">
+      <span class="button_text">ارسال تیکت</span>
+      <div class="loader"></div>
+    </button>
+  </form>
+</x-custom-modal>
 
 @endsection
 
@@ -124,12 +109,12 @@
 <script>
   $(document).ready(function() {
     // مدیریت بستن مودال
-    $('#add-ticket-modal').on('hidden.bs.modal', function() {
-      $('body').removeClass('modal-open');
-      $('.modal-backdrop').remove();
-      $('#add-ticket-form')[0].reset();
-      $('.error-message').text('');
-      $('.form-group').removeClass('has-error');
+    document.addEventListener('x-modal-closed', function(e) {
+      if (e.detail.modalId === 'add-ticket-modal') {
+        $('#add-ticket-form')[0].reset();
+        $('.error-message').text('');
+        $('.form-group').removeClass('has-error');
+      }
     });
 
     // مدیریت صفحه‌بندی
@@ -186,7 +171,7 @@
             backdrop: 'rgba(0,0,0,0.4)' // پس‌زمینه ساده‌تر
           });
 
-          $('#add-ticket-modal').modal('hide');
+          closeXModal('add-ticket-modal');
           updateTicketList(response.tickets);
         },
         error: function(xhr) {
