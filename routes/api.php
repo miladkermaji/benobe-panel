@@ -167,7 +167,10 @@ Route::post('appointments/reservation-status', [AppointmentBookingController::cl
 // مسیرهای عمومی
 Route::prefix('medical-centers')->group(function () {
     Route::get('/list', [MedicalCentersController::class, 'list'])->name('api.medical-centers.list');
-    Route::get('/{slug}/profile', [MedicalCentersController::class, 'getProfile'])->name('api.medical-centers.profile');
+
+    // مسیرهای جدید برای پروفایل مراکز درمانی (اولویت بالاتر)
+    Route::get('/{centerId}/profile', [\App\Http\Controllers\Api\MedicalCenterProfileController::class, 'show'])->name('api.medical-centers.profile.details');
+    Route::get('/{centerId}/reviews', [\App\Http\Controllers\Api\MedicalCenterProfileController::class, 'reviews'])->name('api.medical-centers.reviews');
 });
 
 Route::get('prescriptions/insurances', [\App\Http\Controllers\Api\PrescriptionRequestController::class, 'prescriptionInsurances']);
@@ -177,3 +180,6 @@ Route::match(['get', 'post'], 'prescriptions/payment/callback', [\App\Http\Contr
 Route::match(['get', 'post'], 'search', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('api.search');
 
 Route::get('public-doctor-comments/{doctor_id}', [\App\Http\Controllers\Api\DoctorCommentController::class, 'publicDoctorComments']);
+
+// مسیر قدیمی با slug (در انتها برای جلوگیری از تداخل)
+Route::get('medical-centers/{slug}/profile', [MedicalCentersController::class, 'getProfile'])->name('api.medical-centers.profile.old');

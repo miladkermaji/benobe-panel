@@ -218,4 +218,20 @@ class MedicalCenter extends Authenticatable
     {
         return $this->morphMany(LoginLog::class, 'loggable');
     }
+
+    /**
+     * رابطه با نظرات مرکز درمانی
+     */
+    public function reviews()
+    {
+        return $this->hasMany(MedicalCenterReview::class);
+    }
+
+    /**
+     * رابطه با نظرات تأیید شده
+     */
+    public function approvedReviews()
+    {
+        return $this->hasMany(MedicalCenterReview::class)->where('status', true);
+    }
 }
