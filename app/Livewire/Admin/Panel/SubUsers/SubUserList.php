@@ -245,9 +245,13 @@ class SubUserList extends Component
                 })->get());
             }
         }
+
+        $subUsers = $this->readyToLoad ? $this->getSubUsersQuery()->paginate($this->perPage) : collect();
         $this->totalFilteredCount = $this->readyToLoad ? $this->getSubUsersQuery()->count() : 0;
+
         return view('livewire.admin.panel.sub-users.sub-user-list', [
             'owners' => $owners,
+            'subUsers' => $subUsers,
             'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
