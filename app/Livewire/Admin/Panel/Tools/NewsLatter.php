@@ -11,13 +11,23 @@ class NewsLatter extends Component
 {
     use WithPagination;
 
-    public $search          = '';
-    public $newEmail        = '';
-    public $editId          = null;
-    public $editEmail       = '';
-    public $perPage         = 10;
+    protected $paginationTheme = 'bootstrap';
+
+    protected $listeners = ['deleteMemberConfirmed' => 'deleteMember'];
+
+    public $search = '';
+    public $newEmail = '';
+    public $editId = null;
+    public $editEmail = '';
+    public $perPage = 100;
     public $selectedMembers = [];
-    public $selectAll       = false;
+    public $selectAll = false;
+    public $readyToLoad = false;
+    public $groupAction = '';
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+    ];
 
     protected $rules = [
         'newEmail'  => 'required|email|unique:newsletters,email',
@@ -33,6 +43,16 @@ class NewsLatter extends Component
         'editEmail.email'    => 'ایمیل واردشده معتبر نیست.',
     ];
 
+    public function mount()
+    {
+        $this->perPage = max($this->perPage, 1);
+    }
+
+    public function loadNewsletterMembers()
+    {
+        $this->readyToLoad = true;
+    }
+
     public function updatedSearch()
     {
         $this->resetPage();
@@ -40,22 +60,51 @@ class NewsLatter extends Component
 
     public function updatedSelectAll($value)
     {
-        $currentPageIds = Newsletter::where('email', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage)
-            ->pluck('id')
-            ->toArray();
-
+        $currentPageIds = $this->getNewsletterQuery()->pluck('id')->toArray();
         $this->selectedMembers = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedMembers()
     {
-        $currentPageIds = Newsletter::where('email', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage)
-            ->pluck('id')
-            ->toArray();
+        $currentPageIds = $this->getNewsletterQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedMembers) && count(array_diff($currentPageIds, $this->selectedMembers)) === 0;
+    }
 
-        $this->selectAll = ! empty($this->selectedMembers) && count(array_diff($currentPageIds, $this->selectedMembers)) === 0;
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedMembers)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ عضوی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        Newsletter::whereIn('id', $this->selectedMembers)
+            ->update(['is_active' => $status]);
+
+        $this->selectedMembers = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت اعضای انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function addMember()
@@ -68,10 +117,11 @@ class NewsLatter extends Component
                 'is_active' => true,
             ]);
             $this->newEmail = '';
-            $this->dispatch('toast', 'عضو جدید با موفقیت اضافه شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'عضو جدید با موفقیت اضافه شد.');
+            $this->dispatch('close-modal', modalId: 'addMemberModal');
         } catch (\Exception $e) {
             Log::error('Error adding newsletter member: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در اضافه کردن عضو: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در اضافه کردن عضو: ' . $e->getMessage());
         }
     }
 
@@ -91,10 +141,10 @@ class NewsLatter extends Component
             $member->update(['email' => $this->editEmail]);
             $this->editId    = null;
             $this->editEmail = '';
-            $this->dispatch('toast', 'عضو با موفقیت ویرایش شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'عضو با موفقیت ویرایش شد.');
         } catch (\Exception $e) {
             Log::error('Error updating newsletter member: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در ویرایش عضو: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در ویرایش عضو: ' . $e->getMessage());
         }
     }
 
@@ -108,13 +158,18 @@ class NewsLatter extends Component
     {
         try {
             $member            = Newsletter::findOrFail($id);
-            $member->is_active = ! $member->is_active;
+            $member->is_active = !$member->is_active;
             $member->save();
-            $this->dispatch('toast', 'وضعیت عضو با موفقیت تغییر کرد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'وضعیت عضو با موفقیت تغییر کرد.');
         } catch (\Exception $e) {
             Log::error('Error toggling newsletter status: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در تغییر وضعیت: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در تغییر وضعیت: ' . $e->getMessage());
         }
+    }
+
+    public function confirmDelete($id)
+    {
+        $this->dispatch('confirm-delete', id: $id);
     }
 
     public function deleteMember($id)
@@ -123,34 +178,24 @@ class NewsLatter extends Component
             $member = Newsletter::findOrFail($id);
             $member->delete();
             $this->selectedMembers = array_diff($this->selectedMembers, [$id]);
-            $this->dispatch('toast', 'عضو با موفقیت حذف شد.', ['type' => 'success']);
+            $this->dispatch('show-alert', type: 'success', message: 'عضو با موفقیت حذف شد.');
         } catch (\Exception $e) {
             Log::error('Error deleting newsletter member: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در حذف عضو: ' . $e->getMessage(), ['type' => 'error']);
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در حذف عضو: ' . $e->getMessage());
         }
     }
 
     public function deleteSelected()
     {
         if (empty($this->selectedMembers)) {
-            $this->dispatch('toast', 'هیچ عضوی انتخاب نشده است.', ['type' => 'warning']);
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ عضوی انتخاب نشده است.');
             return;
         }
 
-        $this->dispatch('confirmDeleteSelected');
-    }
-
-    public function confirmDeleteSelected()
-    {
-        try {
-            Newsletter::whereIn('id', $this->selectedMembers)->delete();
-            $this->selectedMembers = [];
-            $this->selectAll       = false;
-            $this->dispatch('toast', 'اعضای انتخاب‌شده با موفقیت حذف شدند.', ['type' => 'success']);
-        } catch (\Exception $e) {
-            Log::error('Error deleting selected members: ' . $e->getMessage());
-            $this->dispatch('toast', 'خطا در حذف اعضا: ' . $e->getMessage(), ['type' => 'error']);
-        }
+        Newsletter::whereIn('id', $this->selectedMembers)->delete();
+        $this->selectedMembers = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'اعضای انتخاب‌شده با موفقیت حذف شدند.');
     }
 
     public function export()
@@ -165,10 +210,15 @@ class NewsLatter extends Component
         }, 'newsletter-members.csv');
     }
 
+    private function getNewsletterQuery()
+    {
+        return Newsletter::where('email', 'like', '%' . $this->search . '%')
+            ->paginate($this->perPage);
+    }
+
     public function render()
     {
-        $members = Newsletter::where('email', 'like', '%' . $this->search . '%')
-            ->paginate($this->perPage);
+        $members = $this->readyToLoad ? $this->getNewsletterQuery() : null;
 
         return view('livewire.admin.panel.tools.news-latter', [
             'members' => $members,
