@@ -10,22 +10,23 @@ class NotificationList extends Component
 {
     use WithPagination;
 
-    protected $listeners = [
-        'deleteSelected' => 'deleteSelected',
-        'deleteNotificationConfirmed' => 'deleteNotificationConfirmed',
-    ];
-
-    public $search                = '';
-    public $selectAll             = false;
-    public $selectedNotifications = [];
-    public $readyToLoad           = false;
-    public $groupAction = null;
-
     protected $paginationTheme = 'bootstrap';
+
+    protected $listeners = ['deleteNotificationConfirmed' => 'deleteNotification'];
+
+    public $search = '';
+    public $selectAll = false;
+    public $selectedNotifications = [];
+    public $readyToLoad = false;
+    public $groupAction = '';
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+    ];
 
     public function mount()
     {
-        $this->readyToLoad = false; // حالت اولیه
+        $this->readyToLoad = false;
     }
 
     public function loadNotifications()
@@ -35,30 +36,68 @@ class NotificationList extends Component
 
     public function updatedSearch()
     {
-        $this->resetPage(); // ریست صفحه‌بندی موقع سرچ
+        $this->resetPage();
     }
 
     public function updatedSelectAll($value)
     {
-        $notifications = $this->notifications;
-        if ($value && $notifications) {
-            $this->selectedNotifications = $notifications->pluck('id')->toArray();
-        } else {
-            $this->selectedNotifications = [];
-        }
+        $currentPageIds = $this->getNotificationsQuery()->pluck('id')->toArray();
+        $this->selectedNotifications = $value ? $currentPageIds : [];
     }
 
     public function updatedSelectedNotifications()
     {
-        $notifications   = $this->notifications;
-        $this->selectAll = $notifications && count($this->selectedNotifications) === $notifications->count();
+        $currentPageIds = $this->getNotificationsQuery()->pluck('id')->toArray();
+        $this->selectAll = !empty($this->selectedNotifications) && count(array_diff($currentPageIds, $this->selectedNotifications)) === 0;
+    }
+
+    public function executeGroupAction()
+    {
+        if (empty($this->selectedNotifications)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ اعلانی انتخاب نشده است.');
+            return;
+        }
+
+        if (empty($this->groupAction)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'لطفا یک عملیات را انتخاب کنید.');
+            return;
+        }
+
+        switch ($this->groupAction) {
+            case 'delete':
+                $this->deleteSelected();
+                break;
+            case 'status_active':
+                $this->updateStatus(true);
+                break;
+            case 'status_inactive':
+                $this->updateStatus(false);
+                break;
+        }
+
+        $this->groupAction = '';
+    }
+
+    private function updateStatus($status)
+    {
+        Notification::whereIn('id', $this->selectedNotifications)
+            ->update(['is_active' => $status]);
+
+        $this->selectedNotifications = [];
+        $this->selectAll = false;
+        $this->dispatch('show-alert', type: 'success', message: 'وضعیت اعلان‌های انتخاب‌شده با موفقیت تغییر کرد.');
     }
 
     public function toggleStatus($id)
     {
-        $notification = Notification::findOrFail($id);
-        $notification->update(['is_active' => ! $notification->is_active]);
-        $this->dispatch('show-alert', type: 'success', message: 'وضعیت اعلان با موفقیت تغییر کرد.');
+        try {
+            $notification = Notification::findOrFail($id);
+            $notification->is_active = !$notification->is_active;
+            $notification->save();
+            $this->dispatch('show-alert', type: 'success', message: 'وضعیت اعلان با موفقیت تغییر کرد.');
+        } catch (\Exception $e) {
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در تغییر وضعیت: ' . $e->getMessage());
+        }
     }
 
     public function confirmDelete($id)
@@ -66,48 +105,39 @@ class NotificationList extends Component
         $this->dispatch('confirm-delete', id: $id);
     }
 
-    public function deleteNotificationConfirmed($id)
+    public function deleteNotification($id)
     {
-        Notification::findOrFail($id)->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت حذف شد.');
+        try {
+            $notification = Notification::findOrFail($id);
+            $notification->delete();
+            $this->selectedNotifications = array_diff($this->selectedNotifications, [$id]);
+            $this->dispatch('show-alert', type: 'success', message: 'اعلان با موفقیت حذف شد.');
+        } catch (\Exception $e) {
+            $this->dispatch('show-alert', type: 'error', message: 'خطا در حذف اعلان: ' . $e->getMessage());
+        }
     }
 
     public function deleteSelected()
     {
+        if (empty($this->selectedNotifications)) {
+            $this->dispatch('show-alert', type: 'warning', message: 'هیچ اعلانی انتخاب نشده است.');
+            return;
+        }
+
         Notification::whereIn('id', $this->selectedNotifications)->delete();
         $this->selectedNotifications = [];
-        $this->selectAll             = false;
+        $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده با موفقیت حذف شدند.');
-    }
-
-    public function executeGroupAction()
-    {
-        switch ($this->groupAction) {
-            case 'status_active':
-                Notification::whereIn('id', $this->selectedNotifications)->update(['is_active' => true]);
-                $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده فعال شدند.');
-                break;
-            case 'status_inactive':
-                Notification::whereIn('id', $this->selectedNotifications)->update(['is_active' => false]);
-                $this->dispatch('show-alert', type: 'success', message: 'اعلان‌های انتخاب‌شده غیرفعال شدند.');
-                break;
-            case 'delete':
-                $this->dispatch('confirm-delete-selected');
-                break;
-            default:
-                $this->dispatch('show-alert', type: 'warning', message: 'هیچ عملیات معتبری انتخاب نشده است.');
-        }
-        $this->groupAction = null;
     }
 
     public function getTypeLabel($type)
     {
         return match ($type) {
-            'info' => ['label' => 'اطلاع‌رسانی', 'class' => 'bg-label-info'],
-            'success' => ['label' => 'موفقیت', 'class' => 'bg-label-success'],
-            'warning' => ['label' => 'هشدار', 'class' => 'bg-label-warning'],
-            'error' => ['label' => 'خطا', 'class' => 'bg-label-danger'],
-            default => ['label' => 'نامشخص', 'class' => 'bg-label-secondary'],
+            'info' => ['label' => 'اطلاع‌رسانی', 'class' => 'bg-info'],
+            'success' => ['label' => 'موفقیت', 'class' => 'bg-success'],
+            'warning' => ['label' => 'هشدار', 'class' => 'bg-warning'],
+            'error' => ['label' => 'خطا', 'class' => 'bg-danger'],
+            default => ['label' => 'نامشخص', 'class' => 'bg-secondary'],
         };
     }
 
@@ -129,12 +159,8 @@ class NotificationList extends Component
         return 'نامشخص';
     }
 
-    public function getNotificationsProperty()
+    private function getNotificationsQuery()
     {
-        if (! $this->readyToLoad) {
-            return Notification::whereRaw('0=1')->paginate(10); // مجموعه خالی برای حالت اولیه
-        }
-
         return Notification::query()
             ->when($this->search, function ($query) {
                 $query->where('title', 'like', '%' . $this->search . '%')
@@ -146,8 +172,10 @@ class NotificationList extends Component
 
     public function render()
     {
+        $notifications = $this->readyToLoad ? $this->getNotificationsQuery() : null;
+
         return view('livewire.admin.panel.tools.notification-list', [
-            'notifications' => $this->notifications, // صراحتاً پاس دادن به ویو
+            'notifications' => $notifications,
         ])->layout('layouts.admin');
     }
 }
