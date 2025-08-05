@@ -13,7 +13,8 @@ return new class () extends Migration {
         Schema::create('notification_recipients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('notification_id')->constrained('notifications')->onDelete('cascade');
-            $table->morphs('recipient', null, null, 'recipient_id'); // برای انعطاف‌پذیری با جدول‌های مختلف (users, doctors, secretaries)
+            $table->string('recipient_type')->nullable(); // برای انعطاف‌پذیری با جدول‌های مختلف (users, doctors, secretaries)
+            $table->unsignedBigInteger('recipient_id')->nullable(); // Made nullable for single phone notifications
             $table->string('phone_number')->nullable(); // شماره تلفن برای ارسال تکی
             $table->boolean('is_read')->default(false); // آیا دیده شده
             $table->timestamp('read_at')->nullable(); // زمان دیده شدن
