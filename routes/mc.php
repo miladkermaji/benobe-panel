@@ -354,5 +354,12 @@ Route::prefix('mc')
             // My Prescriptions routes moved from bottom
             Route::get('my-prescriptions', [\App\Http\Controllers\Mc\Panel\DoctorPrescriptionController::class, 'index'])->name('mc.panel.my-prescriptions');
             Route::get('my-prescriptions/settings', [\App\Http\Controllers\Mc\Panel\DoctorPrescriptionController::class, 'settings'])->name('mc.panel.my-prescriptions.settings');
+
+            // Doctor Management Routes
+            Route::prefix('doctors')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'index'])->name('mc.panel.doctors.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'create'])->name('mc.panel.doctors.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'edit'])->name('mc.panel.doctors.edit');
+            });
         });
     });

@@ -1307,7 +1307,17 @@ body {
 
    
 }
-
+.btn-gradient-primary {
+  background: var(--gradient-primary);
+  border: none;
+  color: white;
+  padding: 10px 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+  border-radius: var(--radius-button);
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
 /* Collapsible Section Styles */
 #mobileSearchSection {
     transition: all 0.3s ease;

@@ -276,6 +276,31 @@
           </ul>
         </li>
         <li
+          class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="doctor-management">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            مدیریت پزشکان
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.doctors.index') }}">لیست پزشکان</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.create') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.doctors.create') }}">افزودن پزشک</a>
+            </li>
+          </ul>
+        </li>
+        <li
           class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="hesab-karbari">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -809,6 +834,9 @@
         <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
         <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
         <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
+        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
+        <a href="{{ route('mc.panel.doctors.index') }}">لیست پزشکان</a>
+        <a href="{{ route('mc.panel.doctors.create') }}">افزودن پزشک</a>
       </div>
     </div>
   </div>

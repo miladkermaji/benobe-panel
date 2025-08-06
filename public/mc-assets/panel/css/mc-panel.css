@@ -1,69 +1,1158 @@
-@import url("./../../../app-assets/fonts/IRANSans/style.css");
-
-.badge-font-size {
-    font-size: 17px !important;
+:root {
+    /* پالت رنگی اصلی */
+    --primary: #2e86c1; /* آبی اصلی - استفاده در دکمه‌ها و لینک‌ها */
+    --primary-light: #84caf9; /* آبی روشن - در گرادیان‌ها */
+    --secondary: #1deb3c; /* سبز - برای دکمه‌های ثانویه */
+    --secondary-hover: #15802a; /* سبز تیره‌تر برای هاور */
+    --background-light: #f0f8ff; /* آبی بسیار روشن - پس‌زمینه بخش‌ها */
+    --background-footer: #d4ecfd; /* آبی روشن‌تر - فوتر */
+    --background-card: #ffffff; /* سفید - کارت‌ها */
+    --text-primary: #000000; /* مشکی - متن اصلی */
+    --text-secondary: #707070; /* خاکستری - متن ثانویه */
+    --text-discount: #008000; /* سبز - قیمت با تخفیف */
+    --text-original: #ff0000; /* قرمز - قیمت اولیه */
+    --border-neutral: #e5e7eb; /* خاکستری روشن - حاشیه‌ها */
+    --shadow: rgba(0, 0, 0, 0.35); /* سایه‌ها */
+    --gradient-instagram-from: #f92ca7; /* گرادیان اینستاگرام - شروع */
+    --gradient-instagram-to: #6b1a93; /* گرادیان اینستاگرام - پایان */
+    --button-mobile: #4f9acd; /* آبی متوسط - دکمه‌های موبایل */
+    --button-mobile-light: #a2cdeb; /* آبی روشن‌تر - دکمه‌های موبایل */
+    --support-section: #2e86c1; /* آبی - بخش پشتیبانی */
+    --support-text: #084d7c; /* آبی تیره - متن پشتیبانی */
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    ) !important;
+    /* شعاع گوشه‌ها (border-radius) */
+    --radius-button: 0.5rem; /* 8px - دکمه‌های کوچک */
+    --radius-button-large: 1rem; /* 16px - دکمه‌های بزرگ */
+    --radius-button-xl: 1.25rem; /* 20px - دکمه‌های خیلی بزرگ */
+    --radius-card: 1.125rem !important; /* 18px - کارت‌ها */
+    --radius-footer: 1.875rem; /* 30px - فوتر و برخی بخش‌ها */
+    --radius-nav: 1.25rem; /* 20px - نوار ناوبری */
+    --radius-circle: 9999px; /* دایره کامل - برای آیکون‌ها */
 }
-.main-content .row .col-3 {
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-}
-.p-10 {
-    padding: 10px;
-}
-.center {
+#loading-overlay-current-nobat {
+    width: calc(100% - 250px);
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: absolute;
+    background-color: #fff;
+    z-index: 555;
 }
-.dropdown-select {
-    display: none !important;
+th {
+    font-weight: bold !important;
 }
-option,
-select {
-    font-family: "IRANSans" !important;
+.bg-active-slot {
+    background-color: #eef2f8 !important;
+}
+.bg-light-blue {
+    background-color: #ebeff8 !important;
+}
+.form-group {
+    margin-bottom: 0 !important;
+}
+.sidebar__nav {
+    z-index: 556;
+}
+.border-bottom-2 {
+    border-bottom: 2px dashed rgb(190, 190, 190) !important;
+    margin-top: 10px;
+}
+/* .label-top-input-special-takhasos {
+    z-index: 700 !important;
+} */
+
+.h-80 {
+    height: 80px !important;
 }
 
-.normalize {
-    direction: ltr !important;
+.gap-20 {
+    display: flex;
+    gap: 20px !important;
 }
 
-/* نقطه قرمز روی کلینیک‌های غیرفعال */
-.inactive-dot {
+.gap-4 {
+    display: flex;
+    gap: 4px !important;
+}
+
+.remove-form-item svg {
+    cursor: pointer;
+}
+
+.calendar-and-add-sick-section {
+    position: relative;
+}
+
+.my-form-control {
+    background-color: #ebeff8;
+    border-radius: 8px;
+    padding: 10px;
+
+    position: relative;
+    font-family: inherit;
+    height: 50px;
+}
+
+.my-form-control-light {
+    width: 30vw;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid #e7e7e7;
+
+    position: relative;
+    font-family: inherit;
+    height: 50px;
+}
+
+.search-input-icon {
+    position: absolute;
+    right: 340px;
+    top: 30px;
+    z-index: 555;
+}
+
+.svg-caret-left {
+    position: absolute;
+    right: 234px;
+}
+
+.border-radius-4 {
+    border-radius: 4px !important;
+}
+
+.my-shodow {
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+        rgba(0, 0, 0, 0.08) 0px 0px 0px 1px !important;
+}
+
+.selectDate_datepicker__xkZeS:hover {
+    background-color: #eeeeee !important;
+    transition: 0.5s ease-in-out;
+}
+.gap-3 {
+    gap: 3rem !important;
+}
+.form-check-input:checked {
+    background-color: var(--primary);
+    /* Bootstrap primary color */
+    border-color: var(--primary);
+    /* Bootstrap primary border color */
+}
+
+.form-check-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    /* Focus shadow */
+}
+.sidebar__scrollable ol ul {
+    padding-right: 0 !important;
+}
+.form-check-input {
+    width: 1rem;
+    /* Change width as needed */
+    height: 1rem;
+    /* Change height as needed */
+    border-radius: 0.5rem;
+    /* Adjust border radius */
+}
+
+.form-check-label {
+    margin-left: 0.5rem;
+    /* Space between checkbox and label */
+}
+
+.my-days-content {
+    width: 100%;
+    max-width: 100%; /* اضافه کردن حداکثر عرض */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    white-space: nowrap; /* جلوگیری از شکستن خط */
+    overflow-x: auto !important; /* اجازه اسکرول افقی */
+    overflow-y: hidden !important; /* پنهان کردن اسکرول عمودی */
+    transition: transform 1s ease;
+}
+
+.my-form-control:focus,
+.form-control:focus,
+.my-form-control-light:focus {
+    border: 2px solid rgb(60, 60, 245) !important;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+}
+
+.top-details-sicks-cards .rounded-lg {
+    border-radius: 12px !important;
+}
+
+.nobat-option {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+/* برای Chrome, Safari, Edge جدید */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* برای Firefox */
+* {
+    scrollbar-width: none;
+}
+th {
+    text-wrap: nowrap !important;
+}
+/* برای IE و Edge قدیمی */
+body {
+    -ms-overflow-style: none;
+}
+@media screen and (max-width: 1059px) {
+    .top-details-sicks-cards .rounded-lg {
+        border-radius: 12px !important;
+        width: 25vw;
+    }
+
+    .rounded-lg span {
+        font-size: 14px;
+        font-weight: bold !important;
+    }
+
+    .rounded-lg svg {
+        width: 22px;
+        height: 22px;
+    }
+}
+
+@media screen and (max-width: 991px) {
+    .top-details-sicks-cards .rounded-lg {
+        border-radius: 12px !important;
+        width: inherit;
+    }
+    .close span {
+        font-size: 24px !important;
+    }
+
+    .top-details-sicks-cards {
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        overflow-x: scroll !important;
+        text-wrap: nowrap !important;
+    }
+
+    .datepicker-container {
+        position: absolute !important;
+        left: 455px !important;
+        top: 284px !important;
+    }
+
+    th,
+    td {
+        text-wrap: nowrap !important;
+        font-size: 12px !important;
+    }
+
+    .my-days-content {
+        width: 100%;
+        display: flex;
+        text-wrap: nowrap;
+        flex-wrap: nowrap;
+        overflow-x: scroll !important;
+        overflow-y: hidden !important;
+    }
+
+    .my-badge-danger {
+        position: absolute;
+        top: 0 !important;
+    }
+
+    button:first-child,
+    button:nth-child(even) {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    #tuesday-date,
+    #saturday-date,
+    #sunday-date,
+    #monday-date,
+    #wednesday-date,
+    #thursday-date,
+    #friday-date {
+        font-size: 11px;
+    }
+}
+
+@media screen and (max-width: 868px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 369px !important;
+        top: 284px !important;
+    }
+}
+
+@media screen and (max-width: 775px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 303px !important;
+        top: 284px !important;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .notification-box {
+        width: 450px !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 20px !important;
+        position: fixed !important;
+    }
+
+    .top-details-sicks-cards .rounded-lg span {
+        font-size: 13px;
+    }
+
+    .top-details-sicks-cards .top-s-a-wrapper {
+        display: flex !important;
+        justify-content: space-around !important;
+        gap: 11px !important;
+    }
+    .top-details-sicks-cards {
+        padding: 2px !important;
+    }
+    .my-form-control::placeholder {
+        font-size: 13px;
+    }
+}
+
+@media screen and (max-width: 707px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 252px !important;
+        top: 284px !important;
+    }
+}
+
+@media screen and (max-width: 657px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 210px !important;
+        top: 284px !important;
+    }
+}
+
+@media screen and (max-width: 634px) {
+    .top-details-sicks-cards .rounded-lg span {
+        font-size: 12px;
+    }
+
+    .calendar-and-add-sick-section {
+        position: relative;
+        flex: 1 1;
+    }
+
+    .rounded-lg svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .rounded-lg span {
+        font-size: 11px;
+    }
+
+    .my-form-control::placeholder {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 615px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 97px !important;
+        top: 284px !important;
+    }
+}
+
+@media screen and (max-width: 556px) {
+    .top-dr-panel {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .my-dropdown-menu {
+        width: 370px;
+        min-height: 87px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        position: absolute;
+        top: 42px;
+        z-index: 9999 !important; /* افزایش z-index */
+        left: 0 !important; /* تنظیم موقعیت */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media screen and (max-width: 569px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 82px !important;
+        top: 327px !important;
+    }
+
+    .top-details-sicks-cards .rounded-lg span {
+        font-size: 12px;
+    }
+
+    .calendar-and-add-sick-section {
+        position: relative;
+        flex: 1 1;
+    }
+
+    .rounded-lg svg {
+        width: 22px;
+        height: 22px;
+    }
+
+    .rounded-lg span {
+        font-size: 11px;
+    }
+
+    .my-form-control::placeholder {
+        font-size: 12px;
+    }
+
+    .top-s-a-wrapper {
+        display: flex;
+        width: 100%;
+    }
+
+    .c-a-wrapper {
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-around !important;
+    }
+    .selectDate_datepicker__xkZeS {
+        border: 1px solid #ddd;
+    }
+
+    .my-form-control {
+        width: 70vw;
+        background-color: #ebeff8;
+        border-radius: 8px;
+        padding: 10px;
+        position: relative;
+        font-family: inherit;
+        height: 50px;
+    }
+
+    .turning_selectDate__MLRSb {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+    .px-3 {
+        padding-left: 0.3rem !important;
+        padding-right: 0.3rem !important;
+    }
+}
+
+@media screen and (max-width: 488px) {
+    .datepicker-container {
+        position: absolute !important;
+        left: 2px !important;
+        top: 327px !important;
+    }
+     .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 11px !important;
+        position: fixed !important;
+    }
+    /* .myPanelOption .dropdown-trigger{
+        width: 200px;
+    }
+        */
+}
+
+@media screen and (min-width: 992px) {
+    .datepicker-container {
+        position: absolute !important;
+        top: 287px !important;
+        right: 600px !important;
+    }
+}
+
+@media screen and (max-width: 456px) {
+    .dropdown-trigger {
+        width: 250px !important;
+    }
+}
+@media screen and (max-width: 430px) {
+    .top-dr-panel {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .my-dropdown-menu {
+        width: 90vw !important;
+        min-height: 87px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        position: absolute;
+        right: -90px !important;
+        top: 42px;
+        z-index: 9999 !important; /* افزایش z-index */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+@media screen and (max-width: 391px) {
+    .top-dr-panel {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .my-dropdown-menu {
+        width: 306px !important;
+        min-height: 87px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        position: absolute;
+        right: -60px;
+        top: 42px;
+        z-index: 9999 !important; /* افزایش z-index */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .dropdown-trigger {
+        width: 220px !important;
+    }
+    .svg-help {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 346px) {
+    .top-dr-panel {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .dropdown-trigger {
+        width: 190px !important;
+    }
+    .logout {
+        margin-right: 0 !important;
+    }
+    .notif-option {
+        padding: 0 2px !important;
+    }
+    .my-dropdown-menu {
+        width: 306px !important;
+        min-height: 87px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        position: absolute;
+        right: -60px;
+        top: 42px;
+        z-index: 9999 !important; /* افزایش z-index */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .svg-help {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 404px) {
+    .datepicker-plot-area {
+        box-sizing: border-box;
+        overflow: hidden;
+        min-height: 70px;
+        display: block;
+        width: 320px !important;
+        min-width: 167px;
+        padding: 3px;
+        position: absolute;
+        font: 12px tahoma;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        background-color: #fff;
+    }
+}
+
+@media screen and (max-width: 389px) {
+    .myPanelOption .dropdown-trigger {
+        max-width: 210px;
+    }
+}
+@media screen and (max-width: 432px) {
+    .top-details-sicks-cards .rounded-lg span {
+        font-size: 12px;
+    }
+
+    .calendar-and-add-sick-section {
+        position: relative;
+        flex: 1 1;
+    }
+
+    .rounded-lg svg {
+        width: 22px;
+        height: 22px;
+    }
+    #CalculatorModal .modal-dialog {
+        position: relative;
+        width: auto;
+        pointer-events: none;
+    }
+    #calculate-modal {
+        width: 100% !important;
+    }
+    .rounded-lg span {
+        font-size: 11px;
+    }
+
+    .my-form-control::placeholder {
+        font-size: 12px;
+    }
+
+    .top-s-a-wrapper {
+        display: flex;
+        width: 100%;
+    }
+
+    .c-a-wrapper {
+        width: 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-around !important;
+    }
+
+    .selectDate_datepicker__xkZeS {
+        border: 1px solid #ddd;
+    }
+
+    .my-form-control {
+        width: 92vw;
+        background-color: #ebeff8;
+        border-radius: 8px;
+        padding: 10px;
+        position: relative;
+        font-family: inherit;
+        height: 50px;
+    }
+
+    .btn-425-left {
+        display: flex;
+        justify-content: end;
+        width: 100%;
+    }
+
+    .turning_selectDate__MLRSb {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+}
+
+.jdp-calendar {
+    z-index: 666;
+}
+
+/* .datepicker-container {
+  position: fixed !important;
+  left: 882.646px !important;
+  top: 247.967px !important;
+} */
+
+.datepicker-plot-area .datepicker-day-view .table-days td span {
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.text-decoration-underline {
+    text-decoration: underline !important;
+    font-size: 14px !important;
+    color: blue !important;
+}
+
+.h-50 {
+    height: 50px !important;
+    border-radius: 8px !important;
+}
+
+.border-radius-8 {
+    border-radius: 1.3rem !important;
+}
+
+button {
+    outline: none !important;
+}
+
+.space-s-1 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-s-reverse: 0;
+    margin-inline-end: calc(0.25rem * var(--tw-space-s-reverse));
+    margin-inline-start: calc(0.25rem * (1 - var(--tw-space-s-reverse)));
+}
+
+.password_toggle__AXK9v {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.password_toggle__AXK9v input[type="checkbox"] {
+    height: 0;
+    visibility: hidden;
+    width: 0;
+}
+
+.my-modal-body ul li {
+    list-style-type: circle !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    line-height: 2rem !important;
+}
+
+.my-modal-body {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+}
+
+.password_toggle__AXK9v input:checked + label {
+    background: #0070f3;
+}
+
+.password_toggle__AXK9v label {
+    background: gray;
+    border-radius: 100px;
+    cursor: pointer;
+    display: block;
+    height: 1.7rem;
+    position: relative;
+    text-indent: -9999px;
+    width: 3rem;
+}
+
+.border-radius-6 {
+    border-radius: var(--radius-card) !important;
+}
+
+.p-2-5 {
+    padding: 0.8rem 0.4rem !important;
+}
+
+.password_toggle__AXK9v input:checked + label:after {
+    left: calc(100% - 5px);
+    transform: translateX(-100%);
+}
+
+.gap-10 {
+    gap: 10px !important;
+    display: flex !important;
+}
+
+#incrementHour {
+    position: absolute;
+    top: 7px;
+    left: 32px;
+    font-weight: bolder !important;
+}
+
+#decrementHour {
+    position: absolute;
+    bottom: 7px;
+    left: 36px;
+}
+
+#incrementMinute {
+    position: absolute;
+    top: 7px;
+    right: 32px;
+}
+
+#decrementMinute {
+    position: absolute;
+    bottom: 7px;
+    right: 32px;
+}
+
+#calculate-modal {
+    width: 320px;
+}
+
+.timepicker-ui input {
+    width: 70px !important;
+}
+
+.lh-2 {
+    line-height: 2rem !important;
+}
+
+.gap-40 {
+    gap: 40px !important;
+    display: flex !important;
+}
+
+.my-border-dark {
+    border: 1px solid #cfcfcf !important;
+}
+
+.my-badge-danger {
+    position: absolute;
+    /* می‌توانید این را به relative تغییر دهید */
+    background-color: rgb(241, 84, 84);
+    color: #ffff;
+    padding: 6px;
+    /* از padding کمتری استفاده کنید تا کمتر فضای دکمه را بگیرد */
+    z-index: 800;
+    left: 5px;
+    /* مرکز دکمه */
+    top: inherit;
+    /* می‌توانید این مقدار را تا اندازه‌ای تنظیم کنید که قابلیت دید بهتری داشته باشد */
+    transform: translateX(-50%);
+    /* برای تنظیم مرکزیت */
+    border-radius: 50px;
+    width: auto;
+    /* می‌توانید این را به auto تغییر دهید */
+    height: auto;
+    bottom: 60px;
+    padding: 0px 10px;
+}
+
+.dropdown-item {
+    display: block;
+    padding: 8px 16px;
+    text-decoration: none;
+    color: black;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+    /* رنگ پس‌زمینه در حالت هوور */
+}
+
+.password_toggle__AXK9v label:after {
+    background: #fff;
+    border-radius: 100%;
+    content: "";
+    height: 1rem;
+    left: 6px;
+    position: absolute;
+    top: 5px;
+    transition: 0.3s;
+    width: 1rem;
+}
+
+.h-100 {
+    height: 100% !important;
+}
+.top-table {
+    position: absolute;
+    top: 48px;
+    width: 100%;
+    min-height: 500px;
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+.sicks-content {
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    min-height: 40vh;
+}
+
+.gap-5 {
+    display: flex !important;
+    gap: 5px !important;
+}
+
+.gap-10 {
+    display: flex !important;
+    gap: 10px !important;
+}
+
+.selectDate_datepicker__xkZeS {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 170px;
+    text-align: center;
+}
+
+.fs-13 {
+    font-size: 13px !important;
+    text-wrap: nowrap !important;
+}
+
+.fs-15 {
+    font-size: 15px !important;
+    text-wrap: nowrap !important;
+}
+
+.h-40 {
+    height: 40px !important;
+}
+
+.h-35 {
+    height: 35px !important;
+    border-radius: 7px !important;
+}
+
+.w-300 {
+    width: 300px;
+}
+
+.card-active {
+    background-color: #ebf1f5;
+    margin: 6px;
+    border-radius: 5px;
+    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+}
+
+.option-card:hover {
+    cursor: pointer;
+}
+
+.my-dropdown-menu {
+    width: 370px;
+    min-height: 87px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    position: absolute;
+    left: 8px;
+    top: 42px;
+    z-index: 201;
+}
+
+.dropdown-menu {
+    position: absolute !important;
+    z-index: 1050;
+    /* مقدار بالا برای اطمینان از نمایش روی سایر المان‌ها */
+    top: 100%;
+    /* باعث می‌شود زیر دکمه نمایش داده شود */
+    /* از چپ چین شود */
+    min-width: 160px;
+    /* اندازه حداقل */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    /* سایه برای بهتر دیده شدن */
+    /* در حالت عادی مخفی باشد */
+}
+.my-drp-left-0 {
+    position: absolute !important;
+    left: 0 !important;
+}
+
+.top-table {
+    overflow: scroll !important;
+}
+.border-radius-0 {
+    border-top-right-radius: 6px !important;
+    border-bottom-right-radius: 6px !important;
+    border-bottom-left-radius: 0px !important;
+    border-top-left-radius: 0px !important;
+}
+.label-top-input-special-takhasos {
+    border-radius: 4px;
+    position: absolute;
+    z-index: 2;
+    font-weight: bold;
+    right: inherit;
+    font-size: 12px;
+    bottom: 43px;
+}
+.border-radius-11 {
+    border-radius: 11px !important;
+}
+@media screen and (max-width: 768px) {
+    .top-table {
+        overflow-x: auto;
+    }
+
+    .table {
+        width: 100%;
+        font-size: 12px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+    }
+}
+.dropdown-menu li.disabled {
+    pointer-events: none; /* غیرفعال کردن کلیک */
+    opacity: 0.5; /* کم‌رنگ کردن آیتم */
+    cursor: not-allowed; /* تغییر شکل مکان‌نما */
+}
+
+/* استایل‌های جدول */
+.table-modern th,
+.table-modern td {
+    vertical-align: middle;
+    text-align: center;
+}
+.table-modern .btn-sm {
+    padding: 5px;
+    margin: 0 2px;
+}
+.table-modern {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.bg-primary {
+    background: var(--gradient-primary);
+    color: white !important;
+}
+
+/* 
+radio button styles customized */
+/* استایل کلی برای رادیوباتن‌ها */
+.ant-radio-wrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* مخفی کردن رادیوباتن پیش‌فرض */
+.ant-radio input[type="radio"] {
+    display: none;
+}
+
+/* استایل دایره خارجی رادیوباتن */
+.ant-radio .ant-radio-inner {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d9d9d9;
+    border-radius: 50%;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* دایره داخلی وقتی انتخاب شده */
+.ant-radio input[type="radio"]:checked + .ant-radio-inner {
+    border-color: #007bff;
+    background-color: #007bff;
+}
+
+/* نقطه وسط وقتی انتخاب شده */
+.ant-radio input[type="radio"]:checked + .ant-radio-inner::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
     width: 8px;
     height: 8px;
-    background-color: red;
+    background-color: #fff;
     border-radius: 50%;
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease;
 }
 
-/* انیمیشن لرزش برای دراپ‌داون */
-@keyframes shake {
-    0% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-2px);
-    }
-
-    50% {
-        transform: translateX(2px);
-    }
-
-    75% {
-        transform: translateX(-2px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
+/* افکت هاور */
+.ant-radio-wrapper:hover .ant-radio-inner {
+    border-color: #40c4ff;
 }
 
-/* کلاس هشدار برای دراپ‌داون */
-.dropdown-trigger.warning {
-    border: 2px solid red;
-    animation: shake 0.5s infinite;
+/* متن کنار رادیوباتن */
+.ant-radio-wrapper span:not(.ant-radio-inner) {
+    margin-right: 8px;
+    font-size: 14px;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+/* تغییر رنگ متن وقتی هاور می‌کنه */
+.ant-radio-wrapper:hover span:not(.ant-radio-inner) {
+    color: #007bff;
+}
+
+/* حالت غیرفعال (اختیاری) */
+.ant-radio-wrapper.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.ant-radio-wrapper.disabled .ant-radio-inner {
+    border-color: #d9d9d9;
+    background-color: #f5f5f5;
+}
+/* radio button styles customized */
+img {
+    display: inline !important;
+}
+
+/* Container for the panel option with reduced shadow */
+.myPanelOption {
+    padding: 1.25rem; /* کمی کوچکتر برای تناسب */
+    background: #ffffff;
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease;
+}
+
+/* Tooltip icon (unchanged but included for context) */
+.my-tooltip {
+    margin: 0 0.75rem;
+    display: flex;
+    align-items: center;
+}
+
+.svg-help {
+    width: 18px;
+    height: 18px;
+    color: #4b5eaa;
+    cursor: help;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.svg-help:hover {
+    transform: scale(1.1);
+    color: #3b82f6;
 }
 
 /* Dropdown trigger button with slightly smaller size */
@@ -80,91 +1169,885 @@ select {
     transition: all 0.3s ease;
 }
 
-/* واکنش‌گرایی برای دراپ‌داون */
-@media (max-width: 768px) {
-    .dropdown-trigger {
-        height: 38px;
-        width: 100%;
-        max-width: 200px;
-        font-size: 13px;
+.dropdown-trigger:hover {
+    background: linear-gradient(135deg, #e2e8f0, #d1dae6);
+    border-color: #d1dae6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Dropdown label */
+.dropdown-label {
+    font-size: 14px; /* کمی کوچکتر */
+    font-weight: 500;
+    color: #1f2937;
+}
+
+/* Chevron icon */
+.chevron_bottom__M8fF9 {
+    width: 7px; /* کمی کوچکتر */
+    height: 11px;
+    fill: #6b7280;
+    transition: transform 0.3s ease;
+}
+
+.dropdown-trigger[aria-expanded="true"] .chevron_bottom__M8fF9 {
+    transform: rotate(270deg);
+}
+
+/* Dropdown menu with increased width and moved to left */
+.my-dropdown-menu {
+    width: 360px; /* عرض بیشتر */
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08); /* سایه نرم‌تر */
+    position: absolute;
+    top: 46px; /* کمی نزدیک‌تر به دکمه */
+    left: 0; /* به گوشه چپ صفحه */
+    z-index: 201;
+    padding: 0.375rem 0; /* پدینگ کمتر برای فشردگی */
+    animation: slideDown 0.3s ease-out;
+}
+
+/* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+.my-dropdown-menu:not(.d-none) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* Dropdown animation */
+@keyframes slideDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-8px); /* حرکت کمتر برای کوچکتر شدن */
     }
-    
-    .dropdown-label {
-        font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 150px;
+    100% {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
-.provider-card {
+
+/* Option card with smaller padding */
+.option-card {
+    display: flex;
+    align-items: center;
+    padding: 0.625rem 0.875rem; /* پدینگ کمتر */
+    margin: 0.2rem 0.375rem; /* حاشیه کمتر */
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.option-card:hover {
+    background: #f8fafc;
+    transform: translateX(2px);
+    cursor: pointer;
+}
+
+/* Active card */
+.card-active {
+    background: #e0e7ff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); /* سایه ظریف‌تر */
+}
+
+/* Icons in option card */
+.option-card svg {
+    width: 20px; /* کمی کوچکتر */
+    height: 20px;
+    fill: #4b5eaa;
+}
+
+/* Text in option card */
+.option-card .fs-15 {
+    font-size: 13px; /* کوچکتر و شیک‌تر */
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.option-card .fs-13 {
+    font-size: 11px; /* کوچکتر */
+    font-weight: 400;
+    color: #6b7280;
+}
+
+/* Inactive clinic dot */
+.inactive-dot {
+    width: 7px; /* کمی کوچکتر */
+    height: 7px;
+    background: #ef4444;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    transform: translateY(-50%);
+    box-shadow: 0 0 3px rgba(239, 68, 68, 0.5); /* هاله کمتر */
+}
+
+/* Activation button */
+.option-card .btn {
+    font-size: 11px; /* کوچکتر */
+    padding: 0.35rem 0.65rem; /* فشرده‌تر */
+    border-radius: 6px;
+    color: #ffffff;
+    border: none;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.option-card .btn:hover {
+    background: #1e40af;
+    transform: translateY(-1px);
+}
+
+/* کارت‌های بالای صفحه */
+.top-details-sicks-cards .rounded-lg {
+    background-color: #f1f5f9 !important; /* رنگ روشن‌تر و مدرن‌تر */
+    border-radius: 16px !important; /* گوشه‌های گردتر */
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.top-details-sicks-cards .rounded-lg svg {
+    width: 24px;
+    height: 24px;
+    fill: #4b5eaa; /* رنگ هماهنگ با تم */
+}
+.modal-content {
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.modal-header {
+    border-bottom: none;
+}
+
+.modal-body .fw-bold {
+    color: #1f2937;
+}
+/* دراپ‌داون */
+.dropdown-menu {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: none;
+    padding: 0.5rem 0;
+    min-width: 180px;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    font-size: 14px;
+    color: #1f2937;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* استایل رادیوباتن‌ها */
+.ant-radio-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.ant-radio input[type="radio"] {
+    display: none;
+}
+
+.ant-radio .ant-radio-inner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #d1d5db;
+    border-radius: 50%;
+    background-color: #ffffff;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.ant-radio input[type="radio"]:checked + .ant-radio-inner {
+    border-color: #3b82f6;
+    background-color: #3b82f6;
+}
+
+.ant-radio input[type="radio"]:checked + .ant-radio-inner::after {
+    content: "";
+    width: 8px;
+    height: 8px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.ant-radio-wrapper:hover .ant-radio-inner {
+    border-color: #60a5fa;
+}
+
+/* ردیف‌های جدول */
+.table tbody tr {
+    background: #fff;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.table tbody tr:hover {
+    background: #f6f8fa;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* سلول‌های جدول */
+.table td {
+    padding: 14px 16px;
+    color: #2d3748;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    vertical-align: middle;
+}
+
+.dropdown-menu {
+    inset: 0px 1px auto 0px !important;
+}
+
+.table td input[type="checkbox"]:checked {
+    accent-color: #6366f1; /* رنگ بنفش مدرن */
+}
+
+/* دکمه‌های داخل جدول */
+.btn-table {
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-outline-info.btn-table {
+    border: 2px solid #6366f1;
+    color: #6366f1;
+    background: transparent;
+}
+
+.btn-outline-info.btn-table:hover:not(:disabled) {
+    background: linear-gradient(45deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+    transform: scale(1.05);
+}
+
+.btn-outline-info.btn-table:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    border-color: #d1d5db;
+    color: #d1d5db;
+}
+
+/* افکت موج هنگام کلیک */
+.btn-table::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-table:active::after {
+    width: 200px;
+    height: 200px;
+}
+
+/* دکمه‌های دراپ‌داون */
+.custom-dropdown-trigger {
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.custom-dropdown-trigger:hover {
+    background: #eef2f8;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.dropdown-menu {
+    border-radius: 12px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    padding: 10px 0;
+    min-width: 180px;
+    animation: slideDown 0.3s ease-out;
+}
+
+.dropdown-item {
+    padding: 10px 20px;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background: linear-gradient(90deg, #eef2f8, #e0e7ff);
+    color: #4f46e5;
+    padding-left: 24px; /* جابجایی ظریف به چپ */
+}
+
+/* انیمیشن برای دراپ‌داون */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* غیرفعال کردن آیتم‌ها */
+.dropdown-menu li.disabled .dropdown-item {
+    color: #9ca3af;
+    background: #f9fafb;
+    pointer-events: none;
+}
+
+/* دکمه‌های عملیاتی بالای جدول */
+.nobat-option .btn {
+    padding: 2px 4px;
+    font-size: 13px;
+    border-radius: 12px;
+    color: #4b5563;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+}
+
+.nobat-option .btn:hover {
+    background: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
+    transform: translateY(-2px);
+}
+
+.nobat-option .btn svg {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.nobat-option .btn:hover svg {
+    transform: scale(1.1);
+    fill: #fff; /* رنگ آیکون در حالت هاور */
+}
+
+/* استایل وضعیت‌ها */
+.text-danger {
+    color: #ef4444 !important;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 13px !important;
+}
+
+/* واکنش‌گرایی */
+@media screen and (max-width: 991px) {
+    .table thead th {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    .table td {
+        font-size: 11px;
+        padding: 10px;
+    }
+
+    .btn-table {
+        padding: 6px 14px;
+        font-size: 11px;
+    }
+
+    .nobat-option .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .table {
+        font-size: 11px;
+        border-radius: 10px;
+    }
+
+    .nobat-option {
+        flex-direction: column;
+        gap: 10px !important;
+        padding: 12px;
+    }
+
+    .nobat-option .btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+}
+
+/* Loading Row */
+#loading-row {
+    background: var(--background-light); /* آبی بسیار روشن برای پس‌زمینه */
+    border-radius: var(--radius-card); /* گوشه‌های گرد */
+    box-shadow: 0 4px 12px var(--shadow); /* سایه ملایم */
+}
+.spinner-border {
+    border-radius: 50% !important;
+}
+/* Custom Spinner */
+.spinner-custom {
+    width: 32px; /* کوچکتر از 44px */
+    height: 32px;
+    border: 3px solid var(--primary-light); /* آبی روشن برای حاشیه */
+    border-top: 3px solid var(--primary); /* آبی اصلی برای چرخش */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto; /* مرکز کردن اسپینر */
+}
+
+/* Spinner Animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Visually Hidden (for Accessibility) */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    .spinner-custom {
+        width: 28px; /* کوچکتر برای تبلت */
+        height: 28px;
+        border-width: 2.5px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .spinner-custom {
+        width: 24px; /* کوچکتر برای موبایل */
+        height: 24px;
+        border-width: 2px;
+    }
+}
+.pagination-container {
+    margin-top: 20px;
+    position: relative;
+    top: 27px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    padding-top: 20px;
+}
+
+.pagination .page-item {
+    margin: 0 2px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: #007bff;
+    color: white;
+}
+
+.pagination .page-item.disabled .page-link {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.pagination .page-link {
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #007bff;
+    background-color: white;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s;
+}
+
+.pagination .page-link:hover:not(.disabled) {
+    background-color: var(--primary);
+    color: #0056b3;
+}
+
+.loader {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #fff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading .loader {
+    display: inline-block;
+}
+
+.loading .button_text {
+    display: none;
+}
+
+/* دکمه شناور */
+.floating-panel-btn {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    z-index: 5000;
+}
+
+.floating-btn {
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.provider-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.floating-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
-.modal-content {
-    border-radius: 10px !important;
+.floating-btn svg {
+    width: 28px;
+    height: 28px;
 }
 
-.form-control:focus {
-    border-color: #8b5cf6;
-    box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+/* پنل بازشونده */
+.floating-panel {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 300px;
+    height: 100vh;
+    background: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 4000;
+    transition: left 0.3s ease;
+    display: flex;
+    flex-direction: column;
 }
 
-.my-btn-primary {
-    background: linear-gradient(
-        90deg,
-        var(--primary) 0%,
-        var(--primary-light) 100%
-    );
-    color: var(--background-card);
+.floating-panel.panel-open {
+    left: 0;
+}
+
+/* هدر پنل */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e2e2e2;
+}
+
+.panel-header h6 {
+    color: #2d3748;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.panel-close-btn {
+    background: none;
     border: none;
-}
-.btn-primary {
-    background: linear-gradient(
-        90deg,
-        var(--primary) 0%,
-        var(--primary-light) 100%
-    );
-    color: var(--background-card);
-    border: none;
+    cursor: pointer;
+    padding: 5px;
 }
 
-.my-btn-primary:hover {
-    background: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
-    transform: translateY(-2px);
+.panel-close-btn svg {
+    width: 20px;
+    height: 20px;
 }
-.top-panel-bg {
+
+/* محتوای پنل */
+.panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+}
+
+.panel-content .option-card {
+    background: #f7fafc;
     border-radius: 8px;
-}
-.btn-end-visit {
-    font-size: 12px;
-    background: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    border: none;
-    color: #ffff;
-    border-radius: 8px;
-    padding: 5px 10px;
+    margin-bottom: 10px;
+    transition: background 0.2s ease;
 }
 
-.btn-end-visit:hover {
-    background: linear-gradient(
-        90deg,
-        var(--primary-light) 0%,
-        var(--primary) 100%
-    );
-    box-shadow: 0 8px 20px rgba(46, 134, 193, 0.4);
-    transform: translateY(-2px);
+.panel-content .option-card:hover {
+    background: #edf2f7;
+}
+
+.panel-content .option-card.card-active {
+    background: #e2e8f0;
+    border: 1px solid #3182ce;
+}
+
+.panel-content .option-card .btn {
+    padding: 5px 15px;
+    font-size: 13px;
+}
+
+/* استایل برای نقاط غیرفعال */
+.inactive-dot {
+    width: 10px;
+    height: 10px;
+    background: #e53e3e;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+/* پاسخ‌گویی به سایزهای مختلف */
+@media (max-width: 768px) {
+    .myPanelOption {
+        padding: 8px !important;
+        display: flex;
+        justify-content: end;
+    }
+    .row > * {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+    .myPanelOption .dropdown {
+        display: flex;
+        justify-content: end;
+    }
+
+    .myPanelOption .dropdown-menu {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* بهبود نمایش هدر در سایز موبایل */
+    .header__left {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 5px;
+        overflow: hidden !important;
+    }
+
+    .header__left > div {
+        margin: 0 !important;
+    }
+
+    .dropdown-trigger {
+        width: 300px;
+        min-width: 150px;
+        max-width: 400px;
+    }
+
+    .notif-option {
+        padding: 0 5px !important;
+    }
+
+    /* تنظیم فاصله بین آیکون‌ها */
+    .logout {
+        margin-right: 5px;
+    }
+
+    /* اضافه کردن استایل برای دراپ‌داون در موبایل */
+    .my-dropdown-menu {
+        width: 350px !important;
+        background: #ffffff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08) !important;
+        position: absolute !important;
+        top: 55px !important;
+        left: 10px !important;
+        z-index: 9999 !important; /* افزایش z-index برای نمایش روی همه چیز */
+        padding: 0.375rem 0 !important;
+        animation: slideDown 0.3s ease-out !important;
+        display: block !important; /* اطمینان از نمایش */
+    }
+
+    /* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+}
+
+/* استایل کلی برای اطمینان از نمایش دراپ‌داون در همه سایزهای موبایل */
+@media (max-width: 768px) {
+    .dropdown .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        z-index: 9999 !important;
+    }
+
+    /* اضافه کردن استایل برای اطمینان از نمایش دراپ‌داون */
+    .my-dropdown-menu {
+        position: absolute !important;
+        z-index: 9999 !important;
+        background: #ffffff !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        min-width: 300px !important;
+        right: auto !important;
+        top: 71px !important;
+    }
+
+    /* اطمینان از نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+    .my-dropdown-menu:not(.d-none) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+
+    /* تنظیم موقعیت دراپ‌داون برای سایزهای مختلف */
+    @media (max-width: 556px) {
+        .my-dropdown-menu {
+            width: 350px !important;
+            right: auto !important;
+        }
+    }
+
+    @media (max-width: 430px) {
+        .my-dropdown-menu {
+            width: 94vw !important;
+            right: inherit;
+        }
+    }
+
+    @media (max-width: 391px) {
+        .my-dropdown-menu {
+            width: 94vw !important;
+            left: 10px !important;
+        }
+    }
+
+    @media (max-width: 346px) {
+        .my-dropdown-menu {
+            width: 93vw !important;
+        }
+        .notification-box {
+        width: 95vw !important;
+        right: inherit !important;
+        top: 70px !important;
+        left: 9px !important;
+        position: fixed !important;
+    }
+    }
+}
+
+/* استایل کلی برای دراپ‌داون */
+.dropdown {
+    position: relative !important;
+}
+
+/* استایل اصلی دراپ‌داون */
+.my-dropdown-menu {
+    position: fixed !important;
+    top: 80px;
+    
+    right: auto;
+    width: 400px;
+    background: #ffffff !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2) !important;
+    z-index: 10000 !important;
+    padding: 1rem 0 !important;
+    min-height: 200px !important;
+    height: auto !important;
+    overflow: visible !important;
+    transform: none !important;
+    max-height: none !important;
+}
+
+/* نمایش دراپ‌داون وقتی کلاس d-none حذف شده */
+.my-dropdown-menu:not(.d-none) {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* پنهان کردن دراپ‌داون وقتی کلاس d-none دارد */
+.my-dropdown-menu.d-none {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* اطمینان از نمایش دراپ‌داون */
+.my-dropdown-menu[style*="display: block"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Otp;
+use App\Models\Doctor;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
 use App\Models\LoginLog;
