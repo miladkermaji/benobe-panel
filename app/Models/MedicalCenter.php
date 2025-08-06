@@ -250,7 +250,9 @@ class MedicalCenter extends Authenticatable
 
     public function getPermissionsAttribute()
     {
-        if (!$this->permissions()->exists()) {
+        $permissionRecord = MedicalCenterPermission::where('medical_center_id', $this->id)->first();
+
+        if (!$permissionRecord) {
             $defaultPermissions = [
                 "dashboard",
                 "mc-panel",
@@ -321,12 +323,12 @@ class MedicalCenter extends Authenticatable
                 "#"
             ];
 
-            MedicalCenterPermission::create([
+            $permissionRecord = MedicalCenterPermission::create([
                 'medical_center_id' => $this->id,
                 'permissions' => $defaultPermissions
             ]);
         }
 
-        return $this->permissions()->first();
+        return $permissionRecord;
     }
 }

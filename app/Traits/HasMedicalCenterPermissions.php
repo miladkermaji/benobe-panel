@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Auth;
+use App\Models\MedicalCenterPermission;
 
 trait HasMedicalCenterPermissions
 {
@@ -16,7 +17,9 @@ trait HasMedicalCenterPermissions
         // اگر مرکز درمانی وارد شده باشد، بررسی دسترسی
         if (Auth::guard('medical_center')->check()) {
             $medicalCenter = Auth::guard('medical_center')->user();
-            $permissionRecord = $medicalCenter->permissions;
+
+            // دریافت دسترسی‌ها مستقیماً از دیتابیس
+            $permissionRecord = MedicalCenterPermission::where('medical_center_id', $medicalCenter->id)->first();
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
             return in_array($permission, $permissionsArray, true);

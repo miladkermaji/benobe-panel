@@ -5,6 +5,7 @@ namespace App\Http\Middleware\Mc;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\MedicalCenterPermission;
 
 class CheckMedicalCenterPermission
 {
@@ -14,8 +15,8 @@ class CheckMedicalCenterPermission
         if (Auth::guard('medical_center')->check()) {
             $user = Auth::guard('medical_center')->user();
 
-            // دریافت لیست مجوزهای مرکز درمانی
-            $permissionRecord = $user->permissions;
+            // دریافت لیست مجوزهای مرکز درمانی مستقیماً از دیتابیس
+            $permissionRecord = MedicalCenterPermission::where('medical_center_id', $user->id)->first();
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
             // اگر مرکز درمانی مجوز لازم را دارد، اجازه‌ی عبور داده شود
