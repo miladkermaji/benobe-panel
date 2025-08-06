@@ -13,11 +13,6 @@ trait HasMedicalCenterPermissions
             return true;
         }
 
-        // اگر پزشک یا منشی وارد شده باشد، همه دسترسی‌ها را دارد
-        if (Auth::guard('doctor')->check() || Auth::guard('secretary')->check()) {
-            return true;
-        }
-
         // اگر مرکز درمانی وارد شده باشد، بررسی دسترسی
         if (Auth::guard('medical_center')->check()) {
             $medicalCenter = Auth::guard('medical_center')->user();
@@ -25,6 +20,12 @@ trait HasMedicalCenterPermissions
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
             return in_array($permission, $permissionsArray, true);
+        }
+
+        // اگر پزشک یا منشی وارد شده باشد، دسترسی به منوی مرکز درمانی ندارند
+        // چون این trait برای sidebar مرکز درمانی استفاده می‌شود
+        if (Auth::guard('doctor')->check() || Auth::guard('secretary')->check()) {
+            return false;
         }
 
         return false;
