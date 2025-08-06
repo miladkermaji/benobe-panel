@@ -262,40 +262,6 @@
               </div>
             </div>
 
-            <!-- وضعیت -->
-            <div class="card mb-4 border-0 shadow-sm">
-              <div class="card-header bg-primary text-white">
-                <h6 class="mb-0 fw-bold">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="me-2">
-                    <path d="M9 12l2 2 4-4" />
-                    <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z" />
-                    <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z" />
-                  </svg>
-                  وضعیت
-                </h6>
-              </div>
-              <div class="card-body">
-                <div class="row g-3">
-                  <div class="col-md-6">
-                    <div class="form-check form-switch">
-                      <input wire:model="is_active" class="form-check-input" type="checkbox" id="is_active">
-                      <label class="form-check-label" for="is_active">
-                        فعال
-                      </label>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-check form-switch">
-                      <input wire:model="is_verified" class="form-check-input" type="checkbox" id="is_verified">
-                      <label class="form-check-label" for="is_verified">
-                        تایید شده
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <!-- دکمه‌های عملیات -->
             <div class="d-flex justify-content-end gap-3">
