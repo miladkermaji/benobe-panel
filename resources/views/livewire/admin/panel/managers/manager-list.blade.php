@@ -1,5 +1,5 @@
 <div class="doctor-notes-container" x-data="{ mobileSearchOpen: false }">
-  <div class="container py-2 mt-3" dir="rtl">
+  <div class="container py-2 mt-3" dir="rtl" wire:init="loadManagers">
     <!-- Header -->
     <header class="glass-header text-white p-3 rounded-3  shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 w-100">
@@ -186,14 +186,12 @@
                 @empty
                   <tr>
                     <td colspan="9" class="text-center py-4">
-                      <div class="text-muted">
-                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                          class="mb-3">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                          </path>
+                      <div class="d-flex justify-content-center align-items-center flex-column">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-2">
+                          <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
-                        <p>هیچ مدیری یافت نشد!</p>
+                        <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
                       </div>
                     </td>
                   </tr>
@@ -201,131 +199,147 @@
               </tbody>
             </table>
           </div>
-
           <!-- Mobile Card View -->
-          <div class="d-md-none">
+          <div class="notes-cards d-md-none">
             @forelse ($managers as $index => $manager)
-              <div class="card m-2 border-0 shadow-sm" x-data="{ cardOpen: false }">
-                <div class="card-body p-3">
-                  <div class="d-flex align-items-center gap-3 mb-3">
-                    <div class="position-relative" style="width: 50px; height: 50px;">
-                      @if ($manager->avatar)
-                        <img loading="lazy" src="{{ Storage::url($manager->avatar) }}" class="rounded-circle"
-                          style="width: 50px; height: 50px; object-fit: cover;" alt="پروفایل"
-                          onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+              <div class="note-card mb-2" x-data="{ open: false }">
+                <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                  @click="open = !open" style="cursor:pointer;">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
+                      class="form-check-input m-0" @click.stop>
+                    <span class="fw-bold">
+                      {{ $manager->first_name . ' ' . $manager->last_name }}
+                      <span class="text-muted">({{ $manager->email }})</span>
+                    </span>
+                  </div>
+                  <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+                <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">ایمیل:</span>
+                    <span class="note-card-value">{{ $manager->email }}</span>
+                  </div>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">شماره موبایل:</span>
+                    <span class="note-card-value">{{ $manager->mobile ?: 'ندارد' }}</span>
+                  </div>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">سطح دسترسی:</span>
+                    <span class="note-card-value">
+                      @if ($manager->permission_level == 1)
+                        <span class="badge bg-primary">مدیر عادی</span>
                       @else
-                        <div
-                          class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
-                          style="width: 50px; height: 50px;">
-                          {{ strtoupper(substr($manager->first_name, 0, 1)) }}{{ strtoupper(substr($manager->last_name, 0, 1)) }}
-                        </div>
+                        <span class="badge bg-warning">مدیر ارشد</span>
                       @endif
-                    </div>
-                    <div class="flex-grow-1">
-                      <h6 class="mb-1 fw-bold">{{ $manager->first_name . ' ' . $manager->last_name }}</h6>
-                      <p class="mb-1 text-muted small">{{ $manager->email }}</p>
-                      <p class="mb-0 text-muted small">{{ $manager->mobile ?: 'بدون موبایل' }}</p>
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                      <div class="form-check">
-                        <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
-                          class="form-check-input">
-                      </div>
-                      <button @click="cardOpen = !cardOpen" class="btn btn-link p-0">
+                    </span>
+                  </div>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">وضعیت:</span>
+                    <button wire:click="toggleStatus({{ $manager->id }})"
+                      class="badge {{ $manager->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                      {{ $manager->is_active ? 'فعال' : 'غیرفعال' }}
+                    </button>
+                  </div>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">عملیات:</span>
+                    <div class="d-flex gap-2">
+                      <a href="{{ route('admin.panel.managers.edit', $manager->id) }}"
+                        class="btn btn-gradient-primary btn-sm rounded-pill px-3">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2" :class="{ 'rotate-180': cardOpen }" style="transition: transform 0.3s;">
-                          <path d="M6 9l6 6 6-6" />
+                          stroke-width="2">
+                          <path
+                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                        </svg>
+                      </a>
+                      <button wire:click="confirmDelete({{ $manager->id }})"
+                        class="btn btn-gradient-danger btn-sm rounded-pill px-3">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                         </svg>
                       </button>
-                    </div>
-                  </div>
-
-                  <!-- Collapsible Details -->
-                  <div x-show="cardOpen" x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform -translate-y-2"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-start="opacity-100 transform translate-y-0"
-                    x-transition:leave-end="opacity-0 transform -translate-y-2" class="border-top pt-3">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                      <div class="d-flex gap-2">
-                        @if ($manager->permission_level == 1)
-                          <span class="badge bg-primary">مدیر عادی</span>
-                        @else
-                          <span class="badge bg-warning">مدیر ارشد</span>
-                        @endif
-                        <button wire:click="toggleStatus({{ $manager->id }})"
-                          class="badge {{ $manager->is_active ? 'bg-success' : 'bg-danger' }} border-0">
-                          {{ $manager->is_active ? 'فعال' : 'غیرفعال' }}
-                        </button>
-                      </div>
-                      <div class="d-flex gap-1">
-                        <a href="{{ route('admin.panel.managers.edit', $manager->id) }}"
-                          class="btn btn-sm btn-outline-primary">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path
-                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
-                        <button wire:click="confirmDelete({{ $manager->id }})"
-                          class="btn btn-sm btn-outline-danger">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                          </svg>
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             @empty
-              <div class="text-center py-5">
-                <div class="text-muted">
-                  <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                    class="mb-3">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                    </path>
+              <div class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center flex-column">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2" class="text-muted mb-2">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
-                  <p>هیچ مدیری یافت نشد!</p>
+                  <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
                 </div>
               </div>
             @endforelse
           </div>
-
           <!-- Pagination -->
-          @if ($managers->hasPages())
-            <div class="pagination-container d-flex justify-content-center mt-4">
-              {{ $managers->links() }}
+          <div class="d-flex justify-content-between align-items-center  px-4 flex-wrap gap-3">
+            <div class="text-muted">نمایش {{ $managers ? $managers->firstItem() : 0 }} تا
+              {{ $managers ? $managers->lastItem() : 0 }} از {{ $managers ? $managers->total() : 0 }} ردیف
             </div>
-          @endif
+            @if ($managers && $managers->hasPages())
+              <div class="pagination-container">
+                {{ $managers->onEachSide(1)->links('livewire::bootstrap') }}
+              </div>
+            @endif
+          </div>
         </div>
       </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          Livewire.on('show-alert', (event) => {
+            toastr[event.type](event.message);
+          });
+
+          Livewire.on('confirm-delete', (event) => {
+            Swal.fire({
+              title: 'حذف مدیر',
+              text: 'آیا مطمئن هستید که می‌خواهید این مدیر را حذف کنید؟',
+
+              showCancelButton: true,
+              confirmButtonColor: '#ef4444',
+              cancelButtonColor: '#6b7280',
+              confirmButtonText: 'بله، حذف کن',
+              cancelButtonText: 'خیر'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('deleteManagerConfirmed', {
+                  id: event.id
+                });
+              }
+            });
+          });
+
+          Livewire.on('confirm-delete-selected', function(data) {
+            let text = data.allFiltered ?
+              'آیا از حذف همه مدیران فیلترشده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.' :
+              'آیا از حذف مدیران انتخاب شده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.';
+            Swal.fire({
+              title: 'تایید حذف گروهی',
+              text: text,
+
+              showCancelButton: true,
+              confirmButtonText: 'بله، حذف شود',
+              cancelButtonText: 'لغو',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                if (data.allFiltered) {
+                  Livewire.dispatch('deleteSelectedConfirmed', 'allFiltered');
+                } else {
+                  Livewire.dispatch('deleteSelectedConfirmed');
+                }
+              }
+            });
+          });
+        });
+      </script>
     </div>
   </div>
-
-  <!-- Delete Confirmation Modal -->
-  <script>
-    document.addEventListener('livewire:init', () => {
-      Livewire.on('confirm-delete', (event) => {
-        if (confirm('آیا از حذف این مدیر اطمینان دارید؟')) {
-          Livewire.dispatch('deleteManagerConfirmed', {
-            id: event.id
-          });
-        }
-      });
-
-      Livewire.on('confirm-delete-selected', (event) => {
-        const message = event.allFiltered ? 'آیا از حذف تمام مدیران فیلتر شده اطمینان دارید؟' :
-          'آیا از حذف مدیران انتخاب شده اطمینان دارید؟';
-        if (confirm(message)) {
-          Livewire.dispatch('deleteSelectedConfirmed', {
-            allFiltered: event.allFiltered
-          });
-        }
-      });
-    });
-  </script>
 </div>
