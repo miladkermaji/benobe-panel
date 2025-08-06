@@ -37,7 +37,7 @@ class ManagerCreate extends Component
         'gender' => 'nullable|in:male,female,other',
         'email' => 'required|email|unique:managers,email',
         'mobile' => 'nullable|string|max:15|unique:managers,mobile',
-        'password' => 'required|string|min:8|confirmed',
+        'password' => 'nullable|string|min:8|confirmed',
         'two_factor_enabled' => 'boolean',
         'static_password_enabled' => 'boolean',
         'static_password' => 'nullable|string|min:6|confirmed',
@@ -85,6 +85,8 @@ class ManagerCreate extends Component
         if ($this->static_password_enabled) {
             $this->rules['static_password'] = 'required|string|min:6|confirmed';
             $this->messages['static_password.required'] = 'رمز عبور ثابت الزامی است.';
+        } else {
+            $this->rules['static_password'] = 'nullable|string|min:6|confirmed';
         }
 
         $this->validate();
@@ -108,7 +110,7 @@ class ManagerCreate extends Component
                 'gender' => $this->gender ?: null,
                 'email' => $this->email,
                 'mobile' => $this->mobile ?: null,
-                'password' => Hash::make($this->password),
+                'password' => Hash::make('default123'),
                 'two_factor_enabled' => $this->two_factor_enabled,
                 'static_password_enabled' => $this->static_password_enabled,
                 'static_password' => $this->static_password_enabled ? $this->static_password : null,

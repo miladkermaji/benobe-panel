@@ -135,6 +135,8 @@ class ManagerEdit extends Component
         if ($this->static_password_enabled) {
             $this->rules['static_password'] = 'required|string|min:6|confirmed';
             $this->messages['static_password.required'] = 'رمز عبور ثابت الزامی است.';
+        } else {
+            $this->rules['static_password'] = 'nullable|string|min:6|confirmed';
         }
 
         $this->validate();
