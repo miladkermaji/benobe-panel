@@ -254,8 +254,6 @@ class MedicalCenter extends Authenticatable
 
         if (!$permissionRecord) {
             $defaultPermissions = [
-                "dashboard",
-                "mc-panel",
                 "medical_center_management",
                 "mc.panel.doctors.index",
                 "mc.panel.doctors.create",
@@ -269,9 +267,6 @@ class MedicalCenter extends Authenticatable
                 "mc.panel.insurances.index",
                 "mc.panel.insurances.create",
                 "mc.panel.insurances.edit",
-                "mc.panel.profile.edit",
-                "workhours",
-                "mc-workhours",
                 "appointments",
                 "mc-appointments",
                 "mc.panel.doctornotes.index",
@@ -299,8 +294,6 @@ class MedicalCenter extends Authenticatable
                 "mc.panel.financial-reports.index",
                 "mc-payment-setting",
                 "mc-wallet-charge",
-                "patient_communication",
-                "mc.panel.send-message",
                 "secretary_management",
                 "mc-secretary-management",
                 "mc-secretary-permissions",
@@ -320,7 +313,13 @@ class MedicalCenter extends Authenticatable
                 "mc-my-performance-chart",
                 "messages",
                 "mc-panel-tickets",
-                "#"
+                "#",
+                "workhours",
+                "mc-workhours",
+                "dashboard",
+                "mc-panel",
+                "mc.panel.doctors.edit",
+                "mc.panel.profile.edit"
             ];
 
             $permissionRecord = MedicalCenterPermission::create([
