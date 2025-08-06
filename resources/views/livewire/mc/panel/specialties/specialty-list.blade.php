@@ -1,4 +1,4 @@
-<div class="specialty-container" x-data="{ mobileSearchOpen: false }">
+<div class="specialty-container" x-data="{ mobileSearchOpen: false }" wire:key="specialties-{{ $refreshKey ?? '' }}">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadSpecialties">
     <div class="glass-header text-white p-2 shadow-lg">
       <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
@@ -97,113 +97,131 @@
                 </tr>
               </thead>
               <tbody>
-                @forelse($specialties as $index => $specialty)
-                  <tr>
-                    <td class="text-center align-middle">
-                      <div class="d-flex justify-content-center align-items-center">
-                        <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $specialty->id }}"
-                          class="form-check-input m-0 align-middle">
-                      </div>
-                    </td>
-                    <td class="text-center align-middle">{{ $specialties->firstItem() + $index }}</td>
-                    <td class="align-middle">
-                      <div class="d-flex align-items-center">
-                        <span class="fw-medium">{{ $specialty->name }}</span>
-                      </div>
-                    </td>
-                    <td class="align-middle">
-                      <span class="text-muted">{{ $specialty->description ?: 'بدون توضیحات' }}</span>
-                    </td>
-                    <td class="text-center align-middle">
-                      <span class="badge bg-{{ $specialty->status ? 'success' : 'danger' }}">
-                        {{ $specialty->status ? 'فعال' : 'غیرفعال' }}
-                      </span>
-                    </td>
-                    <td class="text-center align-middle">
-                      <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-sm btn-outline-primary"
-                          wire:click="confirmToggleStatus({{ $specialty->id }})"
-                          title="{{ $specialty->status ? 'غیرفعال کردن' : 'فعال کردن' }}">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
+                @if ($readyToLoad)
+                  @forelse($specialties as $index => $specialty)
+                    <tr>
+                      <td class="text-center align-middle">
+                        <div class="d-flex justify-content-center align-items-center">
+                          <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $specialty->id }}"
+                            class="form-check-input m-0 align-middle">
+                        </div>
+                      </td>
+                      <td class="text-center align-middle">{{ $specialties->firstItem() + $index }}</td>
+                      <td class="align-middle">
+                        <div class="d-flex align-items-center">
+                          <span class="fw-medium">{{ $specialty->name }}</span>
+                        </div>
+                      </td>
+                      <td class="align-middle">
+                        <span class="text-muted">{{ $specialty->description ?: 'بدون توضیحات' }}</span>
+                      </td>
+                      <td class="text-center align-middle">
+                        <span class="badge bg-{{ $specialty->status ? 'success' : 'danger' }}">
+                          {{ $specialty->status ? 'فعال' : 'غیرفعال' }}
+                        </span>
+                      </td>
+                      <td class="text-center align-middle">
+                        <div class="btn-group" role="group">
+                          <button type="button" class="btn btn-sm btn-outline-primary"
+                            wire:click="confirmToggleStatus({{ $specialty->id }})"
+                            title="{{ $specialty->status ? 'غیرفعال کردن' : 'فعال کردن' }}">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </button>
+                          <a href="{{ route('mc.panel.specialties.edit', $specialty->id) }}"
+                            class="btn btn-sm btn-outline-warning" title="ویرایش">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                              <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button type="button" class="btn btn-sm btn-outline-danger"
+                            wire:click="confirmDelete({{ $specialty->id }})" title="حذف">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="6" class="text-center py-4">
+                        <div class="d-flex flex-column align-items-center">
+                          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                            stroke-width="1">
                             <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                        </button>
-                        <a href="{{ route('mc.panel.specialties.edit', $specialty->id) }}"
-                          class="btn btn-sm btn-outline-warning" title="ویرایش">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
-                        <button type="button" class="btn btn-sm btn-outline-danger"
-                          wire:click="confirmDelete({{ $specialty->id }})" title="حذف">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path
-                              d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                @empty
+                          <p class="text-muted mt-2 mb-0">هیچ تخصصی یافت نشد</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
                   <tr>
                     <td colspan="6" class="text-center py-4">
-                      <div class="d-flex flex-column align-items-center">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                          stroke-width="1">
-                          <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="text-muted mt-2 mb-0">هیچ تخصصی یافت نشد</p>
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
                     </td>
                   </tr>
-                @endforelse
+                @endif
               </tbody>
             </table>
           </div>
           <!-- Mobile Card View -->
           <div class="d-md-none">
-            @forelse($specialties as $index => $specialty)
-              <div class="card m-2 border-0 shadow-sm">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div class="d-flex align-items-center gap-2">
-                      <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $specialty->id }}"
-                        class="form-check-input">
-                      <h6 class="mb-0 fw-medium">{{ $specialty->name }}</h6>
+            @if ($readyToLoad)
+              @forelse($specialties as $index => $specialty)
+                <div class="card m-2 border-0 shadow-sm">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                      <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" wire:model.live="selectedSpecialties" value="{{ $specialty->id }}"
+                          class="form-check-input">
+                        <h6 class="mb-0 fw-medium">{{ $specialty->name }}</h6>
+                      </div>
+                      <span class="badge bg-{{ $specialty->status ? 'success' : 'danger' }}">
+                        {{ $specialty->status ? 'فعال' : 'غیرفعال' }}
+                      </span>
                     </div>
-                    <span class="badge bg-{{ $specialty->status ? 'success' : 'danger' }}">
-                      {{ $specialty->status ? 'فعال' : 'غیرفعال' }}
-                    </span>
-                  </div>
-                  <p class="text-muted small mb-3">{{ $specialty->description ?: 'بدون توضیحات' }}</p>
-                  <div class="d-flex gap-1">
-                    <button type="button" class="btn btn-sm btn-outline-primary flex-fill"
-                      wire:click="confirmToggleStatus({{ $specialty->id }})">
-                      {{ $specialty->status ? 'غیرفعال' : 'فعال' }}
-                    </button>
-                    <a href="{{ route('mc.panel.specialties.edit', $specialty->id) }}"
-                      class="btn btn-sm btn-outline-warning flex-fill">ویرایش</a>
-                    <button type="button" class="btn btn-sm btn-outline-danger flex-fill"
-                      wire:click="confirmDelete({{ $specialty->id }})">حذف</button>
+                    <p class="text-muted small mb-3">{{ $specialty->description ?: 'بدون توضیحات' }}</p>
+                    <div class="d-flex gap-1">
+                      <button type="button" class="btn btn-sm btn-outline-primary flex-fill"
+                        wire:click="confirmToggleStatus({{ $specialty->id }})">
+                        {{ $specialty->status ? 'غیرفعال' : 'فعال' }}
+                      </button>
+                      <a href="{{ route('mc.panel.specialties.edit', $specialty->id) }}"
+                        class="btn btn-sm btn-outline-warning flex-fill">ویرایش</a>
+                      <button type="button" class="btn btn-sm btn-outline-danger flex-fill"
+                        wire:click="confirmDelete({{ $specialty->id }})">حذف</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            @empty
+              @empty
+                <div class="text-center py-4">
+                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
+                    stroke-width="1">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p class="text-muted mt-2 mb-0">هیچ تخصصی یافت نشد</p>
+                </div>
+              @endforelse
+            @else
               <div class="text-center py-4">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6b7280"
-                  stroke-width="1">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p class="text-muted mt-2 mb-0">هیچ تخصصی یافت نشد</p>
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
               </div>
-            @endforelse
+            @endif
           </div>
           <!-- Pagination -->
-          @if ($specialties->hasPages())
+          @if ($readyToLoad && $specialties->hasPages())
             <div class="d-flex justify-content-center p-3">
               {{ $specialties->links() }}
             </div>
@@ -212,4 +230,69 @@
       </div>
     </div>
   </div>
+
+  <script>
+    document.addEventListener('livewire:init', function() {
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+
+      Livewire.on('confirm-delete', (event) => {
+        Swal.fire({
+          title: 'حذف تخصص',
+          text: 'آیا مطمئن هستید که می‌خواهید این تخصص را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSpecialtyConfirmed', {
+              id: event.id
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-delete-selected', (event) => {
+        Swal.fire({
+          title: 'حذف گروهی تخصص‌ها',
+          text: 'آیا مطمئن هستید که می‌خواهید تخصص‌های انتخاب شده را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteSelectedConfirmed', {
+              allFiltered: event.allFiltered
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-toggle-status', (event) => {
+        Swal.fire({
+          title: event.action + ' تخصص',
+          text: `آیا مطمئن هستید که می‌خواهید تخصص "${event.name}" را ${event.action} کنید؟`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#3b82f6',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('toggleStatusConfirmed', {
+              id: event.id
+            });
+          }
+        });
+      });
+    });
+  </script>
 </div>
