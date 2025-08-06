@@ -23,6 +23,14 @@ return [
             'doctor-blocking-users.index' => 'کاربران مسدود',
         ],
     ],
+    'my-prescriptions' => [
+        'title' => 'نسخه های من',
+        'icon' => 'i-banners',
+        'routes' => [
+            'dr.panel.my-prescriptions' => 'مدیریت نسخه ها',
+            'dr.panel.my-prescriptions.settings' => 'تنظیمات درخواست نسخه',
+        ],
+    ],
     'consult' => [
         'title' => 'مشاوره',
         'icon' => 'i-moshavere',
@@ -80,6 +88,7 @@ return [
         'icon' => 'i-user__secratary',
         'routes' => [
             'dr-secretary-management' => 'مدیریت منشی‌ها',
+            'dr-secretary-permissions' => 'سطح دسترسی منشی',
         ],
     ],
     'clinic_management' => [
@@ -109,10 +118,8 @@ return [
             'dr-subuser' => 'کاربران زیرمجموعه',
             'my-dr-appointments' => 'نوبت‌های من',
             'dr.panel.doctor-faqs.index' => ' سوالات متداول',
-
         ],
     ],
-
     'messages' => [
         'title' => 'پیام',
         'icon' => 'i-comments',
