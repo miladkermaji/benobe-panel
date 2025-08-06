@@ -40,7 +40,7 @@ class DoctorEdit extends Component
 
     // Professional Information
     public $license_number = '';
-    public $specialty_id = '';
+    public $specialty_id = [];
     public $bio = '';
     public $description = '';
 
@@ -102,7 +102,10 @@ class DoctorEdit extends Component
         $this->address = $this->doctor->address;
         $this->postal_code = $this->doctor->postal_code;
         $this->license_number = $this->doctor->license_number;
-        $this->specialty_id = $this->doctor->specialty_id;
+
+        // Load existing specialties from pivot table
+        $this->specialty_id = $this->doctor->doctorSpecialties()->pluck('specialty_id')->toArray();
+
         $this->bio = $this->doctor->bio;
         $this->description = $this->doctor->description;
         $this->current_photo = $this->doctor->profile_photo_path;
@@ -114,6 +117,9 @@ class DoctorEdit extends Component
         if ($this->province_id) {
             $this->cities = Zone::where('level', 2)->where('parent_id', $this->province_id)->get();
         }
+
+        // Dispatch event to update select2 values
+        $this->dispatch('update-select2-values');
     }
 
     public function updatedProvinceId($value)
@@ -145,7 +151,8 @@ class DoctorEdit extends Component
             'province_id' => 'required|exists:zone,id',
             'city_id' => 'required|exists:zone,id',
             'license_number' => 'required|string|max:255|unique:doctors,license_number,' . $this->doctorId,
-            'specialty_id' => 'required|exists:specialties,id',
+            'specialty_id' => 'required|array',
+            'specialty_id.*' => 'exists:specialties,id',
             'address' => 'nullable|string|max:500',
             'postal_code' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:1000',
@@ -169,6 +176,7 @@ class DoctorEdit extends Component
             'license_number.required' => 'کد نظام پزشکی الزامی است.',
             'license_number.unique' => 'این کد نظام پزشکی قبلاً ثبت شده است.',
             'specialty_id.required' => 'تخصص الزامی است.',
+            'specialty_id.*.exists' => 'یکی از تخصص‌ها معتبر نیست.',
             'photo.image' => 'فایل باید تصویر باشد.',
             'photo.max' => 'حجم تصویر نباید بیشتر از 10 مگابایت باشد.',
         ]);
@@ -201,7 +209,6 @@ class DoctorEdit extends Component
                 'address' => $this->address,
                 'postal_code' => $this->postal_code,
                 'license_number' => $this->license_number,
-                'specialty_id' => $this->specialty_id,
                 'bio' => $this->bio,
                 'description' => $this->description,
             ];
@@ -212,6 +219,22 @@ class DoctorEdit extends Component
             }
 
             $this->doctor->update($updateData);
+
+            // Update specialties
+            if (!empty($this->specialty_id)) {
+                // Delete existing specialties
+                $this->doctor->doctorSpecialties()->delete();
+
+                // Create new specialties
+                foreach ($this->specialty_id as $index => $specialtyId) {
+                    $isMain = ($index === 0); // First specialty is main
+                    \App\Models\DoctorSpecialty::create([
+                        'doctor_id' => $this->doctor->id,
+                        'specialty_id' => $specialtyId,
+                        'is_main' => $isMain,
+                    ]);
+                }
+            }
 
             // Handle photo upload
             if ($this->photo) {

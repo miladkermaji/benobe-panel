@@ -36,7 +36,7 @@ class DoctorCreate extends Component
 
     // Professional Information
     public $license_number = '';
-    public $specialty_id = '';
+    public $specialty_id = [];
     public $bio = '';
     public $description = '';
 
@@ -80,7 +80,8 @@ class DoctorCreate extends Component
             'province_id' => 'required|exists:zone,id',
             'city_id' => 'required|exists:zone,id',
             'license_number' => 'required|string|max:255|unique:doctors,license_number',
-            'specialty_id' => 'required|exists:specialties,id',
+            'specialty_id' => 'required|array|min:1',
+            'specialty_id.*' => 'exists:specialties,id',
             'address' => 'nullable|string|max:500',
             'postal_code' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:1000',
@@ -105,6 +106,9 @@ class DoctorCreate extends Component
             'license_number.required' => 'کد نظام پزشکی الزامی است.',
             'license_number.unique' => 'این کد نظام پزشکی قبلاً ثبت شده است.',
             'specialty_id.required' => 'تخصص الزامی است.',
+            'specialty_id.array' => 'تخصص باید به صورت آرایه باشد.',
+            'specialty_id.min' => 'حداقل یک تخصص باید انتخاب شود.',
+            'specialty_id.*.exists' => 'تخصص انتخاب شده معتبر نیست.',
             'photo.image' => 'فایل باید تصویر باشد.',
             'photo.max' => 'حجم تصویر نباید بیشتر از 10 مگابایت باشد.',
         ]);
@@ -125,7 +129,6 @@ class DoctorCreate extends Component
                 'address' => $this->address,
                 'postal_code' => $this->postal_code,
                 'license_number' => $this->license_number,
-                'specialty_id' => $this->specialty_id,
                 'bio' => $this->bio,
                 'description' => $this->description,
                 'is_active' => false, // Default to inactive as requested
@@ -150,6 +153,18 @@ class DoctorCreate extends Component
                 } catch (\Exception $e) {
                     Log::error('Photo upload failed: ' . $e->getMessage());
                     $this->dispatch('show-toastr', ['message' => 'خطا در آپلود عکس: ' . $e->getMessage(), 'type' => 'error']);
+                }
+            }
+
+            // Store specialties
+            if (!empty($this->specialty_id)) {
+                foreach ($this->specialty_id as $index => $specialtyId) {
+                    $isMain = ($index === 0); // First specialty is main
+                    \App\Models\DoctorSpecialty::create([
+                        'doctor_id' => $doctor->id,
+                        'specialty_id' => $specialtyId,
+                        'is_main' => $isMain,
+                    ]);
                 }
             }
 

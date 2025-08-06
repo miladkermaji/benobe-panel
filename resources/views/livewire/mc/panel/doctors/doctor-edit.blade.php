@@ -96,8 +96,8 @@
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
                 </div>
-                <div class="col-6 col-md-6 position-relative mt-5">
-                  <select wire:model="sex" class="form-select" id="sex" required>
+                <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+                  <select wire:model="sex" class="form-select select2" id="sex" required>
                     <option value="">انتخاب کنید</option>
                     <option value="male">مرد</option>
                     <option value="female">زن</option>
@@ -142,10 +142,11 @@
                   @enderror
                 </div>
                 <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-                  <select wire:model="specialty_id" class="form-select select2" id="specialty_id" required>
+                  <select wire:model="specialty_id" class="form-select select2" id="specialty_id" required multiple>
                     <option value="">انتخاب کنید</option>
                     @foreach ($specialties as $specialty)
-                      <option value="{{ $specialty->id }}" {{ $specialty_id == $specialty->id ? 'selected' : '' }}>
+                      <option value="{{ $specialty->id }}"
+                        {{ in_array($specialty->id, $specialty_id) ? 'selected' : '' }}>
                         {{ $specialty->name }}</option>
                     @endforeach
                   </select>
@@ -223,6 +224,12 @@
         format: 'YYYY/MM/DD'
       });
 
+      // Initialize Select2 for sex
+      $('#sex').select2({
+        placeholder: 'جنسیت را انتخاب کنید',
+        allowClear: true
+      });
+
       // Initialize Select2 for provinces
       $('#province_id').select2({
         placeholder: 'استان را انتخاب کنید',
@@ -235,10 +242,39 @@
         allowClear: true
       });
 
-      // Initialize Select2 for specialties
+      // Initialize Select2 for specialties (multiple)
       $('#specialty_id').select2({
         placeholder: 'تخصص را انتخاب کنید',
-        allowClear: true
+        allowClear: true,
+        multiple: true
+      });
+
+      // Set selected values after initialization
+      setTimeout(() => {
+        // Set sex value
+        if ($('#sex').val()) {
+          $('#sex').val($('#sex').val()).trigger('change');
+        }
+
+        // Set province value
+        if ($('#province_id').val()) {
+          $('#province_id').val($('#province_id').val()).trigger('change');
+        }
+
+        // Set city value
+        if ($('#city_id').val()) {
+          $('#city_id').val($('#city_id').val()).trigger('change');
+        }
+
+        // Set specialty values (multiple)
+        if ($('#specialty_id').val()) {
+          $('#specialty_id').val($('#specialty_id').val()).trigger('change');
+        }
+      }, 100);
+
+      // Handle sex change
+      $('#sex').on('change', function() {
+        @this.set('sex', $(this).val());
       });
 
       // Handle province change
@@ -263,6 +299,31 @@
           $('#city_id').append(`<option value="${city.id}">${city.name}</option>`);
         });
         $('#city_id').trigger('change');
+      });
+
+      // Listen for component updates to refresh select2 values
+      Livewire.on('update-select2-values', () => {
+        setTimeout(() => {
+          // Set sex value
+          if ($('#sex').val()) {
+            $('#sex').val($('#sex').val()).trigger('change');
+          }
+
+          // Set province value
+          if ($('#province_id').val()) {
+            $('#province_id').val($('#province_id').val()).trigger('change');
+          }
+
+          // Set city value
+          if ($('#city_id').val()) {
+            $('#city_id').val($('#city_id').val()).trigger('change');
+          }
+
+          // Set specialty values (multiple)
+          if ($('#specialty_id').val()) {
+            $('#specialty_id').val($('#specialty_id').val()).trigger('change');
+          }
+        }, 100);
       });
     });
   </script>

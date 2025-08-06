@@ -97,8 +97,8 @@
                     <span class="text-danger small">{{ $message }}</span>
                   @enderror
                 </div>
-                <div class="col-6 col-md-6 position-relative mt-5">
-                  <select wire:model="sex" class="form-select" id="sex" required>
+                <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
+                  <select wire:model="sex" class="form-select select2" id="sex" required>
                     <option value="">انتخاب کنید</option>
                     <option value="male">مرد</option>
                     <option value="female">زن</option>
@@ -141,7 +141,7 @@
                   @enderror
                 </div>
                 <div class="col-6 col-md-6 position-relative mt-5" wire:ignore>
-                  <select wire:model="specialty_id" class="form-select select2" id="specialty_id" required>
+                  <select wire:model="specialty_id" class="form-select select2" id="specialty_id" required multiple>
                     <option value="">انتخاب کنید</option>
                     @foreach ($specialties as $specialty)
                       <option value="{{ $specialty->id }}">{{ $specialty->name }}</option>
@@ -222,6 +222,12 @@
         format: 'YYYY/MM/DD'
       });
 
+      // Initialize Select2 for sex
+      $('#sex').select2({
+        placeholder: 'جنسیت را انتخاب کنید',
+        allowClear: true
+      });
+
       // Initialize Select2 for provinces
       $('#province_id').select2({
         placeholder: 'استان را انتخاب کنید',
@@ -234,10 +240,16 @@
         allowClear: true
       });
 
-      // Initialize Select2 for specialties
+      // Initialize Select2 for specialties (multiple)
       $('#specialty_id').select2({
         placeholder: 'تخصص را انتخاب کنید',
-        allowClear: true
+        allowClear: true,
+        multiple: true
+      });
+
+      // Handle sex change
+      $('#sex').on('change', function() {
+        @this.set('sex', $(this).val());
       });
 
       // Handle province change

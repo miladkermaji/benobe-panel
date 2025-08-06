@@ -140,8 +140,15 @@
                       <td>{{ $doctor->mobile }}</td>
                       <td>{{ $doctor->email }}</td>
                       <td>
-                        @if ($doctor->specialty)
-                          <span class="badge bg-primary-subtle text-primary">{{ $doctor->specialty->name }}</span>
+                        @if ($doctor->doctorSpecialties->count() > 0)
+                          @foreach ($doctor->doctorSpecialties as $doctorSpecialty)
+                            <span class="badge bg-primary-subtle text-primary me-1">
+                              {{ $doctorSpecialty->specialty->name }}
+                              @if ($doctorSpecialty->is_main)
+                                <small class="text-success">(اصلی)</small>
+                              @endif
+                            </span>
+                          @endforeach
                         @else
                           <span class="text-muted">-</span>
                         @endif
@@ -238,8 +245,15 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">تخصص:</span>
                       <span class="note-card-value">
-                        @if ($doctor->specialty)
-                          <span class="badge bg-primary-subtle text-primary">{{ $doctor->specialty->name }}</span>
+                        @if ($doctor->doctorSpecialties->count() > 0)
+                          @foreach ($doctor->doctorSpecialties as $doctorSpecialty)
+                            <span class="badge bg-primary-subtle text-primary me-1">
+                              {{ $doctorSpecialty->specialty->name }}
+                              @if ($doctorSpecialty->is_main)
+                                <small class="text-success">(اصلی)</small>
+                              @endif
+                            </span>
+                          @endforeach
                         @else
                           <span class="text-muted">-</span>
                         @endif
