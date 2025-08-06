@@ -67,6 +67,21 @@ class JalaliHelper
             $month = (int)$matches[2];
             $day = (int)$matches[3];
 
+            // بررسی اعتبار تاریخ جلالی
+            if ($month < 1 || $month > 12) {
+                return null;
+            }
+
+            // بررسی تعداد روزهای هر ماه
+            $daysInMonth = [31, 31, 31, 31, 31, 31, 30, 30, 30, 30, 30, 30];
+            if ($month == 12 && $year % 4 == 3) {
+                $daysInMonth[11] = 30; // سال کبیسه
+            }
+
+            if ($day < 1 || $day > $daysInMonth[$month - 1]) {
+                return null;
+            }
+
             try {
                 $jalaliDate = Jalalian::fromFormat('Y/m/d', $jalaliDateString);
                 return $jalaliDate->toCarbon();

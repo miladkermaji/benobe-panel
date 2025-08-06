@@ -93,7 +93,7 @@ class ManagerCreate extends Component
             if ($this->date_of_birth) {
                 $gregorianDateOfBirth = JalaliHelper::jalaliToGregorian($this->date_of_birth);
                 if (!$gregorianDateOfBirth) {
-                    $this->addError('date_of_birth', 'تاریخ تولد نامعتبر است.');
+                    $this->addError('date_of_birth', 'تاریخ تولد نامعتبر است. لطفاً تاریخ جلالی معتبر وارد کنید (مثال: 1404/04/15).');
                     return;
                 }
             }
