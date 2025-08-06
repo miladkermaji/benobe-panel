@@ -1,6 +1,11 @@
 @extends('mc.panel.layouts.master')
 
 @section('styles')
+<style>
+  .myPanelOption{
+    display: none !important;
+  }
+</style>
 @endsection
 
 @section('site-header')

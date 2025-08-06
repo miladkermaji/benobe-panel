@@ -2,6 +2,11 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('admin-assets/panel/css/users/users.css') }}" rel="stylesheet" />
+  <style>
+  .myPanelOption{
+    display: none !important;
+  }
+</style>
 @endsection
 
 @section('site-header')
