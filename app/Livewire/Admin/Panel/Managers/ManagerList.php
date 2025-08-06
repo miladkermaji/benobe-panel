@@ -17,29 +17,19 @@ class ManagerList extends Component
 
     public $perPage = 50;
     public $search = '';
-    public $readyToLoad = false;
     public $selectedManagers = [];
     public $selectAll = false;
     public $groupAction = '';
-    public $statusFilter = '';
-    public $permissionLevelFilter = '';
     public $applyToAllFiltered = false;
     public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'statusFilter' => ['except' => ''],
-        'permissionLevelFilter' => ['except' => ''],
     ];
 
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
-    }
-
-    public function loadManagers()
-    {
-        $this->readyToLoad = true;
     }
 
     public function toggleStatus($id)
@@ -64,16 +54,6 @@ class ManagerList extends Component
     }
 
     public function updatedSearch()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedStatusFilter()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedPermissionLevelFilter()
     {
         $this->resetPage();
     }
@@ -176,28 +156,15 @@ class ManagerList extends Component
             });
         }
 
-        if ($this->statusFilter !== '') {
-            $query->where('is_active', $this->statusFilter);
-        }
-
-        if ($this->permissionLevelFilter !== '') {
-            $query->where('permission_level', $this->permissionLevelFilter);
-        }
-
         return $query->orderBy('created_at', 'desc');
     }
 
     public function render()
     {
-        $managers = collect();
-        $totalCount = 0;
-
-        if ($this->readyToLoad) {
-            $query = $this->getManagersQuery();
-            $totalCount = $query->count();
-            $this->totalFilteredCount = $totalCount;
-            $managers = $query->paginate($this->perPage);
-        }
+        $query = $this->getManagersQuery();
+        $totalCount = $query->count();
+        $this->totalFilteredCount = $totalCount;
+        $managers = $query->paginate($this->perPage);
 
         return view('livewire.admin.panel.managers.manager-list', [
             'managers' => $managers,
