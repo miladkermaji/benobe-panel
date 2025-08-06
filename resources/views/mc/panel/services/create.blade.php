@@ -14,9 +14,9 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'ویرایش تخصص')
-@livewire('mc.panel.specialties.specialty-edit', ['id' => $id])
+@section('bread-crumb-title', 'افزودن خدمت')
+@livewire('mc.panel.services.service-create')
 @section('scripts')
-<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 @endsection
 @endsection

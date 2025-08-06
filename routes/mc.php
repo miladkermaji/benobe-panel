@@ -368,5 +368,12 @@ Route::prefix('mc')
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'create'])->name('mc.panel.specialties.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'edit'])->name('mc.panel.specialties.edit');
             });
+
+            // Service Management Routes
+            Route::prefix('services')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'index'])->name('mc.panel.services.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'create'])->name('mc.panel.services.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'edit'])->name('mc.panel.services.edit');
+            });
         });
     });

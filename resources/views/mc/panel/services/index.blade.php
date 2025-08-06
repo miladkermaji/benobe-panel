@@ -1,7 +1,6 @@
 @extends('mc.panel.layouts.master')
 
 @section('styles')
-  <link type="text/css" href="{{ asset('admin-assets/panel/css/users/users.css') }}" rel="stylesheet" />
   <style>
     .myPanelOption {
       display: none !important;
@@ -14,9 +13,10 @@
 @endsection
 
 @section('content')
-@section('bread-crumb-title', 'ویرایش تخصص')
-@livewire('mc.panel.specialties.specialty-edit', ['id' => $id])
+@section('bread-crumb-title', 'مدیریت خدمات')
+@livewire('mc.panel.services.service-list')
 @section('scripts')
-<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+  <script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+
 @endsection
 @endsection
