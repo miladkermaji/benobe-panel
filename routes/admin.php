@@ -1,4 +1,5 @@
 <?php
+
 use App\Livewire\Admin\Auth\Logout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -69,6 +70,7 @@ use App\Http\Controllers\Dr\Panel\DoctorsClinic\Activation\Workhours\ActivationW
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
+
 /* login manager routes */
 Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
@@ -350,6 +352,11 @@ Route::prefix('admin')
         Route::get('/panel/doctors/permissions', function () {
             return view('admin.panel.doctors.doctors-permissions');
         })->name('admin.panel.doctors.permissions');
+
+        // Medical Center Permissions Routes
+        Route::get('/panel/medical-centers/permissions', function () {
+            return view('admin.panel.medical_centers.permissions.index');
+        })->name('admin.panel.medical-centers.permissions');
         // User Subscriptions Routes
         Route::prefix('user-subscriptions')->group(function () {
             Route::get('/', [UserSubscriptionController::class, 'index'])->name('admin.panel.user-subscriptions.index');
