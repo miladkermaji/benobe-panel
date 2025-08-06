@@ -39,7 +39,7 @@ class JalaliHelper
         }
         $date = Carbon::parse($gregorianDate);
         $jDate = Jalalian::fromCarbon($date);
-        return $jDate->format('Y-m-d');
+        return $jDate->format('Y/m/d');
     }
 
     public static function toJalaliDateTime($gregorianDateTime)
