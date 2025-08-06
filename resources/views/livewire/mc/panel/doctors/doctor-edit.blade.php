@@ -89,8 +89,8 @@
                   @enderror
                 </div>
                 <div class="col-6 col-md-6 position-relative mt-5">
-                  <input type="text" wire:model="date_of_birth" class="form-control" id="date_of_birth"
-                    placeholder=" " required data-jdp>
+                  <input type="text" wire:model="date_of_birth" class="form-control jalali-datepicker text-end"
+                    id="date_of_birth" placeholder=" " required data-jdp>
                   <label for="date_of_birth" class="form-label">تاریخ تولد *</label>
                   @error('date_of_birth')
                     <span class="text-danger small">{{ $message }}</span>

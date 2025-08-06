@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
 use Morilog\Jalali\Jalalian;
+use Carbon\Carbon;
 
 class DoctorEdit extends Component
 {
@@ -69,7 +70,31 @@ class DoctorEdit extends Component
         $this->email = $this->doctor->email;
         $this->mobile = $this->doctor->mobile;
         $this->national_code = $this->doctor->national_code;
-        $this->date_of_birth = $this->doctor->date_of_birth;
+
+        // Convert date_of_birth to Jalali format for display
+        if ($this->doctor->date_of_birth) {
+            try {
+                // Always convert to Jalali for display, regardless of storage format
+                $carbonDate = Carbon::parse($this->doctor->date_of_birth);
+                $jalaliDate = Jalalian::fromDateTime($carbonDate);
+                $this->date_of_birth = $jalaliDate->format('Y/m/d');
+            } catch (\Exception $e) {
+                // If conversion fails, try to handle as string
+                if (strpos($this->doctor->date_of_birth, 'T') !== false) {
+                    // ISO format - extract date part
+                    $datePart = explode('T', $this->doctor->date_of_birth)[0];
+                    $carbonDate = Carbon::parse($datePart);
+                    $jalaliDate = Jalalian::fromDateTime($carbonDate);
+                    $this->date_of_birth = $jalaliDate->format('Y/m/d');
+                } else {
+                    // Keep original if all conversions fail
+                    $this->date_of_birth = $this->doctor->date_of_birth;
+                }
+            }
+        } else {
+            $this->date_of_birth = '';
+        }
+
         $this->sex = $this->doctor->sex;
         $this->province_id = $this->doctor->province_id;
         $this->city_id = $this->doctor->city_id;
@@ -148,6 +173,19 @@ class DoctorEdit extends Component
         ]);
 
         try {
+            // Convert Jalali date to Gregorian for database storage
+            $gregorianDate = null;
+            if ($this->date_of_birth) {
+                try {
+                    // Parse Jalali date (Y/m/d format) and convert to Gregorian
+                    $jalaliDate = Jalalian::fromFormat('Y/m/d', $this->date_of_birth);
+                    $gregorianDate = $jalaliDate->toCarbon();
+                } catch (\Exception $e) {
+                    // If conversion fails, try to parse as Carbon
+                    $gregorianDate = Carbon::parse($this->date_of_birth);
+                }
+            }
+
             // Update doctor data
             $updateData = [
                 'first_name' => $this->first_name,
@@ -155,7 +193,7 @@ class DoctorEdit extends Component
                 'email' => $this->email,
                 'mobile' => $this->mobile,
                 'national_code' => $this->national_code,
-                'date_of_birth' => $this->date_of_birth,
+                'date_of_birth' => $gregorianDate,
                 'sex' => $this->sex,
                 'province_id' => $this->province_id,
                 'city_id' => $this->city_id,
