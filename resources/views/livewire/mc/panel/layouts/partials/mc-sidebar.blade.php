@@ -74,6 +74,7 @@
         @endif
         
         @if($this->hasPermission('workhours'))
+     
         <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
           <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
         </li>

@@ -19,8 +19,11 @@ class CheckMedicalCenterPermission
             $permissionRecord = MedicalCenterPermission::where('medical_center_id', $user->id)->first();
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
+            // تبدیل آرایه با کلیدهای عددی به آرایه ساده
+            $permissions = is_array($permissionsArray) ? array_values($permissionsArray) : [];
+
             // اگر مرکز درمانی مجوز لازم را دارد، اجازه‌ی عبور داده شود
-            if ($permission && in_array($permission, $permissionsArray, true)) {
+            if ($permission && in_array($permission, $permissions, true)) {
                 return $next($request);
             }
 

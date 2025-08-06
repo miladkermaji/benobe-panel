@@ -22,7 +22,10 @@ trait HasMedicalCenterPermissions
             $permissionRecord = MedicalCenterPermission::where('medical_center_id', $medicalCenter->id)->first();
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
-            return in_array($permission, $permissionsArray, true);
+            // تبدیل آرایه با کلیدهای عددی به آرایه ساده
+            $permissions = is_array($permissionsArray) ? array_values($permissionsArray) : [];
+
+            return in_array($permission, $permissions, true);
         }
 
         // اگر پزشک یا منشی وارد شده باشد، دسترسی به منوی مرکز درمانی ندارند

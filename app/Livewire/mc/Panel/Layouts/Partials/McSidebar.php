@@ -3,10 +3,10 @@
 namespace App\Livewire\Mc\Panel\Layouts\Partials;
 
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
-use App\Models\DoctorSpecialty;
 use App\Models\Specialty;
+use App\Models\DoctorSpecialty;
 use App\Models\DoctorPermission;
+use Illuminate\Support\Facades\Auth;
 use App\Models\MedicalCenterPermission;
 
 class McSidebar extends Component
@@ -20,7 +20,10 @@ class McSidebar extends Component
 
             // دریافت دسترسی‌ها از دیتابیس
             $permissionRecord = MedicalCenterPermission::where('medical_center_id', $medicalCenter->id)->first();
-            $this->permissions = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+            $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
+
+            // تبدیل آرایه با کلیدهای عددی به آرایه ساده
+            $this->permissions = is_array($permissionsArray) ? array_values($permissionsArray) : [];
         }
     }
 
