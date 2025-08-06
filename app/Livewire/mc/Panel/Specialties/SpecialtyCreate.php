@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Auth;
 class SpecialtyCreate extends Component
 {
     public $selectedSpecialtyIds = [];
-    public $search = '';
     public $availableSpecialties = [];
 
     protected $rules = [
@@ -36,21 +35,10 @@ class SpecialtyCreate extends Component
         $medicalCenter = Auth::guard('medical_center')->user();
         $currentSpecialtyIds = $medicalCenter->specialty_ids ?? [];
 
-        $query = Specialty::where('status', 1)
+        $this->availableSpecialties = Specialty::where('status', 1)
             ->whereNotIn('id', $currentSpecialtyIds)
-            ->orderBy('name', 'asc');
-
-        if ($this->search) {
-            $query->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
-        }
-
-        $this->availableSpecialties = $query->get();
-    }
-
-    public function updatedSearch()
-    {
-        $this->loadAvailableSpecialties();
+            ->orderBy('name', 'asc')
+            ->get();
     }
 
     public function store()
@@ -72,7 +60,7 @@ class SpecialtyCreate extends Component
         // Update medical center
         $medicalCenter->update(['specialty_ids' => array_values($newSpecialtyIds)]);
 
-        $this->dispatch('show-alert', type: 'success', message: 'تخصص‌ها با موفقیت اضافه شدند.'); 
+        $this->dispatch('show-alert', type: 'success', message: 'تخصص‌ها با موفقیت اضافه شدند.');
 
         return redirect()->route('mc.panel.specialties.index');
     }

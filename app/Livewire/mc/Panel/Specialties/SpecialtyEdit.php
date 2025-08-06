@@ -11,7 +11,6 @@ class SpecialtyEdit extends Component
 {
     public $specialtyId;
     public $selectedSpecialtyIds = [];
-    public $search = '';
     public $availableSpecialties = [];
     public $currentSpecialty;
 
@@ -55,21 +54,10 @@ class SpecialtyEdit extends Component
         $medicalCenter = Auth::guard('medical_center')->user();
         $currentSpecialtyIds = $medicalCenter->specialty_ids ?? [];
 
-        $query = Specialty::where('status', 1)
+        $this->availableSpecialties = Specialty::where('status', 1)
             ->whereNotIn('id', $currentSpecialtyIds)
-            ->orderBy('name', 'asc');
-
-        if ($this->search) {
-            $query->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
-        }
-
-        $this->availableSpecialties = $query->get();
-    }
-
-    public function updatedSearch()
-    {
-        $this->loadAvailableSpecialties();
+            ->orderBy('name', 'asc')
+            ->get();
     }
 
     public function update()
