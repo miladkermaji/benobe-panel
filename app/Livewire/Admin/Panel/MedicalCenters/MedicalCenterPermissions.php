@@ -54,6 +54,7 @@ class MedicalCenterPermissions extends Component
     public function render()
     {
         $medicalCenters = MedicalCenter::with('permissions')
+            ->where('type', '!=', 'policlinic')
             ->when($this->search, function ($query) {
                 $query->where('name', 'like', '%' . $this->search . '%')
                     ->orWhere('title', 'like', '%' . $this->search . '%')

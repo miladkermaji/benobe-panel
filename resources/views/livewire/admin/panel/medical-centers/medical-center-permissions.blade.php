@@ -142,13 +142,12 @@
           @empty
             <tr>
               <td colspan="2" class="text-center py-4">
-                <div class="d-flex flex-column align-items-center gap-2">
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
-                    stroke-width="1" class="empty-icon">
-                    <path
-                      d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+                <div class="d-flex flex-column align-items-center justify-content-center">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
+                    stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
+                    <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
-                  <span class="text-muted">هیچ مرکز درمانی یافت نشد</span>
+                  <p class="text-text-secondary font-medium m-0">مرکز درمانی مطابق جستجو یافت نشد.</p>
                 </div>
               </td>
             </tr>
@@ -156,29 +155,29 @@
             </tbody>
           </table>
         </div>
-
-        <!-- Mobile View -->
+        <!-- Mobile Card View (original UI) -->
         <div class="d-md-none">
           @forelse ($medicalCenters as $medicalCenter)
-            <div x-data="{ open: false }" class="mobile-item border-bottom">
-              <div class="d-flex align-items-center justify-content-between p-3" @click="open = !open"
-                style="background: #f5f7fa; cursor: pointer;">
-                <div class="d-flex align-items-center gap-2">
-                  <svg width="20" height="20" fill="none" stroke="#0d6efd" stroke-width="2">
+            <div class="mb-3 p-2 rounded-3 shadow-sm" x-data="{ open: false }"
+              style="border: 2px solid #b3c2d1; background: #f5f7fa;">
+              <div class="fw-bold text-primary mb-2 d-flex align-items-center justify-content-between"
+                style="font-size: 1.08rem; cursor:pointer;" @click="open = !open">
+                <span>
+                  <svg width="18" height="18" fill="none" stroke="#0d6efd" stroke-width="2"
+                    style="vertical-align: middle; margin-left: 6px;">
                     <path
                       d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
                   </svg>
-                  <span class="fw-bold text-primary">{{ $medicalCenter->name }}</span>
-                  @if ($medicalCenter->title)
-                    <small class="text-muted">({{ $medicalCenter->title }})</small>
+                  {{ $medicalCenter->name }} @if ($medicalCenter->title)
+                    ({{ $medicalCenter->title }})
                   @endif
-                </div>
-                <svg width="16" height="16" fill="none" stroke="#0d6efd" stroke-width="2"
-                  :style="open ? 'transform: rotate(180deg); transition: transform 0.2s;' : 'transition: transform 0.2s;'">
+                </span>
+                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                  fill="none" stroke="#0d6efd" stroke-width="2" style="transition: transform 0.2s;">
                   <path d="M6 9l6 6 6-6" />
                 </svg>
               </div>
-              <div x-show="open" x-transition class="p-3">
+              <div x-show="open" x-transition>
                 <div class="permissions-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   @php
                     $permission = $medicalCenter->permissions;
@@ -226,19 +225,17 @@
               </div>
             </div>
           @empty
-            <div class="text-center py-4">
-              <div class="d-flex flex-column align-items-center gap-2">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#6c757d"
-                  stroke-width="1" class="empty-icon">
-                  <path
-                    d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
+            <div class="text-center py-6">
+              <div class="d-flex flex-column align-items-center justify-content-center">
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
+                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
-                <span class="text-muted">هیچ مرکز درمانی یافت نشد</span>
+                <p class="text-text-secondary font-medium m-0">مرکز درمانی مطابق جستجو یافت نشد.</p>
               </div>
             </div>
           @endforelse
         </div>
-
         <!-- Pagination -->
         @if ($medicalCenters->hasPages())
           <div class="d-flex justify-content-center p-3">
@@ -249,42 +246,22 @@
     </div>
   </div>
 
-
-
   <script>
-    document.addEventListener('livewire:init', () => {
-      // Handle parent checkbox changes
+    document.addEventListener('livewire:init', function() {
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+
+      // اضافه کردن event listener برای تیک‌های پدر
       document.addEventListener('change', function(e) {
         if (e.target.classList.contains('parent-checkbox')) {
           const parentId = e.target.id;
-          const isChecked = e.target.checked;
-          const childCheckboxes = document.querySelectorAll(`[data-parent-id="${parentId}"]`);
+          const childCheckboxes = document.querySelectorAll(`.child-checkbox[data-parent-id="${parentId}"]`);
 
+          // Update UI
           childCheckboxes.forEach(checkbox => {
-            checkbox.checked = isChecked;
-            // Trigger change event for Livewire
-            checkbox.dispatchEvent(new Event('change', {
-              bubbles: true
-            }));
+            checkbox.checked = e.target.checked;
           });
-        }
-      });
-
-      // Handle child checkbox changes
-      document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('child-checkbox')) {
-          const parentId = e.target.getAttribute('data-parent-id');
-          const parentCheckbox = document.getElementById(parentId);
-          const childCheckboxes = document.querySelectorAll(`[data-parent-id="${parentId}"]`);
-          const checkedChildren = Array.from(childCheckboxes).filter(cb => cb.checked);
-
-          if (checkedChildren.length === 0) {
-            parentCheckbox.checked = false;
-          } else if (checkedChildren.length === childCheckboxes.length) {
-            parentCheckbox.checked = true;
-          } else {
-            parentCheckbox.indeterminate = true;
-          }
         }
       });
     });
