@@ -23,6 +23,7 @@ class SpecialtyList extends Component
     public $applyToAllFiltered = false;
     public $totalFilteredCount = 0;
     public $readyToLoad = false;
+    public $refreshKey = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -88,6 +89,7 @@ class SpecialtyList extends Component
         $medicalCenter->update(['specialty_ids' => array_values($currentSpecialtyIds)]);
 
         $this->dispatch('show-alert', type: 'success', message: "تخصص {$specialty->name} {$action}.");
+        $this->refreshKey++;
     }
 
     public function confirmDelete($id)
@@ -112,6 +114,7 @@ class SpecialtyList extends Component
         $medicalCenter->update(['specialty_ids' => array_values($currentSpecialtyIds)]);
 
         $this->dispatch('show-alert', type: 'success', message: "تخصص {$specialty->name} حذف شد.");
+        $this->refreshKey++;
     }
 
     public function updatedSelectAll($value)
@@ -153,6 +156,7 @@ class SpecialtyList extends Component
         $this->selectAll = false;
 
         $this->dispatch('show-alert', type: 'success', message: count($specialtiesToDelete) . " تخصص حذف شد.");
+        $this->refreshKey++;
     }
 
     public function executeGroupAction()
