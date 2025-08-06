@@ -17,6 +17,7 @@ class ManagerList extends Component
 
     public $perPage = 50;
     public $search = '';
+    public $readyToLoad = false;
     public $selectedManagers = [];
     public $selectAll = false;
     public $groupAction = '';
@@ -32,11 +33,16 @@ class ManagerList extends Component
         $this->perPage = max($this->perPage, 1);
     }
 
+    public function loadManagers()
+    {
+        $this->readyToLoad = true;
+    }
+
     public function toggleStatus($id)
     {
         $manager = Manager::findOrFail($id);
         $manager->update(['is_active' => !$manager->is_active]);
-        $this->dispatch('show-alert', type: $manager->is_active ? 'success' : 'info', message: $manager->is_active ? 'مدیر فعال شد!' : 'مدیر غیرفعال شد!');
+        $this->dispatch('show-toastr', type: $manager->is_active ? 'success' : 'info', message: $manager->is_active ? 'مدیر فعال شد!' : 'مدیر غیرفعال شد!');
         Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
@@ -49,7 +55,7 @@ class ManagerList extends Component
     {
         $manager = Manager::findOrFail($id);
         $manager->delete();
-        $this->dispatch('show-alert', type: 'success', message: 'مدیر با موفقیت حذف شد!');
+        $this->dispatch('show-toastr', type: 'success', message: 'مدیر با موفقیت حذف شد!');
         Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
@@ -77,17 +83,17 @@ class ManagerList extends Component
             $query->delete();
             $this->selectedManagers = [];
             $this->selectAll = false;
-            $this->dispatch('show-alert', type: 'success', message: 'تمام مدیران انتخاب شده حذف شدند!');
+            $this->dispatch('show-toastr', type: 'success', message: 'تمام مدیران انتخاب شده حذف شدند!');
         } else {
             if (empty($this->selectedManagers)) {
-                $this->dispatch('show-alert', type: 'warning', message: 'لطفاً حداقل یک مدیر را انتخاب کنید!');
+                $this->dispatch('show-toastr', type: 'warning', message: 'لطفاً حداقل یک مدیر را انتخاب کنید!');
                 return;
             }
 
             Manager::whereIn('id', $this->selectedManagers)->delete();
             $this->selectedManagers = [];
             $this->selectAll = false;
-            $this->dispatch('show-alert', type: 'success', message: 'مدیران انتخاب شده حذف شدند!');
+            $this->dispatch('show-toastr', type: 'success', message: 'مدیران انتخاب شده حذف شدند!');
         }
         Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
@@ -95,12 +101,12 @@ class ManagerList extends Component
     public function executeGroupAction()
     {
         if (empty($this->groupAction)) {
-            $this->dispatch('show-alert', type: 'warning', message: 'لطفاً یک عملیات انتخاب کنید!');
+            $this->dispatch('show-toastr', type: 'warning', message: 'لطفاً یک عملیات انتخاب کنید!');
             return;
         }
 
         if (empty($this->selectedManagers) && !$this->applyToAllFiltered) {
-            $this->dispatch('show-alert', type: 'warning', message: 'لطفاً حداقل یک مدیر را انتخاب کنید!');
+            $this->dispatch('show-toastr', type: 'warning', message: 'لطفاً حداقل یک مدیر را انتخاب کنید!');
             return;
         }
 
@@ -119,7 +125,7 @@ class ManagerList extends Component
                 }
                 break;
             default:
-                $this->dispatch('show-alert', type: 'warning', message: 'عملیات نامعتبر!');
+                $this->dispatch('show-toastr', type: 'warning', message: 'عملیات نامعتبر!');
                 break;
         }
 
@@ -132,10 +138,10 @@ class ManagerList extends Component
         if ($this->applyToAllFiltered) {
             $query = $this->getManagersQuery();
             $query->update(['is_active' => $status]);
-            $this->dispatch('show-alert', type: 'success', message: $status ? 'تمام مدیران فعال شدند!' : 'تمام مدیران غیرفعال شدند!');
+            $this->dispatch('show-toastr', type: 'success', message: $status ? 'تمام مدیران فعال شدند!' : 'تمام مدیران غیرفعال شدند!');
         } else {
             Manager::whereIn('id', $this->selectedManagers)->update(['is_active' => $status]);
-            $this->dispatch('show-alert', type: 'success', message: $status ? 'مدیران انتخاب شده فعال شدند!' : 'مدیران انتخاب شده غیرفعال شدند!');
+            $this->dispatch('show-toastr', type: 'success', message: $status ? 'مدیران انتخاب شده فعال شدند!' : 'مدیران انتخاب شده غیرفعال شدند!');
         }
         $this->selectedManagers = [];
         $this->selectAll = false;
@@ -161,14 +167,15 @@ class ManagerList extends Component
 
     public function render()
     {
-        $query = $this->getManagersQuery();
-        $totalCount = $query->count();
-        $this->totalFilteredCount = $totalCount;
-        $managers = $query->paginate($this->perPage);
+        $cacheKey = 'managers_' . $this->search . '_page_' . $this->getPage();
+        $managers = $this->readyToLoad ? Cache::remember($cacheKey, now()->addMinutes(5), function () {
+            return $this->getManagersQuery()->paginate($this->perPage);
+        }) : [];
+        $this->totalFilteredCount = $this->readyToLoad ? $this->getManagersQuery()->count() : 0;
 
         return view('livewire.admin.panel.managers.manager-list', [
             'managers' => $managers,
-            'totalCount' => $totalCount,
+            'totalFilteredCount' => $this->totalFilteredCount,
         ]);
     }
 }

@@ -51,7 +51,7 @@
                 <span class="text-white">افزودن مدیر</span>
               </a>
               <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
-                {{ $managers->total() }}
+                {{ $readyToLoad ? $managers->total() : 0 }}
               </span>
             </div>
           </div>
@@ -75,7 +75,7 @@
             <span class="text-white">افزودن مدیر</span>
           </a>
           <span class="badge bg-white text-primary px-2 py-1 fw-medium flex-shrink-0">
-            {{ $managers->total() }}
+            {{ $readyToLoad ? $managers->total() : 0 }}
           </span>
         </div>
       </div>
@@ -125,48 +125,142 @@
                 </tr>
               </thead>
               <tbody>
-                @forelse ($managers as $index => $manager)
-                  <tr>
-                    <td class="text-center align-middle">
-                      <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
-                        class="form-check-input m-0 align-middle">
-                    </td>
-                    <td class="text-center align-middle">{{ $managers->firstItem() + $index }}</td>
-                    <td class="text-center align-middle">
-                      <div class="position-relative" style="width: 40px; height: 40px;">
-                        @if ($manager->avatar)
-                          <img loading="lazy" src="{{ Storage::url($manager->avatar) }}" class="rounded-circle"
-                            style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
-                            onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                @if ($readyToLoad)
+                  @forelse ($managers as $index => $manager)
+                    <tr>
+                      <td class="text-center align-middle">
+                        <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
+                          class="form-check-input m-0 align-middle">
+                      </td>
+                      <td class="text-center align-middle">{{ $managers->firstItem() + $index }}</td>
+                      <td class="text-center align-middle">
+                        <div class="position-relative" style="width: 40px; height: 40px;">
+                          @if ($manager->avatar)
+                            <img loading="lazy" src="{{ Storage::url($manager->avatar) }}" class="rounded-circle"
+                              style="width: 40px; height: 40px; object-fit: cover;" alt="پروفایل"
+                              onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                          @else
+                            <div
+                              class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
+                              style="width: 40px; height: 40px;">
+                              {{ strtoupper(substr($manager->first_name, 0, 1)) }}{{ strtoupper(substr($manager->last_name, 0, 1)) }}
+                            </div>
+                          @endif
+                        </div>
+                      </td>
+                      <td class="align-middle">{{ $manager->first_name . ' ' . $manager->last_name }}</td>
+                      <td class="align-middle">{{ $manager->email }}</td>
+                      <td class="align-middle">{{ $manager->mobile ?: '-' }}</td>
+                      <td class="align-middle">
+                        @if ($manager->permission_level == 1)
+                          <span class="badge bg-primary">مدیر عادی</span>
                         @else
-                          <div
-                            class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white"
-                            style="width: 40px; height: 40px;">
-                            {{ strtoupper(substr($manager->first_name, 0, 1)) }}{{ strtoupper(substr($manager->last_name, 0, 1)) }}
-                          </div>
+                          <span class="badge bg-warning">مدیر ارشد</span>
                         @endif
+                      </td>
+                      <td class="text-center align-middle">
+                        <button wire:click="toggleStatus({{ $manager->id }})"
+                          class="badge {{ $manager->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                          {{ $manager->is_active ? 'فعال' : 'غیرفعال' }}
+                        </button>
+                      </td>
+                      <td class="text-center align-middle">
+                        <div class="d-flex justify-content-center gap-2">
+                          <a href="{{ route('admin.panel.managers.edit', $manager->id) }}"
+                            class="btn btn-gradient-primary rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $manager->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="9" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                          </svg>
+                          <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
+                  <tr>
+                    <td colspan="9" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
                     </td>
-                    <td class="align-middle">{{ $manager->first_name . ' ' . $manager->last_name }}</td>
-                    <td class="align-middle">{{ $manager->email }}</td>
-                    <td class="align-middle">{{ $manager->mobile ?: '-' }}</td>
-                    <td class="align-middle">
-                      @if ($manager->permission_level == 1)
-                        <span class="badge bg-primary">مدیر عادی</span>
-                      @else
-                        <span class="badge bg-warning">مدیر ارشد</span>
-                      @endif
-                    </td>
-                    <td class="text-center align-middle">
+                  </tr>
+                @endif
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($managers as $index => $manager)
+                <div class="note-card mb-2" x-data="{ open: false }">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">
+                        {{ $manager->first_name . ' ' . $manager->last_name }}
+                        <span class="text-muted">({{ $manager->email }})</span>
+                      </span>
+                    </div>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                  <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">ایمیل:</span>
+                      <span class="note-card-value">{{ $manager->email }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">شماره موبایل:</span>
+                      <span class="note-card-value">{{ $manager->mobile ?: 'ندارد' }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">سطح دسترسی:</span>
+                      <span class="note-card-value">
+                        @if ($manager->permission_level == 1)
+                          <span class="badge bg-primary">مدیر عادی</span>
+                        @else
+                          <span class="badge bg-warning">مدیر ارشد</span>
+                        @endif
+                      </span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">وضعیت:</span>
                       <button wire:click="toggleStatus({{ $manager->id }})"
                         class="badge {{ $manager->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $manager->is_active ? 'فعال' : 'غیرفعال' }}
                       </button>
-                    </td>
-                    <td class="text-center align-middle">
-                      <div class="d-flex justify-content-center gap-2">
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">عملیات:</span>
+                      <div class="d-flex gap-2">
                         <a href="{{ route('admin.panel.managers.edit', $manager->id) }}"
-                          class="btn btn-gradient-primary rounded-pill px-3">
+                          class="btn btn-gradient-primary btn-sm rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path
@@ -174,109 +268,34 @@
                           </svg>
                         </a>
                         <button wire:click="confirmDelete({{ $manager->id }})"
-                          class="btn btn-gradient-danger rounded-pill px-3">
+                          class="btn btn-gradient-danger btn-sm rounded-pill px-3">
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2">
                             <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
                           </svg>
                         </button>
                       </div>
-                    </td>
-                  </tr>
-                @empty
-                  <tr>
-                    <td colspan="9" class="text-center py-4">
-                      <div class="d-flex justify-content-center align-items-center flex-column">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2" class="text-muted mb-2">
-                          <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                        <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
-                      </div>
-                    </td>
-                  </tr>
-                @endforelse
-              </tbody>
-            </table>
-          </div>
-          <!-- Mobile Card View -->
-          <div class="notes-cards d-md-none">
-            @forelse ($managers as $index => $manager)
-              <div class="note-card mb-2" x-data="{ open: false }">
-                <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
-                  @click="open = !open" style="cursor:pointer;">
-                  <div class="d-flex align-items-center gap-2">
-                    <input type="checkbox" wire:model.live="selectedManagers" value="{{ $manager->id }}"
-                      class="form-check-input m-0" @click.stop>
-                    <span class="fw-bold">
-                      {{ $manager->first_name . ' ' . $manager->last_name }}
-                      <span class="text-muted">({{ $manager->email }})</span>
-                    </span>
-                  </div>
-                  <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
-                    <path d="M6 9l6 6 6-6" />
-                  </svg>
-                </div>
-                <div class="note-card-body px-2 py-2" x-show="open" x-transition>
-                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                    <span class="note-card-label">ایمیل:</span>
-                    <span class="note-card-value">{{ $manager->email }}</span>
-                  </div>
-                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                    <span class="note-card-label">شماره موبایل:</span>
-                    <span class="note-card-value">{{ $manager->mobile ?: 'ندارد' }}</span>
-                  </div>
-                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                    <span class="note-card-label">سطح دسترسی:</span>
-                    <span class="note-card-value">
-                      @if ($manager->permission_level == 1)
-                        <span class="badge bg-primary">مدیر عادی</span>
-                      @else
-                        <span class="badge bg-warning">مدیر ارشد</span>
-                      @endif
-                    </span>
-                  </div>
-                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                    <span class="note-card-label">وضعیت:</span>
-                    <button wire:click="toggleStatus({{ $manager->id }})"
-                      class="badge {{ $manager->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
-                      {{ $manager->is_active ? 'فعال' : 'غیرفعال' }}
-                    </button>
-                  </div>
-                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
-                    <span class="note-card-label">عملیات:</span>
-                    <div class="d-flex gap-2">
-                      <a href="{{ route('admin.panel.managers.edit', $manager->id) }}"
-                        class="btn btn-gradient-primary btn-sm rounded-pill px-3">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path
-                            d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                        </svg>
-                      </a>
-                      <button wire:click="confirmDelete({{ $manager->id }})"
-                        class="btn btn-gradient-danger btn-sm rounded-pill px-3">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="2">
-                          <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
-                        </svg>
-                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
-            @empty
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
+            @else
               <div class="text-center py-4">
-                <div class="d-flex justify-content-center align-items-center flex-column">
-                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="text-muted mb-2">
-                    <path d="M5 12h14M12 5l7 7-7 7" />
-                  </svg>
-                  <p class="text-muted fw-medium">هیچ مدیری یافت نشد.</p>
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
                 </div>
               </div>
-            @endforelse
+            @endif
           </div>
           <!-- Pagination -->
           <div class="d-flex justify-content-between align-items-center  px-4 flex-wrap gap-3">
@@ -293,7 +312,7 @@
       </div>
       <script>
         document.addEventListener('DOMContentLoaded', function() {
-          Livewire.on('show-alert', (event) => {
+          Livewire.on('show-toastr', (event) => {
             toastr[event.type](event.message);
           });
 
