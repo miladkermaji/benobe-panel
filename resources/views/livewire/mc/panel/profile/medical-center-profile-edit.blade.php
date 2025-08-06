@@ -14,8 +14,8 @@
             </div>
             <a href="{{ route('mc-panel') }}"
               class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1 hover:shadow-lg transition-all">
-              <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                stroke-width="2">
+              <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
               بازگشت
@@ -201,3 +201,24 @@
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener('livewire:init', function() {
+    Livewire.on('show-alert', (event) => {
+      toastr[event.type](event.message);
+    });
+
+    Livewire.on('show-toastr', (data) => {
+      const toastrData = Array.isArray(data) ? data[0] : data;
+      toastr.clear();
+      toastr.options.rtl = true;
+      if (toastrData.type === 'success') {
+        toastr.success(toastrData.message);
+      } else if (toastrData.type === 'warning') {
+        toastr.warning(toastrData.message);
+      } else if (toastrData.type === 'error') {
+        toastr.error(toastrData.message);
+      }
+    });
+  });
+</script>

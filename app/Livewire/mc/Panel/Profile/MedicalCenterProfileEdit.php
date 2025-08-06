@@ -102,7 +102,9 @@ class MedicalCenterProfileEdit extends Component
             'is_active' => $this->is_active,
         ]);
 
+        // Test both event types to see which one works
         $this->dispatch('show-alert', type: 'success', message: 'پروفایل مرکز درمانی با موفقیت به‌روزرسانی شد.');
+        $this->dispatch('show-toastr', ['type' => 'success', 'message' => 'پروفایل مرکز درمانی با موفقیت به‌روزرسانی شد.']);
     }
 
     public function render()
