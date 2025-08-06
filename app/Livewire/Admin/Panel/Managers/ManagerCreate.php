@@ -118,10 +118,10 @@ class ManagerCreate extends Component
                 'profile_completed' => true,
             ]);
 
-            $this->dispatch('show-alert', type: 'success', message: 'مدیر با موفقیت ایجاد شد!');
+            $this->dispatch('show-toastr', type: 'success', message: 'مدیر با موفقیت ایجاد شد!');
             return redirect()->route('admin.panel.managers.index');
         } catch (\Exception $e) {
-            $this->dispatch('show-alert', type: 'error', message: 'خطا در ایجاد مدیر: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در ایجاد مدیر: ' . $e->getMessage());
         }
     }
 

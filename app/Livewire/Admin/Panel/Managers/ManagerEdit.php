@@ -174,10 +174,10 @@ class ManagerEdit extends Component
 
             $manager->update($updateData);
 
-            $this->dispatch('show-alert', type: 'success', message: 'مدیر با موفقیت بروزرسانی شد!');
+            $this->dispatch('show-toastr', type: 'success', message: 'مدیر با موفقیت بروزرسانی شد!');
             return redirect()->route('admin.panel.managers.index');
         } catch (\Exception $e) {
-            $this->dispatch('show-alert', type: 'error', message: 'خطا در بروزرسانی مدیر: ' . $e->getMessage());
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در بروزرسانی مدیر: ' . $e->getMessage());
         }
     }
 
