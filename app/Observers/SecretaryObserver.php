@@ -104,3 +104,4 @@ class SecretaryObserver
         SecretaryPermission::where('secretary_id', $secretary->id)->delete();
     }
 }
+ 
