@@ -79,7 +79,7 @@
               <div class="col-12 col-md-6 mb-3">
                 <div class="form-group">
                   <label class="form-label fw-bold" for="phone_number">شماره تلفن *</label>
-                  <input type="text" wire:model="phone_number"
+                  <input disabled type="text" wire:model="phone_number"
                     class="form-control @error('phone_number') is-invalid @enderror" id="phone_number"
                     placeholder="شماره تلفن را وارد کنید">
                   @error('phone_number')
@@ -106,7 +106,7 @@
                 <div class="form-group">
                   <label class="form-label fw-bold" for="siam_code">کد سیام</label>
                   <input type="text" wire:model="siam_code"
-                    class="form-control @error('siam_code') is-invalid @enderror" id="siam_code"
+                    class="form-control @error('siam_code') is-invalid @enderror" disabled id="siam_code"
                     placeholder="کد سیام را وارد کنید">
                   @error('siam_code')
                     <div class="invalid-feedback">{{ $message }}</div>
@@ -152,18 +152,7 @@
                 </div>
               </div>
 
-              <!-- وضعیت فعال -->
-              <div class="col-12">
-                <div class="form-check form-switch">
-                  <input class="form-check-input" type="checkbox" wire:model="is_active" id="is_active">
-                  <label class="form-check-label fw-bold" for="is_active">
-                    مرکز درمانی فعال است
-                  </label>
-                </div>
-                @error('is_active')
-                  <div class="text-danger small mt-1">{{ $message }}</div>
-                @enderror
-              </div>
+             
 
               <!-- دکمه‌های عملیات -->
               <div class="col-12">
