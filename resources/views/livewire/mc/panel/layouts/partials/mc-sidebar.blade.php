@@ -477,7 +477,71 @@
             </ul>
           </li>
         @endif
-
+@if (
+            $this->hasPermission('mc-edit-profile') ||
+                $this->hasPermission('mc-edit-profile-security') ||
+                $this->hasPermission('mc-my-performance') ||
+                $this->hasPermission('mc-subuser') ||
+                $this->hasPermission('my-mc-appointments') ||
+                $this->hasPermission('mc.panel.doctor-faqs.index'))
+          <li
+            class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            id="profile-section">
+            <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+              پروفایل
+              <div class="d-flex justify-content-end w-100 align-items-center">
+                <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                  xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                    fill="currentColor"></path>
+                </svg>
+              </div>
+            </a>
+            <ul class="drop-toggle d-none">
+              @if ($this->hasPermission('mc-edit-profile'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('mc-edit-profile-security'))
+                <li
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('mc-my-performance'))
+                <li
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('mc-subuser'))
+                <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('my-mc-appointments'))
+                <li
+                  class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
+                  <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
+                <li
+                  class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
+                  <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
+                </li>
+              @endif
+              @if ($this->hasPermission('mc-edit-profile-upgrade'))
+                <li class="item-li i-user__inforamtion" style="opacity: 0.5; pointer-events: none;">
+                  <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">ارتقا حساب <span
+                      class="soon-label">به زودی</span></a>
+                </li>
+              @endif
+            </ul>
+          </li>
+        @endif
         @if ($this->hasPermission('mc-my-performance-chart'))
           <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
             <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
@@ -509,6 +573,8 @@
             </ul>
           </li>
         @endif
+
+        
       </ul>
     </div>
     <script>
