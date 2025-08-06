@@ -40,8 +40,8 @@
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
             </li>
-            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
-              <a href="#">ویرایش پروفایل</a>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
             </li>
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.specialties.index') ? 'is-active' : '' }}">
@@ -847,7 +847,7 @@
         <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مرکز درمانی من</div>
-        <a href="#">ویرایش پروفایل</a>
+        <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
         <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
         <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
         <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>

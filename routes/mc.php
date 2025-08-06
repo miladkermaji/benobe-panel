@@ -382,5 +382,10 @@ Route::prefix('mc')
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'create'])->name('mc.panel.insurances.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'edit'])->name('mc.panel.insurances.edit');
             });
+
+            // Medical Center Profile Edit Routes
+            Route::prefix('profile')->group(function () {
+                Route::get('/edit', [\App\Http\Controllers\Mc\Panel\Profile\MedicalCenterProfileController::class, 'edit'])->name('mc.panel.profile.edit');
+            });
         });
     });
