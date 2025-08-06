@@ -189,35 +189,31 @@
                       <input wire:model="static_password_enabled" class="form-check-input" type="checkbox"
                         id="static_password_enabled">
                       <label class="form-check-label" for="static_password_enabled">
-                        رمز عبور ثابت
+                        رمز عبور سفارشی
                       </label>
                     </div>
                   </div>
-                  <!-- فیلدهای رمز عبور ثابت -->
+                  <!-- فیلدهای رمز عبور -->
                   <div class="col-12" x-show="staticPasswordEnabled" x-transition>
                     <div class="alert alert-info">
-                      <strong>توجه:</strong> با فعال کردن رمز عبور ثابت، مدیر می‌تواند از رمز عبور ثابت برای ورود
-                      استفاده کند.
+                      <strong>توجه:</strong> با فعال کردن رمز عبور، می‌توانید رمز عبور سفارشی برای مدیر تنظیم کنید.
                     </div>
                   </div>
                   <div class="col-md-6" x-show="staticPasswordEnabled" x-transition>
                     <div class="form-group position-relative">
-                      <label class="form-label">رمز عبور ثابت <span class="text-danger">*</span></label>
-                      <input type="text" wire:model="static_password" class="form-control"
-                        placeholder="رمز عبور ثابت (حداقل ۶ کاراکتر)">
-                      @error('static_password')
+                      <label class="form-label">رمز عبور <span class="text-danger">*</span></label>
+                      <input type="password" wire:model="password" class="form-control"
+                        placeholder="حداقل ۸ کاراکتر">
+                      @error('password')
                         <span class="text-danger small">{{ $message }}</span>
                       @enderror
                     </div>
                   </div>
                   <div class="col-md-6" x-show="staticPasswordEnabled" x-transition>
                     <div class="form-group position-relative">
-                      <label class="form-label">تکرار رمز عبور ثابت <span class="text-danger">*</span></label>
-                      <input type="text" wire:model="static_password_confirmation" class="form-control"
-                        placeholder="تکرار رمز عبور ثابت">
-                      @error('static_password_confirmation')
-                        <span class="text-danger small">{{ $message }}</span>
-                      @enderror
+                      <label class="form-label">تکرار رمز عبور <span class="text-danger">*</span></label>
+                      <input type="password" wire:model="password_confirmation" class="form-control"
+                        placeholder="تکرار رمز عبور">
                     </div>
                   </div>
                 </div>

@@ -40,7 +40,6 @@ class ManagerEdit extends Component
         'password' => 'nullable|string|min:8|confirmed',
         'two_factor_enabled' => 'boolean',
         'static_password_enabled' => 'boolean',
-        'static_password' => 'nullable|string|min:6|confirmed',
         'bio' => 'nullable|string',
         'address' => 'nullable|string',
         'permission_level' => 'required|integer|in:1,2',
@@ -61,8 +60,6 @@ class ManagerEdit extends Component
         'email.email' => 'ایمیل باید معتبر باشد.',
         'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
         'password.confirmed' => 'تکرار رمز عبور مطابقت ندارد.',
-        'static_password.min' => 'رمز عبور ثابت باید حداقل ۶ کاراکتر باشد.',
-        'static_password.confirmed' => 'تکرار رمز عبور ثابت مطابقت ندارد.',
         'permission_level.required' => 'سطح دسترسی الزامی است.',
         'permission_level.in' => 'سطح دسترسی باید ۱ یا ۲ باشد.',
     ];
@@ -131,12 +128,11 @@ class ManagerEdit extends Component
 
     public function save()
     {
-        // اعتبارسنجی رمز عبور ثابت
+        // اعتبارسنجی رمز عبور
         if ($this->static_password_enabled) {
-            $this->rules['static_password'] = 'required|string|min:6|confirmed';
-            $this->messages['static_password.required'] = 'رمز عبور ثابت الزامی است.';
+            $this->rules['password'] = 'nullable|string|min:8|confirmed';
         } else {
-            $this->rules['static_password'] = 'nullable|string|min:6|confirmed';
+            $this->rules['password'] = 'nullable|string|min:8|confirmed';
         }
 
         $this->validate();
@@ -171,10 +167,9 @@ class ManagerEdit extends Component
                 'is_verified' => $this->is_verified,
             ];
 
-            if ($this->static_password_enabled && $this->static_password) {
-                $updateData['static_password'] = $this->static_password;
-            } elseif (!$this->static_password_enabled) {
-                $updateData['static_password'] = null;
+            // بروزرسانی رمز عبور اگر وارد شده باشد
+            if ($this->static_password_enabled && $this->password) {
+                $updateData['password'] = Hash::make($this->password);
             }
 
             $manager->update($updateData);

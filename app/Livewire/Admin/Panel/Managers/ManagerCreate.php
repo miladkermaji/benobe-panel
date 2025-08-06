@@ -40,7 +40,6 @@ class ManagerCreate extends Component
         'password' => 'nullable|string|min:8|confirmed',
         'two_factor_enabled' => 'boolean',
         'static_password_enabled' => 'boolean',
-        'static_password' => 'nullable|string|min:6|confirmed',
         'bio' => 'nullable|string',
         'address' => 'nullable|string',
         'permission_level' => 'required|integer|in:1,2',
@@ -62,11 +61,8 @@ class ManagerCreate extends Component
         'email.email' => 'ایمیل باید معتبر باشد.',
         'email.unique' => 'این ایمیل قبلاً ثبت شده است.',
         'mobile.unique' => 'این شماره موبایل قبلاً ثبت شده است.',
-        'password.required' => 'رمز عبور الزامی است.',
         'password.min' => 'رمز عبور باید حداقل ۸ کاراکتر باشد.',
         'password.confirmed' => 'تکرار رمز عبور مطابقت ندارد.',
-        'static_password.min' => 'رمز عبور ثابت باید حداقل ۶ کاراکتر باشد.',
-        'static_password.confirmed' => 'تکرار رمز عبور ثابت مطابقت ندارد.',
         'permission_level.required' => 'سطح دسترسی الزامی است.',
         'permission_level.in' => 'سطح دسترسی باید ۱ یا ۲ باشد.',
     ];
@@ -81,12 +77,12 @@ class ManagerCreate extends Component
 
     public function save()
     {
-        // اعتبارسنجی رمز عبور ثابت
+        // اعتبارسنجی رمز عبور
         if ($this->static_password_enabled) {
-            $this->rules['static_password'] = 'required|string|min:6|confirmed';
-            $this->messages['static_password.required'] = 'رمز عبور ثابت الزامی است.';
+            $this->rules['password'] = 'required|string|min:8|confirmed';
+            $this->messages['password.required'] = 'رمز عبور الزامی است.';
         } else {
-            $this->rules['static_password'] = 'nullable|string|min:6|confirmed';
+            $this->rules['password'] = 'nullable|string|min:8|confirmed';
         }
 
         $this->validate();
@@ -110,10 +106,10 @@ class ManagerCreate extends Component
                 'gender' => $this->gender ?: null,
                 'email' => $this->email,
                 'mobile' => $this->mobile ?: null,
-                'password' => Hash::make('default123'),
+                'password' => $this->static_password_enabled ? Hash::make($this->password) : Hash::make('default123'),
                 'two_factor_enabled' => $this->two_factor_enabled,
                 'static_password_enabled' => $this->static_password_enabled,
-                'static_password' => $this->static_password_enabled ? $this->static_password : null,
+                'static_password' => null,
                 'bio' => $this->bio ?: null,
                 'address' => $this->address ?: null,
                 'permission_level' => $this->permission_level,
