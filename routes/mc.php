@@ -375,5 +375,12 @@ Route::prefix('mc')
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'create'])->name('mc.panel.services.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'edit'])->name('mc.panel.services.edit');
             });
+
+            // Insurance Management Routes
+            Route::prefix('insurances')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'index'])->name('mc.panel.insurances.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'create'])->name('mc.panel.insurances.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'edit'])->name('mc.panel.insurances.edit');
+            });
         });
     });
