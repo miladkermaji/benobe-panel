@@ -99,6 +99,35 @@
         border-color: #007bff !important;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
       }
+
+      /* Loading indicator styles */
+      .search-loading {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        display: none;
+      }
+
+      .search-loading.show {
+        display: block;
+      }
+
+      .search-loading .spinner-border {
+        width: 2rem;
+        height: 2rem;
+      }
+
+      .search-loading .loading-text {
+        margin-top: 10px;
+        font-size: 14px;
+        color: #6c757d;
+      }
     </style>
 
     <div class="header d-flex item-center bg-white width-100 custom-border-bottom">
@@ -172,7 +201,18 @@
                       </div>
 
                       <!-- Doctors List Container with Fixed Height -->
-                      <div class="doctors-list-container" style="max-height: 500px; overflow-y: auto;">
+                      <div class="doctors-list-container"
+                        style="max-height: 500px; overflow-y: auto; position: relative;">
+                        <!-- Loading Indicator -->
+                        <div class="search-loading" id="searchLoading">
+                          <div class="d-flex flex-column align-items-center">
+                            <div class="spinner-border text-primary" role="status">
+                              <span class="visually-hidden">در حال جستجو...</span>
+                            </div>
+                            <div class="loading-text">در حال جستجو...</div>
+                          </div>
+                        </div>
+
                         <div class="{{ Route::is('medical-centers.doctor.deposit') ? 'd-none' : '' }}"
                           aria-hidden="true">
                           <div
@@ -477,76 +517,90 @@
             const noDoctorsMessage = document.getElementById('noDoctorsMessage');
             const noDoctorsAtAll = document.getElementById('noDoctorsAtAll');
             const defaultOption = document.querySelector('[data-id="default"]');
+            const searchLoading = document.getElementById('searchLoading');
             const selectedDoctorId = '{{ $selectedDoctorId }}';
 
-            let visibleCount = 0;
-
-            // مخفی کردن پیام "هیچ پزشکی وجود ندارد"
-            if (noDoctorsAtAll) {
-              noDoctorsAtAll.style.display = 'none';
+            // نمایش loading indicator فقط اگر جستجو معنادار باشد
+            if (searchLoading && searchTerm.length > 0) {
+              searchLoading.classList.add('show');
             }
 
-            // مدیریت آیتم پیش‌فرض
-            if (defaultOption) {
-              if (searchTerm === '') {
-                defaultOption.style.display = 'flex';
-                defaultOption.classList.remove('d-none');
-                if (!selectedDoctorId || selectedDoctorId === 'null') {
-                  defaultOption.classList.add('card-active');
+            // تاخیر کوتاه برای نمایش loading
+            setTimeout(() => {
+              let visibleCount = 0;
+
+              // مخفی کردن پیام "هیچ پزشکی وجود ندارد"
+              if (noDoctorsAtAll) {
+                noDoctorsAtAll.style.display = 'none';
+              }
+
+              // مدیریت آیتم پیش‌فرض
+              if (defaultOption) {
+                if (searchTerm === '') {
+                  defaultOption.style.display = 'flex';
+                  defaultOption.classList.remove('d-none');
+                  if (!selectedDoctorId || selectedDoctorId === 'null') {
+                    defaultOption.classList.add('card-active');
+                  } else {
+                    defaultOption.classList.remove('card-active');
+                  }
                 } else {
+                  defaultOption.style.display = 'none';
+                  defaultOption.classList.add('d-none');
                   defaultOption.classList.remove('card-active');
                 }
-              } else {
-                defaultOption.style.display = 'none';
-                defaultOption.classList.add('d-none');
-                defaultOption.classList.remove('card-active');
               }
-            }
 
-            // مدیریت آیتم‌های پزشک
-            doctorItems.forEach((item) => {
-              const doctorName = item.getAttribute('data-name') || '';
-              const doctorSpecialty = item.getAttribute('data-specialty') || '';
-              const doctorId = item.getAttribute('data-id') || '';
+              // مدیریت آیتم‌های پزشک
+              doctorItems.forEach((item) => {
+                const doctorName = item.getAttribute('data-name') || '';
+                const doctorSpecialty = item.getAttribute('data-specialty') || '';
+                const doctorId = item.getAttribute('data-id') || '';
 
-              const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
+                const shouldShow = doctorName.includes(searchTerm) || doctorSpecialty.includes(searchTerm);
 
-              if (shouldShow) {
-                item.style.display = 'flex';
-                item.classList.remove('d-none');
-                visibleCount++;
+                if (shouldShow) {
+                  item.style.display = 'flex';
+                  item.classList.remove('d-none');
+                  visibleCount++;
 
-                if (searchTerm === '') {
-                  // جستجو خالی - کلاس‌های اصلی
-                  item.classList.remove('search-match');
-                  if (doctorId === selectedDoctorId) {
-                    item.classList.add('card-active');
+                  if (searchTerm === '') {
+                    // جستجو خالی - کلاس‌های اصلی
+                    item.classList.remove('search-match');
+                    if (doctorId === selectedDoctorId) {
+                      item.classList.add('card-active');
+                    } else {
+                      item.classList.remove('card-active');
+                    }
                   } else {
+                    // جستجو فعال - فقط search-match
+                    item.classList.add('search-match');
                     item.classList.remove('card-active');
                   }
                 } else {
-                  // جستجو فعال - فقط search-match
-                  item.classList.add('search-match');
+                  item.style.display = 'none';
+                  item.classList.add('d-none');
+                  item.classList.remove('search-match');
                   item.classList.remove('card-active');
                 }
-              } else {
-                item.style.display = 'none';
-                item.classList.add('d-none');
-                item.classList.remove('search-match');
-                item.classList.remove('card-active');
-              }
-            });
+              });
 
-            // مدیریت پیام "پزشکی یافت نشد"
-            if (noDoctorsMessage) {
-              if (visibleCount === 0 && searchTerm !== '') {
-                noDoctorsMessage.style.display = 'block';
-                noDoctorsMessage.classList.remove('d-none');
-              } else {
-                noDoctorsMessage.style.display = 'none';
-                noDoctorsMessage.classList.add('d-none');
+              // مدیریت پیام "پزشکی یافت نشد"
+              if (noDoctorsMessage) {
+                if (visibleCount === 0 && searchTerm !== '') {
+                  noDoctorsMessage.style.display = 'block';
+                  noDoctorsMessage.classList.remove('d-none');
+                } else {
+                  noDoctorsMessage.style.display = 'none';
+                  noDoctorsMessage.classList.add('d-none');
+                }
               }
-            }
+
+              // مخفی کردن loading indicator
+              if (searchLoading) {
+                searchLoading.classList.remove('show');
+              }
+            }, searchTerm.length > 0 ? 300 : 0); // تاخیر فقط برای جستجوی معنادار
           }
         }
 
