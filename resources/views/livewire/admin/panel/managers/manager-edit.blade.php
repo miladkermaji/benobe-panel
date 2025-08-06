@@ -72,8 +72,8 @@
                   <div class="col-md-6">
                     <div class="form-group position-relative">
                       <label class="form-label">تاریخ تولد</label>
-                      <input data-jdp type="text" id="date_of_birth" class="form-control" placeholder="انتخاب تاریخ تولد"
-                        readonly>
+                      <input data-jdp type="text" id="date_of_birth" class="form-control"
+                        placeholder="انتخاب تاریخ تولد" readonly>
                       @error('date_of_birth')
                         <span class="text-danger small">{{ $message }}</span>
                       @enderror
@@ -316,38 +316,11 @@
     </div>
   </div>
 </div>
-
 <script>
-  document.addEventListener('livewire:init', () => {
+  document.addEventListener('DOMContentLoaded', function() {
     // Jalali Date Picker
     if (typeof jalaliDatepicker !== 'undefined') {
-      jalaliDatepicker.startWatch({
-        separatorChar: "/",
-        minDate: "1350/01/01",
-        maxDate: "1450/12/29",
-        initDate: false,
-        format: 'YYYY/MM/DD',
-        showGregorianDate: false,
-        showTimeInput: false,
-        autoHide: true,
-        persianDigits: true,
-        showEmptyBtn: false,
-        showTodayBtn: true,
-        showClearBtn: false,
-        editable: true,
-        theme: 'light',
-        onSelect: function(unix) {
-          // Convert jalali to gregorian for backend
-          const gregorianDate = new Date(unix);
-          const year = gregorianDate.getFullYear();
-          const month = String(gregorianDate.getMonth() + 1).padStart(2, '0');
-          const day = String(gregorianDate.getDate()).padStart(2, '0');
-          const formattedDate = `${year}-${month}-${day}`;
-
-          // Update Livewire component
-          @this.set('date_of_birth', formattedDate);
-        }
-      });
+      jalaliDatepicker.startWatch();
     }
   });
 </script>
