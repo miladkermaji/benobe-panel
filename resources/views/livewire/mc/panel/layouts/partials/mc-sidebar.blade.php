@@ -22,9 +22,45 @@
         <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
           <a href="{{ route('mc-panel') }}">داشبورد</a>
         </li>
+        <li
+          class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('#') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          id="medical-center-management">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            مرکز درمانی من
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
+            </li>
+            <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
+              <a href="#">ویرایش پروفایل</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.specialties.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.services.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
+            </li>
+            <li
+              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.insurances.index') ? 'is-active' : '' }}">
+              <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
+            </li>
+          </ul>
+        </li>
         <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
           <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
         </li>
+
         <li
           class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -276,107 +312,7 @@
           </ul>
         </li>
         <li
-          class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="doctor-management">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت پزشکان
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.doctors.index') }}">لیست پزشکان</a>
-            </li>
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.create') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.doctors.create') }}">افزودن پزشک</a>
-            </li>
-          </ul>
-        </li>
-        <li
-          class="item-li i-users {{ Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="specialty-management">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت تخصص
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.specialties.index') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.specialties.index') }}">لیست تخصص‌ها</a>
-            </li>
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.specialties.create') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.specialties.create') }}">افزودن تخصص</a>
-            </li>
-          </ul>
-        </li>
-        <li
-          class="item-li i-users {{ Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="service-management">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت خدمات
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.services.index') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.services.index') }}">لیست خدمات</a>
-            </li>
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.services.create') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.services.create') }}">افزودن خدمت</a>
-            </li>
-          </ul>
-        </li>
-        <li
-          class="item-li i-users {{ Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
-          id="insurance-management">
-          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
-            مدیریت بیمه
-            <div class="d-flex justify-content-end w-100 align-items-center">
-              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
-                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
-                <path fill-rule="evenodd" clip-rule="evenodd"
-                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
-                  fill="currentColor"></path>
-              </svg>
-            </div>
-          </a>
-          <ul class="drop-toggle d-none">
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.insurances.index') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.insurances.index') }}">لیست بیمه‌ها</a>
-            </li>
-            <li
-              class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.insurances.create') ? 'is-active' : '' }}">
-              <a href="{{ route('mc.panel.insurances.create') }}">افزودن بیمه</a>
-            </li>
-          </ul>
-        </li>
-        <li
-          class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('#') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="hesab-karbari">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             حساب کاربری
@@ -910,14 +846,12 @@
         <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
         <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <a href="{{ route('mc.panel.doctors.index') }}">لیست پزشکان</a>
-        <a href="{{ route('mc.panel.doctors.create') }}">افزودن پزشک</a>
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <a href="{{ route('mc.panel.specialties.index') }}">لیست تخصص‌ها</a>
-        <a href="{{ route('mc.panel.specialties.create') }}">افزودن تخصص</a>
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <a href="{{ route('mc.panel.services.index') }}">لیست خدمات</a>
-        <a href="{{ route('mc.panel.services.create') }}">افزودن خدمت</a>
+        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مرکز درمانی من</div>
+        <a href="#">ویرایش پروفایل</a>
+        <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
+        <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
+        <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
+        <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
       </div>
     </div>
   </div>
