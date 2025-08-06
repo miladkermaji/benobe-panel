@@ -3,7 +3,7 @@
     <div class="col-12 col-lg-8">
       <div class="card shadow-sm rounded-2">
         <div class="card-header bg-gradient-primary text-white p-3">
-          <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center justify-content-between w-100">
             <div class="d-flex align-items-center gap-2">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                 stroke-width="2">
@@ -14,9 +14,9 @@
             </div>
             <a href="{{ route('mc-panel') }}"
               class="btn btn-outline-light btn-sm rounded-pill px-3 py-1 d-flex align-items-center gap-1 hover:shadow-lg transition-all">
-              <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-8H7v8M7 3v5h8" />
+              <svg style="transform: rotate(180deg)" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
               </svg>
               بازگشت
             </a>
@@ -27,11 +27,11 @@
           <form wire:submit="update">
             <div class="row g-3">
               <!-- نام مرکز درمانی -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="name">نام مرکز درمانی *</label>
                   <input type="text" wire:model="name" class="form-control @error('name') is-invalid @enderror"
-                    id="name" placeholder="نام مرکز درمانی">
-                  <label for="name">نام مرکز درمانی *</label>
+                    id="name" placeholder="نام مرکز درمانی را وارد کنید">
                   @error('name')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -39,11 +39,11 @@
               </div>
 
               <!-- عنوان -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="title">عنوان</label>
                   <input type="text" wire:model="title" class="form-control @error('title') is-invalid @enderror"
-                    id="title" placeholder="عنوان">
-                  <label for="title">عنوان</label>
+                    id="title" placeholder="عنوان را وارد کنید">
                   @error('title')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -52,10 +52,10 @@
 
               <!-- آدرس -->
               <div class="col-12">
-                <div class="form-floating">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="address">آدرس *</label>
                   <textarea wire:model="address" class="form-control @error('address') is-invalid @enderror" id="address"
-                    placeholder="آدرس" style="height: 100px"></textarea>
-                  <label for="address">آدرس *</label>
+                    placeholder="آدرس را وارد کنید" style="height: 100px"></textarea>
                   @error('address')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -63,12 +63,12 @@
               </div>
 
               <!-- شماره تلفن منشی -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="secretary_phone">شماره تلفن منشی *</label>
                   <input type="text" wire:model="secretary_phone"
                     class="form-control @error('secretary_phone') is-invalid @enderror" id="secretary_phone"
-                    placeholder="شماره تلفن منشی">
-                  <label for="secretary_phone">شماره تلفن منشی *</label>
+                    placeholder="شماره تلفن منشی را وارد کنید">
                   @error('secretary_phone')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -76,12 +76,12 @@
               </div>
 
               <!-- شماره تلفن -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="phone_number">شماره تلفن *</label>
                   <input type="text" wire:model="phone_number"
                     class="form-control @error('phone_number') is-invalid @enderror" id="phone_number"
-                    placeholder="شماره تلفن">
-                  <label for="phone_number">شماره تلفن *</label>
+                    placeholder="شماره تلفن را وارد کنید">
                   @error('phone_number')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -89,12 +89,12 @@
               </div>
 
               <!-- کد پستی -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="postal_code">کد پستی</label>
                   <input type="text" wire:model="postal_code"
                     class="form-control @error('postal_code') is-invalid @enderror" id="postal_code"
-                    placeholder="کد پستی">
-                  <label for="postal_code">کد پستی</label>
+                    placeholder="کد پستی را وارد کنید">
                   @error('postal_code')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -102,11 +102,12 @@
               </div>
 
               <!-- کد سیام -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="siam_code">کد سیام</label>
                   <input type="text" wire:model="siam_code"
-                    class="form-control @error('siam_code') is-invalid @enderror" id="siam_code" placeholder="کد سیام">
-                  <label for="siam_code">کد سیام</label>
+                    class="form-control @error('siam_code') is-invalid @enderror" id="siam_code"
+                    placeholder="کد سیام را وارد کنید">
                   @error('siam_code')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -114,12 +115,12 @@
               </div>
 
               <!-- هزینه مشاوره -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="consultation_fee">هزینه مشاوره (تومان)</label>
                   <input type="number" wire:model="consultation_fee"
                     class="form-control @error('consultation_fee') is-invalid @enderror" id="consultation_fee"
-                    placeholder="هزینه مشاوره" step="0.01" min="0">
-                  <label for="consultation_fee">هزینه مشاوره (تومان)</label>
+                    placeholder="هزینه مشاوره را وارد کنید" step="0.01" min="0">
                   @error('consultation_fee')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -127,12 +128,12 @@
               </div>
 
               <!-- تعرفه نسخه -->
-              <div class="col-12 col-md-6">
-                <div class="form-floating">
+              <div class="col-12 col-md-6 mb-3">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="prescription_tariff">تعرفه نسخه (تومان)</label>
                   <input type="number" wire:model="prescription_tariff"
                     class="form-control @error('prescription_tariff') is-invalid @enderror" id="prescription_tariff"
-                    placeholder="تعرفه نسخه" step="0.01" min="0">
-                  <label for="prescription_tariff">تعرفه نسخه (تومان)</label>
+                    placeholder="تعرفه نسخه را وارد کنید" step="0.01" min="0">
                   @error('prescription_tariff')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -141,10 +142,10 @@
 
               <!-- توضیحات -->
               <div class="col-12">
-                <div class="form-floating">
+                <div class="form-group">
+                  <label class="form-label fw-bold" for="description">توضیحات</label>
                   <textarea wire:model="description" class="form-control @error('description') is-invalid @enderror" id="description"
-                    placeholder="توضیحات" style="height: 120px"></textarea>
-                  <label for="description">توضیحات</label>
+                    placeholder="توضیحات را وارد کنید" style="height: 120px"></textarea>
                   @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                   @enderror
@@ -155,7 +156,7 @@
               <div class="col-12">
                 <div class="form-check form-switch">
                   <input class="form-check-input" type="checkbox" wire:model="is_active" id="is_active">
-                  <label class="form-check-label" for="is_active">
+                  <label class="form-check-label fw-bold" for="is_active">
                     مرکز درمانی فعال است
                   </label>
                 </div>
