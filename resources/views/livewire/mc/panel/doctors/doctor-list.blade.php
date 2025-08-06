@@ -58,7 +58,7 @@
           </div>
         </div>
         <!-- Desktop Search and Actions -->
-        <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
+        <div class="d-none d-md-flex align-items-center gap-2 ms-auto">
           <div class="search-box position-relative">
             <input type="text" wire:model.live="search" class="form-control ps-5"
               placeholder="جستجو بر اساس نام، موبایل یا ایمیل...">
@@ -68,7 +68,7 @@
               <path d="M21 21l-4.35-4.35" />
             </svg>
           </div>
-          <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="statusFilter">
+          <select class="form-select" wire:model.live="statusFilter">
             <option value="">همه وضعیت‌ها</option>
             <option value="1">فقط فعال</option>
             <option value="0">فقط غیرفعال</option>
