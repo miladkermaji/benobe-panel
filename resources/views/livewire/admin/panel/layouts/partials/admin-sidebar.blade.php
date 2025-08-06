@@ -198,6 +198,9 @@
             <li class="item-li {{ Request::routeIs('admin.panel.imaging-centers.index') ? 'is-active' : '' }}">
               <a href="{{ route('admin.panel.imaging-centers.index') }}">مراکز تصویربرداری</a>
             </li>
+            <li class="item-li {{ Request::routeIs('admin.panel.medical-centers.permissions') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.medical-centers.permissions') }}">دسترسی‌های مراکز درمانی</a>
+            </li>
           </ul>
         </li>
         <!-- مدیریت خدمات -->

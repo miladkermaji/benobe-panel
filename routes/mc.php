@@ -48,14 +48,14 @@ Route::prefix('mc')
         });
         Route::prefix('panel')->middleware(['medical_center'])->group(function () {
             Route::get('mc/panel', [McPanelController::class, 'index'])->name('mc-panel');
-            Route::get('/', [McPanelController::class, 'index'])->middleware('secretary.permission:dashboard')->name('mc-panel');
+            Route::get('/', [McPanelController::class, 'index'])->middleware('medical_center.permission:dashboard')->name('mc-panel');
             Route::prefix('doctor-services')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'index'])->name('mc.panel.doctor-services.index');
-                Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'create'])->name('mc.panel.doctor-services.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'edit'])->name('mc.panel.doctor-services.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'index'])->middleware('medical_center.permission:doctor_services')->name('mc.panel.doctor-services.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'create'])->middleware('medical_center.permission:doctor_services')->name('mc.panel.doctor-services.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'edit'])->middleware('medical_center.permission:doctor_services')->name('mc.panel.doctor-services.edit');
             });
             Route::prefix('patient-contact/send-message')->group(function () {
-                Route::get('/', [DoctorSendMessageController::class, 'index'])->name('mc.panel.send-message');
+                Route::get('/', [DoctorSendMessageController::class, 'index'])->middleware('medical_center.permission:patient_communication')->name('mc.panel.send-message');
             });
             Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
             Route::get('/search-appointments-counseling', [MoshavereWaitingController::class, 'searchAppointments'])->middleware('secretary.permission:appointments')->name('search.appointments.counseling');
@@ -73,79 +73,79 @@ Route::prefix('mc')
             });
             Route::get('/doctor/appointments/filter', [McDrScheduleController::class, 'filterAppointments'])->name('doctor.appointments.filter');
             Route::get('/doctor/appointments/filter-counseling', [MoshavereWaitingController::class, 'filterAppointments'])->name('doctor.appointments.filter.counseling');
-            Route::prefix('turn')->middleware('secretary.permission:appointments')->group(function () {
+            Route::prefix('turn')->middleware('medical_center.permission:appointments')->group(function () {
                 Route::prefix('schedule')->group(function () {
-                    Route::get('/appointments', [McDrScheduleController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-appointments');
+                    Route::get('/appointments', [McDrScheduleController::class, 'index'])->middleware('medical_center.permission:mc-appointments')->name('mc-appointments');
                     Route::get('search-appointments', [McDrScheduleController::class, 'searchAppointments'])->name('mc.search.appointments');
                     Route::post('end-visit/{id}', [McDrScheduleController::class, 'endVisit'])->name('end.visit');
-                    Route::get('/my-appointments', [McDrScheduleController::class, 'myAppointments'])->middleware('secretary.permission:my-appointments')->name('my-mc-appointments');
+                    Route::get('/my-appointments', [McDrScheduleController::class, 'myAppointments'])->middleware('medical_center.permission:my-mc-appointments')->name('my-mc-appointments');
                     Route::get('/my-appointments/by-date', [McDrScheduleController::class, 'showByDateAppointments'])->name('mc.turn.my-appointments.by-date');
                     Route::get('filter-appointments', [McDrScheduleController::class, 'filterAppointments'])->name('mc.turn.filter-appointments');
-                    Route::get('/moshavere_setting', [DrMoshavereSettingController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-moshavere_setting');
-                    Route::post('/copy-work-hours-counseling', [DrMoshavereSettingController::class, 'copyWorkHours'])->middleware('secretary.permission:appointments')->name('copy-work-hours-counseling');
-                    Route::get('get-work-schedule-counseling', [DrMoshavereSettingController::class, 'getWorkSchedule'])->middleware('secretary.permission:appointments')->name('mc-get-work-schedule-counseling');
-                    Route::post('/copy-single-slot-counseling', [DrMoshavereSettingController::class, 'copySingleSlot'])->middleware('secretary.permission:appointments')->name('copy-single-slot-counseling');
-                    Route::post('/save-time-slot-counseling', [DrMoshavereSettingController::class, 'saveTimeSlot'])->middleware('secretary.permission:appointments')->name('save-time-slot-counseling');
-                    Route::get('/get-appointment-settings-counseling', [DrMoshavereSettingController::class, 'getAppointmentSettings'])->middleware('secretary.permission:appointments')->name('get-appointment-settings-counseling');
-                    Route::delete('/appointment-slots-conseling/{id}', [DrMoshavereSettingController::class, 'destroy'])->middleware('secretary.permission:appointments')->name('appointment.slots.destroy-counseling');
-                    Route::post('save-work-schedule-counseling', [DrMoshavereSettingController::class, 'saveWorkSchedule'])->middleware('secretary.permission:appointments')->name('mc-save-work-schedule-counseling');
-                    Route::post('/dr/update-work-day-status-counseling', [DrMoshavereSettingController::class, 'updateWorkDayStatus'])->middleware('secretary.permission:appointments')->name('update-work-day-status-counseling');
-                    Route::post('/update-auto-scheduling-counseling', [DrMoshavereSettingController::class, 'updateAutoScheduling'])->middleware('secretary.permission:appointments')->name('update-auto-scheduling-counseling');
-                    Route::get('/get-all-days-settings-counseling', [DrMoshavereSettingController::class, 'getAllDaysSettings'])->middleware('secretary.permission:appointments')->name('get-all-days-settings-counseling');
-                    Route::post('/save-appointment-settings-counseling', [DrMoshavereSettingController::class, 'saveAppointmentSettings'])->middleware('secretary.permission:appointments')->name('save-appointment-settings-counseling');
-                    Route::post('/delete-schedule-setting-counseling', [DrMoshavereSettingController::class, 'deleteScheduleSetting'])->middleware('secretary.permission:appointments')->name('delete-schedule-setting-counseling');
-                    Route::get('/moshavere_waiting', [MoshavereWaitingController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-moshavere_waiting');
+                    Route::get('/moshavere_setting', [DrMoshavereSettingController::class, 'index'])->middleware('medical_center.permission:mc-moshavere_setting')->name('mc-moshavere_setting');
+                    Route::post('/copy-work-hours-counseling', [DrMoshavereSettingController::class, 'copyWorkHours'])->middleware('medical_center.permission:mc-moshavere_setting')->name('copy-work-hours-counseling');
+                    Route::get('get-work-schedule-counseling', [DrMoshavereSettingController::class, 'getWorkSchedule'])->middleware('medical_center.permission:mc-moshavere_setting')->name('mc-get-work-schedule-counseling');
+                    Route::post('/copy-single-slot-counseling', [DrMoshavereSettingController::class, 'copySingleSlot'])->middleware('medical_center.permission:mc-moshavere_setting')->name('copy-single-slot-counseling');
+                    Route::post('/save-time-slot-counseling', [DrMoshavereSettingController::class, 'saveTimeSlot'])->middleware('medical_center.permission:mc-moshavere_setting')->name('save-time-slot-counseling');
+                    Route::get('/get-appointment-settings-counseling', [DrMoshavereSettingController::class, 'getAppointmentSettings'])->middleware('medical_center.permission:mc-moshavere_setting')->name('get-appointment-settings-counseling');
+                    Route::delete('/appointment-slots-conseling/{id}', [DrMoshavereSettingController::class, 'destroy'])->middleware('medical_center.permission:mc-moshavere_setting')->name('appointment.slots.destroy-counseling');
+                    Route::post('save-work-schedule-counseling', [DrMoshavereSettingController::class, 'saveWorkSchedule'])->middleware('medical_center.permission:mc-moshavere_setting')->name('mc-save-work-schedule-counseling');
+                    Route::post('/dr/update-work-day-status-counseling', [DrMoshavereSettingController::class, 'updateWorkDayStatus'])->middleware('medical_center.permission:mc-moshavere_setting')->name('update-work-day-status-counseling');
+                    Route::post('/update-auto-scheduling-counseling', [DrMoshavereSettingController::class, 'updateAutoScheduling'])->middleware('medical_center.permission:mc-moshavere_setting')->name('update-auto-scheduling-counseling');
+                    Route::get('/get-all-days-settings-counseling', [DrMoshavereSettingController::class, 'getAllDaysSettings'])->middleware('medical_center.permission:mc-moshavere_setting')->name('get-all-days-settings-counseling');
+                    Route::post('/save-appointment-settings-counseling', [DrMoshavereSettingController::class, 'saveAppointmentSettings'])->middleware('medical_center.permission:mc-moshavere_setting')->name('save-appointment-settings-counseling');
+                    Route::post('/delete-schedule-setting-counseling', [DrMoshavereSettingController::class, 'deleteScheduleSetting'])->middleware('medical_center.permission:mc-moshavere_setting')->name('delete-schedule-setting-counseling');
+                    Route::get('/moshavere_waiting', [MoshavereWaitingController::class, 'index'])->middleware('medical_center.permission:mc-moshavere_waiting')->name('mc-moshavere_waiting');
                     Route::get('/doctor/appointments/by-date-counseling', [MoshavereWaitingController::class, 'getAppointmentsByDate'])
                                                 ->name('doctor.appointments.by-date-counseling');
-                    Route::get('/manual_nobat', [ManualNobatController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-manual_nobat');
-                    Route::post('manual_nobat/store', [ManualNobatController::class, 'store'])->middleware('secretary.permission:appointments')->name('manual-nobat.store');
-                    Route::post('manual-nobat/store-with-user', [ManualNobatController::class, 'storeWithUser'])->middleware('secretary.permission:appointments')->name('manual-nobat.store-with-user');
-                    Route::delete('/manual_appointments/{id}', [ManualNobatController::class, 'destroy'])->middleware('secretary.permission:appointments')->name('manual_appointments.destroy');
-                    Route::get('/manual_appointments/{id}/edit', [ManualNobatController::class, 'edit'])->middleware('secretary.permission:appointments')->name('manual-appointments.edit');
-                    Route::post('/manual_appointments/{id}', [ManualNobatController::class, 'update'])->middleware('secretary.permission:appointments')->name('manual-appointments.update');
-                    Route::post('/manual-nobat/settings/save', [ManualNobatController::class, 'saveSettings'])->middleware('secretary.permission:appointments')->name('manual-nobat.settings.save');
-                    Route::get('/manual_nobat_setting', [ManualNobatController::class, 'showSettings'])->middleware('secretary.permission:appointments')->name('mc-manual_nobat_setting');
-                    Route::get('/search-users', [ManualNobatController::class, 'searchUsers'])->middleware('secretary.permission:appointments')->name('mc-panel-search.users');
-                    Route::get('/scheduleSetting', [ScheduleSettingController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-scheduleSetting');
+                    Route::get('/manual_nobat', [ManualNobatController::class, 'index'])->middleware('medical_center.permission:mc-manual_nobat')->name('mc-manual_nobat');
+                    Route::post('manual_nobat/store', [ManualNobatController::class, 'store'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-nobat.store');
+                    Route::post('manual-nobat/store-with-user', [ManualNobatController::class, 'storeWithUser'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-nobat.store-with-user');
+                    Route::delete('/manual_appointments/{id}', [ManualNobatController::class, 'destroy'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual_appointments.destroy');
+                    Route::get('/manual_appointments/{id}/edit', [ManualNobatController::class, 'edit'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-appointments.edit');
+                    Route::post('/manual_appointments/{id}', [ManualNobatController::class, 'update'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-appointments.update');
+                    Route::post('/manual-nobat/settings/save', [ManualNobatController::class, 'saveSettings'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-nobat.settings.save');
+                    Route::get('/manual_nobat_setting', [ManualNobatController::class, 'showSettings'])->middleware('medical_center.permission:mc-manual_nobat_setting')->name('mc-manual_nobat_setting');
+                    Route::get('/search-users', [ManualNobatController::class, 'searchUsers'])->middleware('medical_center.permission:mc-manual_nobat')->name('mc-panel-search.users');
+                    Route::get('/scheduleSetting', [ScheduleSettingController::class, 'index'])->middleware('medical_center.permission:mc-scheduleSetting')->name('mc-scheduleSetting');
                     Route::get('/insurances', [ManualNobatController::class, 'getInsurances'])->name('manual-nobat.insurances');
                     Route::get('/services/{insuranceId}', [ManualNobatController::class, 'getServices'])->name('manual-nobat.services');
                     Route::post('/calculate-final-price', [ManualNobatController::class, 'calculateFinalPrice'])->name('manual-nobat.calculate-final-price');
                     Route::post('/{id}/end-visit', [ManualNobatController::class, 'endVisit'])->name('manual-nobat.end-visit');
                     Route::prefix('scheduleSetting/vacation')->group(function () {
-                        Route::get('/', [VacationController::class, 'index'])->middleware('secretary.permission:appointments')->name('mc-vacation');
-                        Route::post('/store', [VacationController::class, 'store'])->middleware('secretary.permission:appointments')->name('doctor.vacation.store');
-                        Route::post('/update/{id}', [VacationController::class, 'update'])->middleware('secretary.permission:appointments')->name('doctor.vacation.update');
-                        Route::delete('/delete/{id}', [VacationController::class, 'destroy'])->middleware('secretary.permission:appointments')->name('doctor.vacation.destroy');
-                        Route::get('/doctor/vacation/{id}/edit', [VacationController::class, 'edit'])->middleware('secretary.permission:appointments')->name('doctor.vacation.edit');
+                        Route::get('/', [VacationController::class, 'index'])->middleware('medical_center.permission:mc-vacation')->name('mc-vacation');
+                        Route::post('/store', [VacationController::class, 'store'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.store');
+                        Route::post('/update/{id}', [VacationController::class, 'update'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.update');
+                        Route::delete('/delete/{id}', [VacationController::class, 'destroy'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.destroy');
+                        Route::get('/doctor/vacation/{id}/edit', [VacationController::class, 'edit'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.edit');
                     });
                     Route::prefix('scheduleSetting/blocking_users')->group(function () {
                         Route::get('/', [BlockingUsersController::class, 'index'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('mc-doctor-blocking-users.index');
                         Route::post('/store', [BlockingUsersController::class, 'store'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.store');
                         // اضافه کردن روت جدید برای مسدود کردن گروهی کاربران
                         Route::post('/store-multiple', [BlockingUsersController::class, 'storeMultiple'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.store-multiple');
                         Route::post('/send-message', [BlockingUsersController::class, 'sendMessage'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.send-message');
                         Route::get('/message-lists', [BlockingUsersController::class, 'getMessages'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.messages');
                         Route::delete('/doctor-blocking-users/{id}', [BlockingUsersController::class, 'destroy'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.destroy');
                         Route::patch('/update-status', [BlockingUsersController::class, 'updateStatus'])
-                            ->middleware('secretary.permission:appointments')
+                            ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                             ->name('doctor-blocking-users.update-status');
                         Route::post('/messages/delete', [BlockingUsersController::class, 'deleteMessage'])
-                        ->middleware('secretary.permission:appointments')
+                        ->middleware('medical_center.permission:mc-doctor-blocking-users.index')
                         ->name('doctor-blocking-users.delete-message');
                     });
-                    Route::get('/scheduleSetting/workhours', [McScheduleSettingController::class, 'workhours'])->middleware('secretary.permission:appointments')->name('mc-workhours');
+                    Route::get('/scheduleSetting/workhours', [McScheduleSettingController::class, 'workhours'])->middleware('medical_center.permission:mc-workhours')->name('mc-workhours');
                     Route::post('/save-appointment-settings', [ScheduleSettingController::class, 'saveAppointmentSettings'])->middleware('secretary.permission:appointments')->name('save-appointment-settings');
                     Route::get('/get-appointment-settings', [ScheduleSettingController::class, 'getAppointmentSettings'])->middleware('secretary.permission:appointments')->name('get-appointment-settings');
                     Route::post('/delete-schedule-setting', [ScheduleSettingController::class, 'deleteScheduleSetting'])->middleware('secretary.permission:appointments')->name('delete-schedule-setting');
@@ -357,35 +357,41 @@ Route::prefix('mc')
 
             // Doctor Management Routes
             Route::prefix('doctors')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'index'])->name('mc.panel.doctors.index');
-                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'create'])->name('mc.panel.doctors.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'edit'])->name('mc.panel.doctors.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'index'])->middleware('medical_center.permission:mc.panel.doctors.index')->name('mc.panel.doctors.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'create'])->middleware('medical_center.permission:mc.panel.doctors.create')->name('mc.panel.doctors.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'edit'])->middleware('medical_center.permission:mc.panel.doctors.edit')->name('mc.panel.doctors.edit');
             });
 
             // Specialty Management Routes
             Route::prefix('specialties')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'index'])->name('mc.panel.specialties.index');
-                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'create'])->name('mc.panel.specialties.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'edit'])->name('mc.panel.specialties.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'index'])->middleware('medical_center.permission:mc.panel.specialties.index')->name('mc.panel.specialties.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'create'])->middleware('medical_center.permission:mc.panel.specialties.create')->name('mc.panel.specialties.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'edit'])->middleware('medical_center.permission:mc.panel.specialties.edit')->name('mc.panel.specialties.edit');
             });
 
             // Service Management Routes
             Route::prefix('services')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'index'])->name('mc.panel.services.index');
-                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'create'])->name('mc.panel.services.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'edit'])->name('mc.panel.services.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'index'])->middleware('medical_center.permission:mc.panel.services.index')->name('mc.panel.services.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'create'])->middleware('medical_center.permission:mc.panel.services.create')->name('mc.panel.services.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Service\ServiceController::class, 'edit'])->middleware('medical_center.permission:mc.panel.services.edit')->name('mc.panel.services.edit');
             });
 
             // Insurance Management Routes
             Route::prefix('insurances')->group(function () {
-                Route::get('/', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'index'])->name('mc.panel.insurances.index');
-                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'create'])->name('mc.panel.insurances.create');
-                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'edit'])->name('mc.panel.insurances.edit');
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'index'])->middleware('medical_center.permission:mc.panel.insurances.index')->name('mc.panel.insurances.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'create'])->middleware('medical_center.permission:mc.panel.insurances.create')->name('mc.panel.insurances.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Insurance\InsuranceController::class, 'edit'])->middleware('medical_center.permission:mc.panel.insurances.edit')->name('mc.panel.insurances.edit');
             });
 
             // Medical Center Profile Edit Routes
             Route::prefix('profile')->group(function () {
-                Route::get('/edit', [\App\Http\Controllers\Mc\Panel\Profile\MedicalCenterProfileController::class, 'edit'])->name('mc.panel.profile.edit');
+                Route::get('/edit', [\App\Http\Controllers\Mc\Panel\Profile\MedicalCenterProfileController::class, 'edit'])->middleware('medical_center.permission:mc.panel.profile.edit')->name('mc.panel.profile.edit');
+            });
+
+            // Medical Center Permissions Routes
+            Route::prefix('medical-center-permissions')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\MedicalCenterPermission\MedicalCenterPermissionController::class, 'index'])->name('mc.panel.medical-center-permissions.index');
+                Route::post('/update', [\App\Http\Controllers\Mc\Panel\MedicalCenterPermission\MedicalCenterPermissionController::class, 'update'])->name('mc.panel.medical-center-permissions.update');
             });
         });
     });

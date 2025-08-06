@@ -19,11 +19,15 @@
     </div>
     <div class="sidebar__scrollable">
       <ul class="" id="">
+        @if($this->hasPermission('dashboard'))
         <li class="item-li i-dashboard {{ Request::routeIs('mc-panel') ? 'is-active' : '' }}">
           <a href="{{ route('mc-panel') }}">داشبورد</a>
         </li>
+        @endif
+        
+        @if($this->hasPermission('medical_center_management'))
         <li
-          class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('#') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="medical-center-management">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             مرکز درمانی من
@@ -37,32 +41,47 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc.panel.doctors.index'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctors.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.profile.edit'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.specialties.index'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.specialties.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.services.index'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.services.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.insurances.index'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.insurances.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('workhours'))
         <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
           <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
         </li>
+        @endif
 
+        @if($this->hasPermission('appointments'))
         <li
-          class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-manual_nobat_setting') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+          class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             نوبت اینترنتی
             <div class="d-flex justify-content-end w-100 align-items-center">
@@ -75,31 +94,41 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-appointments'))
             <li class="item-li {{ Request::routeIs('mc-appointments') ? 'is-active' : '' }}">
               <a href="{{ route('mc-appointments') }}"> لیست نوبت ها</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.doctornotes.index'))
             <li class="item-li {{ Request::routeIs('mc.panel.doctornotes.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.doctornotes.index') }}"> توضیحات نوبت</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-mySpecialDays'))
             <li class="item-li {{ Request::routeIs('mc-mySpecialDays') ? 'is-active' : '' }}">
               <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
             </li>
-            {{--    @if ($this->hasPermission('mc-manual_nobat'))
-              <li class="item-li {{ Request::routeIs('mc-manual_nobat') ? 'is-active' : '' }}">
-                <a href="{{ route('mc-manual_nobat') }}">ثبت نوبت دستی</a>
-              </li>
-             --}}
+            @endif
+            @if($this->hasPermission('mc-scheduleSetting'))
             <li class="item-li {{ Request::routeIs('mc-scheduleSetting') ? 'is-active' : '' }}">
               <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-vacation'))
             <li class="item-li {{ Request::routeIs('mc-vacation') ? 'is-active' : '' }}">
               <a href="{{ route('mc-vacation') }}">تعطیلات</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-doctor-blocking-users.index'))
             <li class="item-li {{ Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc-doctor-blocking-users.index') }}">کاربران مسدود</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('prescriptions'))
         <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             <div class="d-flex align-items-center">
@@ -116,15 +145,22 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc.panel.my-prescriptions'))
             <li class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.my-prescriptions.settings'))
             <li
               class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('consultation'))
         <li
           class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -142,29 +178,43 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-moshavere_setting'))
             <li class="item-li i-courses {{ Request::routeIs('mc-moshavere_setting') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">برنامه‌ریزی مشاوره</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-moshavere_waiting'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-moshavere_waiting') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">گزارش مشاوره</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-mySpecialDays-counseling'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">روزهای خاص</a>
             </li>
+            @endif
+            @if($this->hasPermission('consult-term.index'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('consult-term.index') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">قوانین مشاوره</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('doctor_services'))
         <li
           class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
           <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
         </li>
+        @endif
+        
+        @if($this->hasPermission('electronic_prescriptions'))
         <li
           class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -185,26 +235,37 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('prescription.index'))
             <li class="item-li" style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">پرونده پزشکی</a>
             </li>
+            @endif
+            @if($this->hasPermission('prescription.index'))
             <li class="item-li i-courses {{ Request::routeIs('prescription.index') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه‌های ثبت شده</a>
             </li>
+            @endif
+            @if($this->hasPermission('providers.index'))
             <li class="item-li i-courses {{ Request::routeIs('providers.index') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">بیمه‌های من</a>
             </li>
+            @endif
+            @if($this->hasPermission('favorite.templates.index'))
             <li class="item-li i-courses {{ Request::routeIs('favorite.templates.index') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">نسخه پراستفاده</a>
             </li>
+            @endif
+            @if($this->hasPermission('templates.favorite.service.index'))
             <li
               class="item-li i-courses {{ Request::routeIs('templates.favorite.service.index') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
               <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed;">اقلام پراستفاده</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-patient-records'))
             <li
               class="item-li i-checkout__request {{ Request::routeIs('mc-patient-records') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
               id="gozaresh-mali" style="opacity: 0.5; pointer-events: none;">
@@ -213,8 +274,12 @@
                 پرونده الکترونیک
               </a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('financial_reports'))
         <li
           class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
@@ -230,18 +295,27 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc.panel.financial-reports.index'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.financial-reports.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-payment-setting'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-payment-setting') ? 'is-active' : '' }}">
               <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-wallet-charge'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }}">
               <a href="{{ route('mc-wallet-charge') }}">شارژ کیف‌پول</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('send_messages'))
         <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             ارتباط با بیماران
@@ -255,9 +329,14 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc.panel.send-message'))
             <li class="item-li"><a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a></li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('secretary_management'))
         <li
           class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
@@ -273,16 +352,23 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-secretary-management'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }}">
               <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-secretary-permissions'))
             <li
               class="item-li i-checkout__request {{ Request::routeIs('mc-secretary-permissions') ? 'is-active' : '' }}">
               <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('clinic_management'))
         <li
           class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('mc-doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="gozaresh-mali">
@@ -298,21 +384,30 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-clinic-management'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-clinic-management') ? 'is-active' : '' }}">
               <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.clinics.medical-documents'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.clinics.medical-documents') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-doctors.clinic.deposit'))
             <li
               class="item-li i-checkout__request {{ Request::routeIs('mc-doctors.clinic.deposit') ? 'is-active' : '' }}">
               <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('user_management'))
         <li
-          class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('#') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+          class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
           id="hesab-karbari">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             حساب کاربری
@@ -326,13 +421,18 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-edit-profile'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile') ? 'is-active' : '' }}">
               <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-edit-profile-security'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-security') ? 'is-active' : '' }}">
               <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-edit-profile-upgrade'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc-edit-profile-upgrade') ? 'is-active' : '' }}"
               style="opacity: 0.5; pointer-events: none;">
@@ -343,24 +443,39 @@
                   زودی</span>
               </a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-my-performance'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-my-performance') ? 'is-active' : '' }}">
               <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc-subuser'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-subuser') ? 'is-active' : '' }}">
               <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
             </li>
+            @endif
+            @if($this->hasPermission('my-mc-appointments'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('my-mc-appointments') ? 'is-active' : '' }}">
               <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
             </li>
+            @endif
+            @if($this->hasPermission('mc.panel.doctor-faqs.index'))
             <li
               class="item-li i-user__inforamtion {{ Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }}">
               <a href="{{ route('mc.panel.doctor-faqs.index') }}"> سوالات متداول</a>
             </li>
+            @endif
           </ul>
         </li>
+        @endif
+        
+        @if($this->hasPermission('performance_charts'))
         <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
           <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
         </li>
+        @endif
+        
+        @if($this->hasPermission('tickets'))
         <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">
             پیام
@@ -374,14 +489,17 @@
             </div>
           </a>
           <ul class="drop-toggle d-none">
+            @if($this->hasPermission('mc-panel-tickets'))
             <li class="item-li i-user__inforamtion {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
               <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
             </li>
+            @endif
             <li class="item-li i-user__inforamtion">
               <a href="#">صفحه گفتگو</a>
             </li>
           </ul>
         </li>
+        @endif
       </ul>
     </div>
     <script>
@@ -738,13 +856,27 @@
         <div class="mobile-bottom-nav__label">نوبت‌ها</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
+        @if($this->hasPermission('mc-appointments'))
         <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
+        @endif
+        @if($this->hasPermission('mc.panel.doctornotes.index'))
         <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
+        @endif
+        @if($this->hasPermission('mc-mySpecialDays'))
         <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
+        @endif
+        @if($this->hasPermission('mc-scheduleSetting'))
         <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
+        @endif
+        @if($this->hasPermission('mc-vacation'))
         <a href="{{ route('mc-vacation') }}">تعطیلات</a>
-        <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
+        @endif
+        @if($this->hasPermission('mc-doctor-blocking-users.index'))
+        <a href="{{ route('mc-doctor-blocking-users.index') }}">کاربران مسدود</a>
+        @endif
+        @if($this->hasPermission('mc.panel.my-prescriptions'))
         <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
+        @endif
       </div>
     </div>
     <!-- مشاوره -->
@@ -759,14 +891,22 @@
         <div class="mobile-bottom-nav__label">مشاوره</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
+        @if($this->hasPermission('mc-moshavere_setting'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('mc-moshavere_waiting'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('mc-mySpecialDays-counseling'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('consult-term.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین <span
             class="soon-label">به زودی</span></a>
+        @endif
       </div>
     </div>
     <!-- پروفایل -->
@@ -781,14 +921,28 @@
         <div class="mobile-bottom-nav__label">پروفایل</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
+        @if($this->hasPermission('mc-edit-profile'))
         <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
+        @endif
+        @if($this->hasPermission('mc-edit-profile-security'))
         <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
+        @endif
+        @if($this->hasPermission('mc-my-performance'))
         <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
+        @endif
+        @if($this->hasPermission('mc-subuser'))
         <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
+        @endif
+        @if($this->hasPermission('my-mc-appointments'))
         <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
+        @endif
+        @if($this->hasPermission('mc.panel.doctor-faqs.index'))
         <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
+        @endif
+        @if($this->hasPermission('mc-edit-profile-upgrade'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
             class="soon-label">به زودی</span></a>
+        @endif
       </div>
     </div>
     <!-- ساعت کاری -->
@@ -818,40 +972,84 @@
         <div class="mobile-bottom-nav__label">سایر</div>
       </div>
       <div class="mobile-bottom-nav__dropdown" style="display:none">
+        @if($this->hasPermission('mc-my-performance-chart'))
         <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
+        @endif
+        @if($this->hasPermission('mc-panel-tickets'))
         <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
+        @endif
+        @if($this->hasPermission('mc.panel.send-message'))
         <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
+        @endif
         <a href="#">صفحه گفتگو</a>
+        @if($this->hasPermission('mc.panel.financial-reports.index'))
         <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
+        @endif
+        @if($this->hasPermission('mc-payment-setting'))
         <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
+        @endif
+        @if($this->hasPermission('mc-wallet-charge'))
         <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
+        @endif
+        @if($this->hasPermission('mc.panel.doctor-services.index'))
         <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
+        @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
+        @if($this->hasPermission('prescription.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('prescription.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
           <span class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('providers.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('favorite.templates.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
             class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('templates.favorite.service.index'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
           <span class="soon-label">به زودی</span></a>
+        @endif
+        @if($this->hasPermission('mc-patient-records'))
         <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
           <span class="soon-label">به زودی</span></a>
+        @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
+        @if($this->hasPermission('mc.panel.clinics.medical-documents'))
         <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
+        @endif
+        @if($this->hasPermission('mc-doctors.clinic.deposit'))
         <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
+        @endif
+        @if($this->hasPermission('mc-secretary-management'))
         <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
+        @endif
+        @if($this->hasPermission('mc-secretary-permissions'))
         <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
+        @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مرکز درمانی من</div>
+        @if($this->hasPermission('mc.panel.profile.edit'))
         <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
+        @endif
+        @if($this->hasPermission('mc.panel.doctors.index'))
         <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
+        @endif
+        @if($this->hasPermission('mc.panel.specialties.index'))
         <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
+        @endif
+        @if($this->hasPermission('mc.panel.services.index'))
         <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
+        @endif
+        @if($this->hasPermission('mc.panel.insurances.index'))
         <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
+        @endif
       </div>
     </div>
   </div>

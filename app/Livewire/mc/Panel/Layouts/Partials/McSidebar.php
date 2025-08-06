@@ -7,9 +7,12 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\DoctorSpecialty;
 use App\Models\Specialty;
 use App\Models\DoctorPermission;
+use App\Traits\HasMedicalCenterPermissions;
 
 class McSidebar extends Component
 {
+    use HasMedicalCenterPermissions;
+
     public function render()
     {
         $medical_center = null;
@@ -20,7 +23,6 @@ class McSidebar extends Component
 
         return view('livewire.mc.panel.layouts.partials.mc-sidebar', [
             'medical_center' => $medical_center,
-
         ]);
     }
 }

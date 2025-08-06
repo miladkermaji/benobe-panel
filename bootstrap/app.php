@@ -80,8 +80,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'secretary' => \App\Http\Middleware\secretary::class,
             'medical_center' => \App\Http\Middleware\MedicalCenter::class,
             'secretary.permission' => \App\Http\Middleware\Dr\CheckSecretaryPermission::class,
-            'doctor.permission' => \App\Http\Middleware\Dr\CheckDoctorPermission::class,
-            'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
+            'medical_center.permission' => \App\Http\Middleware\Mc\CheckMedicalCenterPermission::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
