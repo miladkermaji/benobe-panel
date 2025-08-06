@@ -1,0 +1,84 @@
+<?php
+
+namespace App\Livewire\Mc\Panel\Specialties;
+
+use App\Models\Specialty;
+use App\Models\MedicalCenter;
+use Livewire\Component;
+use Illuminate\Support\Facades\Auth;
+
+class SpecialtyCreate extends Component
+{
+    public $selectedSpecialtyIds = [];
+    public $search = '';
+    public $availableSpecialties = [];
+
+    protected $rules = [
+        'selectedSpecialtyIds' => 'required|array|min:1',
+        'selectedSpecialtyIds.*' => 'exists:specialties,id'
+    ];
+
+    protected $messages = [
+        'selectedSpecialtyIds.required' => 'لطفاً حداقل یک تخصص را انتخاب کنید.',
+        'selectedSpecialtyIds.array' => 'تخصص‌ها باید به صورت آرایه باشند.',
+        'selectedSpecialtyIds.min' => 'حداقل یک تخصص باید انتخاب شود.',
+        'selectedSpecialtyIds.*.exists' => 'تخصص انتخاب شده معتبر نیست.'
+    ];
+
+    public function mount()
+    {
+        $this->loadAvailableSpecialties();
+    }
+
+    public function loadAvailableSpecialties()
+    {
+        /** @var MedicalCenter $medicalCenter */
+        $medicalCenter = Auth::guard('medical_center')->user();
+        $currentSpecialtyIds = $medicalCenter->specialty_ids ?? [];
+
+        $query = Specialty::where('status', 1)
+            ->whereNotIn('id', $currentSpecialtyIds)
+            ->orderBy('name', 'asc');
+
+        if ($this->search) {
+            $query->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('description', 'like', '%' . $this->search . '%');
+        }
+
+        $this->availableSpecialties = $query->get();
+    }
+
+    public function updatedSearch()
+    {
+        $this->loadAvailableSpecialties();
+    }
+
+    public function store()
+    {
+        $this->validate();
+
+        /** @var MedicalCenter $medicalCenter */
+        $medicalCenter = Auth::guard('medical_center')->user();
+
+        // Get current specialty IDs
+        $currentSpecialtyIds = $medicalCenter->specialty_ids ?? [];
+
+        // Add new specialty IDs
+        $newSpecialtyIds = array_merge($currentSpecialtyIds, $this->selectedSpecialtyIds);
+
+        // Remove duplicates
+        $newSpecialtyIds = array_unique($newSpecialtyIds);
+
+        // Update medical center
+        $medicalCenter->update(['specialty_ids' => array_values($newSpecialtyIds)]);
+
+        $this->dispatch('show-alert', type: 'success', message: 'تخصص‌ها با موفقیت اضافه شدند.'); 
+
+        return redirect()->route('mc.panel.specialties.index');
+    }
+
+    public function render()
+    {
+        return view('livewire.mc.panel.specialties.specialty-create');
+    }
+}

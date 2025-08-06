@@ -361,5 +361,12 @@ Route::prefix('mc')
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'create'])->name('mc.panel.doctors.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Doctor\DoctorController::class, 'edit'])->name('mc.panel.doctors.edit');
             });
+
+            // Specialty Management Routes
+            Route::prefix('specialties')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'index'])->name('mc.panel.specialties.index');
+                Route::get('/create', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'create'])->name('mc.panel.specialties.create');
+                Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\Specialty\SpecialtyController::class, 'edit'])->name('mc.panel.specialties.edit');
+            });
         });
     });
