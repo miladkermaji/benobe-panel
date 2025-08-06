@@ -57,7 +57,7 @@ class DoctorList extends Component
             return;
         }
         $doctorName = $item->first_name . ' ' . $item->last_name;
-        $action = $item->is_active ? 'غیرفعال کردن' : 'فعال کردن';
+        $action = $item->status ? 'غیرفعال کردن' : 'فعال کردن';
 
         $this->dispatch('confirm-toggle-status', id: $id, name: $doctorName, action: $action);
     }
@@ -80,10 +80,10 @@ class DoctorList extends Component
         }
 
         // Toggle status
-        $doctor->update(['is_active' => !$doctor->is_active]);
+        $doctor->update(['status' => !$doctor->status]);
 
         // If doctor is not active, detach from medical center
-        if (!$doctor->is_active) {
+        if (!$doctor->status) {
             $medicalCenter->doctors()->detach($id);
         }
 
@@ -204,7 +204,7 @@ class DoctorList extends Component
         }
 
         // Update doctors status
-        Doctor::whereIn('id', $doctorsToUpdate)->update(['is_active' => $status]);
+        Doctor::whereIn('id', $doctorsToUpdate)->update(['status' => $status]);
 
         // If status is false, detach from medical center
         if (!$status) {
@@ -268,7 +268,7 @@ class DoctorList extends Component
                 });
             })
             ->when($this->statusFilter !== '', function ($query) {
-                return $query->where('doctors.is_active', $this->statusFilter);
+                return $query->where('doctors.status', $this->statusFilter);
             })
             ->orderBy('doctors.created_at', 'desc');
     }

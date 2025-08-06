@@ -65,7 +65,7 @@ class HeaderComponent extends Component
     {
         $this->doctors = $medicalCenter->doctors()
             ->select('doctors.*')
-            ->where('doctors.is_active', true)
+            ->where('doctors.status', true)
             ->with(['specialties'])
                 ->get();
     }
@@ -114,7 +114,7 @@ class HeaderComponent extends Component
 
         // اگر رکوردی وجود ندارد، بررسی کن که آیا پزشک فعالی دارد یا نه
         $activeDoctors = $medicalCenter->doctors()
-            ->where('doctors.is_active', true)
+            ->where('doctors.status', true)
                 ->get();
 
         if ($activeDoctors->count() > 0) {
@@ -146,7 +146,7 @@ class HeaderComponent extends Component
 
         if ($medicalCenter) {
             // اعتبارسنجی پزشک
-            if ($doctorId && !$medicalCenter->doctors()->where('doctors.id', $doctorId)->where('doctors.is_active', true)->exists()) {
+            if ($doctorId && !$medicalCenter->doctors()->where('doctors.id', $doctorId)->where('doctors.status', true)->exists()) {
                 $this->addError('doctor', 'پزشک انتخاب‌شده معتبر نیست.');
                 return;
             }
@@ -159,7 +159,7 @@ class HeaderComponent extends Component
 
             if ($doctorId) {
                 /** @var Doctor $doctor */
-                $doctor = $medicalCenter->doctors()->where('doctors.is_active', true)->find($doctorId);
+                $doctor = $medicalCenter->doctors()->where('doctors.status', true)->find($doctorId);
                 $this->selectedDoctorName = $doctor->first_name . ' ' . $doctor->last_name;
             } else {
                 $this->selectedDoctorName = 'انتخاب پزشک';

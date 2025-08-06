@@ -161,7 +161,7 @@
                         @endif
                       </td>
                       <td class="text-center">
-                        @if ($doctor->is_active)
+                        @if ($doctor->status)
                           <span class="badge bg-success">فعال</span>
                         @else
                           <span class="badge bg-danger">غیرفعال</span>
@@ -272,7 +272,7 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
                       <span class="note-card-value">
-                        @if ($doctor->is_active)
+                        @if ($doctor->status)
                           <span class="badge bg-success">فعال</span>
                         @else
                           <span class="badge bg-danger">غیرفعال</span>

@@ -244,9 +244,9 @@
                           @if (isset($doctors) && $doctors->count() > 0)
                             @foreach ($doctors as $doctor)
                               <div
-                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->is_active ?? false) ? 'inactive-doctor' : '' }}"
+                                class="d-flex justify-content-between align-items-center option-card doctor-item {{ $selectedDoctorId == ($doctor->id ?? null) ? 'card-active' : '' }} {{ !($doctor->status ?? false) ? 'inactive-doctor' : '' }}"
                                 wire:click="selectDoctor({{ $doctor->id ?? '' }})" data-id="{{ $doctor->id ?? '' }}"
-                                data-active="{{ $doctor->is_active ?? false ? '1' : '0' }}"
+                                data-active="{{ $doctor->status ?? false ? '1' : '0' }}"
                                 data-name="{{ strtolower($doctor->first_name . ' ' . $doctor->last_name) }}"
                                 data-specialty="{{ strtolower($doctor->specialties && $doctor->specialties->count() > 0 ? $doctor->specialties->first()->name : 'پزشک عمومی') }}">
                                 <div class="d-flex align-items-center p-3 position-relative">
@@ -267,13 +267,13 @@
                                       @endif
                                     </span>
                                   </div>
-                                  @if (!($doctor->is_active ?? false))
+                                  @if (!($doctor->status ?? false))
                                     <div class="inactive-dot" title="این پزشک هنوز فعال نشده است">
                                     </div>
                                   @endif
                                 </div>
                                 <div class="mx-2">
-                                  @if (!($doctor->is_active ?? false))
+                                  @if (!($doctor->status ?? false))
                                     <button class="btn my-btn-primary fs-13 btn-sm h-35" tabindex="0"
                                       type="button"
                                       onclick="window.location.href='{{ route('activation-medical-center-doctor', $doctor->id ?? '') }}'">فعال‌سازی
