@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Panel\Managers;
 
 use App\Models\Manager;
+use App\Helpers\JalaliHelper;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Component;
 
@@ -27,7 +28,6 @@ class ManagerEdit extends Component
     public $permission_level = 1;
     public $is_active = true;
     public $is_verified = false;
-    public $change_password = false;
 
     protected $rules = [
         'first_name' => 'required|string|max:100',
@@ -74,7 +74,8 @@ class ManagerEdit extends Component
 
         $this->first_name = $manager->first_name;
         $this->last_name = $manager->last_name;
-        $this->date_of_birth = $manager->date_of_birth;
+        // تبدیل تاریخ میلادی به جلالی برای نمایش
+        $this->date_of_birth = $manager->date_of_birth ? JalaliHelper::toJalaliDate($manager->date_of_birth) : '';
         $this->national_code = $manager->national_code;
         $this->gender = $manager->gender;
         $this->email = $manager->email;
@@ -139,12 +140,22 @@ class ManagerEdit extends Component
         $this->validate();
 
         try {
+            // تبدیل تاریخ جلالی به میلادی
+            $gregorianDateOfBirth = null;
+            if ($this->date_of_birth) {
+                $gregorianDateOfBirth = JalaliHelper::jalaliToGregorian($this->date_of_birth);
+                if (!$gregorianDateOfBirth) {
+                    $this->addError('date_of_birth', 'تاریخ تولد نامعتبر است.');
+                    return;
+                }
+            }
+
             $manager = Manager::findOrFail($this->managerId);
 
             $updateData = [
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
-                'date_of_birth' => $this->date_of_birth ?: null,
+                'date_of_birth' => $gregorianDateOfBirth,
                 'national_code' => $this->national_code ?: null,
                 'gender' => $this->gender ?: null,
                 'email' => $this->email,
@@ -157,10 +168,6 @@ class ManagerEdit extends Component
                 'is_active' => $this->is_active,
                 'is_verified' => $this->is_verified,
             ];
-
-            if ($this->change_password && $this->password) {
-                $updateData['password'] = Hash::make($this->password);
-            }
 
             if ($this->static_password_enabled && $this->static_password) {
                 $updateData['static_password'] = $this->static_password;

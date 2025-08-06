@@ -72,7 +72,7 @@
                   <div class="col-md-6">
                     <div class="form-group position-relative">
                       <label class="form-label">تاریخ تولد</label>
-                      <input data-jdp type="text" id="date_of_birth" class="form-control"
+                      <input data-jdp type="text" wire:model="date_of_birth" class="form-control"
                         placeholder="انتخاب تاریخ تولد" readonly>
                       @error('date_of_birth')
                         <span class="text-danger small">{{ $message }}</span>
@@ -162,37 +162,6 @@
                       @enderror
                     </div>
                   </div>
-
-                  <!-- تغییر رمز عبور -->
-                  <div class="col-12">
-                    <div class="form-check form-switch">
-                      <input wire:model="change_password" class="form-check-input" type="checkbox"
-                        id="change_password">
-                      <label class="form-check-label" for="change_password">
-                        تغییر رمز عبور
-                      </label>
-                    </div>
-                  </div>
-
-                  @if ($change_password)
-                    <div class="col-md-6">
-                      <div class="form-group position-relative">
-                        <label class="form-label">رمز عبور جدید</label>
-                        <input type="password" wire:model="password" class="form-control"
-                          placeholder="حداقل ۸ کاراکتر">
-                        @error('password')
-                          <span class="text-danger small">{{ $message }}</span>
-                        @enderror
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group position-relative">
-                        <label class="form-label">تکرار رمز عبور جدید</label>
-                        <input type="password" wire:model="password_confirmation" class="form-control"
-                          placeholder="تکرار رمز عبور">
-                      </div>
-                    </div>
-                  @endif
                 </div>
               </div>
             </div>

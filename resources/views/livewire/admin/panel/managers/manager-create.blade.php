@@ -70,8 +70,8 @@
                   <div class="col-md-6">
                     <div class="form-group position-relative">
                       <label class="form-label">تاریخ تولد</label>
-                      <input data-jdp type="text" id="date_of_birth" class="form-control" placeholder="انتخاب تاریخ تولد"
-                        readonly>
+                      <input data-jdp type="text" wire:model="date_of_birth" class="form-control"
+                        placeholder="انتخاب تاریخ تولد" readonly>
                       @error('date_of_birth')
                         <span class="text-danger small">{{ $message }}</span>
                       @enderror

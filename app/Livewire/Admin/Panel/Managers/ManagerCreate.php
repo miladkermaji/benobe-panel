@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Panel\Managers;
 
 use App\Models\Manager;
+use App\Helpers\JalaliHelper;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
@@ -89,10 +90,20 @@ class ManagerCreate extends Component
         $this->validate();
 
         try {
+            // تبدیل تاریخ جلالی به میلادی
+            $gregorianDateOfBirth = null;
+            if ($this->date_of_birth) {
+                $gregorianDateOfBirth = JalaliHelper::jalaliToGregorian($this->date_of_birth);
+                if (!$gregorianDateOfBirth) {
+                    $this->addError('date_of_birth', 'تاریخ تولد نامعتبر است.');
+                    return;
+                }
+            }
+
             $manager = Manager::create([
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
-                'date_of_birth' => $this->date_of_birth ?: null,
+                'date_of_birth' => $gregorianDateOfBirth,
                 'national_code' => $this->national_code ?: null,
                 'gender' => $this->gender ?: null,
                 'email' => $this->email,
