@@ -37,7 +37,7 @@ class SearchController extends Controller
                 } else {
                     // Authentication was successful, get the user
                     $user = \Illuminate\Support\Facades\Auth::user();
-                    
+
                     if ($user && $user->id) {
                         // Double-check that the user exists in the database
                         $existingUser = \App\Models\User::find($user->id);
