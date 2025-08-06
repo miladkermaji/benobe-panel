@@ -25,16 +25,35 @@ class Manager extends Authenticatable implements JWTSubject
     protected $table = 'managers';
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
+        'date_of_birth',
+        'national_code',
+        'gender',
         'email',
-        'password',
         'mobile',
-        'is_active'
+        'password',
+        'two_factor_enabled',
+        'static_password_enabled',
+        'static_password',
+        'bio',
+        'address',
+        'permission_level',
+        'is_active',
+        'is_verified',
+        'profile_completed',
+        'email_verified_at',
+        'mobile_verified_at',
+        'two_factor_confirmed_at',
+        'two_factor_secret',
+        'remember_token',
     ];
 
     protected $hidden = [
         'password',
+        'static_password',
         'remember_token',
+        'two_factor_secret',
     ];
 
     protected $casts = [
@@ -42,8 +61,14 @@ class Manager extends Authenticatable implements JWTSubject
         'password' => 'hashed',
         'mobile_verified_at' => 'datetime',
         'two_factor_confirmed_at' => 'datetime',
-        // 'two_factor_secret' رو یا حذف کن (چون رشته پیش‌فرضه) یا به 'string' تغییر بده
-        'two_factor_secret' => 'string', // این بهتره برای وضوح
+        'two_factor_secret' => 'string',
+        'date_of_birth' => 'date',
+        'two_factor_enabled' => 'boolean',
+        'static_password_enabled' => 'boolean',
+        'is_active' => 'boolean',
+        'is_verified' => 'boolean',
+        'profile_completed' => 'boolean',
+        'permission_level' => 'integer',
     ];
 
     public function doctors()
