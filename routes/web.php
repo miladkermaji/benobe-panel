@@ -22,3 +22,15 @@ Route::middleware(['web', 'manager'])->prefix('admin/panel/tools')->group(functi
 // Route for AJAX user search (for Select2 in subscription forms)
 Route::get('/admin/api/users/search', [\App\Http\Controllers\Admin\UserSearchController::class, 'search']);
 Route::get('/admin/api/doctors/search', [\App\Http\Controllers\Admin\DoctorSearchController::class, 'search']);
+
+// Storage files route
+Route::get('storage/{path}', function ($path) {
+    $filePath = storage_path('app/public/' . $path);
+
+    if (file_exists($filePath)) {
+        $file = new \Illuminate\Http\File($filePath);
+        return response()->file($filePath);
+    }
+
+    abort(404);
+})->where('path', '.*');

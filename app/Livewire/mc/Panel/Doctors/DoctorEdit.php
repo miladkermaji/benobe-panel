@@ -11,6 +11,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 use Carbon\Carbon;
 
@@ -104,7 +105,7 @@ class DoctorEdit extends Component
         $this->specialty_id = $this->doctor->specialty_id;
         $this->bio = $this->doctor->bio;
         $this->description = $this->doctor->description;
-        $this->current_photo = $this->doctor->photo;
+        $this->current_photo = $this->doctor->profile_photo_path;
 
         // Load dropdown data
         $this->provinces = Zone::where('level', 1)->get();
@@ -149,7 +150,7 @@ class DoctorEdit extends Component
             'postal_code' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:1000',
             'description' => 'nullable|string|max:2000',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:10240', // 10MB max
         ], [
             'first_name.required' => 'نام الزامی است.',
             'last_name.required' => 'نام خانوادگی الزامی است.',
@@ -169,7 +170,7 @@ class DoctorEdit extends Component
             'license_number.unique' => 'این کد نظام پزشکی قبلاً ثبت شده است.',
             'specialty_id.required' => 'تخصص الزامی است.',
             'photo.image' => 'فایل باید تصویر باشد.',
-            'photo.max' => 'حجم تصویر نباید بیشتر از 2 مگابایت باشد.',
+            'photo.max' => 'حجم تصویر نباید بیشتر از 10 مگابایت باشد.',
         ]);
 
         try {
@@ -214,14 +215,36 @@ class DoctorEdit extends Component
 
             // Handle photo upload
             if ($this->photo) {
-                // Delete old photo if exists
-                if ($this->current_photo && file_exists(storage_path('app/public/' . $this->current_photo))) {
-                    unlink(storage_path('app/public/' . $this->current_photo));
-                }
+                try {
+                    // Delete old photo if exists
+                    if ($this->current_photo && file_exists(storage_path('app/public/' . $this->current_photo))) {
+                        unlink(storage_path('app/public/' . $this->current_photo));
+                    }
 
-                $photoPath = $this->photo->store('doctors/photos', 'public');
-                $this->doctor->update(['photo' => $photoPath]);
-                $this->current_photo = $photoPath;
+                    // Store new photo
+                    $photoPath = $this->photo->store('doctors/photos', 'public');
+
+                    // Debug: Log the photo path
+                    Log::info('Photo uploaded successfully: ' . $photoPath);
+
+                    // Update doctor with new photo path
+                    $updateResult = $this->doctor->update(['profile_photo_path' => $photoPath]);
+
+                    // Debug: Log the update result
+                    Log::info('Doctor update result: ' . ($updateResult ? 'success' : 'failed'));
+                    Log::info('Doctor ID: ' . $this->doctor->id);
+                    Log::info('Photo path saved: ' . $this->doctor->fresh()->profile_photo_path);
+
+                    $this->current_photo = $photoPath;
+
+                    // Clear photo from temporary storage
+                    $this->photo = null;
+
+                } catch (\Exception $e) {
+                    Log::error('Photo update failed: ' . $e->getMessage());
+                    $this->dispatch('show-toastr', ['message' => 'خطا در آپلود عکس: ' . $e->getMessage(), 'type' => 'error']);
+                    return;
+                }
             }
 
             // Clear cache

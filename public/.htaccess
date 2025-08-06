@@ -18,5 +18,18 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
-    RewriteRule ^storage/(.*)$ storage/$1 [NC,L]
+    
+    # Handle Storage Files
+    RewriteCond %{REQUEST_URI} ^/storage/(.*)$
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^storage/(.*)$ storage/app/public/$1 [L]
+</IfModule>
+
+# PHP Settings for Large File Uploads
+<IfModule mod_php.c>
+    php_value upload_max_filesize 40M
+    php_value post_max_size 40M
+    php_value max_execution_time 300
+    php_value max_input_time 300
+    php_value memory_limit 256M
 </IfModule>

@@ -116,10 +116,16 @@
                       <td class="text-center">{{ $doctors->firstItem() + $index }}</td>
                       <td class="text-center">
                         <div class="position-relative" style="width: 40px; height: 40px;">
-                          <img loading="lazy"
-                            src="{{ $doctor->photo ? asset('storage/' . $doctor->photo) : asset('admin-assets/images/default-avatar.png') }}"
-                            class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
-                            alt="پروفایل" onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                          @if ($doctor->profile_photo_path)
+                            <img loading="lazy" src="{{ url('storage/' . $doctor->profile_photo_path) }}"
+                              class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                              alt="پروفایل"
+                              onerror="this.src='{{ asset('admin-assets/images/default-avatar.png') }}'">
+                          @else
+                            <img loading="lazy" src="{{ asset('admin-assets/images/default-avatar.png') }}"
+                              class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                              alt="پروفایل">
+                          @endif
                           <div
                             class="position-absolute top-0 start-0 w-100 h-100 rounded-circle bg-light d-none align-items-center justify-content-center"
                             style="background-color: #f8f9fa;">

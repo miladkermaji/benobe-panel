@@ -10,6 +10,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 use App\Models\MedicalCenter;
 
@@ -84,7 +85,7 @@ class DoctorCreate extends Component
             'postal_code' => 'nullable|string|max:20',
             'bio' => 'nullable|string|max:1000',
             'description' => 'nullable|string|max:2000',
-            'photo' => 'nullable|image|max:2048',
+            'photo' => 'nullable|image|max:10240', // 10MB max
         ], [
             'first_name.required' => 'نام الزامی است.',
             'last_name.required' => 'نام خانوادگی الزامی است.',
@@ -105,7 +106,7 @@ class DoctorCreate extends Component
             'license_number.unique' => 'این کد نظام پزشکی قبلاً ثبت شده است.',
             'specialty_id.required' => 'تخصص الزامی است.',
             'photo.image' => 'فایل باید تصویر باشد.',
-            'photo.max' => 'حجم تصویر نباید بیشتر از 2 مگابایت باشد.',
+            'photo.max' => 'حجم تصویر نباید بیشتر از 10 مگابایت باشد.',
         ]);
 
         try {
@@ -132,8 +133,24 @@ class DoctorCreate extends Component
 
             // Store photo if uploaded
             if ($this->photo) {
-                $photoPath = $this->photo->store('doctors/photos', 'public');
-                $doctor->update(['photo' => $photoPath]);
+                try {
+                    $photoPath = $this->photo->store('doctors/photos', 'public');
+
+                    // Debug: Log the photo path
+                    Log::info('Photo uploaded successfully: ' . $photoPath);
+
+                    // Update the doctor with photo path
+                    $updateResult = $doctor->update(['profile_photo_path' => $photoPath]);
+
+                    // Debug: Log the update result
+                    Log::info('Doctor update result: ' . ($updateResult ? 'success' : 'failed'));
+                    Log::info('Doctor ID: ' . $doctor->id);
+                    Log::info('Photo path saved: ' . $doctor->fresh()->profile_photo_path);
+
+                } catch (\Exception $e) {
+                    Log::error('Photo upload failed: ' . $e->getMessage());
+                    $this->dispatch('show-toastr', ['message' => 'خطا در آپلود عکس: ' . $e->getMessage(), 'type' => 'error']);
+                }
             }
 
             // Associate doctor with medical center
