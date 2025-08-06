@@ -16,4 +16,8 @@
 @section('content')
 @section('bread-crumb-title', 'ویرایش پزشک')
 @livewire('mc.panel.doctors.doctor-edit', ['id' => $id])
+@section('scripts')
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+
+@endsection
 @endsection

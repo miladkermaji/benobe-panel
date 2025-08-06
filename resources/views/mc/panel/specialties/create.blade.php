@@ -16,4 +16,8 @@
 @section('content')
 @section('bread-crumb-title', 'افزودن تخصص')
 @livewire('mc.panel.specialties.specialty-create')
+@section('scripts')
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
+
+@endsection
 @endsection
