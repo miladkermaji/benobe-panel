@@ -9,7 +9,6 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 use App\Models\MedicalCenter;
@@ -172,9 +171,6 @@ class DoctorCreate extends Component
             /** @var MedicalCenter $medicalCenter */
             $medicalCenter = Auth::guard('medical_center')->user();
             $medicalCenter->doctors()->attach($doctor->id);
-
-            // Clear cache
-            Cache::forget('mc_doctors_' . $medicalCenter->id . '_*');
 
             $this->dispatch('show-toastr', ['message' => 'پزشک با موفقیت ایجاد شد.', 'type' => 'success']);
 

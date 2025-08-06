@@ -9,7 +9,6 @@ use App\Models\Specialty;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 use Morilog\Jalali\Jalalian;
 
 class DoctorList extends Component
@@ -87,9 +86,6 @@ class DoctorList extends Component
             $medicalCenter->doctors()->detach($id);
         }
 
-        // Clear cache
-        Cache::forget('mc_doctors_' . $medicalCenter->id . '_*');
-
         $this->dispatch('show-alert', type: 'success', message: "وضعیت پزشک {$doctor->first_name} {$doctor->last_name} تغییر کرد.");
     }
 
@@ -119,9 +115,6 @@ class DoctorList extends Component
         $medicalCenter->doctors()->detach($id);
 
         $this->dispatch('show-alert', type: 'success', message: "پزشک {$doctor->first_name} {$doctor->last_name} از مرکز درمانی شما حذف شد.");
-
-        // Clear cache
-        Cache::forget('mc_doctors_' . $medicalCenter->id . '_*');
     }
 
     public function updatedSelectAll($value)
@@ -161,9 +154,6 @@ class DoctorList extends Component
 
         $this->selectedDoctors = [];
         $this->selectAll = false;
-
-        // Clear cache
-        Cache::forget('mc_doctors_' . $medicalCenter->id . '_*');
 
         $this->dispatch('show-alert', type: 'success', message: count($doctorsToRemove) . ' پزشک از مرکز درمانی شما حذف شد.');
     }
@@ -213,9 +203,6 @@ class DoctorList extends Component
 
         $this->selectedDoctors = [];
         $this->selectAll = false;
-
-        // Clear cache
-        Cache::forget('mc_doctors_' . $medicalCenter->id . '_*');
 
         $statusText = $status ? 'فعال' : 'غیرفعال';
         $this->dispatch('show-alert', type: 'success', message: count($doctorsToUpdate) . " پزشک {$statusText} شد.");
@@ -282,14 +269,7 @@ class DoctorList extends Component
             ]);
         }
 
-        /** @var MedicalCenter $medicalCenter */
-        $medicalCenter = Auth::guard('medical_center')->user();
-        $cacheKey = "mc_doctors_{$medicalCenter->id}_" . md5($this->search . $this->statusFilter . $this->perPage);
-
-        $doctors = Cache::remember($cacheKey, 300, function () {
-            return $this->getDoctorsQuery()->paginate($this->perPage);
-        });
-
+        $doctors = $this->getDoctorsQuery()->paginate($this->perPage);
         $this->totalFilteredCount = $doctors->total();
 
         return view('livewire.mc.panel.doctors.doctor-list', [
