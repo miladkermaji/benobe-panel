@@ -71,6 +71,25 @@
             <li class="item-li"><a href="{{ route('admin.panel.user-blockings.index') }}">مدیریت مسدودیت‌ها</a></li>
           </ul>
         </li>
+        <!-- مدیریت -->
+        <li class="item-li i-users {{ Request::routeIs('admin.panel.managers.*') ? 'is-active' : '' }}">
+          <a href="#" class="d-flex justify-content-between w-100 align-items-center">
+            مدیریت
+            <div class="d-flex justify-content-end w-100 align-items-center">
+              <svg width="6" height="9" class="svg-caret-left" viewBox="0 0 7 11" fill="none"
+                xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s; transform: rotate(180deg);">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.658146 0.39655C0.95104 0.103657 1.42591 0.103657 1.71881 0.39655L6.21881 4.89655C6.5117 5.18944 6.5117 5.66432 6.21881 5.95721L1.71881 10.4572C1.42591 10.7501 0.95104 10.7501 0.658146 10.4572C0.365253 10.1643 0.365253 9.68944 0.658146 9.39655L4.62782 5.42688L0.658146 1.45721C0.365253 1.16432 0.365253 0.689443 0.658146 0.39655Z"
+                  fill="currentColor"></path>
+              </svg>
+            </div>
+          </a>
+          <ul class="drop-toggle d-none">
+            <li class="item-li {{ Request::routeIs('admin.panel.managers.index') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.managers.index') }}">مدیران</a>
+            </li>
+          </ul>
+        </li>
         <!-- مدیریت پزشکان -->
         <li class="item-li i-users">
           <a href="#" class="d-flex justify-content-between w-100 align-items-center">

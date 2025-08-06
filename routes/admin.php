@@ -349,6 +349,14 @@ Route::prefix('admin')
             Route::get('/edit/{id}', [UserController::class, 'edit'])->name('admin.panel.users.edit');
             // عملیات‌های دیگر مثل toggle، update و destroy در Livewire انجام می‌شوند
         });
+
+        // Manager Routes
+        Route::prefix('managers/')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'index'])->name('admin.panel.managers.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'create'])->name('admin.panel.managers.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'edit'])->name('admin.panel.managers.edit');
+        });
+
         Route::get('/panel/doctors/permissions', function () {
             return view('admin.panel.doctors.doctors-permissions');
         })->name('admin.panel.doctors.permissions');
