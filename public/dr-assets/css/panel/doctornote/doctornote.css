@@ -157,7 +157,13 @@ body {
     background: rgba(200, 200, 200, 0.5);
     cursor: not-allowed;
 }
-
+.form-control::placeholder{
+    font-size: 12px !important;
+    font-weight: bold !important;
+}
+.btn.btn-gradient-success.btn-gradient-success-576.rounded-1.px-3.py-1.d-flex.align-items-center.gap-1.h-50{
+    font-size: 12px !important;
+}
 /* ورودی‌ها */
 .form-control,
 .form-select {
