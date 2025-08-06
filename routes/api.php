@@ -23,6 +23,9 @@ use App\Http\Controllers\Api\DoctorAppointmentController;
 use App\Http\Controllers\Api\AppointmentBookingController;
 use App\Http\Controllers\Api\UserSubscriptionController;
 use Modules\Payment\App\Http\Controllers\PaymentController;
+use Illuminate\Http\Request;
+use App\Services\JwtTokenService;
+use App\Http\Controllers\Api\SearchController;
 
 // مسیرهای نسخه 1 (یا بدون نسخه - قبلی)
 Route::prefix('/auth')->group(function () {
@@ -38,7 +41,23 @@ Route::prefix('/auth')->group(function () {
 });
 
 // مسیرهای جدید نسخه 2
-Route::prefix('v2')->group(function () {
+Route::prefix('/v2')->group(function () {
+    // مسیرهای جستجو
+    Route::get('/search', [SearchController::class, 'search'])->name('api.v2.search');
+
+    // مسیرهای احراز هویت
+    Route::prefix('/auth')->group(function () {
+        Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.v2.auth.login-register');
+        Route::post('/login-confirm/{token}', [AuthController::class, 'loginConfirm'])->name('api.v2.auth.login-confirm');
+        Route::post('/resend-otp/{token}', [AuthController::class, 'resendOtp'])->name('api.v2.auth.resend-otp');
+        Route::middleware(['custom-auth.jwt'])->group(function () {
+            Route::post('/logout', [AuthController::class, 'logout'])->name('api.v2.auth.logout');
+            Route::get('/profile', [AuthController::class, 'me']);
+            Route::get('/verify-token', [AuthController::class, 'verifyToken']);
+            Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.v2.auth.update-profile');
+        });
+    });
+
     Route::middleware(['custom-auth.jwt'])->group(function () {
         Route::prefix('appointments')->group(function () {
             Route::get('book/{doctorId}', [AppointmentBookingController::class, 'getBookingDetails'])->name('api.v2.appointments.booking-details');
@@ -54,6 +73,26 @@ Route::prefix('v2')->group(function () {
     // اضافه کردن روت callback به صورت مستقل و خارج از middleware
     Route::get('subscriptions/payment/callback', [UserSubscriptionController::class, 'paymentCallback'])->name('api.v2.subscriptions.payment.callback');
 });
+
+// Debug route for JWT token validation (remove in production)
+Route::post('/debug/jwt-validate', function (Request $request) {
+    $token = $request->input('token');
+
+    if (!$token) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Token is required'
+        ], 400);
+    }
+
+    $jwtService = new JwtTokenService();
+    $validation = $jwtService->validateToken($token);
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $validation
+    ]);
+})->name('api.debug.jwt-validate');
 
 // مسیرهای عمومی
 Route::prefix('zone')->group(function () {

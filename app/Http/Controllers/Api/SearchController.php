@@ -25,14 +25,31 @@ class SearchController extends Controller
 
         if ($token) {
             try {
-                app(\App\Http\Middleware\JwtMiddleware::class)->handle($request, function () {});
-                $user = \Illuminate\Support\Facades\Auth::user();
-                // Validate that the user actually exists in the database
-                if ($user && \App\Models\User::find($user->id)) {
-                    $userId = $user->id;
-                    \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
+                // Use the JWT middleware to validate the token
+                $jwtMiddleware = app(\App\Http\Middleware\JwtMiddleware::class);
+                $response = $jwtMiddleware->handle($request, function ($request) {
+                    return null; // Continue to next middleware
+                });
+
+                // If middleware returned a response, it means authentication failed
+                if ($response && $response->getStatusCode() === 401) {
+                    \Illuminate\Support\Facades\Log::warning('JWT authentication failed in search: ' . $response->getContent());
                 } else {
-                    \Illuminate\Support\Facades\Log::warning("JWT token contains user ID that doesn't exist in database: " . ($user ? $user->id : 'null'));
+                    // Authentication was successful, get the user
+                    $user = \Illuminate\Support\Facades\Auth::user();
+                    
+                    if ($user && $user->id) {
+                        // Double-check that the user exists in the database
+                        $existingUser = \App\Models\User::find($user->id);
+                        if ($existingUser) {
+                            $userId = $user->id;
+                            \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
+                        } else {
+                            \Illuminate\Support\Facades\Log::warning("JWT token contains user ID that doesn't exist in database: " . ($user ? $user->id : 'null'));
+                        }
+                    } else {
+                        \Illuminate\Support\Facades\Log::warning("JWT token contains null user ID or user object is null");
+                    }
                 }
             } catch (\Exception $e) {
                 // If JWT authentication fails, userId remains null

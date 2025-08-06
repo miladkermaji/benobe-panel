@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\UserTypeDetectionService;
+use App\Services\JwtTokenService;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
@@ -281,9 +282,24 @@ class AuthController extends Controller
 
         $user->update(['mobile_verified_at' => Carbon::now()]);
 
-        // Add the guard to the token claims to identify user type in middleware
-        $customClaims = ['guard' => $guard];
-        $jwtToken = JWTAuth::claims($customClaims)->fromUser($user);
+        // Use the JWT service for better token creation and validation
+        $jwtService = new JwtTokenService();
+
+        try {
+            $jwtToken = $jwtService->createToken($user, $guard);
+        } catch (\Exception $e) {
+            Log::error('Failed to create JWT token during login', [
+                'user_id' => $user->id,
+                'guard' => $guard,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطا در ایجاد توکن احراز هویت',
+                'data' => null
+            ], 500);
+        }
 
         $loginAttempts->resetLoginAttempts($user->mobile);
 
@@ -417,10 +433,11 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
+            $jwtService = new JwtTokenService();
             $token = JWTAuth::getToken();
 
             if ($token) {
-                JWTAuth::invalidate($token);
+                $jwtService->invalidateToken($token);
             }
 
             $user = Auth::user();
@@ -452,6 +469,11 @@ class AuthController extends Controller
             ])->withCookie(cookie()->forget('auth_token'));
 
         } catch (\Exception $e) {
+            Log::error('Logout failed', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::user() ? Auth::user()->id : 'null'
+            ]);
+
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطایی در خروج رخ داد',
