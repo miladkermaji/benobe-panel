@@ -18,10 +18,10 @@ class AdminSidebar extends Component
         if ($this->user) {
             switch ($this->user->permission_level) {
                 case 1:
-                    $this->userType = 'مدیر عادی';
+                    $this->userType = 'مدیر ارشد';
                     break;
                 case 2:
-                    $this->userType = 'مدیر ارشد';
+                    $this->userType = 'مدیر عادی';
                     break;
                 default:
                     $this->userType = 'نامشخص';
