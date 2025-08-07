@@ -116,8 +116,9 @@
     }
 
     document.addEventListener('livewire:initialized', () => {
-      if (!window.location.href.includes('from_back')) { // فقط در بارگذاری اولیه
-        document.querySelector('input[wire\\:model="mobile"]').focus();
+      if (!window.location.href.includes('from_back')) {
+        const input = document.querySelector('input[wire\\:model="mobile"]');
+        if (input) input.focus();
       }
     });
   </script>

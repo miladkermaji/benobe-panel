@@ -8,7 +8,7 @@
       </div>
       <div class="text-center mb-4 d-none">
         <h2 class="text-primary fw-bold mb-2" style="font-weight: 700 !important;">پنل مدیریت به نوبه</h2>
-        <p class="text-muted fw-bold">به پنل مدیریت  به نوبه خوش آمدید</p>
+        <p class="text-muted fw-bold">به پنل مدیریت به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="d-flex align-items-center">
@@ -30,8 +30,8 @@
           </div>
           <div class="position-relative">
             <input wire:model="password"
-              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror"
-              type="password" placeholder="رمز عبور خود را وارد کنید" id="password-input">
+              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror" type="password"
+              placeholder="رمز عبور خود را وارد کنید" id="password-input">
             <img src="{{ asset('admin-assets/login/images/visible.svg') }}" alt="نمایش رمز" class="password-toggle"
               onclick="togglePasswordVisibility('password-input')">
           </div>
@@ -114,7 +114,7 @@
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });
-  document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       if (typeof toastr !== 'undefined') {
         toastr.options = {
           timeOut: 10000,
@@ -124,9 +124,9 @@
           newestOnTop: true,
           maxOpened: 1, // فقط یک توستر در هر لحظه
           closeButton: false,
-          
+
         };
-        
+
       }
       toastr.options.rtl = true;
     });
@@ -147,7 +147,8 @@
     }
 
     document.addEventListener('livewire:initialized', () => {
-      document.querySelector('input[wire\\:model="password"]').focus();
+      const input = document.querySelector('input[wire\\:model="password"]');
+      if (input) input.focus();
     });
   </script>
 @endpush
