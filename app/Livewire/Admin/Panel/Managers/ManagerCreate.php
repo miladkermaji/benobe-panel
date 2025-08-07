@@ -77,6 +77,11 @@ class ManagerCreate extends Component
 
     public function save()
     {
+        // اگر رمز عبور ثابت غیر فعال بود، فیلدهای رمز عبور را خالی کن
+        if (! $this->static_password_enabled) {
+            $this->password = '';
+            $this->password_confirmation = '';
+        }
         // اعتبارسنجی رمز عبور
         if ($this->static_password_enabled) {
             $this->rules['password'] = 'required|string|min:8|confirmed';
