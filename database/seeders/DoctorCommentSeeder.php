@@ -1,11 +1,12 @@
 <?php
+
 namespace Database\Seeders;
 
-use App\Models\Doctor;
-use App\Models\Doctors\DoctorManagements\DoctorComment;
 use Carbon\Carbon;
-use Illuminate\Database\Seeder;
+use App\Models\Doctor;
 use Illuminate\Support\Str;
+use App\Models\DoctorComment;
+use Illuminate\Database\Seeder;
 
 class DoctorCommentSeeder extends Seeder
 {
@@ -67,8 +68,6 @@ class DoctorCommentSeeder extends Seeder
         for ($i = 1; $i <= 50; $i++) {
             DoctorComment::create([
                 'doctor_id'  => $doctors->random()->id,
-                'user_name'  => $userNames[array_rand($userNames)],
-                'user_phone' => '09' . Str::random(9), // شماره تلفن تصادفی
                 'comment'    => $comments[array_rand($comments)],
                 'status'     => rand(0, 1),                                     // 0 یا 1 برای غیرفعال/فعال
                 'ip_address' => '192.168.' . rand(1, 255) . '.' . rand(1, 255), // IP تصادفی

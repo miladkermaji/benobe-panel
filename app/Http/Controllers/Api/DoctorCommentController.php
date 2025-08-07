@@ -80,6 +80,17 @@ class DoctorCommentController extends Controller
             'receptionist_comment' => 'nullable|string',
             'experience_comment' => 'nullable|string',
         ], $messages);
+
+        // Map experience_comment to comment if comment is not provided
+        if (empty($validated['comment']) && !empty($validated['experience_comment'])) {
+            $validated['comment'] = $validated['experience_comment'];
+        }
+
+        // Ensure comment field is not empty (required by database)
+        if (empty($validated['comment'])) {
+            $validated['comment'] = 'نظر کاربر';
+        }
+
         // مقداردهی userable
         if ($user) {
             $validated['userable_id'] = $user->id;
