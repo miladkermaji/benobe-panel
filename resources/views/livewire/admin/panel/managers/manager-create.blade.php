@@ -95,8 +95,8 @@
                     <div class="form-group position-relative">
                       <label class="form-label">سطح دسترسی <span class="text-danger">*</span></label>
                       <select wire:model="permission_level" class="form-select" required>
-                        <option value="1">مدیر عادی</option>
-                        <option value="2">مدیر ارشد</option>
+                        <option value="2">مدیر عادی</option>
+                        <option value="1">مدیر ارشد</option>
                       </select>
                       @error('permission_level')
                         <div class="invalid-feedback d-block">{{ $message }}</div>

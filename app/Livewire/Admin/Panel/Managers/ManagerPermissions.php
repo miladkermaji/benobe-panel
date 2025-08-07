@@ -52,7 +52,12 @@ class ManagerPermissions extends Component
 
     public function render()
     {
+        $currentManager = auth('manager')->user();
         $managers = Manager::with(['permissions'])
+            ->when($currentManager && $currentManager->permission_level == 1, function ($query) use ($currentManager) {
+                $query->where('permission_level', 2)
+                      ->where('id', '!=', $currentManager->id);
+            })
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('first_name', 'like', '%' . $this->search . '%')

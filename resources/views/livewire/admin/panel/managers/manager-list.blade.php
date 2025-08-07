@@ -152,7 +152,7 @@
                       <td class="align-middle">{{ $manager->email }}</td>
                       <td class="align-middle">{{ $manager->mobile ?: '-' }}</td>
                       <td class="align-middle">
-                        @if ($manager->permission_level == 1)
+                        @if ($manager->permission_level == 2)
                           <span class="badge bg-primary">مدیر عادی</span>
                         @else
                           <span class="badge bg-warning">مدیر ارشد</span>
@@ -242,7 +242,7 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">سطح دسترسی:</span>
                       <span class="note-card-value">
-                        @if ($manager->permission_level == 1)
+                        @if ($manager->permission_level == 2)
                           <span class="badge bg-primary">مدیر عادی</span>
                         @else
                           <span class="badge bg-warning">مدیر ارشد</span>
