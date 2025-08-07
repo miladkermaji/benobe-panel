@@ -11,10 +11,10 @@
         <div class="v-dialog__container" style="display: block;"></div>
         <div class="box__camera default__avatar"></div>
       </div>
-      <span class="profile__name sidebar-full-name br">
+      <span class="profile__name sidebar-full-name">
         {{ $user ? $user->first_name . ' ' . $user->last_name : 'کاربر ناشناس' }}
       </span>
-      <span class="fs-11 fw-bold" id="takhasos-txt">{{ $userType }}</span>
+      <span class="fs-11 fw-bold d-block" id="takhasos-txt">{{ $userType }}</span>
     </div>
   </div>
   <!-- بخش اسکرول‌پذیر -->
