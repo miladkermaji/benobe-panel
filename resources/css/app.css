@@ -220,3 +220,10 @@ button {
 .card {
     border-radius: var(--radius-nav) !important;
 }
+@media (max-width: 768px) {
+  .form-control, input:not([type="checkbox"]) {
+    height: 42px !important;
+    font-size: 15px;
+    border-radius: 0.45rem !important;
+  }
+}
