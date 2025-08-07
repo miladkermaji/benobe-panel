@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api;
 
 use App\Models\Zone;
@@ -23,18 +24,18 @@ class DoctorFilterController extends Controller
             $data = Cache::remember('doctor_filter_options', 1440, function () {
                 // گرفتن استان‌ها (level = 1)
                 $provinces = Zone::where('level', 1)
-                    ->select('id', 'name')
+                    ->select('id', 'name', 'slug')
                     ->orderBy('name')
                     ->get();
 
                 // گرفتن شهرها (level = 2)
                 $cities = Zone::where('level', 2)
-                    ->select('id', 'name', 'parent_id as province_id')
+                    ->select('id', 'name', 'slug', 'parent_id as province_id')
                     ->orderBy('name')
                     ->get();
 
                 // گرفتن تخصص‌ها از جدول specialties
-                $specialties = Specialty::select('id', 'name')
+                $specialties = Specialty::select('id', 'name', 'slug')
                     ->orderBy('name')
                     ->get();
 
@@ -43,7 +44,7 @@ class DoctorFilterController extends Controller
                 $hasTextCounseling  = DoctorCounselingConfig::where('has_text_counseling', true)->exists();
                 $hasVideoCounseling = DoctorCounselingConfig::where('has_video_counseling', true)->exists();
 
-                                                                                           // تعریف انواع خدمات (تب‌ها) - فقط مواردی که حداقل یک پزشک فعال کرده باشد
+                // تعریف انواع خدمات (تب‌ها) - فقط مواردی که حداقل یک پزشک فعال کرده باشد
                 $serviceTypes = [['value' => 'in_person', 'name' => 'نوبت‌دهی']]; // نوبت‌دهی همیشه وجود دارد
                 if ($hasPhoneCounseling) {
                     $serviceTypes[] = ['value' => 'phone', 'name' => 'مشاوره تلفنی'];
@@ -55,14 +56,14 @@ class DoctorFilterController extends Controller
                     $serviceTypes[] = ['value' => 'video', 'name' => 'مشاوره ویدیویی'];
                 }
 
-                // گرفتن خدمات از جدول services (فقط 10 مورد اول برای بهینه‌سازی)
+                // گرفتن خدمات از جدول services
                 $services = Service::where('status', true)
-                    ->select('id', 'name')
+                    ->select('id', 'name', 'slug')
                     ->orderBy('name')
                     ->get();
 
                 // گرفتن بیمه‌ها از جدول insurances
-                $insurances = Insurance::select('id', 'name')
+                $insurances = Insurance::select('id', 'name', 'slug')
                     ->orderBy('name')
                     ->get();
 
