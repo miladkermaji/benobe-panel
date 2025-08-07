@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\ManagerPermission;
 
 class Manager extends Authenticatable implements JWTSubject
 {
@@ -104,6 +105,11 @@ class Manager extends Authenticatable implements JWTSubject
     public function loginLogs()
     {
         return $this->morphMany(\App\Models\LoginLog::class, 'loggable');
+    }
+
+    public function permissions()
+    {
+        return $this->hasOne(ManagerPermission::class);
     }
 
     /**

@@ -353,10 +353,11 @@ Route::prefix('admin')
         });
 
         // Manager Routes
-        Route::prefix('managers/')->group(function () {
-            Route::get('/', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'index'])->name('admin.panel.managers.index');
-            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'create'])->name('admin.panel.managers.create');
-            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'edit'])->name('admin.panel.managers.edit');
+        Route::prefix('managers/')->name('admin.panel.managers.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'index'])->name('index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'create'])->name('create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'edit'])->name('edit');
+            Route::get('/permissions', [\App\Http\Controllers\Admin\Panel\Managers\ManagerController::class, 'permissions'])->name('permissions');
         });
 
         Route::get('/panel/doctors/permissions', function () {

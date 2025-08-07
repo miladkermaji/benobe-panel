@@ -88,6 +88,9 @@
             <li class="item-li {{ Request::routeIs('admin.panel.managers.index') ? 'is-active' : '' }}">
               <a href="{{ route('admin.panel.managers.index') }}">مدیران</a>
             </li>
+            <li class="item-li {{ Request::routeIs('admin.panel.managers.permissions') ? 'is-active' : '' }}">
+              <a href="{{ route('admin.panel.managers.permissions') }}">مدیریت دسترسی مدیران</a>
+            </li>
           </ul>
         </li>
         <!-- مدیریت پزشکان -->

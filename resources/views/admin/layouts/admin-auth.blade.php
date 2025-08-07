@@ -55,7 +55,7 @@
 
   <main class="min-h-screen">
     <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
-      {{ $slot }}
+      @yield('content')
     </div>
   </main>
 
@@ -69,52 +69,51 @@
 
   @livewireScripts
   @once
-  <script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof toastr !== 'undefined') {
+          toastr.options = {
+            timeOut: 10000,
+            progressBar: true,
+            positionClass: 'toast-top-right',
+            preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
+            newestOnTop: true,
+            maxOpened: 1, // فقط یک توستر در هر لحظه
+            closeButton: false,
 
-    document.addEventListener('DOMContentLoaded', () => {
-      if (typeof toastr !== 'undefined') {
-        toastr.options = {
-          timeOut: 10000,
-          progressBar: true,
-          positionClass: 'toast-top-right',
-          preventDuplicates: true, // جلوگیری از نمایش توسترهای تکراری
-          newestOnTop: true,
-          maxOpened: 1, // فقط یک توستر در هر لحظه
-          closeButton: false,
-          
-        };
-        
-      }
-      toastr.options.rtl = true;
-    });
+          };
 
-    Livewire.on('otpSent', (data) => {
-      localStorage.removeItem('otpTimerData');
-    });
+        }
+        toastr.options.rtl = true;
+      });
 
-    // تعریف متغیر isSubmitting در اسکوپ جهانی فقط یک‌بار
-    window.isSubmitting = false;
+      Livewire.on('otpSent', (data) => {
+        localStorage.removeItem('otpTimerData');
+      });
 
-    document.addEventListener('livewire:initialized', () => {
-      // انتخاب فرم‌های مختلف با کلاس‌های منحصربه‌فرد
-      const forms = document.querySelectorAll(
-        'form.login-register-form, form.login-confirm-form, form.login-user-pass-form');
-      forms.forEach((form) => {
-        form.addEventListener('submit', (e) => {
-          if (window.isSubmitting) {
-            e.preventDefault();
-            return;
-          }
-          window.isSubmitting = true;
-          setTimeout(() => {
-            window.isSubmitting = false;
-          }, 1000); // ریست فلگ پس از 1 ثانیه
+      // تعریف متغیر isSubmitting در اسکوپ جهانی فقط یک‌بار
+      window.isSubmitting = false;
+
+      document.addEventListener('livewire:initialized', () => {
+        // انتخاب فرم‌های مختلف با کلاس‌های منحصربه‌فرد
+        const forms = document.querySelectorAll(
+          'form.login-register-form, form.login-confirm-form, form.login-user-pass-form');
+        forms.forEach((form) => {
+          form.addEventListener('submit', (e) => {
+            if (window.isSubmitting) {
+              e.preventDefault();
+              return;
+            }
+            window.isSubmitting = true;
+            setTimeout(() => {
+              window.isSubmitting = false;
+            }, 1000); // ریست فلگ پس از 1 ثانیه
+          });
         });
       });
-    });
-  </script>
+    </script>
   @endonce
- 
+
   @stack('scripts')
 </body>
 

@@ -20,4 +20,9 @@ class ManagerController extends Controller
     {
         return view('admin.panel.managers.edit', compact('id'));
     }
+
+    public function permissions()
+    {
+        return view('admin.panel.managers.permissions');
+    }
 }
