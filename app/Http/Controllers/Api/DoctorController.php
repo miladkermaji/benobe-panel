@@ -229,8 +229,7 @@ class DoctorController extends Controller
                                 'appointmentConfig',
                             ]);
                     },
-                    'hospital'     => fn ($query) => $query->select('id', 'name'),
-                    'appointments' => fn ($query) => $query->where('appointments.status', 'scheduled'),
+                    'medicalCenter' => fn ($query) => $query->select('id', 'name'),
                 ])
                 ->select(['id', 'doctor_id', 'star_rating'])
                 ->when($limit !== null, function ($query) use ($limit) {
@@ -240,7 +239,6 @@ class DoctorController extends Controller
                 ->get()
                 ->groupBy('doctor_id')
                 ->map(fn ($group) => $group->first());
-
 
             $formattedDoctors = $bestDoctors->map(function ($bestDoctor) {
                 $slotData = $this->getNextAvailableSlot($bestDoctor->doctor);
