@@ -55,7 +55,7 @@
 
   <main class="min-h-screen">
     <div class="login-wrapper d-flex w-100 justify-content-center align-items-center h-100vh">
-      @yield('content')
+      {{ $slot }}
     </div>
   </main>
 
