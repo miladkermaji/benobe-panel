@@ -15,6 +15,7 @@ class BestDoctorEdit extends Component
     public $medical_center_id;
     public $best_doctor;
     public $best_consultant;
+    public $star_rating;
     public $status;
 
     public $doctors;
@@ -28,6 +29,7 @@ class BestDoctorEdit extends Component
         $this->medical_center_id       = $this->bestdoctor->medical_center_id;
         $this->best_doctor     = $this->bestdoctor->best_doctor;
         $this->best_consultant = $this->bestdoctor->best_consultant;
+        $this->star_rating     = $this->bestdoctor->star_rating;
         $this->status          = $this->bestdoctor->status;
 
         $this->doctors = Doctor::all();
@@ -74,6 +76,7 @@ class BestDoctorEdit extends Component
             'medical_center_id'       => 'nullable|exists:medical_centers,id',
             'best_doctor'     => 'boolean',
             'best_consultant' => 'boolean',
+            'star_rating'     => 'nullable|numeric|min:0|max:5',
             'status'          => 'boolean',
         ], [
             'doctor_id.required' => 'لطفاً یک پزشک انتخاب کنید.',
@@ -86,6 +89,7 @@ class BestDoctorEdit extends Component
         $this->bestdoctor->medical_center_id       = $this->medical_center_id;
         $this->bestdoctor->best_doctor     = $this->best_doctor ?? false;
         $this->bestdoctor->best_consultant = $this->best_consultant ?? false;
+        $this->bestdoctor->star_rating     = $this->star_rating;
         $this->bestdoctor->status          = $this->status ?? false;
         $updated                           = $this->bestdoctor->save();
 

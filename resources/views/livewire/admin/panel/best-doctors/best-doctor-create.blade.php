@@ -73,6 +73,29 @@
               </div>
             </div>
 
+            <!-- امتیاز ستاره -->
+            <div class="col-6 col-md-6 position-relative mt-5">
+              <div class="star-rating-container">
+                <label class="form-label">امتیاز ستاره</label>
+                <div class="star-rating" wire:ignore>
+                  @for ($i = 1; $i <= 5; $i++)
+                    <svg class="star-icon" data-rating="{{ $i }}" width="24" height="24"
+                      viewBox="0 0 24 24" fill="{{ $i <= $star_rating ? '#ffc107' : '#e5e7eb' }}"
+                      stroke="{{ $i <= $star_rating ? '#ffc107' : '#9ca3af' }}" stroke-width="1"
+                      style="cursor: pointer;">
+                      <path
+                        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  @endfor
+                  <span class="rating-text ms-2 fw-medium">{{ number_format($star_rating, 1) }}/5.0</span>
+                </div>
+                <input type="hidden" wire:model="star_rating" id="star_rating_input">
+                @error('star_rating')
+                  <span class="text-danger small">{{ $message }}</span>
+                @enderror
+              </div>
+            </div>
+
             <!-- وضعیت -->
             <div class="col-6 col-md-6 position-relative mt-5 d-flex align-items-center">
               <div class="form-check form-switch w-100 d-flex align-items-center">
@@ -225,6 +248,39 @@
       border: 1px solid #e5e7eb;
       border-radius: 8px;
     }
+
+    .star-rating-container {
+      padding: 12px 15px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fafafa;
+      transition: all 0.3s ease;
+    }
+
+    .star-rating-container:focus-within {
+      border-color: #6b7280;
+      box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
+      background: #fff;
+    }
+
+    .star-rating {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .star-icon {
+      transition: all 0.2s ease;
+    }
+
+    .star-icon:hover {
+      transform: scale(1.1);
+    }
+
+    .rating-text {
+      color: #374151;
+      font-size: 14px;
+    }
   </style>
 
   <script>
@@ -302,6 +358,58 @@
         placeholder: 'انتخاب پزشک',
         allowClear: true
       });
+    });
+
+    // Star rating functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const starIcons = document.querySelectorAll('.star-icon');
+      const ratingText = document.querySelector('.rating-text');
+      const ratingInput = document.getElementById('star_rating_input');
+      let currentRating = parseFloat(ratingInput.value) || 0;
+
+      function updateStars(rating) {
+        starIcons.forEach((star, index) => {
+          const starNumber = index + 1;
+          if (starNumber <= rating) {
+            star.setAttribute('fill', '#ffc107');
+            star.setAttribute('stroke', '#ffc107');
+          } else {
+            star.setAttribute('fill', '#e5e7eb');
+            star.setAttribute('stroke', '#9ca3af');
+          }
+        });
+
+        if (ratingText) {
+          ratingText.textContent = `${rating.toFixed(1)}/5.0`;
+        }
+
+        if (ratingInput) {
+          ratingInput.value = rating;
+          ratingInput.dispatchEvent(new Event('input', {
+            bubbles: true
+          }));
+        }
+      }
+
+      starIcons.forEach((star, index) => {
+        const starNumber = index + 1;
+
+        star.addEventListener('click', () => {
+          currentRating = starNumber;
+          updateStars(currentRating);
+        });
+
+        star.addEventListener('mouseenter', () => {
+          updateStars(starNumber);
+        });
+
+        star.addEventListener('mouseleave', () => {
+          updateStars(currentRating);
+        });
+      });
+
+      // Initialize stars
+      updateStars(currentRating);
     });
   </script>
 

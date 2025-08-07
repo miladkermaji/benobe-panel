@@ -125,6 +125,7 @@
                   <th class="align-middle">کلینیک</th>
                   <th class="align-middle">بهترین پزشک</th>
                   <th class="align-middle">بهترین مشاور</th>
+                  <th class="align-middle">امتیاز ستاره</th>
                   <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
                   <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                 </tr>
@@ -142,6 +143,21 @@
                       <td class="align-middle">{{ $item->clinic ? $item->clinic->name : '-' }}</td>
                       <td class="align-middle">{{ $item->best_doctor ? 'بله' : 'خیر' }}</td>
                       <td class="align-middle">{{ $item->best_consultant ? 'بله' : 'خیر' }}</td>
+                      <td class="align-middle">
+                        <div class="d-flex align-items-center gap-1">
+                          <span class="fw-medium">{{ number_format($item->star_rating, 1) }}</span>
+                          <div class="d-flex">
+                            @for ($i = 1; $i <= 5; $i++)
+                              <svg width="16" height="16" viewBox="0 0 24 24"
+                                fill="{{ $i <= $item->star_rating ? '#ffc107' : '#e5e7eb' }}"
+                                stroke="{{ $i <= $item->star_rating ? '#ffc107' : '#9ca3af' }}" stroke-width="1">
+                                <path
+                                  d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              </svg>
+                            @endfor
+                          </div>
+                        </div>
+                      </td>
                       <td class="text-center align-middle">
                         <button wire:click="confirmToggleStatus({{ $item->id }})"
                           class="badge {{ $item->status ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
@@ -171,7 +187,7 @@
                     </tr>
                   @empty
                     <tr>
-                      <td colspan="8" class="text-center py-4">
+                      <td colspan="9" class="text-center py-4">
                         <div class="d-flex justify-content-center align-items-center flex-column">
                           <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" class="text-muted mb-2">
@@ -184,7 +200,7 @@
                   @endforelse
                 @else
                   <tr>
-                    <td colspan="8" class="text-center py-4">
+                    <td colspan="9" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
@@ -226,6 +242,22 @@
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">بهترین مشاور:</span>
                       <span class="note-card-value">{{ $item->best_consultant ? 'بله' : 'خیر' }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">امتیاز ستاره:</span>
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="note-card-value fw-medium">{{ number_format($item->star_rating, 1) }}</span>
+                        <div class="d-flex">
+                          @for ($i = 1; $i <= 5; $i++)
+                            <svg width="14" height="14" viewBox="0 0 24 24"
+                              fill="{{ $i <= $item->star_rating ? '#ffc107' : '#e5e7eb' }}"
+                              stroke="{{ $i <= $item->star_rating ? '#ffc107' : '#9ca3af' }}" stroke-width="1">
+                              <path
+                                d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                          @endfor
+                        </div>
+                      </div>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>

@@ -15,6 +15,7 @@ class BestDoctorCreate extends Component
     public $medical_center_id;
     public $best_doctor     = false;
     public $best_consultant = false;
+    public $star_rating     = 0.0;
     public $status          = true;
 
     public $doctors;
@@ -61,27 +62,16 @@ class BestDoctorCreate extends Component
     protected function rules()
     {
         return [
-            'doctor_id' => [
+            'doctor_id'       => [
                 'required',
                 'exists:doctors,id',
-                function ($attribute, $value, $fail) {
-                    $exists = BestDoctor::where('doctor_id', $value)
-                        ->when($this->medical_center_id, function ($query) {
-                            return $query->where('medical_center_id', $this->medical_center_id);
-                        }, function ($query) {
-                            return $query->whereNull('medical_center_id');
-                        })
-                        ->exists();
-
-                    if ($exists) {
-                        $fail('این پزشک با این کلینیک قبلاً ثبت شده است.');
-                    }
-                },
+                "unique:best_doctors,doctor_id,NULL,id,medical_center_id," . ($this->medical_center_id ?? 'NULL'),
             ],
             'medical_center_id' => 'nullable|exists:medical_centers,id',
-            'best_doctor' => 'boolean',
+            'best_doctor'     => 'boolean',
             'best_consultant' => 'boolean',
-            'status' => 'boolean',
+            'star_rating'     => 'numeric|min:0|max:5',
+            'status'          => 'boolean',
         ];
     }
 
@@ -111,6 +101,7 @@ class BestDoctorCreate extends Component
                 'medical_center_id' => $this->medical_center_id,
                 'best_doctor'     => $this->best_doctor,
                 'best_consultant' => $this->best_consultant,
+                'star_rating'     => $this->star_rating,
                 'status'          => $this->status,
             ]);
             Cache::forget('best_doctors__status__page_1');
