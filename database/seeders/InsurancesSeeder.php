@@ -1,6 +1,7 @@
 <?php
 namespace Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -27,6 +28,7 @@ class InsurancesSeeder extends Seeder
             $data[] = [
                 'id'         => $insurance['value'],
                 'name'       => $insurance['label'],
+                'slug'       => Str::slug($insurance['label']),
                 'created_at' => now(),
                 'updated_at' => now(),
             ];

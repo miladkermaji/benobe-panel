@@ -2,23 +2,39 @@
 
 namespace App\Models;
 
-use App\Models\Appointment;
 use App\Models\Doctor;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Model;
+use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Insurance extends Model
 {
     use HasFactory;
+    use Sluggable;
 
     protected $fillable = [
         'medical_center_id',
         'name',
+        'slug',
         'calculation_method',
         'appointment_price',
         'insurance_percent',
         'final_price',
     ];
+       /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'name',
+            ],
+        ];
+    }
 
     public function doctor()
     {

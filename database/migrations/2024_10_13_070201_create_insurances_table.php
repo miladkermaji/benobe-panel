@@ -14,6 +14,9 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('medical_center_id')->nullable()->constrained('medical_centers')->nullOnDelete();
             $table->string('name');
+
+            $table->string('slug')->unique();
+
             $table->tinyInteger('calculation_method')->default(0);
             $table->unsignedInteger('appointment_price')->nullable();
             $table->unsignedInteger('insurance_percent')->nullable();
