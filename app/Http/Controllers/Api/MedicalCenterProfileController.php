@@ -14,14 +14,20 @@ class MedicalCenterProfileController extends Controller
     /**
      * دریافت پروفایل مرکز درمانی
      *
-     * @param int $centerId
+     * @param string $centerSlug
      * @return JsonResponse
      */
-    public function show($centerId): JsonResponse
+    public function show($centerSlug): JsonResponse
     {
         try {
-            // ابتدا مرکز درمانی را بدون eager loading دریافت می‌کنیم
-            $medicalCenter = MedicalCenter::findOrFail($centerId);
+            // دریافت مرکز درمانی با استفاده از slug و Eager Loading روابط واقعی
+            $medicalCenter = MedicalCenter::where('slug', $centerSlug)
+                ->with([
+                    'province' => fn ($q) => $q->select('id', 'name', 'slug'),
+                    'city' => fn ($q) => $q->select('id', 'name', 'slug'),
+                    'doctors' => fn ($q) => $q->with(['specialty' => fn ($s) => $s->select('id', 'name', 'slug')]),
+                ])
+                ->firstOrFail();
 
             // بررسی نوع مرکز درمانی - اگر policlinic باشد، خطا برگردان
             if ($medicalCenter->type === 'policlinic') {
@@ -36,14 +42,11 @@ class MedicalCenterProfileController extends Controller
             $totalAppointments = $medicalCenter->appointments()->where('status', 'completed')->count();
             $totalSuccessfulAppointments = $medicalCenter->appointments()->where('status', 'completed')->count();
 
-            // دریافت روابط به صورت جداگانه
-            $province = $medicalCenter->province;
-            $city = $medicalCenter->city;
-            $doctors = $medicalCenter->doctors()->with('specialty')->get();
+            // لود جداگانه روابط غیرواقعی (برای حفظ عملکرد کد اولیه)
             $specialties = $medicalCenter->specialties();
             $insurances = $medicalCenter->insurances();
             $services = $medicalCenter->services();
-            $recentReviews = $medicalCenter->approvedReviews()->latest()->limit(5)->get();
+            $recentReviews = $medicalCenter->approvedReviews()->latest()->take(5)->get();
 
             // ساختار پاسخ
             $response = [
@@ -52,9 +55,18 @@ class MedicalCenterProfileController extends Controller
                     'center_details' => [
                         'id' => $medicalCenter->id,
                         'name' => $medicalCenter->name,
+                        'slug' => $medicalCenter->slug, // اضافه کردن slug مرکز
                         'title' => $medicalCenter->title,
-                        'city' => $city?->name,
-                        'province' => $province?->name,
+                        'city' => [
+                            'id' => $medicalCenter->city?->id,
+                            'name' => $medicalCenter->city?->name,
+                            'slug' => $medicalCenter->city?->slug, // اضافه کردن slug شهر
+                        ],
+                        'province' => [
+                            'id' => $medicalCenter->province?->id,
+                            'name' => $medicalCenter->province?->name,
+                            'slug' => $medicalCenter->province?->slug, // اضافه کردن slug استان
+                        ],
                         'type' => $medicalCenter->type,
                         'is_24_7' => $medicalCenter->type === 'hospital' || $medicalCenter->type === 'treatment_centers',
                         'rating' => [
@@ -85,11 +97,16 @@ class MedicalCenterProfileController extends Controller
                         'longitude' => $medicalCenter->longitude,
                         'location_confirmed' => $medicalCenter->location_confirmed
                     ],
-                    'doctors' => $doctors->map(function ($doctor) {
+                    'doctors' => $medicalCenter->doctors->map(function ($doctor) {
                         return [
                             'id' => $doctor->id,
                             'name' => $doctor->full_name,
-                            'specialty' => $doctor->specialty?->name,
+                            'slug' => $doctor->slug, // اضافه کردن slug پزشک
+                            'specialty' => [
+                                'id' => $doctor->specialty?->id,
+                                'name' => $doctor->specialty?->name,
+                                'slug' => $doctor->specialty?->slug, // اضافه کردن slug تخصص
+                            ],
                             'rating' => [
                                 'value' => $doctor->average_rating,
                                 'reviews_count' => $doctor->reviews()->count()
@@ -101,33 +118,35 @@ class MedicalCenterProfileController extends Controller
                                 ->orderBy('appointment_date')
                                 ->first()?->appointment_date
                         ];
-                    }),
+                    })->values(),
                     'specialties' => $specialties->map(function ($specialty) {
                         return [
                             'id' => $specialty->id,
-                            'name' => $specialty->name
+                            'name' => $specialty->name,
+                            'slug' => $specialty->slug // اضافه کردن slug تخصص
                         ];
-                    }),
+                    })->values(),
                     'insurances' => $insurances->map(function ($insurance) {
                         return [
                             'id' => $insurance->id,
                             'name' => $insurance->name,
+                            'slug' => $insurance->slug, // اضافه کردن slug بیمه
                             'image_url' => $insurance->image_path ? asset('storage/' . $insurance->image_path) : null
                         ];
-                    }),
+                    })->values(),
                     'services' => $services->map(function ($service) {
                         return [
                             'id' => $service->id,
                             'name' => $service->name,
                             'description' => $service->description
                         ];
-                    }),
+                    })->values(),
                     'gallery' => collect($medicalCenter->galleries ?? [])->map(function ($image) {
                         return [
                             'url' => asset('storage/' . $image),
                             'alt_text' => 'تصویر مرکز درمانی'
                         ];
-                    }),
+                    })->values(),
                     'recent_reviews' => $recentReviews->map(function ($review) {
                         return [
                             'id' => $review->id,
@@ -138,7 +157,7 @@ class MedicalCenterProfileController extends Controller
                             'waiting_time' => $review->waiting_time,
                             'created_at' => $review->created_at->format('Y-m-d H:i:s')
                         ];
-                    }),
+                    })->values(),
                     'additional_info' => [
                         'siam_code' => $medicalCenter->siam_code,
                         'is_main_center' => $medicalCenter->is_main_center,
@@ -151,6 +170,11 @@ class MedicalCenterProfileController extends Controller
 
             return response()->json($response, 200);
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'مرکز درمانی یافت نشد'
+            ], 404);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -164,10 +188,10 @@ class MedicalCenterProfileController extends Controller
      * دریافت نظرات مرکز درمانی
      *
      * @param Request $request
-     * @param int $centerId
+     * @param string $centerSlug
      * @return JsonResponse
      */
-    public function reviews(Request $request, $centerId): JsonResponse
+    public function reviews(Request $request, $centerSlug): JsonResponse
     {
         try {
             // اعتبارسنجی پارامترها
@@ -187,8 +211,8 @@ class MedicalCenterProfileController extends Controller
                 ], 400);
             }
 
-            // بررسی وجود مرکز درمانی
-            $medicalCenter = MedicalCenter::findOrFail($centerId);
+            // بررسی وجود مرکز درمانی با استفاده از slug
+            $medicalCenter = MedicalCenter::where('slug', $centerSlug)->firstOrFail();
 
             // بررسی نوع مرکز درمانی - اگر policlinic باشد، خطا برگردان
             if ($medicalCenter->type === 'policlinic') {
@@ -208,7 +232,7 @@ class MedicalCenterProfileController extends Controller
 
             // شروع کوئری
             $query = MedicalCenterReview::with(['userable', 'appointment'])
-                ->where('medical_center_id', $centerId)
+                ->where('medical_center_id', $medicalCenter->id)
                 ->where('status', true); // فقط نظرات تأیید شده
 
             // فیلتر بر اساس امتیاز
@@ -244,7 +268,17 @@ class MedicalCenterProfileController extends Controller
             $response = [
                 'success' => true,
                 'data' => [
-                    'reviews' => $reviews->items(),
+                    'reviews' => $reviews->getCollection()->map(function ($review) {
+                        return [
+                            'id' => $review->id,
+                            'user_name' => $review->user_name,
+                            'comment' => $review->comment,
+                            'rating' => $review->overall_score,
+                            'recommendation' => $review->recommend_center ? 'suggest' : 'not_suggest',
+                            'waiting_time' => $review->waiting_time,
+                            'created_at' => $review->created_at->format('Y-m-d H:i:s')
+                        ];
+                    })->values(),
                     'pagination' => [
                         'current_page' => $reviews->currentPage(),
                         'last_page' => $reviews->lastPage(),
