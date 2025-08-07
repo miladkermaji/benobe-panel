@@ -3,7 +3,6 @@
 namespace App\Livewire\Admin\Panel\Managers;
 
 use App\Models\Manager;
-use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -43,7 +42,6 @@ class ManagerList extends Component
         $manager = Manager::findOrFail($id);
         $manager->update(['is_active' => !$manager->is_active]);
         $this->dispatch('show-toastr', type: $manager->is_active ? 'success' : 'info', message: $manager->is_active ? 'مدیر فعال شد!' : 'مدیر غیرفعال شد!');
-        Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function confirmDelete($id)
@@ -56,7 +54,6 @@ class ManagerList extends Component
         $manager = Manager::findOrFail($id);
         $manager->delete();
         $this->dispatch('show-toastr', type: 'success', message: 'مدیر با موفقیت حذف شد!');
-        Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function updatedSearch()
@@ -95,7 +92,6 @@ class ManagerList extends Component
             $this->selectAll = false;
             $this->dispatch('show-toastr', type: 'success', message: 'مدیران انتخاب شده حذف شدند!');
         }
-        Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
     public function executeGroupAction()
@@ -145,7 +141,6 @@ class ManagerList extends Component
         }
         $this->selectedManagers = [];
         $this->selectAll = false;
-        Cache::forget('managers_' . $this->search . '_page_' . $this->getPage());
     }
 
     protected function getManagersQuery()
@@ -167,10 +162,7 @@ class ManagerList extends Component
 
     public function render()
     {
-        $cacheKey = 'managers_' . $this->search . '_page_' . $this->getPage();
-        $managers = $this->readyToLoad ? Cache::remember($cacheKey, now()->addMinutes(5), function () {
-            return $this->getManagersQuery()->paginate($this->perPage);
-        }) : [];
+        $managers = $this->readyToLoad ? $this->getManagersQuery()->paginate($this->perPage) : [];
         $this->totalFilteredCount = $this->readyToLoad ? $this->getManagersQuery()->count() : 0;
 
         return view('livewire.admin.panel.managers.manager-list', [
