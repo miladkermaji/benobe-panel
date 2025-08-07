@@ -32,6 +32,47 @@ class AdminSidebar extends Component
         }
     }
 
+    /**
+     * بررسی دسترسی مدیر به بخش خاص
+     */
+    public function hasManagerPermission($permissionKey)
+    {
+        if (!$this->user) {
+            return false;
+        }
+
+        // مدیر ارشد همه دسترسی‌ها را دارد
+        if ($this->user->permission_level == 1) {
+            return true;
+        }
+
+        // مدیر عادی باید دسترسی داشته باشد
+        if ($this->user->permission_level == 2) {
+            // استفاده از متد getPermissionsAttribute که خودکار دسترسی‌های پیش‌فرض را ایجاد می‌کند
+            $permissions = $this->user->permissions->permissions ?? [];
+
+            // بررسی دسترسی مستقیم
+            if (in_array($permissionKey, $permissions)) {
+                return true;
+            }
+
+            // بررسی دسترسی‌های گروهی
+            $permissionsConfig = config('admin-permissions');
+            if (isset($permissionsConfig[$permissionKey])) {
+                $permissionData = $permissionsConfig[$permissionKey];
+                if (isset($permissionData['routes'])) {
+                    foreach ($permissionData['routes'] as $route => $title) {
+                        if (in_array($route, $permissions)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public function render()
     {
         if (! $this->user) {

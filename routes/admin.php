@@ -83,7 +83,7 @@ Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
 });
 Route::prefix('admin')
     ->namespace('Admin')
-    ->middleware('manager')
+    ->middleware(['manager', 'manager.permission'])
     ->group(function () {
         Route::prefix('clinic-deposit-settings')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\ClinicDepositSettings\ClinicDepositSettingController::class, 'index'])->name('admin.panel.clinic-deposit-settings.index');

@@ -112,6 +112,24 @@ class Manager extends Authenticatable implements JWTSubject
         return $this->hasOne(ManagerPermission::class);
     }
 
+    public function getPermissionsAttribute()
+    {
+        if (!$this->permissions()->exists()) {
+            $defaultPermissions = [
+                'dashboard',
+                'medical_centers',
+                'support'
+            ];
+
+            ManagerPermission::create([
+                'manager_id' => $this->id,
+                'permissions' => $defaultPermissions
+            ]);
+        }
+
+        return $this->permissions()->first();
+    }
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

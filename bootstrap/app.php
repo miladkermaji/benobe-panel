@@ -82,6 +82,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'secretary.permission' => \App\Http\Middleware\Dr\CheckSecretaryPermission::class,
             'medical_center.permission' => \App\Http\Middleware\Mc\CheckMedicalCenterPermission::class,
             'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
+            'manager.permission' => \App\Http\Middleware\ManagerPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
