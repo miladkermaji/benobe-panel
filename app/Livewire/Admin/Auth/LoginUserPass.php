@@ -97,7 +97,7 @@ class LoginUserPass extends Component
         $user = $userInfo['model'];
 
         // بررسی فعال بودن قابلیت ورود با رمز عبور
-        if (($user->static_password_enabled ?? 0) !== 1) {
+        if ($user->static_password_enabled !== true) {
             $this->addError('password', 'شما قابلیت ورود با رمز عبور را فعال نکرده‌اید.');
             return;
         }

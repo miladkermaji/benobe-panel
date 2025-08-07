@@ -33,7 +33,9 @@ class LoginRegister extends Component
         } elseif (session('current_step') === 2) {
             $this->redirect(route('admin.auth.login-confirm-form', ['token' => session('otp_token')]), navigate: true);
         } elseif (session('current_step') === 3) {
-            $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
+            $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
+        } elseif (session('current_step') === 4) {
+            $this->redirect(route('admin.auth.login-set-password-form'), navigate: true);
         }
         session(['current_step' => 1]);
     }
@@ -97,8 +99,15 @@ class LoginRegister extends Component
 
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 
+        // Debug: بررسی وضعیت static_password_enabled
+        \Log::info('LoginRegister Debug', [
+            'mobile' => $formattedMobile,
+            'static_password_enabled' => $user->static_password_enabled,
+            'user_id' => $user->id
+        ]);
+
         // بررسی فعال بودن رمز عبور ثابت
-        if (($user->static_password_enabled ?? 0) === 1) {
+        if ($user->static_password_enabled === true) {
             // اگر رمز عبور ثابت فعال است، به مرحله رمز عبور برو
             session(['current_step' => 3]);
             $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);

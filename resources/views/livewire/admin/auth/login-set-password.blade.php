@@ -57,7 +57,7 @@
               onclick="togglePasswordVisibility('password-input')">
           </div>
           @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="invalid-feedback d-block">{{ $message }}</div>
           @enderror
         </div>
 
@@ -74,7 +74,7 @@
               onclick="togglePasswordVisibility('password-confirmation-input')">
           </div>
           @error('password_confirmation')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="invalid-feedback d-block">{{ $message }}</div>
           @enderror
         </div>
 
