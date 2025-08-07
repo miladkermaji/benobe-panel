@@ -99,46 +99,18 @@ class LoginRegister extends Component
 
         // بررسی فعال بودن رمز عبور ثابت
         if (($user->static_password_enabled ?? 0) === 1) {
+            // اگر رمز عبور ثابت فعال است، به مرحله رمز عبور برو
             session(['current_step' => 3]);
             $this->redirect(route('admin.auth.login-user-pass-form'), navigate: true);
             $this->dispatch('pass-form');
             return;
         }
 
-        // ارسال OTP
-        $otpCode = rand(1000, 9999);
-        $token = Str::random(60);
-
-        Otp::create([
-            'token' => $token,
-            'otp_code' => $otpCode,
-            'login_id' => $user->mobile,
-            'type' => 0,
-            'otpable_type' => $userInfo['model_class'],
-            'otpable_id' => $userInfo['model_id'],
-        ]);
-
-        LoginSession::create([
-            'token' => $token,
-            'sessionable_type' => $userInfo['model_class'],
-            'sessionable_id' => $userInfo['model_id'],
-            'step' => 2,
-            'expires_at' => now()->addMinutes(10),
-        ]);
-
-        // ارسال پیامک
-        $messagesService = new MessageService(
-            SmsService::create(100286, $user->mobile, [$otpCode])
-        );
-        $response = $messagesService->send();
-        Log::info('SMS send response', ['response' => $response]);
-
-        // ارسال اعلان
-        $this->notificationService->sendOtpNotification($user->mobile, $otpCode);
-
-        session(['current_step' => 2, 'otp_token' => $token]);
-        $this->dispatch('otpSent', token: $token, otpCode: $otpCode);
-        $this->redirect(route('admin.auth.login-confirm-form', ['token' => $token]), navigate: true);
+        // اگر رمز عبور ثابت فعال نیست، به مرحله تعیین رمز عبور برو
+        session(['current_step' => 4]);
+        $this->redirect(route('admin.auth.login-set-password-form'), navigate: true);
+        $this->dispatch('set-password-form');
+        return;
     }
 
     public function render()

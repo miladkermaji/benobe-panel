@@ -7,8 +7,8 @@
           src="{{ asset('app-assets/logos/benobe.svg') }}" alt="لوگوی به نوبه">
       </div>
       <div class="text-center mb-4">
-        <h2 class="text-primary fw-bold mb-2">پنل مدیریت  به نوبه</h2>
-        <p class="text-muted fw-bold">به پنل مدیریت  به نوبه خوش آمدید</p>
+        <h2 class="text-primary fw-bold mb-2">پنل مدیریت به نوبه</h2>
+        <p class="text-muted fw-bold">به پنل مدیریت به نوبه خوش آمدید</p>
       </div>
       <div class="d-flex justify-content-between align-items-center mb-3">
         <div class="d-flex align-items-center">
@@ -24,7 +24,7 @@
           </div>
           <input wire:model="mobile" dir="ltr"
             class="form-control  h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
-            inputmode="numeric"  placeholder="09123456789" maxlength="11">
+            inputmode="numeric" placeholder="09123456789" maxlength="11">
           @error('mobile')
             <div class="invalid-feedback">{{ $message }}</div>
           @enderror
@@ -91,6 +91,9 @@
     });
     Livewire.on('pass-form', (data) => {
       toastr.success('موفقیت آمیز');
+    });
+    Livewire.on('set-password-form', (data) => {
+      toastr.success('لطفاً رمز عبور جدید خود را تعیین کنید');
     });
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);

@@ -10,6 +10,7 @@ use App\Livewire\Admin\Auth\LoginConfirm;
 use App\Livewire\Dr\Auth\DoctorTwoFactor;
 use App\Livewire\Admin\Auth\LoginRegister;
 use App\Livewire\Admin\Auth\LoginUserPass;
+use App\Livewire\Admin\Auth\LoginSetPassword;
 use App\Livewire\Dr\Auth\DoctorLoginConfirm;
 use App\Livewire\Dr\Auth\DoctorLoginRegister;
 use App\Livewire\Dr\Auth\DoctorLoginUserPass;
@@ -75,6 +76,7 @@ use App\Http\Controllers\Dr\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettin
 Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
     Route::get('login-user-pass', LoginUserPass::class)->name('admin.auth.login-user-pass-form');
+    Route::get('login-set-password', LoginSetPassword::class)->name('admin.auth.login-set-password-form');
     Route::get('login-confirm/{token}', LoginConfirm::class)->name('admin.auth.login-confirm-form');
     Route::get('login-resend-otp/{token}', LoginConfirm::class)->name('admin.auth.login-resend-otp'); // اضافه شده
     Route::get('logout', Logout::class)->name('admin.auth.logout');
