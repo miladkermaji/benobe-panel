@@ -100,7 +100,7 @@ class LoginRegister extends Component
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 
         // Debug: بررسی وضعیت static_password_enabled
-        \Log::info('LoginRegister Debug', [
+        Log::info('LoginRegister Debug', [
             'mobile' => $formattedMobile,
             'static_password_enabled' => $user->static_password_enabled,
             'user_id' => $user->id
