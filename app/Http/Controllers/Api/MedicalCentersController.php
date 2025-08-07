@@ -583,11 +583,11 @@ class MedicalCentersController extends Controller
         }
     }
 
-    /**
+/**
      * لیست همه مراکز درمانی فعال
      *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @queryParam province_id integer آیدی استان (اختیاری)
      * @queryParam city_id integer آیدی شهر (اختیاری)
@@ -602,143 +602,78 @@ class MedicalCentersController extends Controller
      * @queryParam sort_by string فیلد مرتب‌سازی (اختیاری)
      * @queryParam sort_dir string جهت مرتب‌سازی (asc/desc، اختیاری)
      * @queryParam per_page integer تعداد آیتم در هر صفحه (پیش‌فرض: 20)
-     *
-     * @response 200 {
-     *   "status": "success",
-     *   "message": "عملیات با موفقیت انجام شد",
-     *   "data": {
-     *     "medical_centers": [
-     *       {
-     *         "id": 1,
-     *         "name": "کلینیک نمونه",
-     *         "type": "clinic",
-     *         "province_id": 1,
-     *         "city_id": 2,
-     *         "address": "تهران، خیابان اصلی",
-     *         "slug": "clinic-sample"
-     *       }
-     *     ],
-     *     "zones": {
-     *       "provinces": [
-     *         { "id": 1, "name": "تهران", "province_id": 1, "cities": "..." }
-     *       ],
-     *       "cities": [
-     *         { "id": 2, "name": "تهران", "province_id": 1, "cities": "..." }
-     *       ]
-     *     },
-     *     "specialties": [
-     *       { "id": 1, "name": "قلب و عروق" }
-     *     ],
-     *     "insurances": [
-     *       { "id": 1, "name": "تامین اجتماعی" }
-     *     ],
-     *     "services": [
-     *       { "id": 1, "name": "ویزیت", "description": "..." }
-     *     ],
-     *     "center_types": {
-     *       "clinic": "کلینیک",
-     *       "hospital": "بیمارستان"
-     *     },
-     *     "tariff_types": {
-     *       "public": "دولتی",
-     *       "private": "خصوصی"
-     *     }
-     *   },
-     *   "pagination": {
-     *     "current_page": "1",
-     *     "last_page": "10",
-     *     "per_page": "20",
-     *     "total": "200"
-     *   }
-     * }
-     * @response 500 {
-     *   "status": "error",
-     *   "message": "خطای سرور",
-     *   "data": null
-     * }
      */
     public function list(Request $request)
     {
         try {
             $perPage = (int) $request->input('per_page', 20);
-            $query = MedicalCenter::where('is_active', 1)
-                ->whereNotIn('type', ['policlinic']);
+            $query = MedicalCenter::where('is_active', true)
+                ->whereNotIn('type', ['policlinic'])
+                ->with([
+                    'province' => fn ($q) => $q->select('id', 'name', 'slug'),
+                    'city' => fn ($q) => $q->select('id', 'name', 'slug'),
+                ]);
 
-            // فیلتر استان
-            if ($request->filled('province_id')) {
-                $query->where('province_id', $request->input('province_id'));
-            }
-            // فیلتر شهر
-            if ($request->filled('city_id')) {
-                $query->where('city_id', $request->input('city_id'));
-            }
-            // فیلتر نوع مرکز
-            if ($request->filled('center_type')) {
-                $query->where('type', $request->input('center_type'));
-            }
-            // فیلتر نوع تعرفه
-            if ($request->filled('tariff_type')) {
-                $query->where('Center_tariff_type', $request->input('tariff_type'));
-            }
-            // فیلتر تخصص
-            if ($request->filled('specialty_id') || $request->filled('specialty_ids')) {
-                $specialtyId = $request->input('specialty_ids', $request->input('specialty_id'));
-                $query->whereJsonContains('specialty_ids', (string)$specialtyId);
-            }
-            // فیلتر خدمات
-            if ($request->filled('service_id') || $request->filled('service_ids')) {
-                $serviceId = $request->input('service_ids', $request->input('service_id'));
-                $query->whereJsonContains('service_ids', (string)$serviceId);
-            }
-            // فیلتر بیمه
-            if ($request->filled('insurance_id') || $request->filled('insurance_ids')) {
-                $insuranceId = $request->input('insurance_ids', $request->input('insurance_id'));
-                $query->whereJsonContains('insurance_ids', (string)$insuranceId);
-            }
+            // فیلترها
+            $filters = [
+                'province_id' => $request->input('province_id'),
+                'city_id' => $request->input('city_id'),
+                'center_type' => $request->input('center_type'),
+                'tariff_type' => $request->input('tariff_type'),
+                'specialty_ids' => $request->input('specialty_ids', $request->input('specialty_id')),
+                'service_ids' => $request->input('service_ids', $request->input('service_id')),
+                'insurance_ids' => $request->input('insurance_ids', $request->input('insurance_id')),
+            ];
 
-            // مرتب‌سازی
+            // اعمال فیلترها با استفاده از scopeFilter
+            $query->filter($filters);
+
+            // مرتب‌سازی با استفاده از scopeSort
             if ($request->filled('sort_by')) {
                 $sortBy = $request->input('sort_by');
                 $sortDir = $request->input('sort_dir', 'desc');
-                $query->orderBy($sortBy, $sortDir);
+                $query->sort($sortBy, $sortDir);
             }
 
+            // دریافت مراکز درمانی
             $centers = $query->paginate($perPage);
 
             // Provinces (level 1)
-            $provinces = \App\Models\Zone::where('level', 1)
-                ->select('id', 'name')
+            $provinces = Zone::where('level', 1)
+                ->select('id', 'name', 'slug')
                 ->get()
                 ->map(function ($province) {
                     return [
                         'id' => $province->id,
                         'name' => $province->name,
+                        'slug' => $province->slug,
                         'province_id' => $province->id,
                         'cities' => '',
                     ];
                 });
 
             // Cities (level 2)
-            $cities = \App\Models\Zone::where('level', 2)
-                ->select('id', 'name', 'parent_id as province_id')
+            $cities = Zone::where('level', 2)
+                ->select('id', 'name', 'slug', 'parent_id as province_id')
                 ->get()
                 ->map(function ($city) {
                     return [
                         'id' => $city->id,
                         'name' => $city->name,
+                        'slug' => $city->slug,
                         'province_id' => $city->province_id,
                         'cities' => '',
                     ];
                 });
 
             // Specialties
-            $specialties = \App\Models\Specialty::select('id', 'name')->get();
+            $specialties = Specialty::select('id', 'name', 'slug')->get();
 
             // Insurances
-            $insurances = \App\Models\Insurance::select('id', 'name')->get();
+            $insurances = Insurance::select('id', 'name', 'slug')->get();
 
             // Services
-            $services = \App\Models\Service::select('id', 'name', 'description')->get();
+            $services = Service::select('id', 'name', 'description')->get();
 
             // Center types
             $center_types = [
@@ -757,18 +692,57 @@ class MedicalCentersController extends Controller
                 'private' => 'خصوصی',
             ];
 
+            // ساختار خروجی
             return response()->json([
                 'status' => 'success',
                 'message' => 'عملیات با موفقیت انجام شد',
                 'data' => [
-                    'medical_centers' => $centers->items(),
+                    'medical_centers' => $centers->getCollection()->map(function ($center) {
+                        return [
+                            'id' => $center->id,
+                            'name' => $center->name,
+                            'slug' => $center->slug, // اضافه کردن slug
+                            'type' => $center->type,
+                            'province_id' => $center->province_id,
+                            'province' => $center->province ? [
+                                'id' => $center->province->id,
+                                'name' => $center->province->name,
+                                'slug' => $center->province->slug,
+                            ] : null,
+                            'city_id' => $center->city_id,
+                            'city' => $center->city ? [
+                                'id' => $center->city->id,
+                                'name' => $center->city->name,
+                                'slug' => $center->city->slug,
+                            ] : null,
+                            'address' => $center->address,
+                        ];
+                    })->values(),
                     'zones' => [
                         'provinces' => $provinces,
                         'cities' => $cities,
                     ],
-                    'specialties' => $specialties,
-                    'insurances' => $insurances,
-                    'services' => $services,
+                    'specialties' => $specialties->map(function ($specialty) {
+                        return [
+                            'id' => $specialty->id,
+                            'name' => $specialty->name,
+                            'slug' => $specialty->slug, // اضافه کردن slug
+                        ];
+                    })->values(),
+                    'insurances' => $insurances->map(function ($insurance) {
+                        return [
+                            'id' => $insurance->id,
+                            'name' => $insurance->name,
+                            'slug' => $insurance->slug, // اضافه کردن slug
+                        ];
+                    })->values(),
+                    'services' => $services->map(function ($service) {
+                        return [
+                            'id' => $service->id,
+                            'name' => $service->name,
+                            'description' => $service->description,
+                        ];
+                    })->values(),
                     'center_types' => $center_types,
                     'tariff_types' => $tariff_types,
                 ],
