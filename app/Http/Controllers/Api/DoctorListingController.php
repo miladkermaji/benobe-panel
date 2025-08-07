@@ -76,10 +76,10 @@ class DoctorListingController extends Controller
                     ->whereNotNull('first_name')->where('first_name', '!=', '')
                     ->whereNotNull('last_name')->where('last_name', '!=', '')
                     ->with([
-                        'specialty'     => fn ($q) => $q->select('id', 'name'),
-                        'province'      => fn ($q) => $q->select('id', 'name'),
+                        'specialty'     => fn ($q) => $q->select('id', 'name', 'slug'), // اضافه کردن slug
+                        'province'      => fn ($q) => $q->select('id', 'name', 'slug'), // اضافه کردن slug
                         'clinics'       => fn ($q) => $q->where('is_active', true)
-                            ->with(['city' => fn ($q) => $q->select('id', 'name')])
+                            ->with(['city' => fn ($q) => $q->select('id', 'name', 'slug')]) // اضافه کردن slug برای شهر
                             ->select('medical_centers.id', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.payment_methods', 'medical_centers.is_main_center'),
                         'workSchedules' => fn ($q) => $q->where('is_working', true)
                             ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
@@ -260,11 +260,23 @@ class DoctorListingController extends Controller
                 return [
                     'id'                  => $doctor->id,
                     'name'                => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
-                    'specialty'           => $doctor->specialty?->name,
+                    'slug'                => $doctor->slug, // اضافه کردن slug پزشک
+                    'specialty'           => [
+                        'id'   => $doctor->specialty?->id,
+                        'name' => $doctor->specialty?->name,
+                        'slug' => $doctor->specialty?->slug, // اضافه کردن slug تخصص
+                    ],
                     'avatar'              => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : '/default-avatar.png',
                     'location'            => [
-                        'province'            => $doctor->province?->name ?? 'نامشخص',
-                        'city'                => $city,
+                        'province'            => [
+                            'id'   => $doctor->province?->id,
+                            'name' => $doctor->province?->name,
+                            'slug' => $doctor->province?->slug, // اضافه کردن slug استان
+                        ],
+                        'city'                => [
+                            'name' => $city,
+                            'slug' => $mainClinic && $mainClinic->city ? $mainClinic->city->slug : ($doctor->city ? $doctor->city->slug : null), // اضافه کردن slug شهر
+                        ],
                         'address'             => $mainClinic?->address ?? 'نامشخص',
                         'other_clinics_count' => $otherClinicsCount > 0 ? $otherClinicsCount : 0,
                     ],
@@ -274,9 +286,9 @@ class DoctorListingController extends Controller
                     'next_available_slot' => $slotData['next_available_slot'] ?? 'نوبت خالی ندارد',
                     'tags'                => $tags,
                     'services'            => $services,
-                    'profile_url'         => "/profile/doctor/{$doctor->slug}",
-                    'appointment_url'     => "/api/appointments/book/{$doctor->id}",
-                    'consultation_url'    => "/api/consultations/book/{$doctor->id}",
+                    'profile_url'         => "/profile/doctor/{$doctor->slug}", // استفاده از slug به جای id
+                    'appointment_url'     => "/api/appointments/book/{$doctor->slug}", // استفاده از slug به جای id
+                    'consultation_url'    => "/api/consultations/book/{$doctor->slug}", // استفاده از slug به جای id
                 ];
             });
 
@@ -432,9 +444,6 @@ class DoctorListingController extends Controller
         ];
     }
 
-    /**
-     * بررسی اینکه آیا پزشک نوبت خالی دارد یا نه
-     */
     private function hasAvailableAppointments($doctor, $clinicId = null)
     {
         $doctorId        = $doctor->id;
@@ -514,20 +523,13 @@ class DoctorListingController extends Controller
         return false; // هیچ نوبت خالی پیدا نشد
     }
 
-    /**
-     * استخراج مدت زمان نوبت از appointment_settings برای روز مشخص
-     * پشتیبانی از فرمت‌های قدیمی و جدید
-     */
     private function getAppointmentDuration($appointmentSettings, $dayOfWeek, $defaultDuration = 15)
     {
-        // اطمینان از اینکه appointmentSettings آرایه است
         if (empty($appointmentSettings) || !is_array($appointmentSettings)) {
             return $defaultDuration;
         }
 
-        // فرمت جدید: هر آیتم شامل 'day' field
         if (isset($appointmentSettings[0]['day'])) {
-            // پیدا کردن تنظیمات برای روز فعلی
             foreach ($appointmentSettings as $setting) {
                 if (is_array($setting) && isset($setting['day']) && $setting['day'] === $dayOfWeek) {
                     return $setting['appointment_duration'] ?? $defaultDuration;
@@ -536,7 +538,6 @@ class DoctorListingController extends Controller
             return $defaultDuration;
         }
 
-        // فرمت قدیمی: هر آیتم شامل 'days' array
         foreach ($appointmentSettings as $setting) {
             if (is_array($setting) && isset($setting['days']) && is_array($setting['days']) && in_array($dayOfWeek, $setting['days'])) {
                 return $setting['appointment_duration'] ?? $defaultDuration;
@@ -546,20 +547,13 @@ class DoctorListingController extends Controller
         return $defaultDuration;
     }
 
-    /**
-     * استخراج حداکثر تعداد نوبت از appointment_settings
-     * پشتیبانی از فرمت‌های قدیمی و جدید
-     */
     private function getMaxAppointmentsFromSettings($appointmentSettings, $defaultMaxAppointments = 22)
     {
-        // اطمینان از اینکه appointmentSettings آرایه است
         if (empty($appointmentSettings) || !is_array($appointmentSettings)) {
             return $defaultMaxAppointments;
         }
 
-        // فرمت جدید: هر آیتم شامل 'day' field
         if (isset($appointmentSettings[0]['day'])) {
-            // پیدا کردن اولین تنظیمات که max_appointments داشته باشد
             foreach ($appointmentSettings as $setting) {
                 if (is_array($setting) && isset($setting['max_appointments']) && $setting['max_appointments'] > 0) {
                     return $setting['max_appointments'];
@@ -568,7 +562,6 @@ class DoctorListingController extends Controller
             return $defaultMaxAppointments;
         }
 
-        // فرمت قدیمی: هر آیتم شامل 'days' array
         foreach ($appointmentSettings as $setting) {
             if (is_array($setting) && isset($setting['max_appointments']) && $setting['max_appointments'] > 0) {
                 return $setting['max_appointments'];

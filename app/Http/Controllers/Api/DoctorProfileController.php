@@ -21,62 +21,85 @@ class DoctorProfileController extends Controller
     /**
      * دریافت اطلاعات کامل پروفایل پزشک
      */
-    public function getDoctorProfile(Request $request, $doctorId)
+    public function getDoctorProfile(Request $request, $doctorSlug)
     {
         try {
             $doctor = Doctor::with([
-             'specialty' => fn ($q) => $q->select('id', 'name'),
-             'province'  => fn ($q) => $q->select('id', 'name'),
-             'city'      => fn ($q) => $q->select('id', 'name'),
-             'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'policlinic')
-              ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.phone_number', 'medical_centers.is_main_center'),
-             'reviews'   => fn ($q) => $q->where('is_approved', true)
-              ->with(['reviewable' => fn ($q) => $q->select('id', 'first_name', 'last_name')])
-              ->orderBy('created_at', 'desc')
-              ->limit(3),
-             'messengers',
-             'doctorTags',
-             'counselingConfig',
-             'appointmentConfig',
-             'workSchedules',
-             'insurances' => fn ($q) => $q->select('insurances.id', 'insurances.name'), // اصلاح شده
-            ])->find($doctorId);
+                'specialty' => fn ($q) => $q->select('id', 'name', 'slug'), // اضافه کردن slug
+                'province'  => fn ($q) => $q->select('id', 'name', 'slug'), // اضافه کردن slug
+                'city'      => fn ($q) => $q->select('id', 'name', 'slug'), // اضافه کردن slug
+                'medicalCenters'   => fn ($q) => $q->where('is_active', true)->where('type', 'policlinic')
+                    ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.phone_number', 'medical_centers.is_main_center'),
+                'reviews'   => fn ($q) => $q->where('is_approved', true)
+                    ->with(['reviewable' => fn ($q) => $q->select('id', 'first_name', 'last_name')])
+                    ->orderBy('created_at', 'desc')
+                    ->limit(3),
+                'messengers',
+                'doctorTags',
+                'counselingConfig',
+                'appointmentConfig',
+                'workSchedules',
+                'insurances' => fn ($q) => $q->select('insurances.id', 'insurances.name', 'insurances.slug'), // اضافه کردن slug
+            ])->where('slug', $doctorSlug)->first();
 
             if (!$doctor) {
                 return response()->json([
-                 'status'  => 'error',
-                 'message' => 'پزشک یافت نشد',
-                 'data'    => null,
+                    'status'  => 'error',
+                    'message' => 'پزشک یافت نشد',
+                    'data'    => null,
                 ], 404);
             }
 
             // اطلاعات اصلی پزشک
             $doctorData = [
-             'id'              => $doctor->id,
-             'name'            => $doctor->full_name,
-             'specialty'       => $doctor->specialty ? $doctor->specialty->name : 'نامشخص',
-             'avatar'          => $doctor->profile_photo_url,
-             'location'        => $doctor->city ? $doctor->city->name : ($doctor->province ? $doctor->province->name : 'تهران'),
-             'description'     => $doctor->description ?? 'دستیار تخصصی ارتوپدی دانشگاه علوم پزشکی شیراز، درمان کمردرد، درد مفاصل، آسیب تاندون‌ها، شکستگی، دررفتگی، استخوان و مفاصل',
-             'medical_code'    => $doctor->license_number ?? '۱۵۴۶۲۳',
-             'rating'          => $doctor->reviews->avg('rating') ?? 4.3,
-             'reviews_count'   => $doctor->reviews->count() ?? 1903,
+                'id'              => $doctor->id,
+                'name'            => $doctor->full_name,
+                'slug'            => $doctor->slug, // اضافه کردن slug پزشک
+                'specialty'       => [
+                    'id'   => $doctor->specialty ? $doctor->specialty->id : null,
+                    'name' => $doctor->specialty ? $doctor->specialty->name : 'نامشخص',
+                    'slug' => $doctor->specialty ? $doctor->specialty->slug : null, // اضافه کردن slug تخصص
+                ],
+                'avatar'          => $doctor->profile_photo_url,
+                'location'        => [
+                    'province' => [
+                        'id'   => $doctor->province ? $doctor->province->id : null,
+                        'name' => $doctor->province ? $doctor->province->name : 'نامشخص',
+                        'slug' => $doctor->province ? $doctor->province->slug : null, // اضافه کردن slug استان
+                    ],
+                    'city' => [
+                        'id'   => $doctor->city ? $doctor->city->id : null,
+                        'name' => $doctor->city ? $doctor->city->name : ($doctor->province ? $doctor->province->name : 'تهران'),
+                        'slug' => $doctor->city ? $doctor->city->slug : null, // اضافه کردن slug شهر
+                    ],
+                ],
+                'description'     => $doctor->description ?? 'دستیار تخصصی ارتوپدی دانشگاه علوم پزشکی شیراز، درمان کمردرد، درد مفاصل، آسیب تاندون‌ها، شکستگی، دررفتگی، استخوان و مفاصل',
+                'medical_code'    => $doctor->license_number ?? '۱۵۴۶۲۳',
+                'rating'          => $doctor->reviews->avg('rating') ?? 4.3,
+                'reviews_count'   => $doctor->reviews->count() ?? 1903,
+                'insurances'      => $doctor->insurances->map(function ($insurance) {
+                    return [
+                        'id'   => $insurance->id,
+                        'name' => $insurance->name,
+                        'slug' => $insurance->slug, // اضافه کردن slug بیمه
+                    ];
+                })->values()->all(),
             ];
 
             // تگ‌ها
             $tags = $doctor->doctorTags->map(function ($tag) {
                 return [
-                 'name'       => $tag->name,
-                 'color'      => $tag->color ?? '#D1FAE5', // رنگ پیش‌فرض
-                 'text_color' => $tag->text_color ?? '#059669', // رنگ متن پیش‌فرض
+                    'name'       => $tag->name,
+                    'color'      => $tag->color ?? '#D1FAE5', // رنگ پیش‌فرض
+                    'text_color' => $tag->text_color ?? '#059669', // رنگ متن پیش‌فرض
                 ];
             })->values()->all();
 
             if (empty($tags)) {
                 $tags = [
-                 ['name' => 'کمترین معطلی', 'color' => '#D1FAE5', 'text_color' => '#059669'],
-                 ['name' => 'خوش برخورد', 'color' => '#FFEDD5', 'text_color' => '#EA580C'],
-                 ['name' => 'پوشش بیمه', 'color' => '#FEF3C7', 'text_color' => '#D97706'],
+                    ['name' => 'کمترین معطلی', 'color' => '#D1FAE5', 'text_color' => '#059669'],
+                    ['name' => 'خوش برخورد', 'color' => '#FFEDD5', 'text_color' => '#EA580C'],
+                    ['name' => 'پوشش بیمه', 'color' => '#FEF3C7', 'text_color' => '#D97706'],
                 ];
             }
 
@@ -92,8 +115,8 @@ class DoctorProfileController extends Controller
             // آدرس و تلفن تماس
             $mainClinic = $doctor->medicalCenters->where('is_main_center', true)->first() ?? $doctor->medicalCenters->first();
             $addressData = [
-             'address'      => $mainClinic ? $mainClinic->address : 'آدرس ی ثبت نشده',
-             'phone_number' => $mainClinic ? $mainClinic->phone_number : 'نامشخص',
+                'address'      => $mainClinic ? $mainClinic->address : 'آدرس ثبت نشده',
+                'phone_number' => $mainClinic ? $mainClinic->phone_number : 'نامشخص',
             ];
 
             // نظرات کاربران
@@ -101,16 +124,16 @@ class DoctorProfileController extends Controller
 
             // پاسخ نهایی
             return response()->json([
-             'status' => 'success',
-             'data'   => [
-              'doctor'       => $doctorData,
-              'tags'         => $tags,
-              'social_media' => $socialMedia,
-              'about'        => $about,
-              'appointments' => $appointments,
-              'address'      => $addressData,
-              'reviews'      => $reviews,
-             ],
+                'status' => 'success',
+                'data'   => [
+                    'doctor'       => $doctorData,
+                    'tags'         => $tags,
+                    'social_media' => $socialMedia,
+                    'about'        => $about,
+                    'appointments' => $appointments,
+                    'address'      => $addressData,
+                    'reviews'      => $reviews,
+                ],
             ], 200);
         } catch (\Exception $e) {
             Log::error('Doctor profile error: ' . $e->getMessage(), [
@@ -120,9 +143,9 @@ class DoctorProfileController extends Controller
             ]);
 
             return response()->json([
-             'status'  => 'error',
-             'message' => 'خطای سرور',
-             'data'    => null,
+                'status'  => 'error',
+                'message' => 'خطای سرور',
+                'data'    => null,
             ], 500);
         }
     }
@@ -137,17 +160,17 @@ class DoctorProfileController extends Controller
 
         foreach ($messengers as $messenger) {
             $socialMedia[] = [
-             'type' => $messenger->messenger_type,
-             'link' => $messenger->username ? "https://{$messenger->messenger_type}.com/{$messenger->username}" : $messenger->phone_number,
+                'type' => $messenger->messenger_type,
+                'link' => $messenger->username ? "https://{$messenger->messenger_type}.com/{$messenger->username}" : $messenger->phone_number,
             ];
         }
 
         // اگر شبکه اجتماعی ثبت نشده، مقادیر پیش‌فرض
         if (empty($socialMedia)) {
             $socialMedia = [
-             ['type' => 'website', 'link' => 'https://benobe.ir'],
-             ['type' => 'whatsapp', 'link' => ''],
-             ['type' => 'instagram', 'link' => ''],
+                ['type' => 'website', 'link' => 'https://benobe.ir'],
+                ['type' => 'whatsapp', 'link' => ''],
+                ['type' => 'instagram', 'link' => ''],
             ];
         }
 
@@ -176,18 +199,18 @@ class DoctorProfileController extends Controller
             $gregorianDate = $this->parseJalaliToGregorian($jalaliDate);
             if ($gregorianDate) {
                 $inPersonSlot = (object) [
-                 'date' => $gregorianDate->toDateString(), // مثلاً "2025-03-23"
-                 'time' => Carbon::parse($time)->toTimeString(), // "07:00:00"
+                    'date' => $gregorianDate->toDateString(), // مثلاً "2025-03-23"
+                    'time' => Carbon::parse($time)->toTimeString(), // "07:00:00"
                 ];
             }
         }
 
         $inPersonData = $inPersonSlot ? [
-         'date_time' => $this->formatJalaliDateTime($inPersonSlot->date, $inPersonSlot->time),
-         'address' => $mainClinic ? $mainClinic->address : '',
+            'date_time' => $this->formatJalaliDateTime($inPersonSlot->date, $inPersonSlot->time),
+            'address' => $mainClinic ? $mainClinic->address : '',
         ] : [
-         'date_time' => '',
-         'address' => $mainClinic ? $mainClinic->address : '',
+            'date_time' => '',
+            'address' => $mainClinic ? $mainClinic->address : '',
         ];
 
         // نوبت آنلاین
@@ -203,57 +226,57 @@ class DoctorProfileController extends Controller
             $gregorianDate = $this->parseJalaliToGregorian($jalaliDate);
             if ($gregorianDate) {
                 $onlineSlot = (object) [
-                 'date' => $gregorianDate->toDateString(),
-                 'time' => Carbon::parse($time)->toTimeString(),
-                 'fee' => 300000,
-                 'consultation_types' => [
-                  'phone' => $doctor->counselingConfig && $doctor->counselingConfig->has_phone_counseling,
-                  'video' => $doctor->counselingConfig && $doctor->counselingConfig->has_video_counseling,
-                  'text' => $doctor->counselingConfig && $doctor->counselingConfig->has_text_counseling,
-                 ],
+                    'date' => $gregorianDate->toDateString(),
+                    'time' => Carbon::parse($time)->toTimeString(),
+                    'fee' => 300000,
+                    'consultation_types' => [
+                        'phone' => $doctor->counselingConfig && $doctor->counselingConfig->has_phone_counseling,
+                        'video' => $doctor->counselingConfig && $doctor->counselingConfig->has_video_counseling,
+                        'text' => $doctor->counselingConfig && $doctor->counselingConfig->has_text_counseling,
+                    ],
                 ];
             }
         }
 
         $onlineData = $onlineSlot ? [
-         'date_time' => $this->formatJalaliDateTime($onlineSlot->date, $onlineSlot->time),
-         'fee' => $onlineSlot->fee ?? 300000,
-         'consultation_types' => [
-          'phone' => $onlineSlot->consultation_types['phone'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_phone_counseling),
-          'video' => $onlineSlot->consultation_types['video'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_video_counseling),
-          'text' => $onlineSlot->consultation_types['text'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_text_counseling),
-         ],
+            'date_time' => $this->formatJalaliDateTime($onlineSlot->date, $onlineSlot->time),
+            'fee' => $onlineSlot->fee ?? 300000,
+            'consultation_types' => [
+                'phone' => $onlineSlot->consultation_types['phone'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_phone_counseling),
+                'video' => $onlineSlot->consultation_types['video'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_video_counseling),
+                'text' => $onlineSlot->consultation_types['text'] ?? ($doctor->counselingConfig && $doctor->counselingConfig->has_text_counseling),
+            ],
         ] : [
-         'date_time' => '',
-         'fee' => 300000,
-         'consultation_types' => [
-          'phone' => true,
-          'video' => true,
-          'text' => true,
-         ],
+            'date_time' => '',
+            'fee' => 300000,
+            'consultation_types' => [
+                'phone' => true,
+                'video' => true,
+                'text' => true,
+            ],
         ];
 
         return [
-         'in_person' => $inPersonData,
-         'online' => $onlineData,
+            'in_person' => $inPersonData,
+            'online' => $onlineData,
         ];
     }
 
     private function parseJalaliToGregorian($jalaliDate)
     {
         $persianMonths = [
-         'فروردین' => 1,
-         'اردیبهشت' => 2,
-         'خرداد' => 3,
-         'تیر' => 4,
-         'مرداد' => 5,
-         'شهریور' => 6,
-         'مهر' => 7,
-         'آبان' => 8,
-         'آذر' => 9,
-         'دی' => 10,
-         'بهمن' => 11,
-         'اسفند' => 12,
+            'فروردین' => 1,
+            'اردیبهشت' => 2,
+            'خرداد' => 3,
+            'تیر' => 4,
+            'مرداد' => 5,
+            'شهریور' => 6,
+            'مهر' => 7,
+            'آبان' => 8,
+            'آذر' => 9,
+            'دی' => 10,
+            'بهمن' => 11,
+            'اسفند' => 12,
         ];
 
         $parts = explode(' ', trim($jalaliDate)); // "3 فروردین 1404" -> ["3", "فروردین", "1404"]
@@ -275,7 +298,6 @@ class DoctorProfileController extends Controller
             $jalali = new \Morilog\Jalali\Jalalian($year, $month, $day);
             return $jalali->toCarbon();
         } catch (\Exception $e) {
-
             // در صورت خطا، تقریب اولیه
             $gregorianYear = $year - 621;
             $gregorianDate = Carbon::create($gregorianYear, $month, $day, 0, 0, 0, 'Asia/Tehran');
@@ -298,28 +320,29 @@ class DoctorProfileController extends Controller
         $reviews = $doctor->reviews->map(function ($review) {
             $user = $review->reviewable;
             return [
-             'user_name' => $user ? $user->full_name : '',
-             'date'      => $review->created_at ? Jalalian::fromCarbon($review->created_at)->ago() : '',
-             'type'      => '', // می‌تونید منطق پیچیده‌تر برای نوع نوبت اضافه کنید
-             'rating'    => $review->rating ?? 4,
-             'comment'   => $review->comment ?? '',
+                'user_name' => $user ? $user->full_name : '',
+                'date'      => $review->created_at ? Jalalian::fromCarbon($review->created_at)->ago() : '',
+                'type'      => '', // می‌تونید منطق پیچیده‌تر برای نوع نوبت اضافه کنید
+                'rating'    => $review->rating ?? 4,
+                'comment'   => $review->comment ?? '',
             ];
         })->values()->all();
 
         if (empty($reviews)) {
             $reviews = [
-             [
-              'user_name' => '',
-              'date'      => '',
-              'type'      => '',
-              'rating'    => '',
-              'comment'   => '',
-             ],
+                [
+                    'user_name' => '',
+                    'date'      => '',
+                    'type'      => '',
+                    'rating'    => '',
+                    'comment'   => '',
+                ],
             ];
         }
 
         return $reviews;
     }
+
     private function getNextAvailableSlot($doctor, $clinicId)
     {
         $doctorId = $doctor->id;
