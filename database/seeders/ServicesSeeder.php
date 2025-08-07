@@ -1,8 +1,10 @@
 <?php
+
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ServicesSeeder extends Seeder
 {
@@ -27,6 +29,7 @@ class ServicesSeeder extends Seeder
             $data[] = [
                 'id'         => $service['value'], // استفاده از value به‌عنوان id
                 'name'       => $service['label'], // استفاده از label به‌عنوان name
+                'slug'       => Str::slug($service['label']), // ایجاد اسلاگ از نام
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
