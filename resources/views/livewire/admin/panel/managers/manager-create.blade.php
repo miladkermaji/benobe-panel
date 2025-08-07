@@ -44,7 +44,7 @@
                       <label class="form-label">نام <span class="text-danger">*</span></label>
                       <input type="text" wire:model="first_name" class="form-control" placeholder="نام مدیر">
                       @error('first_name')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -53,7 +53,7 @@
                       <label class="form-label">نام خانوادگی <span class="text-danger">*</span></label>
                       <input type="text" wire:model="last_name" class="form-control" placeholder="نام خانوادگی مدیر">
                       @error('last_name')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -63,7 +63,7 @@
                       <input type="text" wire:model="national_code" class="form-control"
                         placeholder="کد ملی (۱۰ رقم)" maxlength="10">
                       @error('national_code')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -73,7 +73,7 @@
                       <input data-jdp type="text" wire:model="date_of_birth" class="form-control"
                         placeholder="انتخاب تاریخ تولد" readonly>
                       @error('date_of_birth')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -87,7 +87,7 @@
                         <option value="other">سایر</option>
                       </select>
                       @error('gender')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -99,7 +99,7 @@
                         <option value="2">مدیر ارشد</option>
                       </select>
                       @error('permission_level')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -108,7 +108,7 @@
                       <label class="form-label">آدرس</label>
                       <textarea wire:model="address" class="form-control" rows="3" placeholder="آدرس کامل"></textarea>
                       @error('address')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -117,7 +117,7 @@
                       <label class="form-label">بیوگرافی</label>
                       <textarea wire:model="bio" class="form-control" rows="3" placeholder="توضیحات مختصر"></textarea>
                       @error('bio')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -146,7 +146,7 @@
                       <input type="email" wire:model="email" class="form-control"
                         placeholder="example@domain.com">
                       @error('email')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -155,7 +155,7 @@
                       <label class="form-label">شماره موبایل</label>
                       <input type="text" wire:model="mobile" class="form-control" placeholder="شماره موبایل">
                       @error('mobile')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
@@ -205,7 +205,7 @@
                       <input type="password" wire:model="password" class="form-control"
                         placeholder="حداقل ۸ کاراکتر">
                       @error('password')
-                        <span class="text-danger small">{{ $message }}</span>
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
                       @enderror
                     </div>
                   </div>
