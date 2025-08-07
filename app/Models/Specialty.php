@@ -5,15 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 class Specialty extends Model
 {
     use HasFactory;
+    use Sluggable;
 
     protected $table = 'specialties';
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'status',
     ];
@@ -23,6 +26,20 @@ class Specialty extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
+     */
+    public function sluggable(): array
+    {
+        return [
+            'slug' => [
+                'source' => 'name',
+            ],
+        ];
+    }
 
     // Relationship with Doctors
     public function doctors()

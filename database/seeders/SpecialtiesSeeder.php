@@ -20,6 +20,7 @@ class SpecialtiesSeeder extends Seeder
             foreach ($data['specialties'] as $specialty) {
                 DB::table('specialties')->insert([
                     'name' => $specialty['name'], // نام تخصص
+                    'slug' => Str::slug($specialty['name']), // ایجاد اسلاگ از نام
                     'description' => $specialty['description'] ?? null,
                     'status' => 1, // توضیحات تخصص (اختیاری)
                     'created_at' => now(), // زمان ایجاد رکورد
