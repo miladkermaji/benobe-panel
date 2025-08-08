@@ -66,7 +66,16 @@ class ActivationDoctorsClinicController extends Controller
     public function getPhones($id)
     {
         $clinic         = MedicalCenter::findOrFail($id);
-        $phones         = $clinic->phone_numbers ? json_decode($clinic->phone_numbers, true) : [];
+        $phones         = [];
+
+        if ($clinic->phone_numbers) {
+            if (is_string($clinic->phone_numbers)) {
+                $phones = json_decode($clinic->phone_numbers, true) ?: [];
+            } elseif (is_array($clinic->phone_numbers)) {
+                $phones = $clinic->phone_numbers;
+            }
+        }
+
         $secretaryPhone = $clinic->secretary_phone;
 
         return response()->json(['phones' => $phones, 'secretary_phone' => $secretaryPhone]);
@@ -105,7 +114,13 @@ class ActivationDoctorsClinicController extends Controller
         $phoneIndex = $request->input('phone_index');
 
         if ($clinic->phone_numbers) {
-            $phones = json_decode($clinic->phone_numbers, true);
+            $phones = [];
+            if (is_string($clinic->phone_numbers)) {
+                $phones = json_decode($clinic->phone_numbers, true) ?: [];
+            } elseif (is_array($clinic->phone_numbers)) {
+                $phones = $clinic->phone_numbers;
+            }
+
             if (isset($phones[$phoneIndex])) {
                 unset($phones[$phoneIndex]);                                 // حذف شماره تماس از آرایه
                 $clinic->phone_numbers = json_encode(array_values($phones)); // مرتب‌سازی مجدد آرایه

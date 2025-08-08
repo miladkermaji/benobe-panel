@@ -70,43 +70,12 @@
               </div>
               <div class="input-group mt-2">
                 <input type="text" value="{{ $clinic->address ?? '' }}" class="my-form-control w-100"
-                  placeholder="آدرس شما" readonly data-bs-toggle="modal" data-bs-target="#addressModalCenter">
-                <div class="modal fade" id="addressModalCenter" tabindex="-1" role="dialog"
-                  aria-labelledby="addressModalCenterLabel" aria-hidden="true">
-                  <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content border-radius-6">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="addressModalCenterLabel">ثبت آدرس</h5>
-                        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                        </button>
-                      </div>
-                      <div class="modal-body">
-                        <form id="addressForm">
-                          @csrf
-                          <input type="hidden" name="latitude" id="latitude" value="">
-                          <input type="hidden" name="longitude" id="longitude" value="">
-                          <textarea style="height: 90px !important" placeholder="تهران,آزادی" name="address" id="address" cols="1"
-                            rows="1" class="my-form-control-light w-100"></textarea>
-                          <div class="w-100">
-                            <button type="submit"
-                              class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
-                              <span class="button_text">ذخیره</span>
-                              <div class="loader"></div>
-                            </button>
-                          </div>
-                        </form>
+                  placeholder="آدرس شما" readonly onclick="openXModal('addressModal')">
+              </div>
 
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-3 w-100">
-                  <button class="btn my-btn-primary h-50 w-100 " type="button" data-bs-toggle="modal"
-                    data-bs-target="#doneModal">انجام
-                    شد</button>
-                </div>
+              <div class="mt-3 w-100">
+                <button class="btn my-btn-primary h-50 w-100 " type="button" onclick="openXModal('doneModal')">انجام
+                  شد</button>
               </div>
 
             </div>
@@ -116,44 +85,48 @@
     </div>
   </div>
 
-  <div class="modal fade" id="doneModal" tabindex="-1" role="dialog" aria-labelledby="doneModalLabel"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-      <div class="modal-content border-radius-6">
-        <div class="modal-header">
-          <h5 class="modal-title fs-6 fw-bold" id="doneModalLabel">اطلاعات تماس مطب</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="phoneForm">
-            @csrf
-            <div id="phoneInputs">
-
-              <!-- شماره‌های تماس موجود اینجا نمایش داده می‌شوند -->
-            </div>
-            <div class="form-group mt-3">
-              <a href="#" class="font-size-13 text-decoration-none fw-bold text-primary" id="addPhoneLink"
-                onclick="addPhoneField()">افزودن شماره تماس</a>
-            </div>
-            <div class="alert alert-info w-100 mt-2">
-              <span class="fw-bold font-size-13">
-                لطفا برای اطلاع رسانی نوبت های مطب شماره موبایل منشی خود را وارد نمایید.
-              </span>
-            </div>
-            <div class="mt-3">
-              <button type="submit"
-                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                <span class="button_text">ذخیره</span>
-                <div class="loader" style="display: none;"></div>
-              </button>
-            </div>
-          </form>
-        </div>
+  <!-- مودال آدرس -->
+  <x-custom-modal id="addressModal" title="ثبت آدرس" size="md">
+    <form id="addressForm">
+      @csrf
+      <input type="hidden" name="latitude" id="latitude" value="">
+      <input type="hidden" name="longitude" id="longitude" value="">
+      <textarea style="height: 90px !important" placeholder="تهران,آزادی" name="address" id="address" cols="1"
+        rows="1" class="my-form-control-light w-100"></textarea>
+      <div class="w-100 mt-3">
+        <button type="submit"
+          class="w-100 btn my-btn-primary h-50 border-radius-4 d-flex justify-content-center align-items-center">
+          <span class="button_text">ذخیره</span>
+          <div class="loader"></div>
+        </button>
       </div>
-    </div>
-  </div>
+    </form>
+  </x-custom-modal>
+
+  <!-- مودال اطلاعات تماس -->
+  <x-custom-modal id="doneModal" title="اطلاعات تماس مطب" size="lg">
+    <form id="phoneForm">
+      @csrf
+      <div id="phoneInputs">
+        <!-- شماره‌های تماس موجود اینجا نمایش داده می‌شوند -->
+      </div>
+      <div class="form-group mt-3">
+        <a href="#" class="font-size-13 text-decoration-none fw-bold text-primary" id="addPhoneLink"
+          onclick="addPhoneField()">افزودن شماره تماس</a>
+      </div>
+      <div class="alert alert-info w-100 mt-2">
+        <span class="fw-bold font-size-13">
+          لطفا برای اطلاع رسانی نوبت های مطب شماره موبایل منشی خود را وارد نمایید.
+        </span>
+      </div>
+      <div class="mt-3">
+        <button type="submit" class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
+          <span class="button_text">ذخیره</span>
+          <div class="loader" style="display: none;"></div>
+        </button>
+      </div>
+    </form>
+  </x-custom-modal>
 @endsection
 
 
@@ -209,21 +182,16 @@
       }
     }
 
-
-
-    // حذف شماره تماس از فرم و دیتابیس
     // حذف شماره تماس از فرم و دیتابیس
     function deletePhone(phoneCount, index) {
       if (index === null) {
         toggleAddPhoneButton();
         document.getElementById("addPhoneLink").removeAttribute('style');
-
       }
       if (index !== null) {
         Swal.fire({
           title: 'آیا مطمئن هستید؟',
           text: "این شماره تماس حذف خواهد شد!",
-
           showCancelButton: true,
           confirmButtonColor: '#d33',
           cancelButtonColor: '#3085d6',
@@ -247,7 +215,6 @@
               },
               error: function() {
                 toastr.error('خطا در حذف شماره تماس.');
-
               }
             });
           }
@@ -256,73 +223,72 @@
         $(`#phoneGroup${phoneCount}`).remove();
         phoneCount--; // کاهش تعداد شماره‌ها
         document.getElementById("addPhoneLink").removeAttribute('style');
-
         toggleAddPhoneButton(); // به‌روزرسانی وضعیت دکمه
       }
     }
-    $('#doneModal').on('hidden.bs.modal', function() {
-      $('body').removeClass('modal-open'); // حذف کلاس اسکرول
-      $('.modal-backdrop').remove(); // حذف بک‌دراپ
-    });
 
-    $('#doneModal').on('show.bs.modal', function() {
-      // نمایش لودینگ
-      const loadingHtml = `
-        <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">در حال بارگذاری...</span>
-            </div>
-        </div>
-    `;
-      $('#phoneInputs').html(loadingHtml);
+    // رویداد باز شدن مودال اطلاعات تماس
+    document.addEventListener('DOMContentLoaded', function() {
+      const doneModal = document.getElementById('doneModal');
 
-      // خالی کردن ورودی‌ها
-      phoneCount = 0;
+      // اضافه کردن event listener برای باز شدن مودال
+      doneModal.addEventListener('x-modal:show', function() {
+        // نمایش لودینگ
+        const loadingHtml = `
+          <div class="d-flex justify-content-center align-items-center" style="height: 200px;">
+              <div class="spinner-border text-primary" role="status">
+                  <span class="sr-only">در حال بارگذاری...</span>
+              </div>
+          </div>
+        `;
+        $('#phoneInputs').html(loadingHtml);
 
-      // بارگذاری شماره‌های تماس از دیتابیس
-      $.ajax({
-        url: "{{ route('doctors.clinic.get.phones', ['id' => $clinic->id]) }}",
-        type: 'GET',
-        success: function(response) {
-          // خالی کردن محتوای مودال
-          $('#phoneInputs').empty();
+        // خالی کردن ورودی‌ها
+        phoneCount = 0;
 
-          const phones = response.phones;
+        // بارگذاری شماره‌های تماس از دیتابیس
+        $.ajax({
+          url: "{{ route('doctors.clinic.get.phones', ['id' => $clinic->id]) }}",
+          type: 'GET',
+          success: function(response) {
+            // خالی کردن محتوای مودال
+            $('#phoneInputs').empty();
 
-          // اگر شماره‌ای وجود نداشته باشد، یک ورودی بدون آیکون حذف اضافه می‌کنیم
-          if (phones.length === 0) {
-            addPhoneField('', 'null', false); // ورودی بدون آیکون حذف
-          } else {
-            phones.forEach((phone, index) => {
-              addPhoneField(phone, index, true); // ورودی با آیکون حذف
-            });
+            const phones = response.phones;
+            const secretaryPhone = response.secretary_phone ||
+            ''; // اگر شماره‌ای وجود نداشته باشد، خالی می‌ماند
+
+            // ابتدا شماره موبایل منشی را اضافه می‌کنیم
+            const secretaryInput = `
+                  <div class="form-group position-relative mb-4" id="secretaryPhoneGroup">
+                      <label class="label-top-input-special-takhasos" for="secretaryPhone">شماره موبایل منشی</label>
+                      <input type="text" class="form-control h-50 border-radius-4" id="secretaryPhone" name="secretary_phone" value="${secretaryPhone}" placeholder="شماره موبایل منشی">
+                  </div>`;
+            $('#phoneInputs').append(secretaryInput);
+
+            // سپس شماره‌های مطب را اضافه می‌کنیم
+            if (phones.length === 0) {
+              addPhoneField('', 'null', false); // ورودی بدون آیکون حذف
+            } else {
+              phones.forEach((phone, index) => {
+                addPhoneField(phone, index, true); // ورودی با آیکون حذف
+              });
+            }
+
+            // تنظیم وضعیت دکمه افزودن شماره تماس
+            toggleAddPhoneButton();
+          },
+          error: function() {
+            // در صورت خطا، پیام خطا را نمایش می‌دهیم
+            $('#phoneInputs').html(`
+                  <div class="alert alert-danger text-center" role="alert">
+                      خطا در بارگذاری اطلاعات. لطفاً دوباره تلاش کنید.
+                  </div>
+              `);
           }
-
-          // اضافه کردن اینپوت شماره موبایل منشی
-          const secretaryPhone = response.secretary_phone || ''; // اگر شماره‌ای وجود نداشته باشد، خالی می‌ماند
-          const secretaryInput = `
-                <div class="form-group position-relative mt-4" id="secretaryPhoneGroup">
-                    <label class="label-top-input-special-takhasos" for="secretaryPhone">شماره موبایل منشی</label>
-                    <input type="text" class="form-control h-50 border-radius-4" id="secretaryPhone" name="secretary_phone" value="${secretaryPhone}" placeholder="شماره موبایل منشی">
-                </div>`;
-          $('#phoneInputs').append(secretaryInput);
-
-          // تنظیم وضعیت دکمه افزودن شماره تماس
-          toggleAddPhoneButton();
-        },
-        error: function() {
-          // در صورت خطا، پیام خطا را نمایش می‌دهیم
-          $('#phoneInputs').html(`
-                <div class="alert alert-danger text-center" role="alert">
-                    خطا در بارگذاری اطلاعات. لطفاً دوباره تلاش کنید.
-                </div>
-            `);
-        }
+        });
       });
     });
-
-
-
 
     // ذخیره شماره‌ها
     $('#phoneForm').on('submit', function(e) {
@@ -345,16 +311,13 @@
           loader.hide();
           toastr.success('شماره‌های تماس با موفقیت ذخیره شدند.');
 
-          $('#doneModal').modal('hide'); // بستن مودال
-          $('body').removeClass('modal-open'); // جلوگیری از اسکرول مودال
-          $('.modal-backdrop').remove(); // حذف overlay
+          closeXModal('doneModal'); // بستن مودال
           location.href = "{{ route('doctors.clinic.cost', $clinic->id) }}"
         },
         error: function() {
           buttonText.show();
           loader.hide();
           toastr.error('خطا در ذخیره شماره‌ها. دوباره تلاش کنید.');
-
         },
         complete: function() {
           buttonText.show();
@@ -363,12 +326,6 @@
         }
       });
     });
-    $('#doneModal').on('hidden.bs.modal', function() {
-      $('body').removeClass('modal-open'); // حذف کلاس اسکرول
-      $('.modal-backdrop').remove(); // حذف overlay
-    });
-
-
 
     // تغییر در افزودن شماره تماس برای حذف مستقیم
   </script>
@@ -377,7 +334,6 @@
     function addPhone() {
       if (phoneCount >= 3) {
         Swal.fire({
-
           title: 'حداکثر تعداد شماره تلفن',
           text: 'شما نمی‌توانید بیشتر از ۳ شماره تلفن مطب اضافه کنید.'
         });
@@ -405,7 +361,6 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: "این شماره تلفن حذف خواهد شد!",
-
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
@@ -415,7 +370,6 @@
           const phoneInputGroup = document.getElementById(`phoneGroup${index}`);
           phoneInputGroup.remove();
           document.getElementById("addPhoneLink").removeAttribute('style');
-
           phoneCount--;
           updateRemoveButtonVisibility();
         }
@@ -548,10 +502,11 @@
             document.querySelector('.my-form-control').value = data.display_name;
           });
       });
+
       // انتقال مقدار به مودال
-      $('#addressModalCenter').on('show.bs.modal', function() {
+      document.getElementById('addressModal').addEventListener('x-modal:show', function() {
         var address = document.querySelector('.my-form-control').value;
-        $(this).find('textarea').val(address);
+        document.getElementById('address').value = address;
       });
 
       // ارسال به‌روزرسانی به سرور با AJAX
@@ -578,17 +533,12 @@
             _token: '{{ csrf_token() }}'
           },
           success: function(response) {
-            $('#addressModalCenter').modal('hide');
-            $('body').removeClass('modal-open');
-            $('.modal-backdrop').remove();
+            closeXModal('addressModal');
             toastr.success('آدرس شما با موفقیت به‌روزرسانی شد.');
-
             document.querySelector('.my-form-control').value = address;
           },
           error: function() {
-
             toastr.error('مشکلی پیش آمد. دوباره تلاش کنید.');
-
           },
           complete: function() {
             buttonText.show();
@@ -596,8 +546,6 @@
           }
         });
       });
-
-
     });
   </script>
 @endsection

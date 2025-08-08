@@ -243,8 +243,7 @@ Route::prefix('mc')
                 Route::patch('update-status', [SecretaryManagementController::class, 'updateStatus'])->name('mc-secretary-update-status');
             });
             Route::group(['prefix' => 'doctors-clinic'], function () {
-                Route::get('activation/{clinic}', [ActivationDoctorsClinicController::class, 'index'])->middleware('medical_center.permission:clinic_management')->name('activation-doctor-clinic');
-                Route::post('activation/{id}/update-address', [ActivationDoctorsClinicController::class, 'updateAddress'])->middleware('medical_center.permission:clinic_management')->name('doctors.clinic.update.address');
+               
                 Route::get('/doctors/clinic/{id}/phones', [ActivationDoctorsClinicController::class, 'getPhones'])->middleware('medical_center.permission:clinic_management')->name('doctors.clinic.get.phones');
                 Route::post('/doctors/clinic/{id}/phones', [ActivationDoctorsClinicController::class, 'updatePhones'])->middleware('medical_center.permission:clinic_management')->name('doctors.clinic.update.phones');
                 Route::post('/doctors/clinic/{id}/phones/delete', [ActivationDoctorsClinicController::class, 'deletePhone'])->middleware('medical_center.permission:clinic_management')->name('doctors.clinic.delete.phone');
@@ -253,11 +252,7 @@ Route::prefix('mc')
                 Route::get('/costs/{medical_center_id}/list', [CostController::class, 'listDeposits'])->middleware('medical_center.permission:clinic_management')->name('cost.list');
                 Route::post('/costs/delete', [CostController::class, 'deleteDeposit'])->middleware('medical_center.permission:clinic_management')->name('cost.delete');
                 Route::post('/doctors-clinic/duration/store', [DurationController::class, 'store'])->middleware('medical_center.permission:clinic_management')->name('duration.store');
-                Route::get('/activation/duration/{clinic}', [DurationController::class, 'index'])->middleware('medical_center.permission:clinic_management')->name('duration.index');
-                Route::get('/activation/workhours/{clinic}', [ActivationWorkhoursController::class, 'index'])->middleware('medical_center.permission:clinic_management')->name('activation.workhours.index');
-                Route::get('{clinicId}/{doctorId}', [ActivationWorkhoursController::class, 'getWorkHours'])->middleware('medical_center.permission:clinic_management')->name('workhours.get');
-                Route::post('/activation/workhours/store', [ActivationWorkhoursController::class, 'store'])->middleware('medical_center.permission:clinic_management')->name('activation.workhours.store');
-                Route::post('workhours/delete', [ActivationWorkhoursController::class, 'deleteWorkHours'])->middleware('medical_center.permission:clinic_management')->name('activation.workhours.delete');
+               
                 Route::post('/dr/panel/start-appointment', [ActivationWorkhoursController::class, 'startAppointment'])->middleware('medical_center.permission:clinic_management')->name('start.appointment');
                 Route::post('/cost/store', [CostController::class, 'store'])->middleware('medical_center.permission:clinic_management')->name('cost.store');
                 Route::get('gallery', [DoctorsClinicManagementController::class, 'gallery'])->middleware('medical_center.permission:clinic_management')->name('mc-office-gallery');
