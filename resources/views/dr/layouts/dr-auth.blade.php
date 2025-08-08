@@ -2,7 +2,7 @@
 <html lang="fa-IR" dir="rtl" class="scroll-smooth">
 
 <head>
-  <title>پنل دکتر به نوبه</title>
+  <title>پنل دکتر  و مراکز درمانی به نوبه</title>
   <!-- Meta Tags -->
   <meta charset="utf-8" />
   <meta name="viewport"
