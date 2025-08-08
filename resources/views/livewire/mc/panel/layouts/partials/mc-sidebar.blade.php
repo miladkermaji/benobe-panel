@@ -27,7 +27,7 @@
 
         @if ($this->hasPermission('medical_center_management'))
           <li
-            class="item-li i-users {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-medical-center {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="medical-center-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مرکز درمانی من
@@ -76,14 +76,14 @@
         @endif
 
         @if ($this->hasPermission('workhours'))
-          <li class="item-li i-checkout__request {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
+          <li class="item-li i-workhours {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
             <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
           </li>
         @endif
 
         @if ($this->hasPermission('appointments'))
           <li
-            class="item-li i-courses {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
+            class="item-li i-appointments {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               نوبت اینترنتی
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -131,7 +131,7 @@
         @endif
 
         @if ($this->hasPermission('prescriptions'))
-          <li class="item-li i-banners {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
+          <li class="item-li i-prescriptions {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">نسخه های من</span>
@@ -164,7 +164,7 @@
 
         @if ($this->hasPermission('consult'))
           <li
-            class="item-li i-moshavere {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
+            class="item-li i-consultation {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">مشاوره</span>
@@ -213,15 +213,14 @@
         @endif
 
         @if ($this->hasPermission('doctor_services'))
-          <li
-            class="item-li i-checkout__request {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
+          <li class="item-li i-insurance {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
             <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
         @endif
 
         @if ($this->hasPermission('electronic_prescription'))
           <li
-            class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
+            class="item-li i-electronic-prescription {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">
@@ -286,7 +285,7 @@
 
         @if ($this->hasPermission('financial_reports'))
           <li
-            class="item-li i-my__peyments {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-financial-reports {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               گزارش مالی
@@ -322,7 +321,8 @@
         @endif
 
         @if ($this->hasPermission('patient_communication'))
-          <li class="item-li i-users {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
+          <li
+            class="item-li i-patient-communication {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               ارتباط با بیماران
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -344,7 +344,7 @@
 
         @if ($this->hasPermission('secretary_management'))
           <li
-            class="item-li i-user__secratary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-secretary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               منشی
@@ -414,7 +414,7 @@
 
         @if ($this->hasPermission('user_management'))
           <li
-            class="item-li i-users {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-profile {{ Request::routeIs('mc-edit-profile') || Request::routeIs('mc-edit-profile-security') || Request::routeIs('mc-edit-profile-upgrade') || Request::routeIs('mc-my-performance') || Request::routeIs('mc-subuser') || Request::routeIs('my-mc-appointments') || Request::routeIs('mc.panel.doctor-faqs.index') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="hesab-karbari">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               حساب کاربری
@@ -477,7 +477,7 @@
             </ul>
           </li>
         @endif
-@if (
+        @if (
             $this->hasPermission('mc-edit-profile') ||
                 $this->hasPermission('mc-edit-profile-security') ||
                 $this->hasPermission('mc-my-performance') ||
@@ -543,13 +543,13 @@
           </li>
         @endif
         @if ($this->hasPermission('mc-my-performance-chart'))
-          <li class="item-li i-transactions {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
+          <li class="item-li i-statistics {{ Request::routeIs('mc-my-performance-chart') ? 'is-active' : '' }}">
             <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
           </li>
         @endif
 
         @if ($this->hasPermission('mc-panel-tickets'))
-          <li class="item-li i-comments {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
+          <li class="item-li i-messages {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               پیام
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -574,7 +574,7 @@
           </li>
         @endif
 
-        
+
       </ul>
     </div>
     <script>

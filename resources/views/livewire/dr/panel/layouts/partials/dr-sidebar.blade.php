@@ -31,7 +31,7 @@
         @endif
         @if ($this->hasPermission('appointments'))
           <li
-            class="item-li i-courses {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
+            class="item-li i-appointments {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               نوبت اینترنتی
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -83,7 +83,7 @@
           </li>
         @endif
         @if ($this->hasPermission('my-prescriptions'))
-          <li class="item-li i-banners {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
+          <li class="item-li i-prescriptions {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">نسخه های من</span>
@@ -111,7 +111,7 @@
         @endif
         @if ($this->hasPermission('consult'))
           <li
-            class="item-li i-moshavere {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
+            class="item-li i-consultation {{ Request::routeIs('dr-moshavere_setting') || Request::routeIs('dr-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('dr-mySpecialDays-counseling') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">مشاوره</span>
@@ -158,14 +158,13 @@
           </li>
         @endif
         @if ($this->hasPermission('insurance'))
-          <li
-            class="item-li i-checkout__request {{ Request::routeIs('dr.panel.doctor-services.index') ? 'is-active' : '' }}">
+          <li class="item-li i-insurance {{ Request::routeIs('dr.panel.doctor-services.index') ? 'is-active' : '' }}">
             <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
         @endif
         @if ($this->hasPermission('prescription'))
           <li
-            class="item-li i-banners {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
+            class="item-li i-electronic-prescription {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('dr-patient-records') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               <div class="d-flex align-items-center">
                 <span class="fw-bold">
@@ -229,7 +228,7 @@
         @endif
         @if ($this->hasPermission('financial_reports'))
           <li
-            class="item-li i-my__peyments {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-financial-reports {{ Request::routeIs('dr-wallet') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               گزارش مالی
@@ -264,7 +263,8 @@
           </li>
         @endif
         @if ($this->hasPermission('patient_communication'))
-          <li class="item-li i-users {{ Request::routeIs('dr.panel.send-message') ? 'is-active' : '' }}">
+          <li
+            class="item-li i-patient-communication {{ Request::routeIs('dr.panel.send-message') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               ارتباط با بیماران
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -285,7 +285,7 @@
         @endif
         @if ($this->hasPermission('secretary_management'))
           <li
-            class="item-li i-user__secratary {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-secretary {{ Request::routeIs('dr-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="gozaresh-mali">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               منشی
@@ -353,7 +353,7 @@
         @endif
         @if ($this->hasPermission('profile'))
           <li
-            class="item-li i-users {{ Request::routeIs('dr-edit-profile') || Request::routeIs('dr-edit-profile-security') || Request::routeIs('dr-edit-profile-upgrade') || Request::routeIs('dr-my-performance') || Request::routeIs('dr-subuser') || Request::routeIs('my-dr-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
+            class="item-li i-profile {{ Request::routeIs('dr-edit-profile') || Request::routeIs('dr-edit-profile-security') || Request::routeIs('dr-edit-profile-upgrade') || Request::routeIs('dr-my-performance') || Request::routeIs('dr-subuser') || Request::routeIs('my-dr-appointments') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
             id="hesab-karbari">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               حساب کاربری
@@ -417,12 +417,12 @@
           </li>
         @endif
         @if ($this->hasPermission('statistics'))
-          <li class="item-li i-transactions {{ Request::routeIs('dr-my-performance-chart') ? 'is-active' : '' }}">
+          <li class="item-li i-statistics {{ Request::routeIs('dr-my-performance-chart') ? 'is-active' : '' }}">
             <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
           </li>
         @endif
         @if ($this->hasPermission('messages'))
-          <li class="item-li i-comments {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
+          <li class="item-li i-messages {{ Request::routeIs('dr-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               پیام
               <div class="d-flex justify-content-end w-100 align-items-center">

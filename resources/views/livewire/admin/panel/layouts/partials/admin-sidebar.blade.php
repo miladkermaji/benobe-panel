@@ -30,7 +30,7 @@
 
         <!-- ابزارها -->
         @if ($this->hasManagerPermission('tools'))
-          <li class="item-li i-courses">
+          <li class="item-li i-tools">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               ابزارها
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -62,7 +62,7 @@
 
         <!-- مدیریت کاربران -->
         @if ($this->hasManagerPermission('user_management'))
-          <li class="item-li i-users">
+          <li class="item-li i-user-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت کاربران
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -84,7 +84,7 @@
 
         <!-- مدیریت -->
         @if ($this->hasManagerPermission('manager_management'))
-          <li class="item-li i-users {{ Request::routeIs('admin.panel.managers.*') ? 'is-active' : '' }}">
+          <li class="item-li i-manager-management {{ Request::routeIs('admin.panel.managers.*') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -109,7 +109,7 @@
 
         <!-- مدیریت پزشکان -->
         @if ($this->hasManagerPermission('doctor_management'))
-          <li class="item-li i-users">
+          <li class="item-li i-doctor-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت پزشکان
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -142,7 +142,7 @@
         @endif
         <!-- حق عضویت -->
         @if ($this->hasManagerPermission('membership'))
-          <li class="item-li i-courses">
+          <li class="item-li i-membership">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               حق عضویت
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -166,7 +166,7 @@
 
         <!-- مدیریت منشی‌ها -->
         @if ($this->hasManagerPermission('secretary_management'))
-          <li class="item-li i-users">
+          <li class="item-li i-secretary-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت منشی‌ها
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -188,7 +188,7 @@
 
         <!-- مدیریت بیماران -->
         @if ($this->hasManagerPermission('patient_management'))
-          <li class="item-li i-users">
+          <li class="item-li i-patient-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت بیماران
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -218,7 +218,7 @@
         <!-- مدیریت مراکز درمانی -->
         @if ($this->hasManagerPermission('medical_centers'))
           <li
-            class="item-li i-courses {{ Request::routeIs('admin.panel.hospitals.index') || Request::routeIs('admin.panel.laboratories.index') || Request::routeIs('admin.panel.clinics.index') || Request::routeIs('admin.panel.treatment-centers.index') || Request::routeIs('admin.panel.imaging-centers.index') ? 'is-active' : '' }}">
+            class="item-li i-medical-centers {{ Request::routeIs('admin.panel.hospitals.index') || Request::routeIs('admin.panel.laboratories.index') || Request::routeIs('admin.panel.clinics.index') || Request::routeIs('admin.panel.treatment-centers.index') || Request::routeIs('admin.panel.imaging-centers.index') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مراکز درمانی
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -255,7 +255,7 @@
         @endif
         <!-- مدیریت خدمات -->
         @if ($this->hasManagerPermission('service_management'))
-          <li class="item-li i-courses">
+          <li class="item-li i-service-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت خدمات
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -276,7 +276,7 @@
 
         <!-- مدیریت مالی -->
         @if ($this->hasManagerPermission('financial_management'))
-          <li class="item-li i-courses">
+          <li class="item-li i-financial-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت مالی
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -297,7 +297,7 @@
 
         <!-- مدیریت محتوا -->
         @if ($this->hasManagerPermission('content_management'))
-          <li class="item-li i-courses">
+          <li class="item-li i-content-management">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               مدیریت محتوا
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -327,7 +327,7 @@
         @endif
         <!-- تنظیمات سایت -->
         @if ($this->hasManagerPermission('site_settings'))
-          <li class="item-li i-courses">
+          <li class="item-li i-site-settings">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               تنظیمات سایت
               <div class="d-flex justify-content-end w-100 align-items-center">
@@ -382,7 +382,7 @@
 
         <!-- پشتیبانی -->
         @if ($this->hasManagerPermission('support'))
-          <li class="item-li i-courses">
+          <li class="item-li i-support">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
               پشتیبانی
               <div class="d-flex justify-content-end w-100 align-items-center">

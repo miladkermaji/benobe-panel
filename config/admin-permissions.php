@@ -10,7 +10,7 @@ return [
     ],
     'tools' => [
         'title' => 'ابزارها',
-        'icon' => 'i-courses',
+        'icon' => 'i-tools',
         'routes' => [
             'admin.panel.tools.file-manager' => 'مدیریت فایل',
             'admin.tools.data-migration.index' => 'انتقال داده‌ها',
@@ -27,7 +27,7 @@ return [
     ],
     'user_management' => [
         'title' => 'مدیریت کاربران',
-        'icon' => 'i-users',
+        'icon' => 'i-user-management',
         'routes' => [
             'admin.panel.users.index' => 'لیست کاربران',
             'admin.panel.user-groups.index' => 'گروه‌های کاربری',
@@ -36,7 +36,7 @@ return [
     ],
     'manager_management' => [
         'title' => 'مدیریت مدیران',
-        'icon' => 'i-users',
+        'icon' => 'i-manager-management',
         'routes' => [
             'admin.panel.managers.index' => 'مدیران',
             'admin.panel.managers.permissions' => 'مدیریت دسترسی مدیران',
@@ -44,7 +44,7 @@ return [
     ],
     'doctor_management' => [
         'title' => 'مدیریت پزشکان',
-        'icon' => 'i-users',
+        'icon' => 'i-doctor-management',
         'routes' => [
             'admin.panel.doctors.index' => 'لیست پزشکان',
             'admin.panel.best-doctors.index' => 'پزشک برتر',
@@ -56,7 +56,7 @@ return [
     ],
     'membership' => [
         'title' => 'حق عضویت',
-        'icon' => 'i-courses',
+        'icon' => 'i-membership',
         'routes' => [
             'admin.panel.user-subscriptions.index' => 'اشتراک‌ها',
             'admin.panel.user-membership-plans.index' => 'طرح‌های عضویت',
@@ -65,7 +65,7 @@ return [
     ],
     'secretary_management' => [
         'title' => 'مدیریت منشی‌ها',
-        'icon' => 'i-users',
+        'icon' => 'i-secretary-management',
         'routes' => [
             'admin.panel.secretaries.index' => 'لیست منشی‌ها',
             'admin.panel.secretaries.secreteries-permission' => 'دسترسی‌های منشی',
@@ -73,7 +73,7 @@ return [
     ],
     'patient_management' => [
         'title' => 'مدیریت بیماران',
-        'icon' => 'i-users',
+        'icon' => 'i-patient-management',
         'routes' => [
             'admin.panel.users.index' => 'لیست بیماران',
             'admin.panel.sub-users.index' => 'کاربران زیرمجموعه',
@@ -81,7 +81,7 @@ return [
     ],
     'medical_centers' => [
         'title' => 'مراکز درمانی',
-        'icon' => 'i-courses',
+        'icon' => 'i-medical-centers',
         'routes' => [
             'admin.panel.hospitals.index' => 'مدیریت بیمارستان',
             'admin.panel.laboratories.index' => 'مدیریت آزمایشگاه',
@@ -93,7 +93,7 @@ return [
     ],
     'service_management' => [
         'title' => 'مدیریت خدمات',
-        'icon' => 'i-courses',
+        'icon' => 'i-service-management',
         'routes' => [
             'admin.panel.services.index' => 'لیست خدمات',
             'admin.panel.doctor-services.index' => 'خدمات پزشکان',
@@ -101,7 +101,7 @@ return [
     ],
     'financial_management' => [
         'title' => 'مدیریت مالی',
-        'icon' => 'i-courses',
+        'icon' => 'i-financial-management',
         'routes' => [
             'admin.panel.transactions.index' => 'تراکنش‌ها',
             'admin.panel.doctor-wallets.index' => 'کیف‌پول',
@@ -109,7 +109,7 @@ return [
     ],
     'content_management' => [
         'title' => 'مدیریت محتوا',
-        'icon' => 'i-courses',
+        'icon' => 'i-content-management',
         'routes' => [
             'admin.panel.blogs.index' => 'مدیریت بلاگ',
             'admin.panel.specialties.index' => 'مدیریت تخصص ها',
@@ -119,7 +119,7 @@ return [
     ],
     'site_settings' => [
         'title' => 'تنظیمات سایت',
-        'icon' => 'i-courses',
+        'icon' => 'i-site-settings',
         'routes' => [
             'admin.panel.menus.index' => 'منوها',
             'admin.panel.banner-texts.index' => 'بنر صفحه اصلی',
@@ -129,7 +129,7 @@ return [
     ],
     'support' => [
         'title' => 'پشتیبانی',
-        'icon' => 'i-courses',
+        'icon' => 'i-support',
         'routes' => [
             'admin.panel.tickets.index' => 'تیکت‌های پشتیبانی',
         ],

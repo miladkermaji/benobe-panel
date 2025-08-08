@@ -10,7 +10,7 @@ return [
     ],
     'appointments' => [
         'title' => 'نوبت اینترنتی',
-        'icon' => 'i-courses',
+        'icon' => 'i-appointments',
         'routes' => [
             'dr-appointments' => 'لیست نوبت ها',
             'dr-workhours' => 'ساعت کاری',
@@ -25,7 +25,7 @@ return [
     ],
     'my-prescriptions' => [
         'title' => 'نسخه های من',
-        'icon' => 'i-banners',
+        'icon' => 'i-prescriptions',
         'routes' => [
             'dr.panel.my-prescriptions' => 'مدیریت نسخه ها',
             'dr.panel.my-prescriptions.settings' => 'تنظیمات درخواست نسخه',
@@ -33,7 +33,7 @@ return [
     ],
     'consult' => [
         'title' => 'مشاوره',
-        'icon' => 'i-moshavere',
+        'icon' => 'i-consultation',
         'routes' => [
             'dr-moshavere_setting' => 'برنامه‌ریزی مشاوره',
             'dr-moshavere_waiting' => 'گزارش مشاوره',
@@ -44,14 +44,14 @@ return [
     ],
     'insurance' => [
         'title' => 'خدمات و بیمه',
-        'icon' => 'i-checkout__request',
+        'icon' => 'i-insurance',
         'routes' => [
             'dr.panel.doctor-services.index' => 'خدمات و بیمه',
         ],
     ],
     'prescription' => [
         'title' => 'نسخه الکترونیک',
-        'icon' => 'i-banners',
+        'icon' => 'i-electronic-prescription',
         'routes' => [
             'dr-patient-records' => 'پرونده پزشکی',
             'prescription.index' => 'نسخه‌های ثبت شده',
@@ -62,7 +62,7 @@ return [
     ],
     'financial_reports' => [
         'title' => 'گزارش مالی',
-        'icon' => 'i-my__peyments',
+        'icon' => 'i-financial-reports',
         'routes' => [
             'dr.panel.financial-reports.index' => 'گزارش مالی',
             'dr-payment-setting' => 'پرداخت',
@@ -71,21 +71,21 @@ return [
     ],
     'patient_communication' => [
         'title' => 'ارتباط با بیماران',
-        'icon' => 'i-users',
+        'icon' => 'i-patient-communication',
         'routes' => [
             'dr.panel.send-message' => 'ارسال پیام',
         ],
     ],
     'patient_records' => [
         'title' => 'پرونده الکترونیک',
-        'icon' => 'i-checkout__request',
+        'icon' => 'i-patient-records',
         'routes' => [
             'dr-patient-records' => 'پرونده الکترونیک',
         ],
     ],
     'secretary_management' => [
         'title' => 'منشی',
-        'icon' => 'i-user__secratary',
+        'icon' => 'i-secretary',
         'routes' => [
             'dr-secretary-management' => 'مدیریت منشی‌ها',
             'dr-secretary-permissions' => 'سطح دسترسی منشی',
@@ -102,14 +102,14 @@ return [
     ],
     'permissions' => [
         'title' => 'دسترسی‌ها',
-        'icon' => 'i-checkout__request',
+        'icon' => 'i-permissions',
         'routes' => [
             'dr-secretary-permissions' => 'سطح دسترسی منشی',
         ],
     ],
     'profile' => [
         'title' => 'حساب کاربری',
-        'icon' => 'i-users',
+        'icon' => 'i-profile',
         'routes' => [
             'dr-edit-profile' => 'ویرایش پروفایل',
             'dr-edit-profile-security' => 'امنیت',
@@ -122,14 +122,14 @@ return [
     ],
     'statistics' => [
         'title' => 'گزارش‌ها و آمار',
-        'icon' => 'i-transactions',
+        'icon' => 'i-statistics',
         'routes' => [
             'dr-my-performance-chart' => 'آمار و نمودار'
         ],
     ],
     'messages' => [
         'title' => 'پیام',
-        'icon' => 'i-comments',
+        'icon' => 'i-messages',
         'routes' => [
             'dr-panel-tickets' => 'تیکت‌ها',
             '#' => 'صفحه گفتگو',

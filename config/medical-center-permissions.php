@@ -10,7 +10,7 @@ return [
     ],
     'medical_center_management' => [
         'title' => 'مرکز درمانی من',
-        'icon' => 'i-users',
+        'icon' => 'i-medical-center',
         'routes' => [
             'mc.panel.doctors.index' => 'مدیریت پزشکان',
             'mc.panel.doctors.create' => 'افزودن پزشک',
@@ -29,14 +29,14 @@ return [
     ],
     'workhours' => [
         'title' => 'ساعت کاری',
-        'icon' => 'i-checkout__request',
+        'icon' => 'i-workhours',
         'routes' => [
             'mc-workhours' => 'ساعت کاری',
         ],
     ],
     'appointments' => [
         'title' => 'نوبت اینترنتی',
-        'icon' => 'i-courses',
+        'icon' => 'i-appointments',
         'routes' => [
             'mc-appointments' => 'لیست نوبت ها',
             'mc.panel.doctornotes.index' => 'توضیحات نوبت',
@@ -48,7 +48,7 @@ return [
     ],
     'prescriptions' => [
         'title' => 'نسخه های من',
-        'icon' => 'i-banners',
+        'icon' => 'i-prescriptions',
         'routes' => [
             'mc.panel.my-prescriptions' => 'مدیریت نسخه ها',
             'mc.panel.my-prescriptions.settings' => 'تنظیمات درخواست نسخه',
@@ -56,7 +56,7 @@ return [
     ],
     'consult' => [
         'title' => 'مشاوره',
-        'icon' => 'i-moshavere',
+        'icon' => 'i-consultation',
         'routes' => [
             'mc-moshavere_setting' => 'برنامه‌ریزی مشاوره',
             'mc-moshavere_waiting' => 'گزارش مشاوره',
@@ -66,14 +66,14 @@ return [
     ],
     'doctor_services' => [
         'title' => 'خدمات و بیمه',
-        'icon' => 'i-checkout__request',
+        'icon' => 'i-insurance',
         'routes' => [
             'mc.panel.doctor-services.index' => 'خدمات و بیمه',
         ],
     ],
     'electronic_prescription' => [
         'title' => 'نسخه الکترونیک',
-        'icon' => 'i-banners',
+        'icon' => 'i-electronic-prescription',
         'routes' => [
             'prescription.index' => 'نسخه‌های ثبت شده',
             'providers.index' => 'بیمه‌های من',
@@ -84,7 +84,7 @@ return [
     ],
     'financial_reports' => [
         'title' => 'گزارش مالی',
-        'icon' => 'i-my__peyments',
+        'icon' => 'i-financial-reports',
         'routes' => [
             'mc.panel.financial-reports.index' => 'گزارش مالی',
             'mc-payment-setting' => 'پرداخت',
@@ -93,14 +93,14 @@ return [
     ],
     'patient_communication' => [
         'title' => 'ارتباط با بیماران',
-        'icon' => 'i-users',
+        'icon' => 'i-patient-communication',
         'routes' => [
             'mc.panel.send-message' => 'ارسال پیام',
         ],
     ],
     'secretary_management' => [
         'title' => 'منشی',
-        'icon' => 'i-user__secratary',
+        'icon' => 'i-secretary',
         'routes' => [
             'mc-secretary-management' => 'مدیریت منشی‌ها',
             'mc-secretary-permissions' => 'دسترسی‌ها',
@@ -117,7 +117,7 @@ return [
     ],
     'profile' => [
         'title' => 'حساب کاربری',
-        'icon' => 'i-users',
+        'icon' => 'i-profile',
         'routes' => [
             'mc-edit-profile' => 'ویرایش پروفایل',
             'mc-edit-profile-security' => 'امنیت',
@@ -130,14 +130,14 @@ return [
     ],
     'statistics' => [
         'title' => 'آمار و نمودار',
-        'icon' => 'i-transactions',
+        'icon' => 'i-statistics',
         'routes' => [
             'mc-my-performance-chart' => 'آمار و نمودار'
         ],
     ],
     'messages' => [
         'title' => 'پیام',
-        'icon' => 'i-comments',
+        'icon' => 'i-messages',
         'routes' => [
             'mc-panel-tickets' => 'تیکت‌ها',
             '#' => 'صفحه گفتگو',
