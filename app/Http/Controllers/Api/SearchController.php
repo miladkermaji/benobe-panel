@@ -27,38 +27,32 @@ class SearchController extends Controller
 
         if ($token) {
             try {
-                // Use the JWT middleware to validate the token
-                $jwtMiddleware = app(\App\Http\Middleware\JwtMiddleware::class);
-                $response = $jwtMiddleware->handle($request, function ($request) {
-                    return null; // Continue to next middleware
-                });
+                // Use the JWT service for better token validation
+                $jwtService = new \App\Services\JwtTokenService();
+                $validation = $jwtService->validateToken($token);
 
-                // If middleware returned a response, it means authentication failed
-                if ($response && $response->getStatusCode() === 401) {
-                    \Illuminate\Support\Facades\Log::warning('JWT authentication failed in search: ' . $response->getContent());
-                } else {
-                    // Authentication was successful, get the user
-                    $user = \Illuminate\Support\Facades\Auth::user();
-
+                if ($validation['valid'] && $validation['user_exists']) {
+                    $user = $jwtService->getUserFromToken($token);
                     if ($user && $user->id) {
-                        // Double-check that the user exists in the database
-                        $existingUser = \App\Models\User::find($user->id);
-                        if ($existingUser) {
-                            $userId = $user->id;
-                            \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
-                        } else {
-                            \Illuminate\Support\Facades\Log::warning("JWT token contains user ID that doesn't exist in database: " . ($user ? $user->id : 'null'));
-                        }
-                    } else {
-                        \Illuminate\Support\Facades\Log::warning("JWT token contains null user ID or user object is null");
+                        $userId = $user->id;
+                        \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
                     }
+                } else {
+                    // Token is invalid or user doesn't exist, but this is expected for public search
+                    \Illuminate\Support\Facades\Log::debug("Search request with invalid token - continuing as unauthenticated", [
+                        'token_valid' => $validation['valid'],
+                        'user_exists' => $validation['user_exists'] ?? false,
+                        'error' => $validation['error'] ?? null
+                    ]);
                 }
             } catch (\Exception $e) {
-                // If JWT authentication fails, userId remains null
-                \Illuminate\Support\Facades\Log::warning('JWT authentication failed in search: ' . $e->getMessage());
+                // Token validation failed, but this is expected for public search
+                \Illuminate\Support\Facades\Log::debug("Search request with token validation error - continuing as unauthenticated", [
+                    'error' => $e->getMessage()
+                ]);
             }
         } else {
-            \Illuminate\Support\Facades\Log::info("Search request from unauthenticated user");
+            \Illuminate\Support\Facades\Log::debug("Search request from unauthenticated user");
         }
 
         // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان

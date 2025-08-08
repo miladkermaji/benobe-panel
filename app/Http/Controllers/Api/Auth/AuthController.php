@@ -688,4 +688,87 @@ class AuthController extends Controller
             'data' => ['user' => $user],
         ], 200);
     }
+
+    /**
+     * Refresh JWT token
+     *
+     * @bodyParam token string required The current JWT token
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "توکن با موفقیت تمدید شد",
+     *   "data": {
+     *     "token": "new-jwt-token",
+     *     "expires_in": 3600
+     *   }
+     * }
+     * @response 401 {
+     *   "status": "error",
+     *   "message": "توکن نامعتبر یا منقضی شده است",
+     *   "data": null
+     * }
+     */
+    public function refreshToken(Request $request)
+    {
+        try {
+            $token = $request->bearerToken() ?: $request->cookie('auth_token');
+
+            if (!$token) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'توکن یافت نشد',
+                    'data' => null,
+                ], 401);
+            }
+
+            $jwtService = new JwtTokenService();
+            $newToken = $jwtService->refreshToken($token);
+
+            // Get token expiration time
+            JWTAuth::setToken($newToken);
+            $payload = JWTAuth::getPayload();
+            $expiresIn = $payload->get('exp') - time();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'توکن با موفقیت تمدید شد',
+                'data' => [
+                    'token' => $newToken,
+                    'expires_in' => $expiresIn,
+                ],
+            ], 200);
+
+        } catch (TokenExpiredException $e) {
+            Log::warning('Token refresh failed: Token expired', ['exception' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
+                'data' => null,
+            ], 401);
+        } catch (TokenInvalidException $e) {
+            Log::warning('Token refresh failed: Invalid token', ['exception' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'توکن نامعتبر است.',
+                'data' => null,
+            ], 401);
+        } catch (JWTException $e) {
+            Log::error('Token refresh failed: JWT exception', ['exception' => $e->getMessage()]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطا در پردازش توکن.',
+                'data' => null,
+            ], 401);
+        } catch (\Exception $e) {
+            Log::error('Token refresh failed: Unexpected error', [
+                'exception' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطای غیرمنتظره در تمدید توکن.',
+                'data' => null,
+            ], 500);
+        }
+    }
 }

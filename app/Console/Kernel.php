@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('appointments:clean-expired')->everyFiveMinutes();
+        $schedule->command('jwt:cleanup-invalid-tokens')->daily()->withoutOverlapping();
     }
 
     /**

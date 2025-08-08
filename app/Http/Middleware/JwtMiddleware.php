@@ -103,13 +103,90 @@ class JwtMiddleware
                 'guard' => $guard
             ]);
 
+            // Continue with the request and check token expiration
+            $response = $next($request);
+            return $this->checkTokenExpiration($payload, $response);
+
         } catch (TokenExpiredException $e) {
             Log::warning('JWT middleware: Token expired', ['exception' => $e->getMessage()]);
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
-                'data'    => null,
-            ], 401);
+
+            // Attempt to refresh the token automatically
+            try {
+                $jwtService = new \App\Services\JwtTokenService();
+                $newToken = $jwtService->refreshToken($token);
+
+                // Set the new token and continue with the request
+                JWTAuth::setToken($newToken);
+                $payload = JWTAuth::getPayload();
+
+                $guard = $payload->get('guard');
+                $userId = $payload->get('sub');
+
+                if (!$guard || !$userId) {
+                    Log::warning('JWT middleware: Missing required token information after refresh', [
+                        'guard' => $guard,
+                        'user_id' => $userId
+                    ]);
+                    return response()->json(['status' => 'error', 'message' => 'اطلاعات مورد نیاز در توکن وجود ندارد.'], 401);
+                }
+
+                // Get user model
+                $providerName = config("auth.guards.{$guard}.provider");
+                $modelClass = config("auth.providers.{$providerName}.model");
+
+                if (!$modelClass || !class_exists($modelClass)) {
+                    Log::error('JWT middleware: Invalid guard configuration after refresh', [
+                        'guard' => $guard,
+                        'provider' => $providerName,
+                        'model_class' => $modelClass
+                    ]);
+                    return response()->json(['status' => 'error', 'message' => 'نوع کاربر قابل شناسایی نیست.'], 500);
+                }
+
+                $user = $modelClass::find($userId);
+
+                if (!$user) {
+                    Log::warning('JWT middleware: User not found in database after refresh', [
+                        'user_id' => $userId,
+                        'guard' => $guard,
+                        'model_class' => $modelClass
+                    ]);
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'کاربر یافت نشد',
+                        'data'    => null,
+                    ], 401);
+                }
+
+                // Set the user and continue
+                Auth::guard($guard)->setUser($user);
+                Auth::setUser($user);
+                $request->attributes->add(['user' => $user]);
+
+                // Add the new token to the response headers for the client to update
+                $response = $next($request);
+                $response->headers->set('X-New-Token', $newToken);
+                $response->headers->set('X-Token-Refreshed', 'true');
+
+                Log::info('JWT middleware: Token refreshed automatically', [
+                    'user_id' => $user->id,
+                    'guard' => $guard
+                ]);
+
+                return $response;
+
+            } catch (\Exception $refreshException) {
+                Log::warning('JWT middleware: Token refresh failed', [
+                    'original_exception' => $e->getMessage(),
+                    'refresh_exception' => $refreshException->getMessage()
+                ]);
+
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
+                    'data'    => null,
+                ], 401);
+            }
         } catch (TokenInvalidException $e) {
             Log::warning('JWT middleware: Invalid token', ['exception' => $e->getMessage()]);
             return response()->json([
@@ -155,5 +232,28 @@ class JwtMiddleware
         }
 
         return $next($request);
+    }
+
+    /**
+     * Check if token is about to expire and add warning header
+     */
+    private function checkTokenExpiration($payload, $response)
+    {
+        $exp = $payload->get('exp');
+        $currentTime = time();
+        $timeUntilExpiry = $exp - $currentTime;
+
+        // If token expires in less than 30 minutes, add warning header
+        if ($timeUntilExpiry < 1800) { // 30 minutes
+            $response->headers->set('X-Token-Expires-Soon', 'true');
+            $response->headers->set('X-Token-Expires-In', $timeUntilExpiry);
+
+            Log::info('JWT middleware: Token expires soon', [
+                'expires_in_seconds' => $timeUntilExpiry,
+                'expires_in_minutes' => round($timeUntilExpiry / 60, 1)
+            ]);
+        }
+
+        return $response;
     }
 }

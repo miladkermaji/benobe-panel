@@ -55,6 +55,7 @@ Route::prefix('/v2')->group(function () {
             Route::get('/profile', [AuthController::class, 'me']);
             Route::get('/verify-token', [AuthController::class, 'verifyToken']);
             Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.v2.auth.update-profile');
+            Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('api.v2.auth.refresh-token');
         });
     });
 
