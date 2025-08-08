@@ -18,11 +18,15 @@ class HeaderComponent extends Component
     public $selectedMedicalCenterId = null;
     public $selectedMedicalCenterName = 'مشاوره آنلاین به نوبه';
     public $medicalCenters;
+    public $isDarkMode = false;
 
     public function mount()
     {
         $this->notifications = new Collection();
         $this->medicalCenters = new Collection(); // Initialize medicalCenters
+
+        // Initialize dark mode state (will be updated by JavaScript)
+        $this->isDarkMode = false;
 
         if (Auth::guard('doctor')->check()) {
             $doctor = Auth::guard('doctor')->user();
@@ -135,6 +139,30 @@ class HeaderComponent extends Component
                 $doctor->setSelectedMedicalCenter(null);
             }
         }
+    }
+
+    protected function getDarkModePreference()
+    {
+        // Check if we're in a browser environment
+        if (request()->hasHeader('X-Requested-With') && request()->header('X-Requested-With') === 'XMLHttpRequest') {
+            // This is an AJAX request, try to get from session or default to false
+            return session('dark_mode', false);
+        }
+
+        return false; // Default to light mode
+    }
+
+    public function toggleDarkMode()
+    {
+        $this->isDarkMode = !$this->isDarkMode;
+
+        // Dispatch event to update the UI and localStorage
+        $this->dispatch('darkModeToggled', ['isDark' => $this->isDarkMode]);
+    }
+
+    public function syncDarkMode($isDark)
+    {
+        $this->isDarkMode = $isDark;
     }
 
     public function selectMedicalCenter($medicalCenterId = null)
