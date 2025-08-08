@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin\Panel\Doctors;
 
-use App\Models\Doctor;
 use App\Models\Clinic;
+use App\Models\Doctor;
+use App\Models\MedicalCenter;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -12,9 +13,9 @@ class DoctorClinics extends Component
     use WithPagination;
 
     public $doctor;
-    public $selectedClinics = [];
-    public $availableClinics = [];
-    public $search = '';
+    public $availableClinics;
+    public $selectedClinic;
+    public $showAddModal = false;
 
     public function mount($doctorId)
     {
@@ -24,8 +25,8 @@ class DoctorClinics extends Component
 
     public function loadAvailableClinics()
     {
-        $this->availableClinics = Clinic::whereDoesntHave('doctors', function ($query) {
-            $query->where('doctors.id', $this->doctor->id);
+        $this->availableClinics = MedicalCenter::whereDoesntHave('doctors', function ($query) {
+            $query->where('doctor_id', $this->doctor->id);
         })->get();
     }
 

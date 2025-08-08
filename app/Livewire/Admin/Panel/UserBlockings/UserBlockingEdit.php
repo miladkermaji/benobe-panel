@@ -10,6 +10,7 @@ use App\Models\UserBlocking;
 use App\Jobs\SendSmsNotificationJob;
 use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
+use App\Models\MedicalCenter;
 
 class UserBlockingEdit extends Component
 {
@@ -22,6 +23,10 @@ class UserBlockingEdit extends Component
     public $medical_center_id;
     public $status;
     public $clinics;
+    public $doctors;
+    public $users;
+    public $start_date;
+    public $end_date;
 
     public function mount($id)
     {
@@ -35,7 +40,18 @@ class UserBlockingEdit extends Component
         $this->reason = $this->userBlocking->reason;
         $this->medical_center_id = $this->userBlocking->medical_center_id;
         $this->status = $this->userBlocking->status;
-        $this->clinics = Clinic::select('id', 'name')->get();
+        $this->clinics = MedicalCenter::select('id', 'name')->get();
+        $this->doctors = Doctor::select('id', 'name')->get();
+        $this->users = User::select('id', 'name')->get();
+
+        // Set form data
+        $this->user_id = $this->userBlocking->user_id;
+        $this->doctor_id = $this->userBlocking->doctor_id;
+        $this->medical_center_id = $this->userBlocking->medical_center_id;
+        $this->start_date = $this->userBlocking->start_date;
+        $this->end_date = $this->userBlocking->end_date;
+        $this->reason = $this->userBlocking->reason;
+        $this->status = $this->userBlocking->status;
     }
 
     public function updatedType($value)

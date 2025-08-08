@@ -40,7 +40,7 @@ class AdminDashboard extends Component
             $this->totalPatients     = User::where('user_type', 0)->whereNull('deleted_at')->count();
             $this->totalSecretaries  = Secretary::whereNull('deleted_at')->count();
             $this->totalManagers     = Manager::whereNull('deleted_at')->count();
-            $this->totalClinics      = Clinic::count();
+            $this->totalClinics      = MedicalCenter::count();
             $this->totalAppointments = Appointment::whereNull('deleted_at')->count();
         } catch (\Exception $e) {
             Log::error('Error loading dashboard statistics: ' . $e->getMessage());

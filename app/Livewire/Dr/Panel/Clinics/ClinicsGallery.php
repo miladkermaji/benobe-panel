@@ -4,6 +4,8 @@ namespace App\Livewire\Dr\Panel\Clinics;
 
 use App\Models\Clinic;
 use App\Models\ClinicGallery;
+use App\Models\MedicalCenter;
+use App\Models\MedicalCenterGallery;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -13,12 +15,14 @@ class ClinicsGallery extends Component
     use WithFileUploads;
 
     public $clinic;
-    public $images   = [];
-    public $captions = [];
+    public $galleries = [];
+    public $selectedImages = [];
+    public $showUploadModal = false;
 
     public function mount($id)
     {
-        $this->clinic = Clinic::with('galleries')->findOrFail($id);
+        $this->clinic = MedicalCenter::with('galleries')->findOrFail($id);
+        $this->galleries = $this->clinic->galleries ?? [];
     }
 
     public function uploadImages()

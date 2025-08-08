@@ -10,6 +10,7 @@ use App\Models\UserBlocking;
 use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Facades\Validator;
+use App\Models\MedicalCenter;
 
 class UserBlockingCreate extends Component
 {
@@ -21,10 +22,14 @@ class UserBlockingCreate extends Component
     public $medical_center_id;
     public $status = true;
     public $clinics = [];
+    public $doctors = [];
+    public $users = [];
 
     public function mount()
     {
-        $this->clinics = Clinic::select('id', 'name')->get();
+        $this->clinics = MedicalCenter::select('id', 'name')->get();
+        $this->doctors = Doctor::select('id', 'name')->get();
+        $this->users = User::select('id', 'name')->get();
     }
 
     public function updatedType($value)
