@@ -10,6 +10,8 @@ use App\Models\FrequentSearch;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class SearchController extends Controller
 {
@@ -69,15 +71,20 @@ class SearchController extends Controller
                 'services' => [],
             ]);
         }
+
         // حالت ۱: اگر search_text خالی بود فقط جستجوهای پرتکرار کاربر جاری
         if ($searchText === '') {
-            $frequentSearches = FrequentSearch::with('specialty')
-                ->when($userId, function ($q) use ($userId) {
-                    $q->where('user_id', $userId);
-                })
-                ->orderByDesc('search_count')
-                ->limit($limit)
-                ->get();
+            $cacheKey = "frequent_searches_user_{$userId}";
+            $frequentSearches = Cache::remember($cacheKey, 300, function () use ($userId, $limit) {
+                return FrequentSearch::with('specialty')
+                    ->when($userId, function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    })
+                    ->orderByDesc('search_count')
+                    ->limit($limit)
+                    ->get();
+            });
+
             return response()->json([
                 'specialties' => [],
                 'doctors' => [],
@@ -86,150 +93,26 @@ class SearchController extends Controller
             ]);
         }
 
-        // جستجوی چندکلمه‌ای
+        // جستجوی چندکلمه‌ای - بهینه‌سازی شده
         $words = preg_split('/\s+/', $searchText, -1, PREG_SPLIT_NO_EMPTY);
 
-        // تخصص‌ها
-        $specialties = Specialty::where('status', 1)
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where(function ($qq) use ($word) {
-                        $qq->where('name', 'like', "%$word%")
-                           ->orWhere('description', 'like', "%$word%") ;
-                    });
-                }
-            })
-            // ->with(['doctors', 'medicalCenters']) // حذف با توجه به نبود جدول واسط
-            ->limit($limit)
-            ->get();
+        // Build search conditions more efficiently
+        $searchConditions = $this->buildSearchConditions($words);
 
-        // پزشکان
-        $doctorsQuery = Doctor::where('is_active', 1)
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where(function ($qq) use ($word) {
-                        $qq->where('first_name', 'like', "%$word%")
-                           ->orWhere('last_name', 'like', "%$word%")
-                           ->orWhereHas('Specialty', function ($q2) use ($word) {
-                               $q2->where('name', 'like', "%$word%") ;
-                           });
-                    });
-                }
-            })
-            ->with(['Specialty', 'medicalCenters', 'province', 'city']);
-        if ($provinceId && $provinceId !== 'all') {
-            $doctorsQuery->where('province_id', $provinceId);
-        }
-        if ($cityId && $cityId !== 'all') {
-            $doctorsQuery->where('city_id', $cityId);
-        }
-        $doctors = $doctorsQuery->limit($limit)->get();
+        // Use caching for expensive queries
+        $cacheKey = "search_{$searchText}_{$provinceId}_{$cityId}";
+        $results = Cache::remember($cacheKey, 180, function () use ($searchConditions, $provinceId, $cityId, $limit) {
+            return $this->performSearch($searchConditions, $provinceId, $cityId, $limit);
+        });
 
-        // مراکز درمانی
-        $medicalCentersQuery = MedicalCenter::where('is_active', 1)
-            ->whereNotIn('type', ['policlinic'])
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where(function ($qq) use ($word) {
-                        $qq->where('title', 'like', "%$word%")
-                           ->orWhere('type', 'like', "%$word%")
-                           ->orWhereJsonContains('specialty_ids', function ($query) use ($word) {
-                               $ids = Specialty::where('name', 'like', "%$word%")
-                                   ->pluck('id')->toArray();
-                               return $ids;
-                           });
-                    });
-                }
-            })
-            ->with(['province', 'city']);
-        if ($provinceId && $provinceId !== 'all') {
-            $medicalCentersQuery->where('province_id', $provinceId);
-        }
-        if ($cityId && $cityId !== 'all') {
-            $medicalCentersQuery->where('city_id', $cityId);
-        }
-        $medicalCenters = $medicalCentersQuery->limit($limit)->get();
-
-        // جستجوهای پرتکرار فقط برای کاربر جاری
-        $frequentSearches = FrequentSearch::with('specialty')
-            ->when($userId, function ($q) use ($userId) {
-                $q->where('user_id', $userId);
-            })
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where('search_text', 'like', "%$word%") ;
-                }
-            })
-            ->orderByDesc('search_count')
-            ->limit($limit)
-            ->get();
-
-        // واکشی ۱۰ تخصص پرتکرار (بر اساس specialty_id)
-        $frequentSearches = FrequentSearch::with('specialty')
-            ->whereNotNull('specialty_id')
-            ->orderByDesc('search_count')
-            ->limit(10)
-            ->get();
-
-        $specialtyId = $request->input('specialty_id');
-
-        // اگر specialty_id ارسال شده و جزو لیست نبود، آن را به ابتدای خروجی اضافه کن
-        if ($specialtyId) {
-            $alreadyInList = $frequentSearches->contains('specialty_id', $specialtyId);
-            if (!$alreadyInList) {
-                $specialty = \App\Models\Specialty::find($specialtyId);
-                if ($specialty) {
-                    $frequentSearches->prepend((object)[
-                        'specialty_id' => $specialtyId,
-                        'specialty' => $specialty,
-                        'search_text' => $specialty->name,
-                        'search_count' => 0,
-                    ]);
-                    $frequentSearches = $frequentSearches->take(10);
-                }
-            }
-        }
-
-        // خدمات (سرویس‌ها) با اطلاعات دکترها
-        // اگر کاربر نام پزشک را وارد کند، خدمات مربوط به آن پزشک هم نمایش داده شود
-        $doctorIds = Doctor::where('is_active', 1)
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where(function ($qq) use ($word) {
-                        $qq->where('first_name', 'like', "%$word%")
-                           ->orWhere('last_name', 'like', "%$word%") ;
-                    });
-                }
-            })
-            ->pluck('id')->toArray();
-
-        $services = \App\Models\Service::where('status', 1)
-            ->where(function ($q) use ($words) {
-                foreach ($words as $word) {
-                    $q->where(function ($qq) use ($word) {
-                        $qq->where('name', 'like', "%$word%")
-                           ->orWhere('description', 'like', "%$word%") ;
-                    });
-                }
-            })
-            ->orWhereHas('doctorServices', function ($q) use ($doctorIds) {
-                if (!empty($doctorIds)) {
-                    $q->whereIn('doctor_id', $doctorIds);
-                }
-            })
-            ->with(['doctorServices.doctor'])
-            ->limit($limit)
-            ->get();
-
-        $specialtyId = $request->input('specialty_id');
         // ذخیره جستجوی پرتکرار (نمونه پیاده‌سازی)
         if ($searchText && mb_strlen($searchText) > 2 && $userId) {
             // Double-check that the user exists before creating the record
             if (\App\Models\User::find($userId)) {
                 $frequentSearch = FrequentSearch::where('search_text', $searchText)
                     ->where('user_id', $userId)
-                    ->when($specialtyId, function ($q) use ($specialtyId) {
-                        $q->where('specialty_id', $specialtyId);
+                    ->when($request->input('specialty_id'), function ($q) use ($request) {
+                        $q->where('specialty_id', $request->input('specialty_id'));
                     })
                     ->first();
                 if ($frequentSearch) {
@@ -238,7 +121,7 @@ class SearchController extends Controller
                     FrequentSearch::create([
                         'search_text' => $searchText,
                         'user_id' => $userId,
-                        'specialty_id' => $specialtyId,
+                        'specialty_id' => $request->input('specialty_id'),
                         'search_count' => 1,
                     ]);
                 }
@@ -247,12 +130,144 @@ class SearchController extends Controller
             }
         }
 
-        return response()->json([
+        return response()->json($results);
+    }
+
+    /**
+     * Perform the actual search with optimized queries
+     */
+    private function performSearch(array $searchConditions, $provinceId, $cityId, int $limit)
+    {
+        // تخصص‌ها - بهینه‌سازی شده
+        $specialties = Specialty::where('status', 1)
+            ->where(function ($q) use ($searchConditions) {
+                foreach ($searchConditions as $condition) {
+                    $q->where(function ($qq) use ($condition) {
+                        $qq->where('name', 'like', $condition)
+                           ->orWhere('description', 'like', $condition);
+                    });
+                }
+            })
+            ->limit($limit)
+            ->get();
+
+        // پزشکان - بهینه‌سازی شده
+        $doctorsQuery = Doctor::where('is_active', 1)
+            ->where(function ($q) use ($searchConditions) {
+                foreach ($searchConditions as $condition) {
+                    $q->where(function ($qq) use ($condition) {
+                        $qq->where('first_name', 'like', $condition)
+                           ->orWhere('last_name', 'like', $condition)
+                           ->orWhereHas('Specialty', function ($q2) use ($condition) {
+                               $q2->where('name', 'like', $condition);
+                           });
+                    });
+                }
+            })
+            ->with(['Specialty', 'medicalCenters', 'province', 'city']);
+
+        // Apply location filters
+        if ($provinceId && $provinceId !== 'all') {
+            $doctorsQuery->where('province_id', $provinceId);
+        }
+        if ($cityId && $cityId !== 'all') {
+            $doctorsQuery->where('city_id', $cityId);
+        }
+
+        $doctors = $doctorsQuery->limit($limit)->get();
+
+        // مراکز درمانی - بهینه‌سازی شده
+        $medicalCentersQuery = MedicalCenter::where('is_active', 1)
+            ->whereNotIn('type', ['policlinic'])
+            ->where(function ($q) use ($searchConditions) {
+                foreach ($searchConditions as $condition) {
+                    $q->where(function ($qq) use ($condition) {
+                        $qq->where('title', 'like', $condition)
+                           ->orWhere('type', 'like', $condition);
+                    });
+                }
+            })
+            ->with(['province', 'city']);
+
+        // Apply location filters
+        if ($provinceId && $provinceId !== 'all') {
+            $medicalCentersQuery->where('province_id', $provinceId);
+        }
+        if ($cityId && $cityId !== 'all') {
+            $medicalCentersQuery->where('city_id', $cityId);
+        }
+
+        $medicalCenters = $medicalCentersQuery->limit($limit)->get();
+
+        // جستجوهای پرتکرار - بهینه‌سازی شده (یکبار اجرا)
+        $frequentSearches = FrequentSearch::with('specialty')
+            ->whereNotNull('specialty_id')
+            ->orderByDesc('search_count')
+            ->limit(10)
+            ->get();
+
+        // خدمات (سرویس‌ها) - بهینه‌سازی شده
+        $services = $this->getOptimizedServices($searchConditions, $limit);
+
+        return [
             'specialties' => $specialties,
             'doctors' => $doctors,
             'medical_centers' => $medicalCenters,
             'frequent_searches' => $frequentSearches->values(),
             'services' => $services,
-        ]);
+        ];
+    }
+
+    /**
+     * Build optimized search conditions
+     */
+    private function buildSearchConditions(array $words): array
+    {
+        $conditions = [];
+        foreach ($words as $word) {
+            $conditions[] = "%{$word}%";
+        }
+        return $conditions;
+    }
+
+    /**
+     * Get optimized services with reduced queries
+     */
+    private function getOptimizedServices(array $searchConditions, int $limit)
+    {
+        // Get doctor IDs that match the search in one query
+        $doctorIds = Doctor::where('is_active', 1)
+            ->where(function ($q) use ($searchConditions) {
+                foreach ($searchConditions as $condition) {
+                    $q->where(function ($qq) use ($condition) {
+                        $qq->where('first_name', 'like', $condition)
+                           ->orWhere('last_name', 'like', $condition);
+                    });
+                }
+            })
+            ->pluck('id')
+            ->toArray();
+
+        // Get services with optimized query
+        return \App\Models\Service::where('status', 1)
+            ->where(function ($q) use ($searchConditions, $doctorIds) {
+                // Search in service name and description
+                foreach ($searchConditions as $condition) {
+                    $q->where(function ($qq) use ($condition) {
+                        $qq->where('name', 'like', $condition)
+                           ->orWhere('description', 'like', $condition);
+                    });
+                }
+
+                // Search in related doctor services if doctor IDs found
+                if (!empty($doctorIds)) {
+                    $q->orWhereHas('doctorServices', function ($q2) use ($doctorIds) {
+                        $q2->whereIn('doctor_id', $doctorIds);
+                    });
+                }
+            })
+            ->with(['doctorServices.doctor'])
+            ->limit($limit)
+            ->get();
     }
 }
