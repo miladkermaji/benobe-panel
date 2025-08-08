@@ -38,10 +38,65 @@ class PrescriptionRequestController extends Controller
             'data' => \App\Http\Resources\PrescriptionRequestResource::collection($prescriptions),
         ]);
     }
-
-    // اطلاعات مورد نیاز برای ساخت فرم درخواست نسخه (برای ابزار مستندساز)
-    public function requestPrescription(Request $request)
-    {
+/**
+ * اطلاعات مورد نیاز برای ساخت فرم درخواست نسخه (برای ابزار مستندساز) یا ثبت درخواست نسخه
+ * @response 200 {
+ *   "status": "success",
+ *   "data": {
+ *     "types": [
+ *       {"value": "renew_lab", "label": "تمدید آزمایش"},
+ *       {"value": "renew_drug", "label": "تمدید دارو"}
+ *     ],
+ *     "insulins": [
+ *       {"id": 1, "name": "انسولین نمونه", "slug": "انسولین-نمونه"}
+ *     ],
+ *     "insurances": [
+ *       {"id": 1, "name": "تامین اجتماعی", "slug": "تامین-اجتماعی", "children": []}
+ *     ],
+ *     "clinics": [
+ *       {"id": 1, "name": "کلینیک نمونه", "slug": "کلینیک-نمونه", "prescription_fee": 50000}
+ *     ]
+ *   }
+ * }
+ * @response 201 {
+ *   "status": "success",
+ *   "message": "درخواست نسخه با موفقیت ثبت شد",
+ *   "data": {
+ *     "prescription": {
+ *       "id": 1,
+ *       "type": "renew_drug",
+ *       "medical_center": {"id": 1, "name": "کلینیک نمونه", "slug": "کلینیک-نمونه"}
+ *     }
+ *   }
+ * }
+ * @response 201 {
+ *   "status": "success",
+ *   "payment_url": "http://payment-gateway.com/pay/123"
+ * }
+ * @response 400 {
+ *   "status": "error",
+ *   "message": "خطا در اعتبارسنجی",
+ *   "data": null
+ * }
+ * @response 403 {
+ *   "status": "error",
+ *   "message": "شما مجاز به ثبت درخواست نسخه برای این پزشک نیستید.",
+ *   "data": null
+ * }
+ * @response 404 {
+ *   "status": "error",
+ *   "message": "پزشک یا کلینیک یافت نشد",
+ *   "data": null
+ * }
+ * @response 500 {
+ *   "status": "error",
+ *   "message": "خطای سرور",
+ *   "data": null
+ * }
+ */
+public function requestPrescription(Request $request)
+{
+    try {
         if ($request->isMethod('get')) {
             // انواع نسخه
             $types = [
@@ -53,11 +108,16 @@ class PrescriptionRequestController extends Controller
                 ['value' => 'other', 'label' => 'سایر'],
             ];
             // لیست انسولین‌ها
-            $insulins = Insulin::select('id', 'name')->get();
+            $insulins = Insulin::select('id', 'name', 'slug')->get();
             // لیست بیمه‌ها (ساختار درختی)
-            $insurances = PrescriptionInsurance::with('children')->whereNull('parent_id')->get();
+            $insurances = PrescriptionInsurance::with(['children' => fn($query) => $query->select('id', 'name', 'slug', 'parent_id')])
+                ->whereNull('parent_id')
+                ->select('id', 'name', 'slug')
+                ->get();
             // لیست کلینیک‌ها
-            $clinics = MedicalCenter::where('type', 'policlinic')->select('id', 'name', 'prescription_fee')->get();
+            $clinics = MedicalCenter::where('type', 'policlinic')
+                ->select('id', 'name', 'slug', 'prescription_fee')
+                ->get();
 
             return response()->json([
                 'status' => 'success',
@@ -67,16 +127,16 @@ class PrescriptionRequestController extends Controller
                     'insurances' => $insurances,
                     'clinics' => $clinics,
                 ],
-            ]);
+            ], 200);
         }
 
         // POST: ثبت درخواست نسخه
         $messages = [
             'type.required' => 'انتخاب نوع نسخه الزامی است.',
             'type.in' => 'نوع نسخه انتخابی معتبر نیست.',
-            'doctor_id.required' => 'انتخاب پزشک الزامی است.',
-            'doctor_id.exists' => 'پزشک انتخابی معتبر نیست.',
-            'clinic_id.exists' => 'کلینیک انتخابی معتبر نیست.',
+            'doctor_slug.required' => 'اسلاگ پزشک الزامی است.',
+            'doctor_slug.exists' => 'پزشک انتخابی معتبر نیست.',
+            'clinic_slug.exists' => 'کلینیک انتخابی معتبر نیست.',
             'prescription_insurance_id.exists' => 'بیمه انتخابی معتبر نیست.',
             'description.required' => 'توضیحات برای گزینه سایر الزامی است.',
             'description.max' => 'توضیحات نباید بیشتر از ۸۰ کاراکتر باشد.',
@@ -92,8 +152,8 @@ class PrescriptionRequestController extends Controller
 
         $validated = $request->validate([
             'type' => 'required|in:renew_lab,renew_drug,renew_insulin,sonography,mri,other',
-            'doctor_id' => 'required|exists:doctors,id',
-            'clinic_id' => 'nullable|exists:medical_centers,id',
+            'doctor_slug' => 'required|exists:doctors,slug',
+            'clinic_slug' => 'nullable|exists:medical_centers,slug',
             'prescription_insurance_id' => 'nullable|exists:prescription_insurances,id',
             'description' => [
                 $request->input('type') === 'other' ? 'required' : 'prohibited',
@@ -113,7 +173,6 @@ class PrescriptionRequestController extends Controller
                 'min:1'
             ],
             'referral_code' => [
-                // اگر بیمه انتخاب شده نیاز به کد ارجاع دارد
                 function ($attribute, $value, $fail) use ($request) {
                     $insurance = PrescriptionInsurance::find($request->input('prescription_insurance_id'));
                     if ($insurance && $insurance->needs_referral_code && empty($value)) {
@@ -124,10 +183,10 @@ class PrescriptionRequestController extends Controller
         ], $messages);
 
         $user = Auth::user();
-        $doctorId = $validated['doctor_id'];
+        $doctor = \App\Models\Doctor::where('slug', $validated['doctor_slug'])->first();
 
         // شرط نوبت موفق
-        $hasAppointment = \App\Models\Appointment::where('doctor_id', $doctorId)
+        $hasAppointment = \App\Models\Appointment::where('doctor_id', $doctor->id)
             ->where(function ($q) use ($user) {
                 $q->where('patientable_id', $user->id)
                   ->where('patientable_type', get_class($user));
@@ -136,7 +195,7 @@ class PrescriptionRequestController extends Controller
             ->where('payment_status', 'paid')
             ->exists();
 
-        $hasCounseling = \App\Models\CounselingAppointment::where('doctor_id', $doctorId)
+        $hasCounseling = \App\Models\CounselingAppointment::where('doctor_id', $doctor->id)
             ->where('patient_id', $user->id)
             ->where('status', 'attended')
             ->where('payment_status', 'paid')
@@ -150,33 +209,47 @@ class PrescriptionRequestController extends Controller
             ], 403);
         }
 
-        // تولید کد رهگیری عددی یونیک
-        // do {
-        //     $tracking_code = (int)(time() . rand(100, 999));
-        // } while (PrescriptionRequest::where('tracking_code', $tracking_code)->exists());
-
         $clinic = null;
         $prescription_fee = null;
-        if (!empty($validated['clinic_id'])) {
-            $clinic = MedicalCenter::where('type', 'policlinic')->find($validated['clinic_id']);
-            $prescription_fee = $clinic?->prescription_fee;
+        if (!empty($validated['clinic_slug'])) {
+            $clinic = MedicalCenter::where('type', 'policlinic')
+                ->where('slug', $validated['clinic_slug'])
+                ->select('id', 'name', 'slug', 'prescription_fee')
+                ->first();
+            if (!$clinic) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'کلینیک یافت نشد',
+                    'data' => null,
+                ], 404);
+            }
+            $prescription_fee = $clinic->prescription_fee;
         }
         $price = $prescription_fee > 0 ? (int)$prescription_fee : null;
         $transaction_id = null;
         $payment_url = null;
-        // اگر قیمت دارد، پرداخت را با PaymentService انجام بده
-        if ($price) {
+
+        // اگر پرداخت نیاز نیست، prescription را ثبت کن
+        if (!$price) {
+            if (!method_exists($user, 'prescriptions')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'امکان ثبت نسخه برای این نقش وجود ندارد.',
+                    'data' => null,
+                ], 403);
+            }
             $prescription = $user->prescriptions()->create([
                 'type' => $validated['type'],
                 'description' => $validated['type'] === 'other' ? $validated['description'] : null,
-                'doctor_id' => $validated['doctor_id'],
+                'doctor_id' => $doctor->id,
                 'patient_id' => $user->id,
                 'clinic_id' => $clinic?->id,
                 'price' => $price,
                 'status' => 'pending',
-                'payment_status' => $price ? 'pending' : 'paid',
+                'payment_status' => 'paid',
                 'transaction_id' => $transaction_id,
             ]);
+
             // Attach insurance(s) with referral_code to pivot
             if (!empty($validated['prescription_insurance_id'])) {
                 $prescription->insurances()->attach($validated['prescription_insurance_id'], [
@@ -189,54 +262,35 @@ class PrescriptionRequestController extends Controller
                     $prescription->insulins()->attach($insulin['id'], ['count' => $insulin['count']]);
                 }
             }
-            // اگر پرداخت نیاز دارد، prescription_id را در meta ذخیره کن و فقط payment_url را برگردان
-            $meta = [
-                'type' => 'prescription_request',
-                'clinic_id' => $clinic?->id,
-                'doctor_id' => $validated['doctor_id'],
-                'user_id' => $user->id,
-                'prescription_id' => $prescription->id,
-            ];
-            $successRedirect = route('payment.callback');
-            $errorRedirect = route('payment.callback');
-            try {
-                $paymentResponse = $this->paymentService->pay($price, route('api.prescriptions.payment.callback'), $meta, $successRedirect, $errorRedirect);
-                if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
-                    $payment_url = $paymentResponse->getAction();
-                } elseif ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
-                    $payment_url = $paymentResponse->getTargetUrl();
-                } elseif (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
-                    $payment_url = $paymentResponse['payment_url'];
-                } else {
-                    return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
-                }
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
-            }
-            // خروجی فقط payment_url
+
+            $prescription->load([
+                'medicalCenter' => fn($query) => $query->select('id', 'name', 'slug'),
+                'transaction',
+                'insulins' => fn($query) => $query->select('id', 'name', 'slug')
+            ]);
+
             return response()->json([
                 'status' => 'success',
-                'payment_url' => $payment_url,
+                'message' => 'درخواست نسخه با موفقیت ثبت شد',
+                'data' => [
+                    'prescription' => new \App\Http\Resources\PrescriptionRequestResource($prescription),
+                ],
             ], 201);
         }
-        // اگر پرداخت نیاز نیست، prescription را ثبت کن
-        if (!method_exists($user, 'prescriptions')) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'امکان ثبت نسخه برای این نقش وجود ندارد.',
-            ], 403);
-        }
+
+        // اگر قیمت دارد، پرداخت را با PaymentService انجام بده
         $prescription = $user->prescriptions()->create([
             'type' => $validated['type'],
             'description' => $validated['type'] === 'other' ? $validated['description'] : null,
-            'doctor_id' => $validated['doctor_id'],
+            'doctor_id' => $doctor->id,
             'patient_id' => $user->id,
             'clinic_id' => $clinic?->id,
             'price' => $price,
             'status' => 'pending',
-            'payment_status' => $price ? 'pending' : 'paid',
+            'payment_status' => 'pending',
             'transaction_id' => $transaction_id,
         ]);
+
         // Attach insurance(s) with referral_code to pivot
         if (!empty($validated['prescription_insurance_id'])) {
             $prescription->insurances()->attach($validated['prescription_insurance_id'], [
@@ -249,45 +303,45 @@ class PrescriptionRequestController extends Controller
                 $prescription->insulins()->attach($insulin['id'], ['count' => $insulin['count']]);
             }
         }
-        // اگر پرداخت نیاز دارد، prescription_id را در meta ذخیره کن و فقط payment_url را برگردان
-        if ($price) {
-            $meta = [
-                'type' => 'prescription_request',
-                'clinic_id' => $clinic?->id,
-                'doctor_id' => $validated['doctor_id'],
-                'user_id' => $user->id,
-                'prescription_id' => $prescription->id,
-            ];
-            $successRedirect = route('payment.callback');
-            $errorRedirect = route('payment.callback');
-            try {
-                $paymentResponse = $this->paymentService->pay($price, route('api.prescriptions.payment.callback'), $meta, $successRedirect, $errorRedirect);
-                if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
-                    $payment_url = $paymentResponse->getAction();
-                } elseif ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
-                    $payment_url = $paymentResponse->getTargetUrl();
-                } elseif (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
-                    $payment_url = $paymentResponse['payment_url'];
-                } else {
-                    return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
-                }
-            } catch (\Exception $e) {
-                return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
+
+        // ایجاد لینک پرداخت
+        $meta = [
+            'type' => 'prescription_request',
+            'clinic_id' => $clinic?->id,
+            'doctor_id' => $doctor->id,
+            'user_id' => $user->id,
+            'prescription_id' => $prescription->id,
+        ];
+        $successRedirect = route('payment.callback');
+        $errorRedirect = route('payment.callback');
+        try {
+            $paymentResponse = $this->paymentService->pay($price, route('api.prescriptions.payment.callback'), $meta, $successRedirect, $errorRedirect);
+            if ($paymentResponse instanceof \Shetabit\Multipay\RedirectionForm) {
+                $payment_url = $paymentResponse->getAction();
+            } elseif ($paymentResponse instanceof \Illuminate\Http\RedirectResponse) {
+                $payment_url = $paymentResponse->getTargetUrl();
+            } elseif (is_array($paymentResponse) && isset($paymentResponse['payment_url'])) {
+                $payment_url = $paymentResponse['payment_url'];
+            } else {
+                return response()->json(['message' => 'خطا در ایجاد لینک پرداخت.'], 500);
             }
-            return response()->json([
-                'status' => 'success',
-                'payment_url' => $payment_url,
-            ], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'خطای سرور: ' . $e->getMessage()], 500);
         }
-        $prescription->load(['medicalCenter', 'transaction', 'insulins']);
+
+        // خروجی فقط payment_url
         return response()->json([
             'status' => 'success',
-            'message' => 'درخواست نسخه با موفقیت ثبت شد',
-            'data' => [
-                'prescription' => $prescription,
-            ],
+            'payment_url' => $payment_url,
         ], 201);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای سرور: ' . $e->getMessage(),
+            'data' => null,
+        ], 500);
     }
+}
 
     /**
      * Callback پرداخت prescription
@@ -549,24 +603,71 @@ class PrescriptionRequestController extends Controller
         ]);
     }
 
-    // تنظیمات درخواست نسخه برای دکتر لاگین شده
-    public function prescriptionSettings(Request $request)
-    {
-        $doctorId = $request->input('doctor_id');
-        if (!$doctorId) {
+ /**
+ * تنظیمات درخواست نسخه برای دکتر لاگین شده
+ * @queryParam doctor_slug string required اسلاگ پزشک
+ * @response 200 {
+ *   "status": "success",
+ *   "data": {
+ *     "request_enabled": true,
+ *     "enabled_types": ["renew_drug", "renew_lab"]
+ *   }
+ * }
+ * @response 400 {
+ *   "status": "error",
+ *   "message": "اسلاگ پزشک الزامی است",
+ *   "data": null
+ * }
+ * @response 404 {
+ *   "status": "error",
+ *   "message": "پزشک یافت نشد",
+ *   "data": null
+ * }
+ * @response 500 {
+ *   "status": "error",
+ *   "message": "خطای سرور",
+ *   "data": null
+ * }
+ */
+public function prescriptionSettings(Request $request)
+{
+    try {
+        $doctorSlug = $request->input('doctor_slug');
+
+        if (!$doctorSlug) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'doctor_id الزامی است',
+                'message' => 'اسلاگ پزشک الزامی است',
                 'data' => null,
             ], 400);
         }
-        $settings = PrescriptionRequest::where('doctor_id', $doctorId)->first();
+
+        // بررسی وجود پزشک
+        $doctor = \App\Models\Doctor::where('slug', $doctorSlug)->first();
+
+        if (!$doctor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'پزشک یافت نشد',
+                'data' => null,
+            ], 404);
+        }
+
+        $settings = PrescriptionRequest::where('doctor_id', $doctor->id)->first();
+
         return response()->json([
             'status' => 'success',
             'data' => [
                 'request_enabled' => $settings ? (bool) $settings->request_enabled : false,
                 'enabled_types' => $settings ? $settings->enabled_types : [],
             ],
-        ]);
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای سرور',
+            'data' => null,
+        ], 500);
     }
+}
 }
