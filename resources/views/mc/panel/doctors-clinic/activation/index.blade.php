@@ -256,7 +256,7 @@
 
             const phones = response.phones;
             const secretaryPhone = response.secretary_phone ||
-            ''; // اگر شماره‌ای وجود نداشته باشد، خالی می‌ماند
+              ''; // اگر شماره‌ای وجود نداشته باشد، خالی می‌ماند
 
             // ابتدا شماره موبایل منشی را اضافه می‌کنیم
             const secretaryInput = `
