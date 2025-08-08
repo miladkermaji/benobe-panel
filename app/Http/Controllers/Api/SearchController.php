@@ -35,25 +35,14 @@ class SearchController extends Controller
                     $user = $jwtService->getUserFromToken($token);
                     if ($user && $user->id) {
                         $userId = $user->id;
-                        \Illuminate\Support\Facades\Log::info("Search request from authenticated user ID: {$userId}");
+                       
                     }
-                } else {
-                    // Token is invalid or user doesn't exist, but this is expected for public search
-                    \Illuminate\Support\Facades\Log::debug("Search request with invalid token - continuing as unauthenticated", [
-                        'token_valid' => $validation['valid'],
-                        'user_exists' => $validation['user_exists'] ?? false,
-                        'error' => $validation['error'] ?? null
-                    ]);
-                }
+                } 
             } catch (\Exception $e) {
                 // Token validation failed, but this is expected for public search
-                \Illuminate\Support\Facades\Log::debug("Search request with token validation error - continuing as unauthenticated", [
-                    'error' => $e->getMessage()
-                ]);
+               
             }
-        } else {
-            \Illuminate\Support\Facades\Log::debug("Search request from unauthenticated user");
-        }
+        } 
 
         // اگر طول کلمه جستجو کمتر یا مساوی 2 بود، خروجی خالی برگردان
         if (mb_strlen($searchText) > 0 && mb_strlen($searchText) <= 2) {
@@ -119,9 +108,7 @@ class SearchController extends Controller
                         'search_count' => 1,
                     ]);
                 }
-            } else {
-                \Illuminate\Support\Facades\Log::warning("Attempted to create frequent search for non-existent user ID: {$userId}");
-            }
+            } 
         }
 
         return response()->json($results);
