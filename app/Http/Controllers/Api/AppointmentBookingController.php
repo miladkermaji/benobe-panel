@@ -40,175 +40,229 @@ class AppointmentBookingController extends Controller
         $this->paymentService = $paymentService;
     }
 
-    /**
-     * دریافت اطلاعات پزشک و نوبت برای صفحه رزرو
-     */
-    public function getBookingDetails(Request $request, $doctorId)
-    {
-        try {
-            // اعتبارسنجی ورودی‌ها
-            $validated = $request->validate([
-                'appointment_date' => 'required|date_format:Y-m-d',
-                'appointment_time' => 'required|date_format:H:i',
-                'service_type'     => 'required|in:in_person,phone,text,video',
-            ], [
-                'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
-                'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
-                'appointment_time.required'    => 'زمان نوبت الزامی است.',
-                'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
-                'service_type.required'        => 'نوع خدمت الزامی است.',
-                'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
-            ]);
+  /**
+ * دریافت اطلاعات پزشک و نوبت برای صفحه رزرو
+ * @param string $doctorSlug اسلاگ پزشک
+ * @response 200 {
+ *   "status": "success",
+ *   "data": {
+ *     "doctor": {
+ *       "id": 1,
+ *       "slug": "دکتر-نمونه",
+ *       "name": "دکتر نمونه",
+ *       "specialty": "متخصص قلب",
+ *       "avatar": "/storage/avatars/doctor.jpg",
+ *       "location": {
+ *         "province": "تهران",
+ *         "province_slug": "تهران",
+ *         "city": "تهران",
+ *         "address": "خیابان نمونه"
+ *       },
+ *       "office_phone": "02112345678"
+ *     },
+ *     "appointment": {
+ *       "date_time": "شنبه ۲ فروردین ساعت ۱۴:۳۰",
+ *       "service_type": "in_person"
+ *     },
+ *     "payment": {
+ *       "deposit_amount": 50000,
+ *       "infrastructure_fee": 10000,
+ *       "total_amount": 60000
+ *     },
+ *     "tracking_code": "12345678",
+ *     "reserved_at": "2025-08-08 22:55:00"
+ *   }
+ * }
+ * @response 404 {
+ *   "status": "error",
+ *   "message": "پزشک یافت نشد یا غیرفعال است.",
+ *   "data": null
+ * }
+ * @response 422 {
+ *   "status": "error",
+ *   "message": "خطای اعتبارسنجی ورودی‌ها",
+ *   "errors": {}
+ * }
+ * @response 500 {
+ *   "status": "error",
+ *   "message": "خطای سرور",
+ *   "data": null
+ * }
+ */
+public function getBookingDetails(Request $request, $doctorSlug)
+{
+    try {
+        // اعتبارسنجی ورودی‌ها
+        $validated = $request->validate([
+            'appointment_date' => 'required|date_format:Y-m-d',
+            'appointment_time' => 'required|date_format:H:i',
+            'service_type'     => 'required|in:in_person,phone,text,video',
+        ], [
+            'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
+            'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
+            'appointment_time.required'    => 'زمان نوبت الزامی است.',
+            'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
+            'service_type.required'        => 'نوع خدمت الزامی است.',
+            'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
+        ]);
 
-            $appointmentDate = $request->input('appointment_date');
-            $appointmentTime = $request->input('appointment_time');
-            $serviceType     = $request->input('service_type');
+        $appointmentDate = $request->input('appointment_date');
+        $appointmentTime = $request->input('appointment_time');
+        $serviceType     = $request->input('service_type');
 
-            // گرفتن کاربر لاگین‌شده و تعیین guard (اصلاح شده برای JWT guards)
-            $authenticatedUser = null;
-            $patientableType = null;
-            if (Auth::guard('manager-api')->check()) {
-                $authenticatedUser = Auth::guard('manager-api')->user();
-                $patientableType = get_class($authenticatedUser);
-            } elseif (Auth::guard('secretary-api')->check()) {
-                $authenticatedUser = Auth::guard('secretary-api')->user();
-                $patientableType = get_class($authenticatedUser);
-            } elseif (Auth::guard('doctor-api')->check()) {
-                $authenticatedUser = Auth::guard('doctor-api')->user();
-                $patientableType = get_class($authenticatedUser);
-            } elseif (Auth::guard('api')->check()) {
-                $authenticatedUser = Auth::guard('api')->user();
-                $patientableType = get_class($authenticatedUser);
-            }
-            $patientableId = $authenticatedUser ? $authenticatedUser->id : null;
+        // گرفتن کاربر لاگین‌شده و تعیین guard
+        $authenticatedUser = null;
+        $patientableType = null;
+        if (Auth::guard('manager-api')->check()) {
+            $authenticatedUser = Auth::guard('manager-api')->user();
+            $patientableType = get_class($authenticatedUser);
+        } elseif (Auth::guard('secretary-api')->check()) {
+            $authenticatedUser = Auth::guard('secretary-api')->user();
+            $patientableType = get_class($authenticatedUser);
+        } elseif (Auth::guard('doctor-api')->check()) {
+            $authenticatedUser = Auth::guard('doctor-api')->user();
+            $patientableType = get_class($authenticatedUser);
+        } elseif (Auth::guard('api')->check()) {
+            $authenticatedUser = Auth::guard('api')->user();
+            $patientableType = get_class($authenticatedUser);
+        }
+        $patientableId = $authenticatedUser ? $authenticatedUser->id : null;
 
-            // پیدا کردن پزشک
-            $doctor = Doctor::where('id', $doctorId)
-                ->where('status', true)
-                ->first();
+        // پیدا کردن پزشک
+        $doctor = Doctor::where('slug', $doctorSlug)
+            ->where('status', true)
+            ->first();
 
-            if (! $doctor) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'پزشک یافت نشد یا غیرفعال است.',
-                    'data'    => null,
-                ], 404);
-            }
+        if (!$doctor) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'پزشک یافت نشد یا غیرفعال است.',
+                'data'    => null,
+            ], 404);
+        }
 
-            // اطلاعات کلینیک
-            $mainClinic = $doctor->medicalCenters()
+        // اطلاعات کلینیک
+        $mainClinic = $doctor->medicalCenters()
+            ->where('is_active', true)
+            ->where('type', 'policlinic')
+            ->where('is_main_center', true)
+            ->select('id', 'name', 'slug', 'address', 'phone', 'city_id')
+            ->first()
+            ?? $doctor->medicalCenters()
                 ->where('is_active', true)
                 ->where('type', 'policlinic')
-                ->where('is_main_center', true)
-                ->first()
-                ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'policlinic')->first();
-            $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
-
-            // تبدیل تاریخ به شمسی
-            $jalaliDate        = Jalalian::fromCarbon(Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran'));
-            $formattedDateTime = $jalaliDate->format('l d F') . ' ساعت ' . $jalaliDate->format('H:i');
-
-            // محاسبه هزینه‌ها
-            $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
-                ->where('medical_center_id', $mainClinic->id)
-                ->where('is_active', true)
+                ->select('id', 'name', 'slug', 'address', 'phone', 'city_id')
                 ->first();
-            $depositAmount     = $depositSetting ? $depositSetting->deposit_amount : 0;
-            $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
-                ->where('is_active', true)
-                ->first()->fee ?? 0;
+        $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
+        $province = $mainClinic && $mainClinic->city ? $mainClinic->city->province()->select('id', 'name', 'slug')->first() : null;
 
-            // بررسی وجود رزرو موقت فعال برای همین اسلات
-            $existingAppointment = Appointment::where('doctor_id', $doctor->id)
-                ->where('medical_center_id', $mainClinic ? $mainClinic->id : null)
-                ->where('appointment_date', $appointmentDate)
-                ->whereRaw("TIME_FORMAT(appointment_time, '%H:%i') = ?", [$appointmentTime])
-                ->where('status', 'scheduled')
-                ->where('payment_status', 'pending')
-                ->where('reserved_at', '>=', now()->subMinutes(10))
-                ->first();
+        // تبدیل تاریخ به شمسی
+        $jalaliDate = Jalalian::fromCarbon(Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran'));
+        $formattedDateTime = $jalaliDate->format('l d F') . ' ساعت ' . $jalaliDate->format('H:i');
 
-            if ($existingAppointment) {
-                $trackingCode = $existingAppointment->tracking_code;
-                $reservedAt = $existingAppointment->reserved_at ? $existingAppointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
-            } else {
-                // تولید کد رهگیری یکتا (قبل از پرداخت)
-                $trackingCode = null;
-                $maxAttempts = 10;
-                for ($i = 0; $i < $maxAttempts; $i++) {
-                    $trackingCode = mt_rand(10000000, 99999999);
-                    $exists = Appointment::where('tracking_code', $trackingCode)->exists();
-                    if (!$exists) {
-                        break;
-                    }
-                    if ($i === $maxAttempts - 1) {
-                        throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
-                    }
+        // محاسبه هزینه‌ها
+        $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $mainClinic->id)
+            ->where('is_active', true)
+            ->first();
+        $depositAmount = $depositSetting ? $depositSetting->deposit_amount : 0;
+        $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
+            ->where('is_active', true)
+            ->first()->fee ?? 0;
+
+        // بررسی وجود رزرو موقت فعال برای همین اسلات
+        $existingAppointment = Appointment::where('doctor_id', $doctor->id)
+            ->where('medical_center_id', $mainClinic ? $mainClinic->id : null)
+            ->where('appointment_date', $appointmentDate)
+            ->whereRaw("TIME_FORMAT(appointment_time, '%H:%i') = ?", [$appointmentTime])
+            ->where('status', 'scheduled')
+            ->where('payment_status', 'pending')
+            ->where('reserved_at', '>=', now()->subMinutes(10))
+            ->first();
+
+        if ($existingAppointment) {
+            $trackingCode = $existingAppointment->tracking_code;
+            $reservedAt = $existingAppointment->reserved_at ? $existingAppointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
+        } else {
+            // تولید کد رهگیری یکتا (قبل از پرداخت)
+            $trackingCode = null;
+            $maxAttempts = 10;
+            for ($i = 0; $i < $maxAttempts; $i++) {
+                $trackingCode = mt_rand(10000000, 99999999);
+                $exists = Appointment::where('tracking_code', $trackingCode)->exists();
+                if (!$exists) {
+                    break;
                 }
-                // ثبت رزرو موقت
-                $appointment = Appointment::create([
-                    'doctor_id' => $doctor->id,
-                    'medical_center_id' => $mainClinic ? $mainClinic->id : null,
-                    'appointment_date' => $appointmentDate,
-                    'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
-                    'fee' => $depositAmount + $infrastructureFee,
-                    'tracking_code' => $trackingCode,
-                    'reserved_at' => now('Asia/Tehran'),
-                    'status' => 'scheduled',
-                    'payment_status' => 'pending',
-                    'appointment_type' => $serviceType,
-                    'patientable_id' => $patientableId,
-                    'patientable_type' => $patientableType,
-                ]);
-                $reservedAt = $appointment->reserved_at ? $appointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
+                if ($i === $maxAttempts - 1) {
+                    throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
+                }
             }
-
-            // آماده‌سازی داده‌ها برای نمایش
-            $data = [
-                'doctor'      => [
-                    'id'           => $doctor->id,
-                    'name'         => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
-                    'specialty'    => $doctor->specialty()->value('name') ?? 'نامشخص',
-                    'avatar'       => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : '/default-avatar.png',
-                    'location'     => [
-                        'province' => $doctor->province()->value('name') ?? 'نامشخص',
-                        'city'     => $city,
-                        'address'  => $mainClinic?->address ?? 'نامشخص',
-                    ],
-                    'office_phone' => $mainClinic?->phone ?? 'نامشخص',
-                ],
-                'appointment' => [
-                    'date_time'    => $formattedDateTime,
-                    'service_type' => $serviceType,
-                ],
-                'payment'     => [
-                    'deposit_amount'     => $depositAmount,
-                    'infrastructure_fee' => $infrastructureFee,
-                    'total_amount'       => $depositAmount + $infrastructureFee,
-                ],
-                'tracking_code' => $trackingCode, // اضافه کردن کد رهگیری به خروجی
-                'reserved_at' => $reservedAt ? $reservedAt->toDateTimeString() : null,
-            ];
-
-            return response()->json([
-                'status' => 'success',
-                'data'   => $data,
-            ], 200);
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'خطای اعتبارسنجی ورودی‌ها',
-                'errors'  => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
-
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'خطای سرور',
-                'data'    => null,
-            ], 500);
+            // ثبت رزرو موقت
+            $appointment = Appointment::create([
+                'doctor_id' => $doctor->id,
+                'medical_center_id' => $mainClinic ? $mainClinic->id : null,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
+                'fee' => $depositAmount + $infrastructureFee,
+                'tracking_code' => $trackingCode,
+                'reserved_at' => now('Asia/Tehran'),
+                'status' => 'scheduled',
+                'payment_status' => 'pending',
+                'appointment_type' => $serviceType,
+                'patientable_id' => $patientableId,
+                'patientable_type' => $patientableType,
+            ]);
+            $reservedAt = $appointment->reserved_at ? $appointment->reserved_at->copy()->setTimezone('Asia/Tehran') : null;
         }
+
+        // آماده‌سازی داده‌ها برای نمایش
+        $data = [
+            'doctor' => [
+                'id' => $doctor->id,
+                'slug' => $doctor->slug,
+                'name' => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
+                'specialty' => $doctor->specialty()->value('name') ?? 'نامشخص',
+                'avatar' => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : '/default-avatar.png',
+                'location' => [
+                    'province' => $province ? $province->name : 'نامشخص',
+                    'province_slug' => $province ? $province->slug : null,
+                    'city' => $city,
+                    'address' => $mainClinic ? $mainClinic->address : 'نامشخص',
+                    'clinic_slug' => $mainClinic ? $mainClinic->slug : null,
+                ],
+                'office_phone' => $mainClinic ? $mainClinic->phone : 'نامشخص',
+            ],
+            'appointment' => [
+                'date_time' => $formattedDateTime,
+                'service_type' => $serviceType,
+            ],
+            'payment' => [
+                'deposit_amount' => $depositAmount,
+                'infrastructure_fee' => $infrastructureFee,
+                'total_amount' => $depositAmount + $infrastructureFee,
+            ],
+            'tracking_code' => $trackingCode,
+            'reserved_at' => $reservedAt ? $reservedAt->toDateTimeString() : null,
+        ];
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
+        ], 200);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای اعتبارسنجی ورودی‌ها',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای سرور: ' . $e->getMessage(),
+            'data' => null,
+        ], 500);
     }
+}
 
     /**
      * بررسی وضعیت رزرو با کد رهگیری
@@ -263,250 +317,313 @@ class AppointmentBookingController extends Controller
         return response()->json($response);
     }
 
-    public function bookAppointment(Request $request, $doctorId)
-    {
-        try {
-            // اعتبارسنجی ورودی‌ها
-            $validated = $request->validate([
-                'appointment_date' => 'required|date_format:Y-m-d',
-                'appointment_time' => 'required|date_format:H:i',
-                'service_type'     => 'required|in:in_person,phone,text,video',
-                'patient_type'     => 'required|in:self,relative',
-                'first_name'       => 'required_if:patient_type,relative|string|max:255',
-                'last_name'        => 'required_if:patient_type,relative|string|max:255',
-                'national_code'    => 'required_if:patient_type,relative|string|size:10|regex:/^[0-9]{10}$/|unique:users,national_code',
-                'mobile'           => 'required_if:patient_type,relative|string|max:15|regex:/^09[0-9]{9}$/|unique:users,mobile',
-                'email'            => 'nullable|email|unique:users,email',
-                'success_redirect' => 'nullable|url',
-                'error_redirect'   => 'nullable|url',
-                'clinic_id'        => 'nullable|integer|exists:medical_centers,id',
-            ], [
-                'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
-                'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
-                'appointment_time.required'    => 'زمان نوبت الزامی است.',
-                'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
-                'service_type.required'        => 'نوع خدمت الزامی است.',
-                'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
-                'patient_type.required'        => 'نوع بیمار الزامی است.',
-                'patient_type.in'              => 'نوع بیمار باید یکی از مقادیر self یا relative باشد.',
-                'first_name.required_if'       => 'نام بیمار الزامی است وقتی نوع بیمار relative باشد.',
-                'first_name.max'               => 'نام بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-                'last_name.required_if'        => 'نام خانوادگی بیمار الزامی است وقتی نوع بیمار relative باشد.',
-                'last_name.max'                => 'نام خانوادگی بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-                'national_code.required_if'    => 'کدملی بیمار الزامی است وقتی نوع بیمار relative باشد.',
-                'national_code.size'           => 'کدملی بیمار باید دقیقاً 10 رقم باشد.',
-                'national_code.regex'          => 'کدملی باید 10 رقم عددی باشد.',
-                'national_code.unique'         => 'این کدملی قبلاً ثبت شده است.',
-                'mobile.required_if'           => 'شماره موبایل بیمار الزامی است وقتی نوع بیمار relative باشد.',
-                'mobile.max'                   => 'شماره موبایل بیمار نمی‌تواند بیشتر از 15 رقم باشد.',
-                'mobile.regex'                 => 'شماره موبایل باید با 09 شروع شود و 11 رقم باشد.',
-                'mobile.unique'                => 'این شماره موبایل قبلاً ثبت شده است.',
-                'email.email'                  => 'ایمیل باید فرمت معتبر داشته باشد.',
-                'email.unique'                 => 'این ایمیل قبلاً ثبت شده است.',
-                'success_redirect.url'         => 'آدرس هدایت موفقیت باید یک URL معتبر باشد.',
-                'error_redirect.url'           => 'آدرس هدایت خطا باید یک URL معتبر باشد.',
-                'clinic_id.integer'            => 'شناسه کلینیک باید یک عدد صحیح باشد.',
-                'clinic_id.exists'             => 'کلینیک انتخاب‌شده وجود ندارد.',
-            ]);
+/**
+ * رزرو نوبت برای پزشک
+ * @param string $doctorSlug اسلاگ پزشک
+ * @response 200 {
+ *   "status": "success",
+ *   "message": "نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.",
+ *   "payment_url": "http://payment-gateway.com/pay/123",
+ *   "tracking_code": "12345678",
+ *   "expires_in_seconds": 600,
+ *   "data": {
+ *     "doctor": {
+ *       "id": 1,
+ *       "slug": "دکتر-نمونه",
+ *       "name": "دکتر نمونه"
+ *     },
+ *     "clinic": {
+ *       "id": 1,
+ *       "slug": "کلینیک-نمونه",
+ *       "name": "کلینیک نمونه"
+ *     }
+ *   }
+ * }
+ * @response 400 {
+ *   "status": "error",
+ *   "message": "این نوبت دیگر در دسترس نیست.",
+ *   "data": null
+ * }
+ * @response 404 {
+ *   "status": "error",
+ *   "message": "پزشک یا کلینیک یافت نشد یا غیرفعال است.",
+ *   "data": null
+ * }
+ * @response 422 {
+ *   "status": "error",
+ *   "message": "خطای اعتبارسنجی ورودی‌ها",
+ *   "errors": {}
+ * }
+ * @response 500 {
+ *   "status": "error",
+ *   "message": "خطای سرور",
+ *   "data": null
+ * }
+ */
+public function bookAppointment(Request $request, $doctorSlug)
+{
+    try {
+        // اعتبارسنجی ورودی‌ها
+        $validated = $request->validate([
+            'appointment_date' => 'required|date_format:Y-m-d',
+            'appointment_time' => 'required|date_format:H:i',
+            'service_type'     => 'required|in:in_person,phone,text,video',
+            'patient_type'     => 'required|in:self,relative',
+            'first_name'       => 'required_if:patient_type,relative|string|max:255',
+            'last_name'        => 'required_if:patient_type,relative|string|max:255',
+            'national_code'    => 'required_if:patient_type,relative|string|size:10|regex:/^[0-9]{10}$/|unique:users,national_code',
+            'mobile'           => 'required_if:patient_type,relative|string|max:15|regex:/^09[0-9]{9}$/|unique:users,mobile',
+            'email'            => 'nullable|email|unique:users,email',
+            'success_redirect' => 'nullable|url',
+            'error_redirect'   => 'nullable|url',
+            'clinic_slug'      => 'nullable|exists:medical_centers,slug',
+        ], [
+            'appointment_date.required'    => 'تاریخ نوبت الزامی است.',
+            'appointment_date.date_format' => 'فرمت تاریخ نوبت باید به شکل YYYY-MM-DD باشد (مثلاً 2025-03-22).',
+            'appointment_time.required'    => 'زمان نوبت الزامی است.',
+            'appointment_time.date_format' => 'فرمت زمان نوبت باید به شکل HH:MM باشد (مثلاً 14:30).',
+            'service_type.required'        => 'نوع خدمت الزامی است.',
+            'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
+            'patient_type.required'        => 'نوع بیمار الزامی است.',
+            'patient_type.in'              => 'نوع بیمار باید یکی از مقادیر self یا relative باشد.',
+            'first_name.required_if'       => 'نام بیمار الزامی است وقتی نوع بیمار relative باشد.',
+            'first_name.max'               => 'نام بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'last_name.required_if'        => 'نام خانوادگی بیمار الزامی است وقتی نوع بیمار relative باشد.',
+            'last_name.max'                => 'نام خانوادگی بیمار نمی‌تواند بیشتر از 255 کاراکتر باشد.',
+            'national_code.required_if'    => 'کدملی بیمار الزامی است وقتی نوع بیمار relative باشد.',
+            'national_code.size'           => 'کدملی بیمار باید دقیقاً 10 رقم باشد.',
+            'national_code.regex'          => 'کدملی باید 10 رقم عددی باشد.',
+            'national_code.unique'         => 'این کدملی قبلاً ثبت شده است.',
+            'mobile.required_if'           => 'شماره موبایل بیمار الزامی است وقتی نوع بیمار relative باشد.',
+            'mobile.max'                   => 'شماره موبایل بیمار نمی‌تواند بیشتر از 15 رقم باشد.',
+            'mobile.regex'                 => 'شماره موبایل باید با 09 شروع شود و 11 رقم باشد.',
+            'mobile.unique'                => 'این شماره موبایل قبلاً ثبت شده است.',
+            'email.email'                  => 'ایمیل باید فرمت معتبر داشته باشد.',
+            'email.unique'                 => 'این ایمیل قبلاً ثبت شده است.',
+            'success_redirect.url'         => 'آدرس هدایت موفقیت باید یک URL معتبر باشد.',
+            'error_redirect.url'           => 'آدرس هدایت خطا باید یک URL معتبر باشد.',
+            'clinic_slug.exists'           => 'کلینیک انتخاب‌شده وجود ندارد.',
+        ]);
 
-            // پاک‌سازی رزروهای منقضی‌شده قبل از رزرو جدید
-            $this->cleanupExpiredPendingAppointments($doctorId);
+        // پیدا کردن پزشک
+        $doctor = Doctor::where('slug', $doctorSlug)
+            ->where('status', true)
+            ->first();
 
-            // استفاده از تراکنش برای جلوگیری از رزروهای همزمان
-            return DB::transaction(function () use ($request, $doctorId) {
-                $appointmentDate = $request->input('appointment_date');
-                $appointmentTime = $request->input('appointment_time');
-                $serviceType = $request->input('service_type');
-                $patientType = $request->input('patient_type');
-                $successRedirect = $request->input('success_redirect');
-                $errorRedirect = $request->input('error_redirect');
-                $clinicId = $request->input('clinic_id');
+        if (!$doctor) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'پزشک یافت نشد یا غیرفعال است.',
+                'data' => null,
+            ], 404);
+        }
 
-                // گرفتن کاربر احراز هویت‌شده
-                $authenticatedUser = $request->attributes->get('user');
+        // پاک‌سازی رزروهای منقضی‌شده قبل از رزرو جدید
+        $this->cleanupExpiredPendingAppointments($doctor->id);
 
-                // پیدا کردن یا ایجاد بیمار
-                $patient = null;
-                if ($patientType === 'self') {
-                    $patient = $authenticatedUser;
-                } else {
-                    $patient = User::create([
-                        'first_name' => $request->input('first_name'),
-                        'last_name' => $request->input('last_name'),
-                        'national_code' => $request->input('national_code'),
-                        'mobile' => $request->input('mobile'),
-                        'email' => $request->input('email'),
-                        'created_by' => $authenticatedUser->id,
-                        'user_type' => 0,
-                        'status' => 1,
-                    ]);
-                }
+        // استفاده از تراکنش برای جلوگیری از رزروهای همزمان
+        return DB::transaction(function () use ($request, $doctor, $validated) {
+            $appointmentDate = $validated['appointment_date'];
+            $appointmentTime = $validated['appointment_time'];
+            $serviceType = $validated['service_type'];
+            $patientType = $validated['patient_type'];
+            $successRedirect = $validated['success_redirect'];
+            $errorRedirect = $validated['error_redirect'];
+            $clinicSlug = $validated['clinic_slug'];
 
-                if (!$patient) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'کاربر (بیمار) یافت نشد یا ایجاد نشد.',
-                        'data' => null,
-                    ], 400);
-                }
+            // گرفتن کاربر احراز هویت‌شده
+            $authenticatedUser = $request->attributes->get('user');
 
-                // پیدا کردن پزشک
-                $doctor = Doctor::where('id', $doctorId)
-                    ->where('status', true)
+            // پیدا کردن یا ایجاد بیمار
+            $patient = null;
+            if ($patientType === 'self') {
+                $patient = $authenticatedUser;
+            } else {
+                $patient = User::create([
+                    'first_name' => $validated['first_name'],
+                    'last_name' => $validated['last_name'],
+                    'national_code' => $validated['national_code'],
+                    'mobile' => $validated['mobile'],
+                    'email' => $validated['email'],
+                    'created_by' => $authenticatedUser->id,
+                    'user_type' => 0,
+                    'status' => 1,
+                ]);
+            }
+
+            if (!$patient) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'کاربر (بیمار) یافت نشد یا ایجاد نشد.',
+                    'data' => null,
+                ], 400);
+            }
+
+            // تعیین کلینیک
+            $mainClinic = null;
+            if ($clinicSlug) {
+                // اگر clinic_slug در درخواست ارسال شده، کلینیک مربوطه را پیدا کن
+                $mainClinic = $doctor->medicalCenters()
+                    ->where('slug', $clinicSlug)
+                    ->where('is_active', true)
+                    ->where('type', 'policlinic')
+                    ->select('id', 'name', 'slug')
                     ->first();
-
-                if (!$doctor) {
+                if (!$mainClinic) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'پزشک یافت نشد یا غیرفعال است.',
+                        'message' => 'کلینیک انتخاب‌شده یافت نشد یا غیرفعال است.',
                         'data' => null,
                     ], 404);
                 }
-
-                // تعیین کلینیک
-                $mainClinic = null;
-                if ($clinicId) {
-                    // اگر clinic_id در درخواست ارسال شده، کلینیک مربوطه را پیدا کن
-                    $mainClinic = $doctor->medicalCenters()->where('id', $clinicId)->where('is_active', true)->where('type', 'policlinic')->first();
-                    if (!$mainClinic) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'کلینیک انتخاب‌شده یافت نشد یا غیرفعال است.',
-                            'data' => null,
-                        ], 400);
-                    }
-                } else {
-                    // اگر clinic_id ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
-                    $mainClinic = $doctor->medicalCenters()
+            } else {
+                // اگر clinic_slug ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
+                $mainClinic = $doctor->medicalCenters()
+                    ->where('is_active', true)
+                    ->where('type', 'policlinic')
+                    ->where('is_main_center', true)
+                    ->select('id', 'name', 'slug')
+                    ->first()
+                    ?? $doctor->medicalCenters()
                         ->where('is_active', true)
                         ->where('type', 'policlinic')
-                        ->where('is_main_center', true)
-                        ->first()
-                        ?? $doctor->medicalCenters()->where('is_active', true)->where('type', 'policlinic')->first();
-                }
-
-                // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن
-                $clinicId = $mainClinic ? $mainClinic->id : null;
-
-                // بررسی در دسترس بودن نوبت
-                $config = null;
-                if ($serviceType === 'in_person') {
-                    $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
-                        ->where('medical_center_id', $clinicId)
+                        ->select('id', 'name', 'slug')
                         ->first();
-                } else {
-                    $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
-                        ->where('medical_center_id', $clinicId)
-                        ->first();
-                }
+            }
 
-                $isSlotAvailable = $this->checkSlotAvailability($doctor, $appointmentDate, $appointmentTime, $serviceType, $clinicId);
-                if (!$isSlotAvailable) {
-                    if ($config && !$config->auto_scheduling) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'امکان رزرو آنلاین برای این پزشک فعال نیست. لطفاً برای دریافت نوبت با مطب تماس بگیرید یا پزشک دیگری را انتخاب کنید.',
-                            'data' => null,
-                        ], 400);
-                    }
+            // اگر کلینیک پیدا نشد، clinic_id را NULL تنظیم کن
+            $clinicId = $mainClinic ? $mainClinic->id : null;
+
+            // بررسی در دسترس بودن نوبت
+            $config = null;
+            if ($serviceType === 'in_person') {
+                $config = \App\Models\DoctorAppointmentConfig::where('doctor_id', $doctor->id)
+                    ->where('medical_center_id', $clinicId)
+                    ->first();
+            } else {
+                $config = \App\Models\DoctorCounselingConfig::where('doctor_id', $doctor->id)
+                    ->where('medical_center_id', $clinicId)
+                    ->first();
+            }
+
+            $isSlotAvailable = $this->checkSlotAvailability($doctor, $appointmentDate, $appointmentTime, $serviceType, $clinicId);
+            if (!$isSlotAvailable) {
+                if ($config && !$config->auto_scheduling) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'این نوبت دیگر در دسترس نیست.',
+                        'message' => 'امکان رزرو آنلاین برای این پزشک فعال نیست. لطفاً برای دریافت نوبت با مطب تماس بگیرید یا پزشک دیگری را انتخاب کنید.',
                         'data' => null,
                     ], 400);
                 }
-
-                // محاسبه هزینه‌ها
-                $depositAmount = 0;
-                $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
-                    ->where('is_active', true)
-                    ->first()->fee ?? 0;
-
-                if ($mainClinic) {
-                    $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
-                        ->where('medical_center_id', $mainClinic->id)
-                        ->where('is_active', true)
-                        ->first();
-                    $depositAmount = $depositSetting ? $depositSetting->deposit_amount : 0;
-                }
-
-                $totalFee = $depositAmount + $infrastructureFee;
-
-                // تولید کد رهگیری (قبل از پرداخت)
-                $trackingCode = null;
-                $maxAttempts = 10;
-                for ($i = 0; $i < $maxAttempts; $i++) {
-                    $trackingCode = mt_rand(10000000, 99999999);
-                    $exists = Appointment::where('tracking_code', $trackingCode)->exists();
-                    if (!$exists) {
-                        break;
-                    }
-                    if ($i === $maxAttempts - 1) {
-                        throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
-                    }
-                }
-
-                // ثبت نوبت (pending)
-                $appointmentData = [
-                    'doctor_id' => $doctor->id,
-                    'patientable_id' => $patient->id,
-                    'patientable_type' => get_class($patient),
-                    'medical_center_id' => $clinicId,
-                    'appointment_date' => $appointmentDate,
-                    'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
-                    'fee' => $totalFee,
-                    'tracking_code' => $trackingCode,
-                    'reserved_at' => now('Asia/Tehran'),
-                    'status' => 'scheduled',
-                    'payment_status' => 'pending',
-                    'appointment_type' => $serviceType,
-                ];
-                $appointment = $serviceType === 'in_person'
-                    ? Appointment::create($appointmentData)
-                    : CounselingAppointment::create($appointmentData);
-
-                // اطلاعات اضافی برای تراکنش
-                $meta = [
-                    'appointment_id' => $appointment->id,
-                    'appointment_type' => $serviceType === 'in_person' ? 'in_person' : 'counseling',
-                    'infrastructure_fee' => $infrastructureFee,
-                    'patientable_id' => $patient->id,
-                    'patientable_type' => get_class($patient),
-                ];
-
-                // دریافت URL درگاه پرداخت
-                $redirection = $this->paymentService->pay(
-                    $totalFee,
-                    route('payment.callback'),
-                    $meta,
-                    $successRedirect,
-                    $errorRedirect
-                );
-
-                // پاسخ مینیمال
                 return response()->json([
-                    'status' => 'success',
-                    'message' => 'نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.',
-                    'payment_url' => $redirection->getTargetUrl(),
-                    'tracking_code' => $trackingCode,
-                    'expires_in_seconds' => 600,
-                ], 200);
-            });
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'خطای اعتبارسنجی ورودی‌ها',
-                'errors' => $e->errors(),
-            ], 422);
-        } catch (\Exception $e) {
+                    'status' => 'error',
+                    'message' => 'این نوبت دیگر در دسترس نیست.',
+                    'data' => null,
+                ], 400);
+            }
 
+            // محاسبه هزینه‌ها
+            $depositAmount = 0;
+            $infrastructureFee = InfrastructureFee::where('appointment_type', $serviceType)
+                ->where('is_active', true)
+                ->first()->fee ?? 0;
+
+            if ($mainClinic) {
+                $depositSetting = ClinicDepositSetting::where('doctor_id', $doctor->id)
+                    ->where('medical_center_id', $mainClinic->id)
+                    ->where('is_active', true)
+                    ->first();
+                $depositAmount = $depositSetting ? $depositSetting->deposit_amount : 0;
+            }
+
+            $totalFee = $depositAmount + $infrastructureFee;
+
+            // تولید کد رهگیری (قبل از پرداخت)
+            $trackingCode = null;
+            $maxAttempts = 10;
+            for ($i = 0; $i < $maxAttempts; $i++) {
+                $trackingCode = mt_rand(10000000, 99999999);
+                $exists = Appointment::where('tracking_code', $trackingCode)->exists();
+                if (!$exists) {
+                    break;
+                }
+                if ($i === $maxAttempts - 1) {
+                    throw new \Exception('نمی‌توان کد رهگیری یکتا تولید کرد. لطفاً دوباره تلاش کنید.');
+                }
+            }
+
+            // ثبت نوبت (pending)
+            $appointmentData = [
+                'doctor_id' => $doctor->id,
+                'patientable_id' => $patient->id,
+                'patientable_type' => get_class($patient),
+                'medical_center_id' => $clinicId,
+                'appointment_date' => $appointmentDate,
+                'appointment_time' => Carbon::parse($appointmentTime)->format('H:i:s'),
+                'fee' => $totalFee,
+                'tracking_code' => $trackingCode,
+                'reserved_at' => now('Asia/Tehran'),
+                'status' => 'scheduled',
+                'payment_status' => 'pending',
+                'appointment_type' => $serviceType,
+            ];
+            $appointment = $serviceType === 'in_person'
+                ? Appointment::create($appointmentData)
+                : CounselingAppointment::create($appointmentData);
+
+            // اطلاعات اضافی برای تراکنش
+            $meta = [
+                'appointment_id' => $appointment->id,
+                'appointment_type' => $serviceType === 'in_person' ? 'in_person' : 'counseling',
+                'infrastructure_fee' => $infrastructureFee,
+                'patientable_id' => $patient->id,
+                'patientable_type' => get_class($patient),
+            ];
+
+            // دریافت URL درگاه پرداخت
+            $redirection = $this->paymentService->pay(
+                $totalFee,
+                route('payment.callback'),
+                $meta,
+                $successRedirect,
+                $errorRedirect
+            );
+
+            // پاسخ با اطلاعات اضافی
             return response()->json([
-                'status' => 'error',
-                'message' => 'خطای سرور',
-                'data' => null,
-            ], 500);
-        }
+                'status' => 'success',
+                'message' => 'نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.',
+                'payment_url' => $redirection->getTargetUrl(),
+                'tracking_code' => $trackingCode,
+                'expires_in_seconds' => 600,
+                'data' => [
+                    'doctor' => [
+                        'id' => $doctor->id,
+                        'slug' => $doctor->slug,
+                        'name' => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
+                    ],
+                    'clinic' => $mainClinic ? [
+                        'id' => $mainClinic->id,
+                        'slug' => $mainClinic->slug,
+                        'name' => $mainClinic->name,
+                    ] : null,
+                ],
+            ], 200);
+        });
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای اعتبارسنجی ورودی‌ها',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'خطای سرور: ' . $e->getMessage(),
+            'data' => null,
+        ], 500);
     }
+}
 
     /**
      * پاک‌سازی رزروهای pending منقضی‌شده
