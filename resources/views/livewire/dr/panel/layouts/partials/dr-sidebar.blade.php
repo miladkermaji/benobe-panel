@@ -785,8 +785,12 @@
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__activebox">
             <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
               </svg>
             </div>
             <div class="mobile-bottom-nav__label">داشبورد</div>
@@ -799,9 +803,18 @@
       <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm0-13H5V5h14v1z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <path d="M8 14h.01" />
+              <path d="M12 14h.01" />
+              <path d="M16 14h.01" />
+              <path d="M8 18h.01" />
+              <path d="M12 18h.01" />
+              <path d="M16 18h.01" />
             </svg>
           </div>
           <div class="mobile-bottom-nav__label">نوبت‌ها</div>
@@ -836,9 +849,11 @@
       <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              <path d="M8 9h8" />
+              <path d="M8 13h6" />
             </svg>
           </div>
           <div class="mobile-bottom-nav__label">مشاوره</div>
@@ -868,9 +883,10 @@
       <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24">
-              <path
-                d="M12 12c2.7 0 8 1.34 8 4v2H4v-2c0-2.66 5.3-4 8-4zm0-2c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
             </svg>
           </div>
           <div class="mobile-bottom-nav__label">پروفایل</div>
@@ -908,9 +924,10 @@
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__activebox">
             <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24">
-                <path
-                  d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm8-2V4c0-1.1-.9-2-2-2H6C4.9 2 4 2.9 4 4v2C2.9 6 2 6.9 2 8v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <polyline points="12,6 12,12 16,14" />
               </svg>
             </div>
             <div class="mobile-bottom-nav__label">ساعت کاری</div>
@@ -922,9 +939,11 @@
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
       <div class="mobile-bottom-nav__activebox">
         <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" fill="#eee" />
-            <text x="12" y="16" text-anchor="middle" font-size="16" fill="#888">...</text>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
           </svg>
         </div>
         <div class="mobile-bottom-nav__label">سایر</div>
