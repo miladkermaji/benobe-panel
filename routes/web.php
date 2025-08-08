@@ -34,3 +34,8 @@ Route::get('storage/{path}', function ($path) {
 
     abort(404);
 })->where('path', '.*');
+
+// System status route
+Route::get('/system/status', function () {
+    return view('errors.system-status');
+})->name('system.status');

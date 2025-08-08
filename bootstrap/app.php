@@ -23,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrimStrings::class,
             \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
             \App\Http\Middleware\CorsMiddleware::class,
+            \App\Http\Middleware\CheckDatabaseConnection::class,
         ]);
 
         // گروه‌های میدلور (Middleware Groups)
@@ -83,6 +84,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'medical_center.permission' => \App\Http\Middleware\Mc\CheckMedicalCenterPermission::class,
             'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
             'manager.permission' => \App\Http\Middleware\ManagerPermissionMiddleware::class,
+            'check-database-connection' => \App\Http\Middleware\CheckDatabaseConnection::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -105,6 +107,7 @@ $app->singleton(
 
 $app->commands([
     \App\Console\Commands\AddDefaultDoctorPermissions::class,
+    \App\Console\Commands\CheckDatabaseStatus::class,
 ]);
 
 return $app;

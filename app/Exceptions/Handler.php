@@ -3,13 +3,18 @@
 namespace App\Exceptions;
 
 use Throwable;
+use PDOException;
+use Illuminate\Http\Request;
+use Illuminate\Database\QueryException;
+use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
+use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+
 class Handler extends ExceptionHandler
 {
     /**
@@ -32,8 +37,42 @@ class Handler extends ExceptionHandler
             //
         });
     }
+
     public function render($request, Throwable $exception)
     {
+        // Handle database connection errors
+        if ($exception instanceof QueryException || $exception instanceof PDOException) {
+            $errorMessage = $exception->getMessage();
+
+            // Check if it's a connection refused error
+            if (str_contains($errorMessage, 'No connection could be made') ||
+                str_contains($errorMessage, 'Connection refused') ||
+                str_contains($errorMessage, 'SQLSTATE[HY000] [2002]') ||
+                str_contains($errorMessage, 'SQLSTATE[HY000] [2003]')) {
+
+                if ($request->expectsJson()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'ارتباط با سرور پایگاه داده برقرار نشد. لطفاً کمی بعد مجدداً تلاش کنید.',
+                        'data' => null,
+                    ], 503);
+                }
+
+                return response()->view('errors.database-connection', [], 503);
+            }
+
+            // Handle other database errors
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'خطایی در ارتباط با پایگاه داده رخ داده است. لطفاً کمی بعد مجدداً تلاش کنید.',
+                    'data' => null,
+                ], 500);
+            }
+
+            return response()->view('errors.database-error', [], 500);
+        }
+
         if ($exception instanceof ThrottleRequestsException) {
             $retryAfter = $exception->getHeaders()['Retry-After'] ?? 180;
 
@@ -45,46 +84,46 @@ class Handler extends ExceptionHandler
                 'Retry-After' => $retryAfter
             ]);
         }
+
         if ($exception instanceof TokenExpiredException) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
-        'data'    => null,
-    ], 401);
-}
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'توکن منقضی شده است. لطفاً دوباره وارد شوید.',
+                'data'    => null,
+            ], 401);
+        }
 
-if ($exception instanceof TokenInvalidException) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'توکن نامعتبر است.',
-        'data'    => null,
-    ], 401);
-}
+        if ($exception instanceof TokenInvalidException) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'توکن نامعتبر است.',
+                'data'    => null,
+            ], 401);
+        }
 
-if ($exception instanceof TokenBlacklistedException) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
-        'data'    => null,
-    ], 401);
-}
+        if ($exception instanceof TokenBlacklistedException) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
+                'data'    => null,
+            ], 401);
+        }
 
-if ($exception instanceof JWTException) {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'خطایی در پردازش توکن رخ داده است.',
-        'data'    => null,
-    ], 401);
-}
+        if ($exception instanceof JWTException) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطایی در پردازش توکن رخ داده است.',
+                'data'    => null,
+            ], 401);
+        }
 
-if ($exception instanceof UnauthorizedHttpException && $exception->getMessage() === 'The token has been blacklisted') {
-    return response()->json([
-        'status'  => 'error',
-        'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
-        'data'    => null,
-    ], 401);
-}
-
+        if ($exception instanceof UnauthorizedHttpException && $exception->getMessage() === 'The token has been blacklisted') {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'توکن شما دیگر معتبر نیست. لطفاً دوباره وارد شوید.',
+                'data'    => null,
+            ], 401);
+        }
 
         return parent::render($request, $exception);
     }
