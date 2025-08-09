@@ -224,6 +224,342 @@
     fill: var(--text-secondary) !important;
 }
 
+/* Dashboard Dark Mode Styles */
+.dark-mode .chart-content {
+    background: linear-gradient(
+        135deg,
+        var(--background-light) 0%,
+        var(--background-footer) 100%
+    ) !important;
+    box-shadow: inset 0 2px 8px var(--shadow) !important;
+}
+
+.dark-mode .chart-card {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 4px 6px -1px var(--shadow), 0 2px 4px -1px var(--shadow) !important;
+}
+
+.dark-mode .chart-card .card-title {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .chart-container {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 2px 4px var(--shadow) !important;
+}
+
+.dark-mode .chart-container:hover {
+    box-shadow: 0 8px 24px var(--shadow) !important;
+}
+
+.dark-mode .chart-container::before {
+    background: var(--gradient-primary) !important;
+}
+
+/* Top Panel Background Dark Mode */
+.dark-mode .top-panel-bg {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Stat Cards Dark Mode */
+.dark-mode .stat-card {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 2px 4px var(--shadow) !important;
+}
+
+.dark-mode .stat-card:hover {
+    box-shadow: 0 4px 8px var(--shadow) !important;
+}
+
+.dark-mode .stat-icon {
+    background-color: var(--background-footer) !important;
+}
+
+.dark-mode .stat-label {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .stat-value {
+    color: var(--text-primary) !important;
+}
+
+/* Chart.js Dark Mode Overrides */
+.dark-mode .chartjs-legend {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .chartjs-tooltip {
+    background: rgba(0, 0, 0, 0.9) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .chartjs-axis-label {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .chartjs-legend-item-text {
+    color: var(--text-secondary) !important;
+}
+
+/* Chart Grid Lines Dark Mode */
+.dark-mode canvas {
+    filter: brightness(0.9) contrast(1.1);
+}
+
+/* Chart Container Text Dark Mode */
+.dark-mode .chart-container p {
+    color: var(--text-secondary) !important;
+}
+
+/* Scrollbar Dark Mode for Dashboard */
+.dark-mode .top-s-a-wrapper::-webkit-scrollbar-thumb {
+    background: var(--primary) !important;
+}
+
+.dark-mode .top-s-a-wrapper::-webkit-scrollbar-track {
+    background: var(--background-footer) !important;
+}
+
+/* Chart.js Plugin Dark Mode */
+.dark-mode .chartjs-legend-item {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .chartjs-legend-item:hover {
+    color: var(--text-primary) !important;
+}
+
+/* Chart Tooltip Dark Mode */
+.dark-mode .chartjs-tooltip .tooltip-inner {
+    background-color: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Chart Axis Dark Mode */
+.dark-mode .chartjs-axis line {
+    stroke: var(--border-neutral) !important;
+}
+
+.dark-mode .chartjs-axis text {
+    fill: var(--text-secondary) !important;
+}
+
+/* Chart Grid Dark Mode */
+.dark-mode .chartjs-grid line {
+    stroke: var(--border-neutral) !important;
+}
+
+.dark-mode .chartjs-grid path {
+    stroke: var(--border-neutral) !important;
+}
+
+/* Chart Background Dark Mode */
+.dark-mode .chartjs-chart {
+    background-color: var(--background-card) !important;
+}
+
+/* Chart Legend Dark Mode */
+.dark-mode .chartjs-legend ul {
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .chartjs-legend li {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .chartjs-legend li:hover {
+    color: var(--text-primary) !important;
+}
+
+/* Chart Container Hover Effects Dark Mode */
+.dark-mode .chart-container:hover::before {
+    opacity: 0.8 !important;
+}
+
+/* Chart Title Dark Mode */
+.dark-mode .chart-title {
+    color: var(--text-primary) !important;
+}
+
+/* Chart Wrapper Dark Mode */
+.dark-mode .chart-wrapper {
+    background-color: var(--background-card) !important;
+}
+
+/* Chart Grid Container Dark Mode */
+.dark-mode .chart-grid {
+    background-color: var(--background-card) !important;
+}
+
+/* Dashboard Responsive Dark Mode */
+@media (max-width: 768px) {
+    .dark-mode .chart-content {
+        background: var(--background-light) !important;
+    }
+
+    .dark-mode .chart-card {
+        background-color: var(--background-card) !important;
+    }
+
+    .dark-mode .stat-card {
+        background-color: var(--background-card) !important;
+    }
+}
+
+/* Additional Chart Dark Mode Improvements */
+.dark-mode .chart-container canvas {
+    filter: brightness(1.1) contrast(1.2) !important;
+}
+
+.dark-mode .chart-card .card-body {
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .chart-card .card-body:hover {
+    background-color: var(--background-footer) !important;
+}
+
+/* Chart Legend Dark Mode Enhancements */
+.dark-mode .chartjs-legend-item {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    border-radius: 4px !important;
+    padding: 4px 8px !important;
+    margin: 2px !important;
+}
+
+.dark-mode .chartjs-legend-item:hover {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+}
+
+/* Chart Tooltip Dark Mode Enhancements */
+.dark-mode .chartjs-tooltip {
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Chart Grid Dark Mode Enhancements */
+.dark-mode .chartjs-grid line {
+    stroke-width: 0.5 !important;
+}
+
+.dark-mode .chartjs-grid path {
+    stroke-width: 0.5 !important;
+}
+
+/* Chart Axis Dark Mode Enhancements */
+.dark-mode .chartjs-axis line {
+    stroke-width: 1 !important;
+}
+
+.dark-mode .chartjs-axis text {
+    font-weight: 500 !important;
+}
+
+/* Chart Container Dark Mode Enhancements */
+.dark-mode .chart-container::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    border-radius: 12px !important;
+    pointer-events: none !important;
+    box-shadow: inset 0 0 0 1px var(--border-neutral) !important;
+}
+
+/* Chart Card Dark Mode Enhancements */
+.dark-mode .chart-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 3px !important;
+    background: var(--gradient-primary) !important;
+    border-radius: 1rem 1rem 0 0 !important;
+    opacity: 0.8 !important;
+}
+
+/* Stat Card Dark Mode Enhancements */
+.dark-mode .stat-card::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: 2px !important;
+    background: var(--gradient-primary) !important;
+    border-radius: 12px 12px 0 0 !important;
+    opacity: 0.6 !important;
+}
+
+/* Chart Loading State Dark Mode */
+.dark-mode .chart-container .loader {
+    color: var(--text-primary) !important;
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    text-align: center !important;
+}
+
+/* Chart Error State Dark Mode */
+.dark-mode .chart-container p {
+    color: var(--text-secondary) !important;
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    border-radius: 8px !important;
+    padding: 16px !important;
+    text-align: center !important;
+}
+
+/* Chart Container Focus States Dark Mode */
+.dark-mode .chart-container:focus-within {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Chart Legend Focus States Dark Mode */
+.dark-mode .chartjs-legend-item:focus {
+    outline: 2px solid var(--primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* Chart Responsive Dark Mode */
+@media (max-width: 1200px) {
+    .dark-mode .chart-card {
+        background-color: var(--background-card) !important;
+    }
+
+    .dark-mode .chart-container {
+        background-color: var(--background-card) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dark-mode .chart-content {
+        padding: 5px !important;
+    }
+
+    .dark-mode .chart-card {
+        margin-bottom: 0.75rem !important;
+        height: 350px !important;
+    }
+
+    .dark-mode .chart-card .card-body {
+        padding: 0.75rem !important;
+    }
+}
+
 /* Sidebar Dark Mode */
 .dark-mode .sidebar {
     background-color: var(--background-card) !important;
