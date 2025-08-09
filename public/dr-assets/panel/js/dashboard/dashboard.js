@@ -1065,32 +1065,184 @@ function initializeDashboard() {
     // گوش دادن به تغییرات دارک مود
     function handleDarkModeChange() {
         // به‌روزرسانی نمودارها با رنگ‌های جدید
+        const colors = getChartColors();
+
+        // Update performance chart
         if (window.performanceChart) {
-            window.performanceChart.update();
+            window.performanceChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.performanceChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.performanceChart.options.plugins.tooltip.bodyColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.performanceChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.performanceChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.performanceChart.options.scales.y.grid.color = colors.grid;
+            window.performanceChart.options.scales.x.grid.color = colors.grid;
+            window.performanceChart.options.scales.y.border.color =
+                colors.border;
+            window.performanceChart.options.scales.x.border.color =
+                colors.border;
+            window.performanceChart.update("none");
         }
+
+        // Update income chart
         if (window.incomeChart) {
-            window.incomeChart.update();
+            window.incomeChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.incomeChart.options.plugins.tooltip.titleColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.incomeChart.options.plugins.tooltip.bodyColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.incomeChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.incomeChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.incomeChart.options.scales.y.grid.color = colors.grid;
+            window.incomeChart.options.scales.x.grid.color = colors.grid;
+            window.incomeChart.options.scales.y.border.color = colors.border;
+            window.incomeChart.options.scales.x.border.color = colors.border;
+            window.incomeChart.update("none");
         }
+
+        // Update patient chart
         if (window.patientChart) {
-            window.patientChart.update();
+            window.patientChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.patientChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.patientChart.options.plugins.tooltip.bodyColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.patientChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.patientChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.patientChart.options.scales.y.grid.color = colors.grid;
+            window.patientChart.options.scales.x.grid.color = colors.grid;
+            window.patientChart.options.scales.y.border.color = colors.border;
+            window.patientChart.options.scales.x.border.color = colors.border;
+            window.patientChart.update("none");
         }
+
+        // Update status chart
         if (window.statusChart) {
-            window.statusChart.update();
+            window.statusChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.statusChart.options.plugins.tooltip.titleColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.statusChart.options.plugins.tooltip.bodyColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.statusChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.statusChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.statusChart.options.scales.y.grid.color = colors.grid;
+            window.statusChart.options.scales.x.grid.color = colors.grid;
+            window.statusChart.options.scales.y.border.color = colors.border;
+            window.statusChart.options.scales.x.border.color = colors.border;
+            window.statusChart.update("none");
         }
+
+        // Update status pie chart
         if (window.statusPieChart) {
-            window.statusPieChart.update();
+            window.statusPieChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.statusPieChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.statusPieChart.options.plugins.tooltip.bodyColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.statusPieChart.update("none");
         }
+
+        // Update patient trend chart
         if (window.patientTrendChart) {
-            window.patientTrendChart.update();
+            window.patientTrendChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.patientTrendChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.patientTrendChart.options.plugins.tooltip.bodyColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.patientTrendChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.patientTrendChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.patientTrendChart.options.scales.y.grid.color = colors.grid;
+            window.patientTrendChart.options.scales.x.grid.color = colors.grid;
+            window.patientTrendChart.options.scales.y.border.color =
+                colors.border;
+            window.patientTrendChart.options.scales.x.border.color =
+                colors.border;
+            window.patientTrendChart.update("none");
         }
+
+        // Update counseling chart
         if (window.counselingChart) {
-            window.counselingChart.update();
+            window.counselingChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.counselingChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.counselingChart.options.plugins.tooltip.bodyColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.counselingChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.counselingChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.counselingChart.options.scales.y.grid.color = colors.grid;
+            window.counselingChart.options.scales.x.grid.color = colors.grid;
+            window.counselingChart.options.scales.y.border.color =
+                colors.border;
+            window.counselingChart.options.scales.x.border.color =
+                colors.border;
+            window.counselingChart.update("none");
         }
+
+        // Update manual chart
         if (window.manualChart) {
-            window.manualChart.update();
+            window.manualChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.manualChart.options.plugins.tooltip.titleColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.manualChart.options.plugins.tooltip.bodyColor = isDarkMode()
+                ? colors.text
+                : "#ffffff";
+            window.manualChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.manualChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.manualChart.options.scales.y.grid.color = colors.grid;
+            window.manualChart.options.scales.x.grid.color = colors.grid;
+            window.manualChart.options.scales.y.border.color = colors.border;
+            window.manualChart.options.scales.x.border.color = colors.border;
+            window.manualChart.update("none");
         }
+
+        // Update total income chart
         if (window.totalIncomeChart) {
-            window.totalIncomeChart.update();
+            window.totalIncomeChart.options.plugins.legend.labels.color =
+                colors.text;
+            window.totalIncomeChart.options.plugins.tooltip.titleColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.totalIncomeChart.options.plugins.tooltip.bodyColor =
+                isDarkMode() ? colors.text : "#ffffff";
+            window.totalIncomeChart.options.scales.y.ticks.color =
+                colors.textSecondary;
+            window.totalIncomeChart.options.scales.x.ticks.color =
+                colors.textSecondary;
+            window.totalIncomeChart.options.scales.y.grid.color = colors.grid;
+            window.totalIncomeChart.options.scales.x.grid.color = colors.grid;
+            window.totalIncomeChart.options.scales.y.border.color =
+                colors.border;
+            window.totalIncomeChart.options.scales.x.border.color =
+                colors.border;
+            window.totalIncomeChart.update("none");
         }
     }
 

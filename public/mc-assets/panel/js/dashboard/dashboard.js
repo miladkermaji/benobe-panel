@@ -252,32 +252,7 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.05)",
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                        },
-                    },
-                },
+                ...getCommonOptions(),
             },
         });
     }
@@ -324,35 +299,7 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.05)",
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            callback: function (value) {
-                                return value.toLocaleString() + " تومان";
-                            },
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                        },
-                    },
-                },
+                ...getCommonOptions(),
             },
         });
     }
@@ -393,32 +340,7 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.05)",
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                        },
-                    },
-                },
+                ...getCommonOptions(),
             },
         });
     }
@@ -486,32 +408,7 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.05)",
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                        },
-                    },
-                },
+                ...getCommonOptions(),
             },
         });
     }
@@ -565,11 +462,11 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
+                ...getCommonOptions(),
                 plugins: {
-                    ...commonOptions.plugins,
+                    ...getCommonOptions().plugins,
                     tooltip: {
-                        ...commonOptions.plugins.tooltip,
+                        ...getCommonOptions().plugins.tooltip,
                         callbacks: {
                             label: function (context) {
                                 const value = context.raw;
@@ -624,32 +521,7 @@ function initializeDashboard() {
                 ],
             },
             options: {
-                ...commonOptions,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: {
-                            color: "rgba(0, 0, 0, 0.05)",
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                        },
-                    },
-                    x: {
-                        grid: {
-                            display: false,
-                        },
-                        ticks: {
-                            font: {
-                                size: 10,
-                            },
-                            maxRotation: 0,
-                            minRotation: 0,
-                        },
-                    },
-                },
+                ...getCommonOptions(),
             },
         });
     }
@@ -895,14 +767,16 @@ function initializeDashboard() {
                         weight: "500",
                     },
                     padding: 8,
-                    color: "#1e293b",
+                    color: getChartColors().text,
                     boxWidth: 10,
                     usePointStyle: true,
                 },
             },
             tooltip: {
                 enabled: true,
-                backgroundColor: "rgba(30, 41, 59, 0.9)",
+                backgroundColor: isDarkMode()
+                    ? "rgba(0, 0, 0, 0.9)"
+                    : "rgba(30, 41, 59, 0.95)",
                 titleFont: {
                     family: "IRANSans",
                     size: 12,
@@ -913,8 +787,10 @@ function initializeDashboard() {
                 },
                 padding: 8,
                 cornerRadius: 6,
-                borderColor: "rgba(255, 255, 255, 0.2)",
+                borderColor: getChartColors().border,
                 borderWidth: 1,
+                titleColor: isDarkMode() ? getChartColors().text : "#ffffff",
+                bodyColor: isDarkMode() ? getChartColors().text : "#ffffff",
             },
         },
         animation: {
@@ -934,7 +810,165 @@ function initializeDashboard() {
                 left: 10,
             },
         },
+        scales: {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: getChartColors().grid,
+                },
+                ticks: {
+                    font: {
+                        size: 10,
+                    },
+                    color: getChartColors().textSecondary,
+                },
+                border: {
+                    color: getChartColors().border,
+                },
+            },
+            x: {
+                grid: {
+                    color: getChartColors().grid,
+                },
+                ticks: {
+                    font: {
+                        size: 10,
+                    },
+                    color: getChartColors().textSecondary,
+                    maxRotation: 0,
+                    minRotation: 0,
+                },
+                border: {
+                    color: getChartColors().border,
+                },
+            },
+        },
     };
+
+    // تابع تشخیص دارک مود
+    function isDarkMode() {
+        return (
+            document.documentElement.classList.contains("dark") ||
+            document.body.classList.contains("dark-mode") ||
+            localStorage.getItem("darkMode") === "true"
+        );
+    }
+
+    // تابع به‌روزرسانی رنگ‌های نمودار بر اساس دارک مود
+    function getChartColors() {
+        if (isDarkMode()) {
+            return {
+                grid: "rgba(255, 255, 255, 0.15)",
+                text: "#f9fafb",
+                textSecondary: "#d1d5db",
+                border: "#4b5563",
+                background: "rgba(55, 65, 81, 0.1)",
+            };
+        } else {
+            return {
+                grid: "rgba(0, 0, 0, 0.2)",
+                text: "#111827",
+                textSecondary: "#374151",
+                border: "#9ca3af",
+                background: "rgba(0, 0, 0, 0.1)",
+            };
+        }
+    }
+
+    // تابع به‌روزرسانی تنظیمات مشترک نمودارها
+    function getCommonOptions() {
+        const colors = getChartColors();
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        font: {
+                            family: "IRANSans",
+                            size: 11,
+                            weight: "500",
+                        },
+                        padding: 8,
+                        color: colors.text,
+                        boxWidth: 10,
+                        usePointStyle: true,
+                    },
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: isDarkMode()
+                        ? "rgba(0, 0, 0, 0.9)"
+                        : "rgba(30, 41, 59, 0.95)",
+                    titleFont: {
+                        family: "IRANSans",
+                        size: 12,
+                    },
+                    bodyFont: {
+                        family: "IRANSans",
+                        size: 11,
+                    },
+                    padding: 8,
+                    cornerRadius: 6,
+                    borderColor: colors.border,
+                    borderWidth: 1,
+                    titleColor: isDarkMode() ? colors.text : "#ffffff",
+                    bodyColor: isDarkMode() ? colors.text : "#ffffff",
+                },
+            },
+            animation: {
+                duration: 800,
+                easing: "easeOutQuart",
+            },
+            hover: {
+                mode: "nearest",
+                intersect: true,
+                animationDuration: 200,
+            },
+            layout: {
+                padding: {
+                    top: 10,
+                    right: 10,
+                    bottom: 10,
+                    left: 10,
+                },
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: colors.grid,
+                    },
+                    ticks: {
+                        font: {
+                            size: 10,
+                        },
+                        color: colors.textSecondary,
+                    },
+                    border: {
+                        color: colors.border,
+                    },
+                },
+                x: {
+                    grid: {
+                        color: colors.grid,
+                    },
+                    ticks: {
+                        font: {
+                            size: 10,
+                        },
+                        color: colors.textSecondary,
+                        maxRotation: 0,
+                        minRotation: 0,
+                    },
+                    border: {
+                        color: colors.border,
+                    },
+                },
+            },
+        };
+    }
 
     // بارگذاری اولیه نمودارها
     loadCharts();
