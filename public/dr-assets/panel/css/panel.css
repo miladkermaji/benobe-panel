@@ -1159,7 +1159,7 @@ img {
 .dropdown-trigger {
     height: 42px; /* کمی کوچکتر */
     width: 300px; /* عرض کمتر برای تناسب */
-    background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+    /* background: linear-gradient(135deg, #f0f4f8, #e2e8f0); */
     border-radius: 10px;
     border: 1px solid #e5e7eb;
     display: flex;

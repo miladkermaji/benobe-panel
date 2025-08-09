@@ -2405,7 +2405,7 @@ span.tagRemove:hover {
     position: sticky;
     top: 0;
     z-index: 10;
-    background: inherit;
+    /* background: inherit; */
     padding-bottom: 18px;
 }
 

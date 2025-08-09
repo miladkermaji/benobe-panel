@@ -22,14 +22,14 @@
                 <x-custom-tooltip title="از این قسمت، مرکزی که در آن مشغول تجویز و طبابت هستید را انتخاب کنید"
                   placement="bottom">
                   <svg width="16" height="17" viewBox="0 0 16 17" fill="none"
-                    xmlns="http://www.w3.org/2000/svg" class="lg:block svg-help" color="#3f4079" data-tip="true"
-                    data-for="centerSelect" currentItem="false">
+                    xmlns="http://www.w3.org/2000/svg" class="lg:block svg-help" style="color: currentColor;"
+                    data-tip="true" data-for="centerSelect" currentItem="false">
                     <path
                       d="M8.00006 9.9198V9.70984C8.00006 9.02984 8.42009 8.66982 8.84009 8.37982C9.25009 8.09982 9.66003 7.73983 9.66003 7.07983C9.66003 6.15983 8.92006 5.4198 8.00006 5.4198C7.08006 5.4198 6.34009 6.15983 6.34009 7.07983"
-                      stroke="#3f4079" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
-                    <path d="M7.9955 12.0692H8.0045" stroke="#3f4079" stroke-width="1.5" stroke-linecap="round"
+                      stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M7.9955 12.0692H8.0045" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
                       stroke-linejoin="round"></path>
-                    <circle cx="8" cy="8.99445" r="7.25" stroke="#3f4079" stroke-width="1.5"></circle>
+                    <circle cx="8" cy="8.99445" r="7.25" stroke="currentColor" stroke-width="1.5"></circle>
                   </svg>
                 </x-custom-tooltip>
               </div>
@@ -117,9 +117,9 @@
             </div>
           </div>
 
-          <div class="d-flex notif-option px-2 px-md-3">
+          <div class="d-flex notif-option px-2 px-md-3 align-items-center">
             <!-- Dark Mode Toggle -->
-            <div class="dark-mode-toggle me-3">
+            <div class="dark-mode-toggle me-3 d-flex align-items-center">
               <button onclick="toggleDarkMode()" class="btn btn-link p-0 border-0 bg-transparent"
                 title="تغییر به حالت تاریک"
                 style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease;">
@@ -131,7 +131,7 @@
               </button>
             </div>
 
-            <div class="position-relative">
+            <div class="position-relative d-flex align-items-center">
               <span
                 class="absolute -top-3 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white shadow-lg"
                 x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
@@ -198,7 +198,7 @@
             </div>
           </div>
           <a href="#" wire:click.prevent="$dispatch('navigateTo', { url: '{{ route('dr.auth.logout') }}' })"
-            class="logout ms-2" title="خروج"></a>
+            class="logout ms-2 d-flex align-items-center" title="خروج" style="height: 32px;"></a>
         </div>
       </div>
     </div>
@@ -235,6 +235,16 @@
           } else {
             button.innerHTML =
               `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="moon-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+          }
+        }
+
+        // Update help icon color based on dark mode
+        const helpIcon = document.querySelector('.svg-help');
+        if (helpIcon) {
+          if (isDark) {
+            helpIcon.style.color = '#ffffff';
+          } else {
+            helpIcon.style.color = '#3f4079';
           }
         }
       }

@@ -1,5 +1,36 @@
 /* Dark Mode Styles for Doctor Panel */
 
+/* General Header Alignment Improvements */
+.header__left {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.notif-option {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.dark-mode-toggle {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.logout {
+    display: flex !important;
+    align-items: center !important;
+    height: 32px !important;
+}
+
+/* Help Icon Styling */
+.svg-help {
+    transition: color 0.3s ease;
+}
+
+.my-tooltip svg {
+    transition: color 0.3s ease;
+}
+
 /* Dark Mode Variables */
 :root {
     /* Light Mode Colors (Default) */
@@ -63,6 +94,22 @@
         var(--primary) 100%
     );
 }
+.dark-mode .sidebar__nav ul li a {
+    border-radius: 0 !important;
+}
+.dark-mode .sidebar__fixed,
+.dark-mode .sidebar__nav {
+    background-color: var(--background-card) !important;
+    color: #fff;
+}
+.dark-mode li a::before {
+    color: #fff !important;
+}
+.dark-mode .myPanelOption,
+.dropdown {
+    background-color: var(--background-card) !important;
+    color: #fff;
+}
 
 /* Global Dark Mode Styles */
 .dark-mode {
@@ -99,6 +146,82 @@
 .dark-mode .sun-icon,
 .dark-mode .moon-icon {
     color: var(--text-primary) !important;
+}
+
+/* Help Icon Dark Mode */
+.dark-mode .svg-help {
+    color: #ffffff !important;
+}
+
+.dark-mode .my-tooltip svg {
+    color: #ffffff !important;
+}
+
+/* Header Elements Alignment */
+.dark-mode .header__left {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.dark-mode .notif-option {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.dark-mode .dark-mode-toggle {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.dark-mode .logout {
+    display: flex !important;
+    align-items: center !important;
+    height: 32px !important;
+}
+
+/* Notification Icon Dark Mode */
+.dark-mode .notif-option svg {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .notif-option svg:hover {
+    color: var(--primary) !important;
+}
+
+/* Notification Box Dark Mode */
+.dark-mode .notification-box {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+.dark-mode .notification-item {
+    border-bottom: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .notification-content p {
+    color: var(--text-primary) !important;
+}
+
+/* Notification Badge Dark Mode */
+.dark-mode .notif-option .absolute {
+    background-color: #ef4444 !important;
+    color: white !important;
+    border: 2px solid var(--background-card) !important;
+}
+
+/* Wallet Section Dark Mode (Hidden but styled) */
+.dark-mode .notif-option .mx-3 svg {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .notif-option .mx-3 span {
+    color: var(--text-primary) !important;
+}
+
+/* Chevron Icon Dark Mode */
+.dark-mode .chevron_bottom__M8fF9 path {
+    fill: var(--text-secondary) !important;
 }
 
 /* Sidebar Dark Mode */
@@ -469,13 +592,18 @@
 }
 
 .dark-mode .dropdown-trigger {
-    background-color: var(--background-footer) !important;
-    border: 1px solid var(--border-neutral) !important;
-    color: var(--text-primary) !important;
-}
-
-.dark-mode .dropdown-trigger:hover {
     background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: #ffff !important;
+}
+.dark-mode .dropdown-label {
+    color: #fff !important;
+}
+.dark-mode {
+    border-color: #fff !important;
+}
+.dark-mode .dropdown-trigger:hover {
+    color: #ffff !important;
 }
 
 .dark-mode .my-dropdown-menu {
@@ -497,21 +625,6 @@
 .dark-mode .card-active {
     background-color: var(--primary) !important;
     color: white !important;
-}
-
-/* Notification Box Dark Mode */
-.dark-mode .notification-box {
-    background-color: var(--background-card) !important;
-    border: 1px solid var(--border-neutral) !important;
-    box-shadow: 0 4px 12px var(--shadow) !important;
-}
-
-.dark-mode .notification-item {
-    border-bottom: 1px solid var(--border-neutral) !important;
-}
-
-.dark-mode .notification-content p {
-    color: var(--text-primary) !important;
 }
 
 /* Loading States Dark Mode */
