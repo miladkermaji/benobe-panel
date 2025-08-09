@@ -16,7 +16,7 @@ class TreatmentCenterList extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $listeners = ['deleteTreatmentCenterConfirmed' => 'deleteTreatmentCenter'];
+    protected $listeners = ['deleteTreatmentCenterConfirmed' => 'deleteTreatmentCenter', 'toggleStatusConfirmed' => 'toggleStatusConfirmed'];
 
     public $perPage = 50;
     public $search = '';
@@ -63,6 +63,59 @@ class TreatmentCenterList extends Component
     {
         $currentPageIds = $this->getTreatmentCentersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedTreatmentCenters) && count(array_diff($currentPageIds, $this->selectedTreatmentCenters)) === 0;
+    }
+
+    public function confirmToggleStatus($id)
+    {
+        $item = MedicalCenter::find($id);
+        if (!$item) {
+            $this->dispatch('show-alert', type: 'error', message: 'درمانگاه یافت نشد.');
+            return;
+        }
+        $treatmentCenterName = $item->name;
+        $action = $item->is_active ? 'غیرفعال کردن' : 'فعال کردن';
+
+        $this->dispatch('confirm-toggle-status', id: $id, name: $treatmentCenterName, action: $action);
+    }
+
+    public function toggleStatusConfirmed($id)
+    {
+        $item = MedicalCenter::find($id);
+        if (!$item) {
+            $this->dispatch('show-alert', type: 'error', message: 'درمانگاه یافت نشد.');
+            return;
+        }
+
+        $newStatus = !$item->is_active;
+        $item->update(['is_active' => $newStatus]);
+
+        if ($newStatus) {
+            // ارسال پیامک فعال‌سازی
+            if ($item->phone_number) {
+                $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم فعال شد. می‌توانید از طریق لینک زیر وارد پنل خود شوید: " . route('dr.auth.login-register-form', $item->id);
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+                \App\Jobs\SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$item->phone_number],
+                    $templateId,
+                    [$item->name]
+                )->delay(now()->addSeconds(5));
+            }
+            $this->dispatch('show-alert', type: 'success', message: 'درمانگاه فعال شد و پیامک فعال‌سازی ارسال شد!');
+        } else {
+            // ارسال پیامک غیرفعال‌سازی
+            if ($item->phone_number) {
+                $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم غیرفعال شد. برای اطلاعات بیشتر تماس بگیرید.";
+                \App\Jobs\SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$item->phone_number]
+                )->delay(now()->addSeconds(5));
+            }
+            $this->dispatch('show-alert', type: 'info', message: 'درمانگاه غیرفعال شد!');
+        }
     }
 
     public function confirmDelete($id)
@@ -130,12 +183,40 @@ class TreatmentCenterList extends Component
                     $this->dispatch('confirm-delete-selected', ['allFiltered' => true]);
                     return;
                 case 'status_active':
+                    $items = $query->get();
                     $query->update(['is_active' => true]);
-                    $this->dispatch('show-alert', type: 'success', message: 'همه درمانگاه‌های فیلترشده فعال شدند!');
+                    // ارسال پیامک برای همه آیتم‌های فعال شده
+                    foreach ($items as $item) {
+                        if ($item->phone_number) {
+                            $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم فعال شد. می‌توانید از طریق لینک زیر وارد پنل خود شوید: " . route('dr.auth.login-register-form', $item->id);
+                            $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                            $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                            $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+                            \App\Jobs\SendSmsNotificationJob::dispatch(
+                                $message,
+                                [$item->phone_number],
+                                $templateId,
+                                [$item->name]
+                            )->delay(now()->addSeconds(5));
+                        }
+                    }
+                    $this->dispatch('show-alert', type: 'success', message: 'همه درمانگاه‌های فیلترشده فعال شدند و پیامک ارسال شد!');
                     break;
                 case 'status_inactive':
+                    $items = $query->get();
                     $query->update(['is_active' => false]);
-                    $this->dispatch('show-alert', type: 'success', message: 'همه درمانگاه‌های فیلترشده غیرفعال شدند!');
+                    // ارسال پیامک برای همه آیتم‌های غیرفعال شده
+                    foreach ($items as $item) {
+                        if ($item->phone_number) {
+                            $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم غیرفعال شد. برای اطلاعات بیشتر تماس بگیرید.";
+                            \App\Jobs\SendSmsNotificationJob::dispatch(
+                                $message,
+                                [$item->phone_number]
+                            )->delay(now()->addSeconds(5));
+                        }
+                    }
+                    $this->dispatch('show-alert', type: 'success', message: 'همه درمانگاه‌های فیلترشده غیرفعال شدند و پیامک ارسال شد!');
                     break;
             }
             $this->selectedTreatmentCenters = [];
@@ -161,8 +242,37 @@ class TreatmentCenterList extends Component
 
     private function updateStatus($status)
     {
-        MedicalCenter::whereIn('id', $this->selectedTreatmentCenters)
-            ->update(['is_active' => $status]);
+        $items = MedicalCenter::whereIn('id', $this->selectedTreatmentCenters)->get();
+        foreach ($items as $item) {
+            $oldStatus = $item->is_active;
+            $item->update(['is_active' => $status]);
+
+            if ($status && !$oldStatus) {
+                // ارسال پیامک فعال‌سازی
+                if ($item->phone_number) {
+                    $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم فعال شد. می‌توانید از طریق لینک زیر وارد پنل خود شوید: " . route('dr.auth.login-register-form', $item->id);
+                    $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                    $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                    $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+                    \App\Jobs\SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$item->phone_number],
+                        $templateId,
+                        [$item->name]
+                    )->delay(now()->addSeconds(5));
+                }
+            } elseif (!$status && $oldStatus) {
+                // ارسال پیامک غیرفعال‌سازی
+                if ($item->phone_number) {
+                    $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم غیرفعال شد. برای اطلاعات بیشتر تماس بگیرید.";
+                    \App\Jobs\SendSmsNotificationJob::dispatch(
+                        $message,
+                        [$item->phone_number]
+                    )->delay(now()->addSeconds(5));
+                }
+            }
+        }
         $this->selectedTreatmentCenters = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت درمانگاه‌های انتخاب‌شده با موفقیت تغییر کرد.');

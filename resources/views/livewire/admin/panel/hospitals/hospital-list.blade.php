@@ -214,7 +214,7 @@
                         </a>
                       </td>
                       <td class="text-center align-middle">
-                        <button wire:click="toggleStatus({{ $item->id }})"
+                        <button wire:click="confirmToggleStatus({{ $item->id }})"
                           class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                           {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
                         </button>
@@ -354,7 +354,7 @@
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
-                      <button wire:click="toggleStatus({{ $item->id }})"
+                      <button wire:click="confirmToggleStatus({{ $item->id }})"
                         class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
                         {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
                       </button>
@@ -432,6 +432,25 @@
         }).then((result) => {
           if (result.isConfirmed) {
             Livewire.dispatch('deleteHospitalConfirmed', {
+              id: event.id
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-toggle-status', (event) => {
+        Swal.fire({
+          title: event.action + ' بیمارستان',
+          text: 'آیا مطمئن هستید که می‌خواهید ' + event.name + ' را ' + event.action + ' کنید؟',
+
+          showCancelButton: true,
+          confirmButtonColor: '#1deb3c',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('toggleStatusConfirmed', {
               id: event.id
             });
           }

@@ -16,7 +16,7 @@ class ImagingCenterList extends Component
 
     protected $paginationTheme = 'bootstrap';
 
-    protected $listeners = ['deleteImagingCenterConfirmed' => 'deleteImagingCenter'];
+    protected $listeners = ['deleteImagingCenterConfirmed' => 'deleteImagingCenter', 'toggleStatusConfirmed' => 'toggleStatusConfirmed'];
 
     public $perPage = 50;
     public $search = '';
@@ -63,6 +63,59 @@ class ImagingCenterList extends Component
     {
         $currentPageIds = $this->getImagingCentersQuery()->forPage($this->getPage(), $this->perPage)->pluck('id')->toArray();
         $this->selectAll = !empty($this->selectedImagingCenters) && count(array_diff($currentPageIds, $this->selectedImagingCenters)) === 0;
+    }
+
+    public function confirmToggleStatus($id)
+    {
+        $item = MedicalCenter::find($id);
+        if (!$item) {
+            $this->dispatch('show-alert', type: 'error', message: 'مرکز تصویربرداری یافت نشد.');
+            return;
+        }
+        $imagingCenterName = $item->name;
+        $action = $item->is_active ? 'غیرفعال کردن' : 'فعال کردن';
+
+        $this->dispatch('confirm-toggle-status', id: $id, name: $imagingCenterName, action: $action);
+    }
+
+    public function toggleStatusConfirmed($id)
+    {
+        $item = MedicalCenter::find($id);
+        if (!$item) {
+            $this->dispatch('show-alert', type: 'error', message: 'مرکز تصویربرداری یافت نشد.');
+            return;
+        }
+
+        $newStatus = !$item->is_active;
+        $item->update(['is_active' => $newStatus]);
+
+        if ($newStatus) {
+            // ارسال پیامک فعال‌سازی
+            if ($item->phone_number) {
+                $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم فعال شد. می‌توانید از طریق لینک زیر وارد پنل خود شوید: " . route('dr.auth.login-register-form', $item->id);
+                $activeGateway = \Modules\SendOtp\App\Models\SmsGateway::where('is_active', true)->first();
+                $gatewayName = $activeGateway ? $activeGateway->name : 'pishgamrayan';
+                $templateId = ($gatewayName === 'pishgamrayan') ? 100254 : null;
+
+                \App\Jobs\SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$item->phone_number],
+                    $templateId,
+                    [$item->name]
+                )->delay(now()->addSeconds(5));
+            }
+            $this->dispatch('show-alert', type: 'success', message: 'مرکز تصویربرداری فعال شد و پیامک فعال‌سازی ارسال شد!');
+        } else {
+            // ارسال پیامک غیرفعال‌سازی
+            if ($item->phone_number) {
+                $message = "مرکز درمانی گرامی، حساب کاربری شما در سیستم غیرفعال شد. برای اطلاعات بیشتر تماس بگیرید.";
+                \App\Jobs\SendSmsNotificationJob::dispatch(
+                    $message,
+                    [$item->phone_number]
+                )->delay(now()->addSeconds(5));
+            }
+            $this->dispatch('show-alert', type: 'info', message: 'مرکز تصویربرداری غیرفعال شد!');
+        }
     }
 
     public function confirmDelete($id)

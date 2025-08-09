@@ -382,16 +382,7 @@
             if (!checkbox.checked) { // User is trying to uncheck
                 // Immediately revert the uncheck, pending confirmation
                 checkbox.checked = true;
-                Swal.fire({
-                    title: 'آیا مطمئن هستید؟',
-                    text: 'تنظیمات این روز حذف خواهد شد!',
-    
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'بله، حذف کن!',
-                    cancelButtonText: 'انصراف'
-                }).then((result) => {
+                showConfirmDialog('آیا مطمئن هستید؟', 'تنظیمات این روز حذف خواهد شد!', 'بله، حذف کن!', 'انصراف').then((result) => {
                     if (result.isConfirmed) {
                         @this.set(`selectedScheduleDays.${day}`, false);
                         @this.call('deleteScheduleSettingsForDay', day);
@@ -501,7 +492,7 @@
                               <x-custom-tooltip title="حذف تنظیمات" placement="top">
                                 <button class="my-btn btn-light btn-sm delete-schedule-setting p-1"
                                   x-data="{ day: '{{ $day }}', index: '{{ $index }}' }"
-                                  @click="Swal.fire({title: 'آیا مطمئن هستید؟', text: 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!',  showCancelButton: true, confirmButtonColor: '#3085d6', cancelButtonColor: '#d33', confirmButtonText: 'بله، حذف کن!', cancelButtonText: 'خیر', reverseButtons: true}).then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
+                                  @click="showConfirmDialog('آیا مطمئن هستید؟', 'این تنظیم حذف خواهد شد و قابل بازگشت نیست!').then((result) => {if (result.isConfirmed) {@this.call('deleteScheduleSetting', day, index);}})"
                                   {{ empty($setting['start_time']) || empty($setting['end_time']) ? 'disabled' : '' }}>
                                   <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف"
                                     style="width: 14px; height: 14px;">
@@ -670,6 +661,43 @@
       </x-modal>
     </div>
     <script>
+      // CSS برای مخفی کردن دکمه‌های اضافی SweetAlert
+      const style = document.createElement('style');
+      style.textContent = `
+        .swal2-deny {
+          display: none !important;
+        }
+        .swal2-close {
+          display: none !important;
+        }
+      `;
+      document.head.appendChild(style);
+
+      // تابع کمکی برای تنظیمات یکسان SweetAlert
+      function showConfirmDialog(title, text, confirmText = 'بله، حذف کن!', cancelText = 'خیر', isHtml = false) {
+        const config = {
+          title: title,
+          showCancelButton: true,
+          showConfirmButton: true,
+          showDenyButton: false,
+          showCloseButton: false,
+          allowOutsideClick: false,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: confirmText,
+          cancelButtonText: cancelText,
+          reverseButtons: true
+        };
+
+        if (isHtml) {
+          config.html = text;
+        } else {
+          config.text = text;
+        }
+
+        return Swal.fire(config);
+      }
+
       document.addEventListener('livewire:initialized', () => {
         window.addEventListener('open-modal', event => {
           const modalName = event.detail.name;
@@ -821,6 +849,11 @@
               @this.set('copySource.index', index);
               @this.set('selectedDays', []);
               @this.set('selectAllCopyModal', false);
+
+              // Immediately hide the source day in the modal
+              setTimeout(() => {
+                $(`#day-checkboxes .form-check[data-day="${day}"]`).hide();
+              }, 100);
             } catch (error) {
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
@@ -1002,17 +1035,8 @@
             const day = $(this).data('day');
             const index = $(this).data('index');
             if ($(this).is(':disabled')) return;
-            Swal.fire({
-              title: 'آیا مطمئن هستید؟',
-              text: 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!',
-
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'بله، حذف کن!',
-              cancelButtonText: 'خیر',
-              reverseButtons: true
-            }).then((result) => {
+            showConfirmDialog('آیا مطمئن هستید؟', 'این ساعت کاری حذف خواهد شد و قابل بازگشت نیست!').then((
+              result) => {
               if (result.isConfirmed) {
                 toggleButtonLoading($(this), true);
                 @this.call('removeSlot', day, index);
@@ -1142,19 +1166,10 @@
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
-            Swal.fire({
-              title: 'تداخل در کپی تنظیمات زمان‌بندی',
-              html: conflictMessage,
-
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'جایگزین کن',
-              cancelButtonText: 'لغو',
-              reverseButtons: true
-            }).then((result) => {
+            showConfirmDialog('تداخل در کپی برنامه کاری', conflictMessage, 'جایگزین کن', 'لغو', true).then((
+              result) => {
               if (result.isConfirmed) {
-                @this.call('copyScheduleSetting', true);
+                @this.call('copySchedule', true);
               } else {
                 @this.set('modalMessage', 'عملیات کپی لغو شد');
                 @this.set('modalType', 'error');
@@ -1218,17 +1233,8 @@
               return;
             }
             conflictMessage += '<p>آیا می‌خواهید داده‌های موجود را جایگزین کنید؟</p>';
-            Swal.fire({
-              title: 'تداخل در کپی برنامه کاری',
-              html: conflictMessage,
-
-              showCancelButton: true,
-              confirmButtonColor: '#3085d6',
-              cancelButtonColor: '#d33',
-              confirmButtonText: 'جایگزین کن',
-              cancelButtonText: 'لغو',
-              reverseButtons: true
-            }).then((result) => {
+            showConfirmDialog('تداخل در کپی برنامه کاری', conflictMessage, 'جایگزین کن', 'لغو', true).then((
+              result) => {
               if (result.isConfirmed) {
                 @this.call('copySchedule', true);
               } else {
