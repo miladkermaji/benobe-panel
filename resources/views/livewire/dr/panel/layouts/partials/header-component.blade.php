@@ -134,11 +134,10 @@
             <div class="position-relative d-flex align-items-center">
               <span
                 class="absolute -top-3 -right-3 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-white shadow-lg"
-                x-show="{{ $unreadCount }} > 0" x-text="{{ $unreadCount }}"></span>
+                style="display: {{ $unreadCount > 0 ? 'flex' : 'none' }};">{{ $unreadCount }}</span>
               <svg xmlns="http://www.w3.org/2000/svg"
-                class="cursor-pointer hover:text-gray-600 transition-colors duration-200" fill="none"
-                viewBox="0 0 24 24" height="24px" role="img"
-                x-on:click="$refs.notificationBox.classList.toggle('d-none')">
+                class="cursor-pointer hover:text-gray-600 transition-colors duration-200 notification-bell"
+                fill="none" viewBox="0 0 24 24" height="24px" role="img">
                 <path
                   d="M12.02 2.91c-3.31 0-6 2.69-6 6v2.89c0 .61-.26 1.54-.57 2.06L4.3 15.77c-.71 1.18-.22 2.49 1.08 2.93 4.31 1.44 8.96 1.44 13.27 0 1.21-.4 1.74-1.83 1.08-2.93l-1.15-1.91c-.3-.52-.56-1.45-.56-2.06V8.91c0-3.3-2.7-6-6-6z"
                   stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round"></path>
@@ -148,7 +147,7 @@
                 <path d="M15.02 19.06c0 1.65-1.35 3-3 3-.82 0-1.58-.34-2.12-.88a3.01 3.01 0 01-.88-2.12"
                   stroke="currentColor" stroke-width="1.5" stroke-miterlimit="10"></path>
               </svg>
-              <div x-ref="notificationBox"
+              <div id="notificationBox"
                 class="notification-box d-none position-absolute bg-white shadow-lg rounded-3 p-3"
                 style="width: 500px; top: 40px; left: 0; z-index: 1000;">
                 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -259,9 +258,12 @@
         applyDarkMode(isDarkMode);
         updateDarkModeButton(isDarkMode);
 
+        // Initialize notification dropdown
+        initializeNotificationDropdown();
+
         document.addEventListener('click', function(event) {
-          const notificationBox = document.querySelector('.notification-box');
-          const bellIcon = document.querySelector('.notif-option svg');
+          const notificationBox = document.getElementById('notificationBox');
+          const bellIcon = document.querySelector('.notification-bell');
           if (!notificationBox || !bellIcon) return;
           if (!notificationBox.contains(event.target) && !bellIcon.contains(event.target)) {
             notificationBox.classList.add('d-none');
@@ -282,12 +284,27 @@
         });
       });
 
+      function initializeNotificationDropdown() {
+        const bellIcon = document.querySelector('.notification-bell');
+        const notificationBox = document.getElementById('notificationBox');
+
+        if (bellIcon && notificationBox) {
+          bellIcon.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            notificationBox.classList.toggle('d-none');
+          });
+        }
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
         initializeDropdown();
+        initializeNotificationDropdown();
       });
 
       document.addEventListener('livewire:navigated', function() {
         setTimeout(initializeDropdown, 100);
+        setTimeout(initializeNotificationDropdown, 100);
       });
 
       function initializeDropdown() {
