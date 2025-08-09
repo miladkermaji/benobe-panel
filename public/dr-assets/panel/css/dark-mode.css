@@ -264,13 +264,9 @@
     border: 1px solid var(--border-neutral) !important;
 }
 
-
-
 .dark-mode .stat-card:hover {
     box-shadow: 0 4px 8px var(--shadow) !important;
 }
-
-
 
 .dark-mode .stat-label {
     color: var(--text-secondary) !important;
@@ -568,6 +564,11 @@
 
 .dark-mode .sidebar__fixed {
     background-color: var(--background-card) !important;
+}
+
+/* Dashboard Icon Dark Mode - Make it white */
+.dark-mode .sidebar__nav  a::before {
+    filter: brightness(0) invert(1) !important;
 }
 
 .dark-mode .profile__info {
