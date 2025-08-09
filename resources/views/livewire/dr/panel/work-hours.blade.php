@@ -849,6 +849,11 @@
               @this.set('copySource.index', index);
               @this.set('selectedDays', []);
               @this.set('selectAllCopyModal', false);
+
+              // Immediately hide the source day in the modal
+              setTimeout(() => {
+                $(`#day-checkboxes .form-check[data-day="${day}"]`).hide();
+              }, 100);
             } catch (error) {
               window.dispatchEvent(new CustomEvent('close-modal', {
                 detail: {
