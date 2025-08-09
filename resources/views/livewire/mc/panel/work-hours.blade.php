@@ -11,7 +11,7 @@
       <div class="workhours-wrapper-content p-3 pt-4">
         <!-- تنظیمات نوبت دستی (فقط وقتی autoScheduling غیرفعال باشد) -->
         <div class="card border border-radius-11 p-3 mb-4 bg-white shadow-sm">
-          <div class="card-header d-flex align-items-center justify-content-between">
+          <div class="p-2 d-flex align-items-center justify-content-between">
             <h6 class="mb-0">تنظیمات تایید دو مرحله ای نوبت‌های دستی</h6>
             @component('components.custom-tooltip', [
                 'title' =>

@@ -117,19 +117,19 @@
             </div>
           </div>
 
-          <div class="d-flex notif-option px-2 px-md-3 align-items-center">
+          <div class="d-flex notif-option px-2 px-md-3 align-items-center" >
             <!-- Dark Mode Toggle -->
-            <div class="dark-mode-toggle me-3 d-flex align-items-center">
+           {{--  <div class="dark-mode-toggle me-3 d-flex align-items-center" >
               <button onclick="toggleDarkMode()" class="btn btn-link p-0 border-0 bg-transparent"
                 title="تغییر به حالت تاریک"
                 style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                <svg style="display: none" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
                   fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                   stroke-linejoin="round" class="moon-icon">
                   <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                 </svg>
               </button>
-            </div>
+            </div> --}}
 
             <div class="position-relative d-flex align-items-center">
               <span

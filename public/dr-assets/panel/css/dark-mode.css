@@ -1254,3 +1254,1020 @@
         transition: none !important;
     }
 }
+
+/* Workhours Page Dark Mode */
+.dark-mode .workhours-content,#work-hours {
+    background-color: var(--background-light) !important;
+}
+
+.dark-mode .workhours-wrapper-content {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+.dark-mode .workhours-wrapper-content:hover {
+    box-shadow: 0 8px 24px var(--shadow) !important;
+}
+
+/* Auto Schedule Toggle Dark Mode */
+.dark-mode .auto-scheule-content-top {
+    border-radius: 12px !important;
+}
+
+/* Manual Appointment Settings Card Dark Mode */
+.dark-mode .card.border.border-radius-11 {
+    background-color: var(--background-card) !important;
+    border-color: var(--border-neutral) !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+.dark-mode .card-header h6 {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .toggle-appointment-help {
+    color: var(--text-secondary) !important;
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Toggle Buttons Dark Mode */
+.dark-mode .p-1.rounded.bg-white {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Input Fields Dark Mode */
+.dark-mode .form-control {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .form-control:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25) !important;
+}
+
+.dark-mode .input-group-text {
+    background-color: var(--background-footer) !important;
+    border-color: var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .label-top-input-special-takhasos {
+    color: var(--text-secondary) !important;
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .form-group:hover .label-top-input-special-takhasos {
+    color: var(--text-primary) !important;
+}
+
+/* Working Days Section Dark Mode */
+.dark-mode .day-contents {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .day-contents label {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .form-check-input {
+    background-color: var(--background-card) !important;
+    border-color: var(--border-neutral) !important;
+}
+
+.dark-mode .form-check-input:checked {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .form-check-input:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(96, 165, 250, 0.25) !important;
+}
+
+/* Time Slots Dark Mode */
+.dark-mode .bg-active-slot {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .bg-active-slot:hover {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .bg-active-slot.active {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+.dark-mode .border-333 {
+    border-color: var(--border-neutral) !important;
+}
+
+.dark-mode .border-333:hover {
+    border-color: var(--primary) !important;
+}
+
+/* Time Picker Inputs Dark Mode */
+.dark-mode .timepicker-ui-input {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .timepicker-ui-input:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Max Appointments Input Dark Mode */
+.dark-mode .max-appointments {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .max-appointments:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Action Buttons Dark Mode */
+.dark-mode .schedule-btn {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .schedule-btn:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+.dark-mode .emergency-slot-btn {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .emergency-slot-btn:hover {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .copy-single-slot-btn {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .copy-single-slot-btn:hover {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .remove-row-btn {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .remove-row-btn:hover {
+    background-color: var(--error) !important;
+    color: white !important;
+    border-color: var(--error) !important;
+}
+
+/* Add Row Button Dark Mode */
+.dark-mode .add-row-btn {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .add-row-btn:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .add-row-btn span {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .add-row-btn:hover span {
+    color: white !important;
+}
+
+/* Save Button Dark Mode */
+.dark-mode .my-btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+}
+
+.dark-mode .my-btn-primary:hover {
+    background-color: var(--primary-light) !important;
+    border-color: var(--primary-light) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+/* Calendar Days Input Dark Mode */
+.dark-mode .calendar-days-input {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .calendar-days-input:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Floating Label Dark Mode */
+.dark-mode .floating-label {
+    color: var(--text-secondary) !important;
+    background-color: var(--background-card) !important;
+}
+
+/* Conditional Section Dark Mode */
+.dark-mode .conditional-section {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Modal Dark Mode for Workhours */
+.dark-mode .modal-content {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .modal-header {
+    background-color: var(--background-footer) !important;
+    border-bottom: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .modal-title {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .modal-body {
+    background-color: var(--background-card) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .close {
+    color: var(--text-secondary) !important;
+}
+
+.dark-mode .close:hover {
+    color: var(--text-primary) !important;
+}
+
+/* Schedule Modal Specific Dark Mode */
+.dark-mode .schedule-modal .modal-content {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .schedule-modal .modal-body {
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .schedule-modal .timepicker-ui-input {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .schedule-modal .timepicker-ui-input:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Schedule Days Section Dark Mode */
+.dark-mode .schedule-days-section {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .section-title {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .day-schedule-grid {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+/* Calculator Modal Dark Mode */
+.dark-mode .calculator-modal .modal-content {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .calculator-modal .form-check-label {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .calculator-modal .form-control {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .calculator-modal .form-control:focus {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .calculator-modal .input-group-text {
+    background-color: var(--background-footer) !important;
+    border-color: var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Copy Modal Dark Mode */
+.dark-mode .copy-modal .modal-content {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .copy-modal .modal-body {
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .copy-modal p {
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .copy-modal .form-check-label {
+    color: var(--text-primary) !important;
+}
+
+/* Emergency Modal Dark Mode */
+.dark-mode .emergency-times-container {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .time-slot-btn {
+    background-color: var(--background-footer) !important;
+    border: 1px solid var(--border-neutral) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark-mode .time-slot-btn.btn-primary {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: white !important;
+}
+
+.dark-mode .time-slot-btn.btn-outline-primary {
+    background-color: transparent !important;
+    border-color: var(--primary) !important;
+    color: var(--primary) !important;
+}
+
+.dark-mode .time-slot-btn:hover {
+    background-color: var(--primary) !important;
+    color: white !important;
+}
+
+/* Responsive Dark Mode for Workhours */
+@media (max-width: 768px) {
+    .dark-mode .workhours-wrapper-content {
+        padding: 1rem !important;
+    }
+
+    .dark-mode .day-contents {
+        padding: 1rem !important;
+    }
+
+    .dark-mode .day-contents .btn {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    .dark-mode .add-row-btn {
+        padding: 0.5rem 1rem !important;
+    }
+
+    .dark-mode .add-row-btn span {
+        font-size: 0.875rem !important;
+    }
+
+    .dark-mode .add-row-btn img {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .dark-mode .bg-active-slot {
+        padding: 1rem !important;
+    }
+
+    .dark-mode .form-row {
+        flex-direction: column !important;
+        gap: 1rem !important;
+    }
+
+    .dark-mode .timepicker-ui-input,
+    .dark-mode .max-appointments {
+        height: 45px !important;
+        font-size: 0.875rem !important;
+    }
+
+    .dark-mode .schedule-modal .modal-dialog {
+        margin: 1rem !important;
+    }
+
+    .dark-mode .schedule-modal .modal-body {
+        padding: 1rem !important;
+    }
+
+    .dark-mode .schedule-modal .timepicker-ui-input {
+        height: 40px !important;
+        font-size: 0.875rem !important;
+    }
+}
+
+@media (max-width: 544px) {
+    .dark-mode .workhours-wrapper-content {
+        padding: 0.75rem !important;
+    }
+
+    .dark-mode .day-contents {
+        padding: 0.75rem !important;
+        gap: 0.5rem !important;
+    }
+
+    .dark-mode .day-contents .btn {
+        font-size: 0.75rem !important;
+        padding: 0.375rem 0.5rem !important;
+    }
+
+    .dark-mode .bg-active-slot {
+        padding: 0.75rem !important;
+    }
+
+    .dark-mode .timepicker-ui-input {
+        height: 40px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .dark-mode .max-appointments {
+        height: 40px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .dark-mode .copy-single-slot-btn,
+    .dark-mode .remove-row-btn {
+        padding: 0.375rem !important;
+        height: 35px !important;
+        width: 35px !important;
+    }
+
+    .dark-mode .copy-single-slot-btn img,
+    .dark-mode .remove-row-btn img {
+        width: 14px !important;
+        height: 14px !important;
+    }
+
+    .dark-mode .schedule-modal .modal-dialog {
+        margin: 0.5rem !important;
+    }
+
+    .dark-mode .schedule-modal .modal-content {
+        border-radius: 8px !important;
+    }
+
+    .dark-mode .schedule-modal .modal-body {
+        padding: 0.75rem !important;
+    }
+
+    .dark-mode .schedule-modal .timepicker-ui-input {
+        height: 35px !important;
+        font-size: 0.75rem !important;
+    }
+}
+
+@media (max-width: 425px) {
+    .dark-mode .workhours-wrapper-content {
+        padding: 0.5rem !important;
+    }
+
+    .dark-mode .row.border.border-radius-11.p-3 {
+        padding: 0.75rem !important;
+    }
+
+    .dark-mode .day-contents {
+        padding: 0.5rem !important;
+        gap: 0.375rem !important;
+    }
+
+    .dark-mode .day-contents .btn {
+        font-size: 0.6875rem !important;
+        padding: 0.25rem 0.375rem !important;
+    }
+
+    .dark-mode .form-control,
+    .dark-mode .timepicker-ui-input,
+    .dark-mode .max-appointments {
+        height: 35px !important;
+        font-size: 0.6875rem !important;
+    }
+
+    .dark-mode .bg-active-slot {
+        padding: 0.5rem !important;
+    }
+
+    .dark-mode .timepicker-ui-input {
+        height: 35px !important;
+        font-size: 0.6875rem !important;
+    }
+
+    .dark-mode .max-appointments {
+        height: 35px !important;
+        font-size: 0.6875rem !important;
+    }
+
+    .dark-mode .schedule-modal .modal-dialog {
+        margin: 0.25rem !important;
+    }
+
+    .dark-mode .schedule-modal .modal-content {
+        border-radius: 6px !important;
+    }
+
+    .dark-mode .schedule-modal .modal-body {
+        padding: 0.5rem !important;
+    }
+
+    .dark-mode .schedule-modal .day-schedule-grid {
+        gap: 0.5rem !important;
+    }
+
+    .dark-mode .schedule-modal .form-check-label {
+        font-size: 0.75rem !important;
+    }
+
+    .dark-mode .schedule-modal .select-all-checkbox .form-check-label {
+        font-size: 0.875rem !important;
+    }
+
+    .dark-mode .schedule-modal .form-check-input {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .dark-mode .schedule-modal .timepicker-ui-input {
+        height: 30px !important;
+        font-size: 0.6875rem !important;
+    }
+
+    .dark-mode .schedule-modal .save-schedule-btn {
+        height: 40px !important;
+        font-size: 0.875rem !important;
+    }
+
+    .dark-mode .schedule-modal .delete-schedule-setting {
+        height: 30px !important;
+        width: 30px !important;
+    }
+
+    .dark-mode .schedule-modal .delete-schedule-setting img {
+        width: 12px !important;
+        height: 12px !important;
+    }
+
+    .dark-mode .schedule-modal .section-title {
+        font-size: 1rem !important;
+    }
+
+    .dark-mode .schedule-modal .border-section {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Workhours Specific Dark Mode Enhancements */
+.dark-mode .work-hours-saturday,
+.dark-mode .work-hours-sunday,
+.dark-mode .work-hours-monday,
+.dark-mode .work-hours-tuesday,
+.dark-mode .work-hours-wednesday,
+.dark-mode .work-hours-thursday,
+.dark-mode .work-hours-friday {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+}
+
+.dark-mode .work-hours-saturday h6,
+.dark-mode .work-hours-sunday h6,
+.dark-mode .work-hours-monday h6,
+.dark-mode .work-hours-tuesday h6,
+.dark-mode .work-hours-wednesday h6,
+.dark-mode .work-hours-thursday h6,
+.dark-mode .work-hours-friday h6 {
+    color: var(--text-primary) !important;
+}
+
+/* Form Row Enhancements */
+.dark-mode .form-row {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    transition: all 0.3s ease !important;
+}
+
+.dark-mode .form-row:hover {
+    background-color: var(--background-footer) !important;
+    border-color: var(--primary) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+/* Input Group Enhancements */
+.dark-mode .input-group {
+    background-color: var(--background-card) !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+}
+
+.dark-mode .input-group:focus-within {
+    box-shadow: 0 0 0 2px var(--primary) !important;
+}
+
+/* Button States Enhancement */
+.dark-mode .btn:disabled {
+    background-color: var(--background-footer) !important;
+    border-color: var(--border-neutral) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+.dark-mode .btn:disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Loading States Enhancement */
+.dark-mode .loader {
+    border-color: var(--primary) !important;
+    border-top-color: transparent !important;
+}
+
+.dark-mode .loading-overlay {
+    background: rgba(55, 65, 81, 0.7) !important;
+}
+
+/* Focus States Enhancement */
+.dark-mode .form-control:focus,
+.dark-mode .timepicker-ui-input:focus,
+.dark-mode .max-appointments:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25) !important;
+}
+
+/* Hover Effects Enhancement */
+.dark-mode .bg-active-slot:hover,
+.dark-mode .form-row:hover,
+.dark-mode .day-contents:hover {
+    transform: translateY(-2px) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Scrollbar Enhancement for Workhours */
+.dark-mode .day-contents::-webkit-scrollbar,
+.dark-mode .form-row::-webkit-scrollbar,
+.dark-mode .emergency-times-container::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.dark-mode .day-contents::-webkit-scrollbar-track,
+.dark-mode .form-row::-webkit-scrollbar-track,
+.dark-mode .emergency-times-container::-webkit-scrollbar-track {
+    background: var(--background-footer) !important;
+    border-radius: 3px !important;
+}
+
+.dark-mode .day-contents::-webkit-scrollbar-thumb,
+.dark-mode .form-row::-webkit-scrollbar-thumb,
+.dark-mode .emergency-times-container::-webkit-scrollbar-thumb {
+    background: var(--primary) !important;
+    border-radius: 3px !important;
+}
+
+.dark-mode .day-contents::-webkit-scrollbar-thumb:hover,
+.dark-mode .form-row::-webkit-scrollbar-thumb:hover,
+.dark-mode .emergency-times-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light) !important;
+}
+
+/* Animation Enhancements */
+.dark-mode .workhours-wrapper-content,
+.dark-mode .bg-active-slot,
+.dark-mode .form-row {
+    animation: fadeIn 0.5s ease-in-out !important;
+}
+
+.dark-mode .modal-content {
+    animation: modalFadeIn 0.3s ease-out !important;
+}
+.dark-mode .auto-scheule-content-top {
+   /*  background-color: var(--background-card) !important; */
+}
+/* High Contrast Support */
+@media (prefers-contrast: high) {
+    .dark-mode .workhours-wrapper-content {
+        border-width: 2px !important;
+    }
+
+    .dark-mode .bg-active-slot {
+        border-width: 2px !important;
+    }
+
+    .dark-mode .form-control {
+        border-width: 2px !important;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .dark-mode .workhours-wrapper-content,
+    .dark-mode .bg-active-slot,
+    .dark-mode .form-row,
+    .dark-mode .modal-content {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    .dark-mode .btn:hover,
+    .dark-mode .bg-active-slot:hover,
+    .dark-mode .form-row:hover {
+        transform: none !important;
+    }
+}
+
+/* My Toggle Appointment Component Dark Mode */
+.dark-mode .toggle-appointment-container {
+    background-color: var(--background-card) !important;
+    border: 1px solid var(--border-neutral) !important;
+    border-radius: 12px !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 12px var(--shadow) !important;
+}
+
+.dark-mode .toggle-appointment-header {
+    background-color: var(--background-light) !important;
+    border-bottom: 1px solid var(--border-neutral) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 8px 8px 0 0 !important;
+}
+
+.dark-mode .toggle-appointment-header h6 {
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+.dark-mode .toggle-appointment-body {
+    padding: 1rem !important;
+    background-color: var(--background-card) !important;
+}
+
+.dark-mode .toggle-appointment-description {
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem !important;
+    line-height: 1.5 !important;
+    margin-bottom: 1rem !important;
+}
+
+.dark-mode .toggle-appointment-switch {
+    background-color: var(--border-neutral) !important;
+    border: 2px solid var(--border-neutral) !important;
+    border-radius: 20px !important;
+    position: relative !important;
+    width: 50px !important;
+    height: 26px !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
+}
+
+.dark-mode .toggle-appointment-switch.active {
+    background-color: var(--primary) !important;
+    border-color: var(--primary) !important;
+}
+
+.dark-mode .toggle-appointment-switch::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 2px !important;
+    left: 2px !important;
+    width: 18px !important;
+    height: 18px !important;
+    background-color: var(--background-card) !important;
+    border-radius: 50% !important;
+    transition: transform 0.3s ease !important;
+    box-shadow: 0 2px 4px var(--shadow) !important;
+}
+
+.dark-mode .toggle-appointment-switch.active::before {
+    transform: translateX(24px) !important;
+}
+
+.dark-mode .toggle-appointment-switch:hover {
+    box-shadow: 0 4px 8px var(--shadow) !important;
+}
+
+.dark-mode .toggle-appointment-switch:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px var(--primary-light) !important;
+}
+
+.dark-mode .toggle-appointment-footer {
+    background-color: var(--background-light) !important;
+    border-top: 1px solid var(--border-neutral) !important;
+    padding: 0.75rem 1rem !important;
+    border-radius: 0 0 8px 8px !important;
+}
+
+.dark-mode .toggle-appointment-footer .btn {
+    background-color: var(--primary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 6px !important;
+    padding: 0.5rem 1rem !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+}
+
+.dark-mode .toggle-appointment-footer .btn:hover {
+    background-color: var(--primary-light) !important;
+    border-color: var(--primary-light) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px var(--shadow) !important;
+}
+
+.dark-mode .toggle-appointment-footer .btn:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 3px var(--primary-light) !important;
+}
+
+.dark-mode .toggle-appointment-footer .btn:disabled {
+    background-color: var(--border-neutral) !important;
+    border-color: var(--border-neutral) !important;
+    color: var(--text-secondary) !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Custom Tooltip Component Dark Mode */
+.dark-mode .x-tooltip__content {
+    background: linear-gradient(
+        135deg,
+        var(--background-card) 0%,
+        var(--background-light) 100%
+    ) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-neutral) !important;
+    box-shadow: 0 8px 24px var(--shadow) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.dark-mode .x-tooltip__content::before {
+    border-color: var(--border-neutral) !important;
+}
+
+.dark-mode .x-tooltip__content[data-placement="top"]::before {
+    border-top-color: var(--border-neutral) !important;
+}
+
+.dark-mode .x-tooltip__content[data-placement="bottom"]::before {
+    border-bottom-color: var(--border-neutral) !important;
+}
+
+.dark-mode .x-tooltip__content[data-placement="left"]::before {
+    border-left-color: var(--border-neutral) !important;
+}
+
+.dark-mode .x-tooltip__content[data-placement="right"]::before {
+    border-right-color: var(--border-neutral) !important;
+}
+
+.dark-mode .x-tooltip__trigger {
+    color: var(--text-primary) !important;
+    transition: color 0.3s ease !important;
+}
+
+.dark-mode .x-tooltip__trigger:hover {
+    color: var(--primary) !important;
+}
+
+.dark-mode .x-tooltip__trigger:focus {
+    outline: none !important;
+    color: var(--primary) !important;
+}
+
+/* Responsive adjustments for toggle appointment */
+@media (max-width: 768px) {
+    .dark-mode .toggle-appointment-container {
+        padding: 0.75rem !important;
+        margin: 0.5rem !important;
+    }
+
+    .dark-mode .toggle-appointment-header,
+    .dark-mode .toggle-appointment-footer {
+        padding: 0.5rem 0.75rem !important;
+    }
+
+    .dark-mode .toggle-appointment-body {
+        padding: 0.75rem !important;
+    }
+
+    .dark-mode .toggle-appointment-switch {
+        width: 44px !important;
+        height: 24px !important;
+    }
+
+    .dark-mode .toggle-appointment-switch::before {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .dark-mode .toggle-appointment-switch.active::before {
+        transform: translateX(20px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .dark-mode .toggle-appointment-container {
+        padding: 0.5rem !important;
+        margin: 0.25rem !important;
+        border-radius: 8px !important;
+    }
+
+    .dark-mode .toggle-appointment-header,
+    .dark-mode .toggle-appointment-footer {
+        padding: 0.5rem !important;
+    }
+
+    .dark-mode .toggle-appointment-body {
+        padding: 0.5rem !important;
+    }
+
+    .dark-mode .toggle-appointment-description {
+        font-size: 0.85rem !important;
+        margin-bottom: 0.75rem !important;
+    }
+
+    .dark-mode .toggle-appointment-footer .btn {
+        padding: 0.4rem 0.8rem !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .dark-mode .toggle-appointment-container {
+        border-width: 2px !important;
+        box-shadow: 0 6px 16px var(--shadow) !important;
+    }
+
+    .dark-mode .toggle-appointment-switch {
+        border-width: 3px !important;
+    }
+
+    .dark-mode .x-tooltip__content {
+        border-width: 2px !important;
+        box-shadow: 0 10px 30px var(--shadow) !important;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .dark-mode .toggle-appointment-switch,
+    .dark-mode .toggle-appointment-switch::before,
+    .dark-mode .toggle-appointment-footer .btn,
+    .dark-mode .x-tooltip__content {
+        transition: none !important;
+    }
+
+    .dark-mode .toggle-appointment-footer .btn:hover {
+        transform: none !important;
+    }
+}
