@@ -264,20 +264,13 @@
     border: 1px solid var(--border-neutral) !important;
 }
 
-/* Stat Cards Dark Mode */
-.dark-mode .stat-card {
-    background-color: var(--background-card) !important;
-    border: 1px solid var(--border-neutral) !important;
-    box-shadow: 0 2px 4px var(--shadow) !important;
-}
+
 
 .dark-mode .stat-card:hover {
     box-shadow: 0 4px 8px var(--shadow) !important;
 }
 
-.dark-mode .stat-icon {
-    background-color: var(--background-footer) !important;
-}
+
 
 .dark-mode .stat-label {
     color: var(--text-secondary) !important;
@@ -309,11 +302,12 @@
 /* Chart Grid Lines Dark Mode */
 .dark-mode canvas {
     filter: brightness(0.9) contrast(1.1);
+    color: #fff !important;
 }
 
 /* Chart Container Text Dark Mode */
 .dark-mode .chart-container p {
-    color: var(--text-secondary) !important;
+    color: #fff !important;
 }
 
 /* Scrollbar Dark Mode for Dashboard */
@@ -537,11 +531,11 @@
 /* Chart Responsive Dark Mode */
 @media (max-width: 1200px) {
     .dark-mode .chart-card {
-        background-color: var(--background-card) !important;
+        background-color: #ffffff !important;
     }
 
     .dark-mode .chart-container {
-        background-color: var(--background-card) !important;
+        background-color: #ffffff !important;
     }
 }
 

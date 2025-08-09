@@ -27,7 +27,7 @@ function initializeDashboard() {
     function getChartColors() {
         if (isDarkMode()) {
             return {
-                grid: "rgba(255, 255, 255, 0.1)",
+                grid: "rgba(255, 255, 255, 0.15)",
                 text: "#f9fafb",
                 textSecondary: "#d1d5db",
                 border: "#4b5563",
@@ -35,11 +35,11 @@ function initializeDashboard() {
             };
         } else {
             return {
-                grid: "rgba(0, 0, 0, 0.05)",
-                text: "#1e293b",
-                textSecondary: "#4a5568",
-                border: "#e5e7eb",
-                background: "rgba(0, 0, 0, 0.05)",
+                grid: "rgba(0, 0, 0, 0.2)",
+                text: "#111827",
+                textSecondary: "#374151",
+                border: "#9ca3af",
+                background: "rgba(0, 0, 0, 0.1)",
             };
         }
     }
@@ -69,7 +69,7 @@ function initializeDashboard() {
                     enabled: true,
                     backgroundColor: isDarkMode()
                         ? "rgba(0, 0, 0, 0.9)"
-                        : "rgba(30, 41, 59, 0.9)",
+                        : "rgba(30, 41, 59, 0.95)",
                     titleFont: {
                         family: "IRANSans",
                         size: 12,
@@ -82,8 +82,8 @@ function initializeDashboard() {
                     cornerRadius: 6,
                     borderColor: colors.border,
                     borderWidth: 1,
-                    titleColor: colors.text,
-                    bodyColor: colors.text,
+                    titleColor: isDarkMode() ? colors.text : "#ffffff",
+                    bodyColor: isDarkMode() ? colors.text : "#ffffff",
                 },
             },
             animation: {
