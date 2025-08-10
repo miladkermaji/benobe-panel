@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Panel\Stories;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\Story;
 use App\Models\StoryView;
 use App\Models\StoryLike;
@@ -11,10 +12,14 @@ use Illuminate\Support\Facades\DB;
 
 class StoryAnalytics extends Component
 {
+    use WithPagination;
+
     public $readyToLoad = false;
     public $selectedPeriod = '7'; // 7 days default
     public $selectedStory = null;
     public $stories = [];
+    public $search = '';
+    public $perPage = 10;
 
     // Analytics data
     public $totalStories = 0;
@@ -40,6 +45,8 @@ class StoryAnalytics extends Component
         '90' => '90 روز گذشته',
         '365' => '1 سال گذشته',
     ];
+
+    protected $paginationTheme = 'tailwind';
 
     public function mount()
     {
@@ -69,6 +76,16 @@ class StoryAnalytics extends Component
     {
         $this->calculateAnalytics();
         $this->dispatch('analytics-updated');
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedPerPage()
+    {
+        $this->resetPage();
     }
 
     public function calculateAnalytics()
@@ -221,6 +238,25 @@ class StoryAnalytics extends Component
         ];
 
         return $typeMap[$type] ?? 'نامشخص';
+    }
+
+    public function getPaginatedStoriesProperty()
+    {
+        $days = (int) $this->selectedPeriod;
+        $startDate = Carbon::now()->subDays($days);
+
+        $query = Story::where('created_at', '>=', $startDate);
+
+        if ($this->selectedStory) {
+            $query->where('id', $this->selectedStory);
+        }
+
+        if ($this->search) {
+            $query->where('title', 'like', '%' . $this->search . '%');
+        }
+
+        return $query->orderBy('created_at', 'desc')
+            ->paginate($this->perPage);
     }
 
     public function render()
