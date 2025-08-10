@@ -227,7 +227,7 @@
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                       stroke-width="2" class="me-1">
                       <polyline points="3,6 5,6 21,6" />
-                                           <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2" />
+                      <path d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2" />
                     </svg>
                     حذف تصویر بندانگشتی
                   </button>
@@ -268,16 +268,15 @@
                 <div x-data="select2Handler()" x-init="init()">
                   <div x-show="$wire.owner_type === 'user'" x-transition>
                     <div class="position-relative">
-                      <select wire:model="user_id"
-                        class="form-select @error('user_id') is-invalid @enderror" 
-                        id="user_id" 
-                        x-ref="userSelect">
+                      <select wire:model="user_id" class="form-select @error('user_id') is-invalid @enderror"
+                        id="user_id" x-ref="userSelect">
                         <option value="">کاربر را انتخاب کنید</option>
-                        @if($selected_owner && $owner_type === 'user')
+                        @if ($selected_owner && $owner_type === 'user')
                           <option value="{{ $selected_owner['id'] }}" selected>{{ $selected_owner['text'] }}</option>
                         @endif
                       </select>
-                      <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
+                      <label for="user_id" class="form-label">انتخاب کاربر <span
+                          class="text-danger">*</span></label>
                       @error('user_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -286,16 +285,15 @@
 
                   <div x-show="$wire.owner_type === 'doctor'" x-transition>
                     <div class="position-relative">
-                      <select wire:model="doctor_id"
-                        class="form-select @error('doctor_id') is-invalid @enderror" 
-                        id="doctor_id"
-                        x-ref="doctorSelect">
+                      <select wire:model="doctor_id" class="form-select @error('doctor_id') is-invalid @enderror"
+                        id="doctor_id" x-ref="doctorSelect">
                         <option value="">پزشک را انتخاب کنید</option>
-                        @if($selected_owner && $owner_type === 'doctor')
+                        @if ($selected_owner && $owner_type === 'doctor')
                           <option value="{{ $selected_owner['id'] }}" selected>{{ $selected_owner['text'] }}</option>
                         @endif
                       </select>
-                      <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
+                      <label for="doctor_id" class="form-label">انتخاب پزشک <span
+                          class="text-danger">*</span></label>
                       @error('doctor_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -305,11 +303,10 @@
                   <div x-show="$wire.owner_type === 'medical_center'" x-transition wire:ignore>
                     <div class="position-relative">
                       <select wire:model="medical_center_id"
-                        class="form-select @error('medical_center_id') is-invalid @enderror"
-                        id="medical_center_id"
+                        class="form-select @error('medical_center_id') is-invalid @enderror" id="medical_center_id"
                         x-ref="medicalCenterSelect">
                         <option value="">مرکز درمانی را انتخاب کنید</option>
-                        @if($selected_owner && $owner_type === 'medical_center')
+                        @if ($selected_owner && $owner_type === 'medical_center')
                           <option value="{{ $selected_owner['id'] }}" selected>{{ $selected_owner['text'] }}</option>
                         @endif
                       </select>
@@ -323,16 +320,15 @@
 
                   <div x-show="$wire.owner_type === 'manager'" x-transition>
                     <div class="position-relative">
-                      <select wire:model="manager_id"
-                        class="form-select @error('manager_id') is-invalid @enderror" 
-                        id="manager_id"
-                        x-ref="managerSelect">
+                      <select wire:model="manager_id" class="form-select @error('manager_id') is-invalid @enderror"
+                        id="manager_id" x-ref="managerSelect">
                         <option value="">مدیر را انتخاب کنید</option>
-                        @if($selected_owner && $owner_type === 'manager')
+                        @if ($selected_owner && $owner_type === 'manager')
                           <option value="{{ $selected_owner['id'] }}" selected>{{ $selected_owner['text'] }}</option>
                         @endif
                       </select>
-                      <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
+                      <label for="manager_id" class="form-label">انتخاب مدیر <span
+                          class="text-danger">*</span></label>
                       @error('manager_id')
                         <div class="invalid-feedback">{{ $message }}</div>
                       @enderror
@@ -393,6 +389,113 @@
           </div>
         </div>
 
+        <!-- Preview New Uploaded Files -->
+        @if ($media_file || $thumbnail_file)
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-light">
+                  <h6 class="mb-0 fw-bold">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="me-2">
+                      <path
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    پیش‌نمایش فایل‌های جدید
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    @if ($media_file)
+                      <div class="col-md-6">
+                        <div class="border rounded p-3">
+                          <h6 class="fw-bold mb-2">فایل {{ $type === 'image' ? 'تصویر' : 'ویدیو' }} جدید:</h6>
+                          <div class="text-center">
+                            @if ($type === 'image')
+                              @if (method_exists($media_file, 'temporaryUrl') && $media_file->temporaryUrl())
+                                <img src="{{ $media_file->temporaryUrl() }}" class="img-fluid rounded mb-2"
+                                  alt="پیش‌نمایش تصویر جدید" style="max-height: 200px;">
+                              @else
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                  style="height: 200px; border: 2px dashed #dee2e6;">
+                                  <div class="text-center">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="1" class="text-muted mb-2">
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                                      <path d="M14 2v6h6" />
+                                    </svg>
+                                    <div class="text-muted">تصویر انتخاب شده</div>
+                                  </div>
+                                </div>
+                              @endif
+                            @else
+                              @if (method_exists($media_file, 'temporaryUrl') && $media_file->temporaryUrl())
+                                <video class="img-fluid rounded mb-2" controls preload="none"
+                                  style="max-height: 200px;">
+                                  <source src="{{ $media_file->temporaryUrl() }}" type="video/mp4">
+                                  مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
+                                </video>
+                              @else
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                  style="height: 200px; border: 2px dashed #dee2e6;">
+                                  <div class="text-center">
+                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                      stroke="currentColor" stroke-width="1" class="text-muted mb-2">
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                                      <path d="M14 2v6h6" />
+                                    </svg>
+                                    <div class="text-muted">ویدیو انتخاب شده</div>
+                                  </div>
+                                </div>
+                              @endif
+                            @endif
+                            <div class="text-muted small mt-2">
+                              نام فایل: {{ $media_file->getClientOriginalName() }}<br>
+                              اندازه: {{ number_format($media_file->getSize() / 1024 / 1024, 2) }} MB<br>
+                              نوع: {{ $media_file->getMimeType() }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    @endif
+
+                    @if ($thumbnail_file)
+                      <div class="col-md-6">
+                        <div class="border rounded p-3">
+                          <h6 class="fw-bold mb-2">تصویر بندانگشتی جدید:</h6>
+                          <div class="text-center">
+                            @if (method_exists($thumbnail_file, 'temporaryUrl') && $thumbnail_file->temporaryUrl())
+                              <img src="{{ $thumbnail_file->temporaryUrl() }}" class="img-fluid rounded mb-2"
+                                alt="پیش‌نمایش تصویر بندانگشتی جدید" style="max-height: 200px;">
+                            @else
+                              <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                style="height: 200px; border: 2px dashed #dee2e6;">
+                                <div class="text-center">
+                                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1" class="text-muted mb-2">
+                                    <path
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  <div class="text-muted">تصویر بندانگشتی انتخاب شده</div>
+                                </div>
+                              </div>
+                            @endif
+                            <div class="text-muted small mt-2">
+                              نام فایل: {{ $thumbnail_file->getClientOriginalName() }}<br>
+                              اندازه: {{ number_format($thumbnail_file->getSize() / 1024 / 1024, 2) }} MB<br>
+                              نوع: {{ $thumbnail_file->getMimeType() }}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    @endif
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        @endif
+
         <!-- Submit Buttons -->
         <div class="d-flex justify-content-between mt-4">
           <a href="{{ route('admin.panel.stories.index') }}" class="btn btn-secondary">
@@ -420,7 +523,7 @@
     document.addEventListener('alpine:init', () => {
       Alpine.data('select2Handler', () => ({
         select2Instances: {},
-        
+
         init() {
           // Initialize Jalali Datepicker
           jalaliDatepicker.startWatch({
@@ -494,7 +597,7 @@
           if (!config || !this.$refs[config.ref]) return;
 
           const $element = $(this.$refs[config.ref]);
-          
+
           // Initialize Select2
           const select2Instance = $element.select2({
             dir: 'rtl',
