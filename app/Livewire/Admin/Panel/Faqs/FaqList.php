@@ -167,7 +167,7 @@ class FaqList extends Component
                 $this->updateStatus(false);
                 break;
             case 'delete':
-                $this->deleteSelected($this->applyToAllFiltered);
+                $this->dispatch('confirm-delete-selected', allFiltered: $this->applyToAllFiltered);
                 break;
             default:
                 $this->dispatch('show-alert', type: 'warning', message: 'عملیات نامعتبر انتخاب شده است.');

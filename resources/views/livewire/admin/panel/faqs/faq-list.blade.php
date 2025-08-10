@@ -319,9 +319,70 @@
     </div>
   </div>
   <script>
-    document.addEventListener('livewire:init', () => {
+    document.addEventListener('DOMContentLoaded', function() {
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
+      });
+
+      Livewire.on('confirm-delete', (event) => {
+        Swal.fire({
+          title: 'حذف سوال متداول',
+          text: 'آیا مطمئن هستید که می‌خواهید این سوال متداول را حذف کنید؟',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#ef4444',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله، حذف کن',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('deleteFaqConfirmed', {
+              id: event.id
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-toggle-status', (event) => {
+        Swal.fire({
+          title: event.action + ' سوال متداول',
+          text: 'آیا مطمئن هستید که می‌خواهید ' + event.name + ' را ' + event.action + ' کنید؟',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#1deb3c',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'بله',
+          cancelButtonText: 'خیر'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            Livewire.dispatch('toggleStatusConfirmed', {
+              id: event.id
+            });
+          }
+        });
+      });
+
+      Livewire.on('confirm-delete-selected', function(data) {
+        let text = data.allFiltered ?
+          'آیا از حذف همه سوالات متداول فیلترشده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.' :
+          'آیا از حذف سوالات متداول انتخاب شده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.';
+        Swal.fire({
+          title: 'تایید حذف گروهی',
+          text: text,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonText: 'بله، حذف شود',
+          cancelButtonText: 'لغو',
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+            if (data.allFiltered) {
+              Livewire.dispatch('deleteSelectedConfirmed', 'allFiltered');
+            } else {
+              Livewire.dispatch('deleteSelectedConfirmed');
+            }
+          }
+        });
       });
     });
   </script>
