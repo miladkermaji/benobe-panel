@@ -256,3 +256,4 @@ class FaqList extends Component
         ]);
     }
 }
+ 

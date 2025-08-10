@@ -254,3 +254,4 @@ class ContactList extends Component
         ]);
     }
 }
+ 
