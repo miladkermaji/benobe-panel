@@ -135,6 +135,7 @@ return [
             'admin.panel.banner-texts.index' => 'بنر صفحه اصلی',
             'admin.panel.footer-contents.index' => 'فوتر',
             'admin.panel.faqs.index' => 'سوالات متداول',
+            'admin.panel.contact.index' => 'پیام‌های تماس',
             'admin.panel.setting.index' => 'تنظیمات عمومی',
         ],
     ],

@@ -239,6 +239,10 @@ Route::prefix('admin')
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Faq\FaqController::class, 'create'])->name('admin.panel.faqs.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Faq\FaqController::class, 'edit'])->name('admin.panel.faqs.edit');
         });
+        Route::prefix('contact')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Contact\ContactController::class, 'index'])->name('admin.panel.contact.index');
+            Route::get('/show/{id}', [\App\Http\Controllers\Admin\Panel\Contact\ContactController::class, 'show'])->name('admin.panel.contact.show');
+        });
         Route::prefix('stories')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'index'])->name('admin.panel.stories.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'create'])->name('admin.panel.stories.create');

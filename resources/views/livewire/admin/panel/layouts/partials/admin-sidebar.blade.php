@@ -372,6 +372,7 @@
               <li class="item-li"><a href="{{ route('admin.panel.banner-texts.index') }}">بنر صفحه اصلی</a></li>
               <li class="item-li"><a href="{{ route('admin.panel.footer-contents.index') }}">فوتر</a></li>
               <li class="item-li"><a href="{{ route('admin.panel.faqs.index') }}">سوالات متداول</a></li>
+              <li class="item-li"><a href="{{ route('admin.panel.contact.index') }}">پیام‌های تماس</a></li>
               <li class="item-li"><a href="{{ route('admin.panel.setting.index') }}">تنظیمات عمومی</a></li>
               <li class="item-li" style="opacity: 0.5; pointer-events: none;">
                 <a href="javascript:void(0)"
