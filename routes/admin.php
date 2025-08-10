@@ -284,6 +284,14 @@ Route::prefix('admin')
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'edit'])->name('admin.panel.stories.edit');
             Route::get('/analytics', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'analytics'])->name('admin.panel.stories.analytics');
         });
+
+        // Ajax routes for story owners
+        Route::prefix('stories/ajax')->name('admin.panel.stories.ajax.')->group(function () {
+            Route::get('/users', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'getUsers'])->name('users');
+            Route::get('/doctors', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'getDoctors'])->name('doctors');
+            Route::get('/medical-centers', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'getMedicalCenters'])->name('medical-centers');
+            Route::get('/managers', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'getManagers'])->name('managers');
+        });
         Route::get('/doctor-login/{doctor}', function (\App\Models\Doctor $doctor) {
             // لاگین کردن دکتر با گارد doctor
             Auth::guard('doctor')->login($doctor);

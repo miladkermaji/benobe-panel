@@ -38,12 +38,6 @@ class StoryEdit extends Component
     public $medical_center_id = '';
     public $manager_id = '';
 
-    // Lists for dropdowns
-    public $users = [];
-    public $doctors = [];
-    public $medicalCenters = [];
-    public $managers = [];
-
     // Current media paths
     public $current_media_path = '';
     public $current_thumbnail_path = '';
@@ -91,7 +85,6 @@ class StoryEdit extends Component
     {
         $this->storyId = $id;
         $this->loadStory();
-        $this->loadLists();
     }
 
     public function loadStory()
@@ -103,6 +96,10 @@ class StoryEdit extends Component
         $this->type = $this->story->type;
         $this->status = $this->story->status;
         $this->is_live = $this->story->is_live;
+        $this->duration = $this->story->duration;
+        $this->order = $this->story->order;
+        $this->current_media_path = $this->story->media_path;
+        $this->current_thumbnail_path = $this->story->thumbnail_path;
 
         // Convert Gregorian dates to Jalali for display
         if ($this->story->live_start_time) {
@@ -111,11 +108,6 @@ class StoryEdit extends Component
         if ($this->story->live_end_time) {
             $this->live_end_time = \Morilog\Jalali\Jalalian::fromDateTime($this->story->live_end_time)->format('Y/m/d H:i');
         }
-
-        $this->duration = $this->story->duration;
-        $this->order = $this->story->order;
-        $this->current_media_path = $this->story->media_path;
-        $this->current_thumbnail_path = $this->story->thumbnail_path;
 
         // Set owner type and ID
         if ($this->story->user_id) {
@@ -133,29 +125,6 @@ class StoryEdit extends Component
         }
     }
 
-    public function loadLists()
-    {
-        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')
-            ->where('status', true)
-            ->orderBy('first_name')
-            ->get();
-
-        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')
-            ->where('status', true)
-            ->orderBy('first_name')
-            ->get();
-
-        $this->medicalCenters = MedicalCenter::select('id', 'name', 'title')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $this->managers = Manager::select('id', 'first_name', 'last_name')
-            ->where('is_active', true)
-            ->orderBy('first_name')
-            ->get();
-    }
-
     public function updatedOwnerType()
     {
         // Reset owner IDs when owner type changes
@@ -163,6 +132,9 @@ class StoryEdit extends Component
         $this->doctor_id = '';
         $this->medical_center_id = '';
         $this->manager_id = '';
+
+        // Dispatch event to re-initialize Select2
+        $this->dispatch('owner-type-changed');
     }
 
     public function updatedType()

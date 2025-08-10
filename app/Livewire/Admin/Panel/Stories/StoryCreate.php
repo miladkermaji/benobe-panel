@@ -35,12 +35,6 @@ class StoryCreate extends Component
     public $medical_center_id = '';
     public $manager_id = '';
 
-    // Lists for dropdowns
-    public $users = [];
-    public $doctors = [];
-    public $medicalCenters = [];
-    public $managers = [];
-
     protected $rules = [
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -83,30 +77,12 @@ class StoryCreate extends Component
 
     public function mount()
     {
-        $this->loadLists();
-    }
-
-    public function loadLists()
-    {
-        $this->users = User::select('id', 'first_name', 'last_name', 'mobile')
-            ->where('status', true)
-            ->orderBy('first_name')
-            ->get();
-
-        $this->doctors = Doctor::select('id', 'first_name', 'last_name', 'mobile')
-            ->where('status', true)
-            ->orderBy('first_name')
-            ->get();
-
-        $this->medicalCenters = MedicalCenter::select('id', 'name', 'title')
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
-
-        $this->managers = Manager::select('id', 'first_name', 'last_name')
-            ->where('is_active', true)
-            ->orderBy('first_name')
-            ->get();
+        // Owner selection
+        $this->owner_type = 'user';
+        $this->user_id = '';
+        $this->doctor_id = '';
+        $this->medical_center_id = '';
+        $this->manager_id = '';
     }
 
     public function updatedOwnerType()
@@ -116,6 +92,9 @@ class StoryCreate extends Component
         $this->doctor_id = '';
         $this->medical_center_id = '';
         $this->manager_id = '';
+
+        // Dispatch event to re-initialize Select2
+        $this->dispatch('owner-type-changed');
     }
 
     public function updatedType()

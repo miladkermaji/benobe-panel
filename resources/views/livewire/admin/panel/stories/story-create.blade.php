@@ -1,5 +1,10 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/story/story.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
+@endpush
+
+@push('scripts')
+  <script src="{{ asset('admin-assets/js/select2/select2.js') }}"></script>
 @endpush
 
 <div class="container-fluid py-4" dir="rtl">
@@ -199,15 +204,10 @@
                 </div>
 
                 @if ($owner_type === 'user')
-                  <div class="position-relative">
-                    <select wire:model="user_id" class="form-select @error('user_id') is-invalid @enderror"
-                      id="user_id" required>
+                  <div class="position-relative" wire:ignore>
+                    <select wire:model="user_id"
+                      class="form-select select2-user @error('user_id') is-invalid @enderror" id="user_id" required>
                       <option value="">کاربر را انتخاب کنید</option>
-                      @foreach ($users as $user)
-                        <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }}
-                          ({{ $user->mobile }})
-                        </option>
-                      @endforeach
                     </select>
                     <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
                     @error('user_id')
@@ -217,15 +217,11 @@
                 @endif
 
                 @if ($owner_type === 'doctor')
-                  <div class="position-relative">
-                    <select wire:model="doctor_id" class="form-select @error('doctor_id') is-invalid @enderror"
-                      id="doctor_id" required>
+                  <div class="position-relative" wire:ignore>
+                    <select wire:model="doctor_id"
+                      class="form-select select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
+                      required>
                       <option value="">پزشک را انتخاب کنید</option>
-                      @foreach ($doctors as $doctor)
-                        <option value="{{ $doctor->id }}">{{ $doctor->first_name }} {{ $doctor->last_name }}
-                          ({{ $doctor->mobile }})
-                        </option>
-                      @endforeach
                     </select>
                     <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
                     @error('doctor_id')
@@ -235,14 +231,11 @@
                 @endif
 
                 @if ($owner_type === 'medical_center')
-                  <div class="position-relative">
+                  <div class="position-relative" wire:ignore>
                     <select wire:model="medical_center_id"
-                      class="form-select @error('medical_center_id') is-invalid @enderror" id="medical_center_id"
-                      required>
+                      class="form-select select2-medical-center @error('medical_center_id') is-invalid @enderror"
+                      id="medical_center_id" required>
                       <option value="">مرکز درمانی را انتخاب کنید</option>
-                      @foreach ($medicalCenters as $center)
-                        <option value="{{ $center->id }}">{{ $center->name }}</option>
-                      @endforeach
                     </select>
                     <label for="medical_center_id" class="form-label">انتخاب مرکز درمانی <span
                         class="text-danger">*</span></label>
@@ -253,14 +246,11 @@
                 @endif
 
                 @if ($owner_type === 'manager')
-                  <div class="position-relative">
-                    <select wire:model="manager_id" class="form-select @error('manager_id') is-invalid @enderror"
-                      id="manager_id" required>
+                  <div class="position-relative" wire:ignore>
+                    <select wire:model="manager_id"
+                      class="form-select select2-manager @error('manager_id') is-invalid @enderror" id="manager_id"
+                      required>
                       <option value="">مدیر را انتخاب کنید</option>
-                      @foreach ($managers as $manager)
-                        <option value="{{ $manager->id }}">{{ $manager->first_name }} {{ $manager->last_name }}
-                        </option>
-                      @endforeach
                     </select>
                     <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
                     @error('manager_id')
@@ -346,6 +336,7 @@
   </div>
   <script>
     document.addEventListener('livewire:init', () => {
+      // Jalali Datepicker
       jalaliDatepicker.startWatch({
         minDate: "attr",
         maxDate: "attr",
@@ -367,6 +358,168 @@
       });
       document.getElementById('live_end_time').addEventListener('change', function() {
         @this.set('live_end_time', this.value);
+      });
+
+      // Select2 Initialization
+      function initializeSelect2() {
+        // User Select2
+        if ($('#user_id').length) {
+          $('#user_id').select2({
+            dir: 'rtl',
+            placeholder: 'کاربر را انتخاب کنید',
+            width: '100%',
+            ajax: {
+              url: "{{ route('admin.panel.stories.ajax.users') }}",
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                return {
+                  search: params.term,
+                  page: params.page || 1
+                };
+              },
+              processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                  results: data.results,
+                  pagination: {
+                    more: data.pagination.more
+                  }
+                };
+              },
+              cache: true
+            }
+          });
+          setTimeout(function() {
+            @this.set('user_id', $('#user_id').val());
+          }, 200);
+        }
+
+        // Doctor Select2
+        if ($('#doctor_id').length) {
+          $('#doctor_id').select2({
+            dir: 'rtl',
+            placeholder: 'پزشک را انتخاب کنید',
+            width: '100%',
+            ajax: {
+              url: "{{ route('admin.panel.stories.ajax.doctors') }}",
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                return {
+                  search: params.term,
+                  page: params.page || 1
+                };
+              },
+              processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                  results: data.results,
+                  pagination: {
+                    more: data.pagination.more
+                  }
+                };
+              },
+              cache: true
+            }
+          });
+          setTimeout(function() {
+            @this.set('doctor_id', $('#doctor_id').val());
+          }, 200);
+        }
+
+        // Medical Center Select2
+        if ($('#medical_center_id').length) {
+          $('#medical_center_id').select2({
+            dir: 'rtl',
+            placeholder: 'مرکز درمانی را انتخاب کنید',
+            width: '100%',
+            ajax: {
+              url: "{{ route('admin.panel.stories.ajax.medical-centers') }}",
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                return {
+                  search: params.term,
+                  page: params.page || 1
+                };
+              },
+              processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                  results: data.results,
+                  pagination: {
+                    more: data.pagination.more
+                  }
+                };
+              },
+              cache: true
+            }
+          });
+          setTimeout(function() {
+            @this.set('medical_center_id', $('#medical_center_id').val());
+          }, 200);
+        }
+
+        // Manager Select2
+        if ($('#manager_id').length) {
+          $('#manager_id').select2({
+            dir: 'rtl',
+            placeholder: 'مدیر را انتخاب کنید',
+            width: '100%',
+            ajax: {
+              url: "{{ route('admin.panel.stories.ajax.managers') }}",
+              dataType: 'json',
+              delay: 250,
+              data: function(params) {
+                return {
+                  search: params.term,
+                  page: params.page || 1
+                };
+              },
+              processResults: function(data, params) {
+                params.page = params.page || 1;
+                return {
+                  results: data.results,
+                  pagination: {
+                    more: data.pagination.more
+                  }
+                };
+              },
+              cache: true
+            }
+          });
+          setTimeout(function() {
+            @this.set('manager_id', $('#manager_id').val());
+          }, 200);
+        }
+      }
+
+      // Initialize Select2 when component loads
+      initializeSelect2();
+
+      // Re-initialize Select2 when owner type changes
+      Livewire.on('owner-type-changed', () => {
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
+      });
+
+      // Handle Select2 changes
+      $(document).on('change', '#user_id', function() {
+        @this.set('user_id', $(this).val());
+      });
+
+      $(document).on('change', '#doctor_id', function() {
+        @this.set('doctor_id', $(this).val());
+      });
+
+      $(document).on('change', '#medical_center_id', function() {
+        @this.set('medical_center_id', $(this).val());
+      });
+
+      $(document).on('change', '#manager_id', function() {
+        @this.set('manager_id', $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {
