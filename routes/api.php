@@ -23,6 +23,7 @@ use App\Http\Controllers\Api\DoctorAppointmentController;
 use App\Http\Controllers\Api\AppointmentBookingController;
 use App\Http\Controllers\Api\UserSubscriptionController;
 use App\Http\Controllers\Api\ContactMessageController;
+use App\Http\Controllers\Api\FaqController;
 use Modules\Payment\App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use App\Services\JwtTokenService;
@@ -244,3 +245,11 @@ Route::get('medical-centers/{slug}/profile', [MedicalCentersController::class, '
 
 // مسیرهای عمومی - بدون نیاز به احراز هویت
 Route::post('/contact-messages', [ContactMessageController::class, 'store'])->name('api.contact-messages.store');
+
+// مسیرهای FAQ
+Route::prefix('faqs')->group(function () {
+    Route::get('/', [FaqController::class, 'index'])->name('api.faqs.index');
+    Route::get('/citizens', [FaqController::class, 'citizens'])->name('api.faqs.citizens');
+    Route::get('/doctors', [FaqController::class, 'doctors'])->name('api.faqs.doctors');
+    Route::get('/search', [FaqController::class, 'search'])->name('api.faqs.search');
+});
