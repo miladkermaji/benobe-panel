@@ -145,13 +145,13 @@
                             id="selectAll">
                         </div>
                       </th>
-                      <th class="border-0">رسانه</th>
+                      <th class="border-0 d-none d-md-table-cell">رسانه</th>
                       <th class="border-0">عنوان</th>
-                      <th class="border-0">مالک</th>
-                      <th class="border-0">نوع</th>
+                      <th class="border-0 d-none d-lg-table-cell">مالک</th>
+                      <th class="border-0 d-none d-md-table-cell">نوع</th>
                       <th class="border-0">وضعیت</th>
-                      <th class="border-0">آمار</th>
-                      <th class="border-0">تاریخ</th>
+                      <th class="border-0 d-none d-lg-table-cell">آمار</th>
+                      <th class="border-0 d-none d-md-table-cell">تاریخ</th>
                       <th class="border-0">عملیات</th>
                     </tr>
                   </thead>
@@ -164,15 +164,16 @@
                               value="{{ $story->id }}" id="story_{{ $story->id }}">
                           </div>
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                           <div class="d-flex align-items-center">
-                            @if ($story->media_path)
+                            @if ($story->media_path && Storage::exists($story->media_path))
                               @if ($story->type === 'image')
                                 <img src="{{ Storage::url($story->media_path) }}" class="rounded"
                                   alt="{{ $story->title }}" style="width: 50px; height: 50px; object-fit: cover;">
                               @else
                                 <div class="position-relative">
-                                  <video class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                  <video class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
+                                    preload="none">
                                     <source src="{{ Storage::url($story->media_path) }}" type="video/mp4">
                                   </video>
                                   <div class="position-absolute top-50 start-50 translate-middle">
@@ -199,11 +200,35 @@
                           <div>
                             <div class="fw-medium">{{ Str::limit($story->title, 40) }}</div>
                             @if ($story->description)
-                              <small class="text-muted">{{ Str::limit($story->description, 60) }}</small>
+                              <small
+                                class="text-muted d-none d-md-block">{{ Str::limit($story->description, 60) }}</small>
                             @endif
+                            <!-- Mobile info -->
+                            <div class="d-md-none mt-1">
+                              <small class="text-muted">
+                                @if ($story->user)
+                                  کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
+                                @elseif($story->doctor)
+                                  پزشک: {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
+                                @elseif($story->medicalCenter)
+                                  مرکز: {{ $story->medicalCenter->name }}
+                                @elseif($story->manager)
+                                  مدیر: {{ $story->manager->first_name }} {{ $story->manager->last_name }}
+                                @endif
+                              </small>
+                              <br>
+                              <small class="text-muted">
+                                @if ($story->type === 'image')
+                                  <span class="badge bg-info">تصویر</span>
+                                @else
+                                  <span class="badge bg-primary">ویدیو</span>
+                                @endif
+                                • {{ $story->created_at->format('Y/m/d') }}
+                              </small>
+                            </div>
                           </div>
                         </td>
-                        <td>
+                        <td class="d-none d-lg-table-cell">
                           <small class="text-muted">
                             @if ($story->user)
                               کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
@@ -216,7 +241,7 @@
                             @endif
                           </small>
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                           @if ($story->type === 'image')
                             <span class="badge bg-info">تصویر</span>
                           @else
@@ -235,17 +260,17 @@
                             <span class="badge bg-danger ms-1">لایو</span>
                           @endif
                         </td>
-                        <td>
+                        <td class="d-none d-lg-table-cell">
                           <div class="d-flex flex-column">
                             <small class="text-muted">بازدید: {{ number_format($story->views_count) }}</small>
                             <small class="text-muted">لایک: {{ number_format($story->likes_count) }}</small>
                           </div>
                         </td>
-                        <td>
+                        <td class="d-none d-md-table-cell">
                           <small class="text-muted">{{ $story->created_at->format('Y/m/d H:i') }}</small>
                         </td>
                         <td>
-                          <div class="d-flex gap-1">
+                          <div class="d-flex gap-1 flex-wrap">
                             <a href="{{ route('admin.panel.stories.edit', $story->id) }}"
                               class="btn btn-sm btn-outline-primary">
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none"

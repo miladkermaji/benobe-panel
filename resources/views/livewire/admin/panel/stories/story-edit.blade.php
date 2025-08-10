@@ -167,7 +167,7 @@
           <!-- Sidebar -->
           <div class="col-lg-4">
             <!-- Current Media Preview -->
-            @if ($current_media_path)
+            @if ($current_media_path && Storage::exists($current_media_path))
               <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-light">
                   <h6 class="mb-0 fw-bold">
@@ -184,7 +184,7 @@
                     <img src="{{ Storage::url($current_media_path) }}" class="img-fluid rounded mb-2"
                       alt="رسانه فعلی">
                   @else
-                    <video class="img-fluid rounded mb-2" controls>
+                    <video class="img-fluid rounded mb-2" controls preload="none">
                       <source src="{{ Storage::url($current_media_path) }}" type="video/mp4">
                       مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
                     </video>
@@ -202,7 +202,7 @@
               </div>
             @endif
 
-            @if ($current_thumbnail_path)
+            @if ($current_thumbnail_path && Storage::exists($current_thumbnail_path))
               <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-light">
                   <h6 class="mb-0 fw-bold">
@@ -267,7 +267,8 @@
                       <option value="">کاربر را انتخاب کنید</option>
                       @foreach ($users as $user)
                         <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }}
-                          ({{ $user->mobile }})</option>
+                          ({{ $user->mobile }})
+                        </option>
                       @endforeach
                     </select>
                     <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
@@ -284,7 +285,8 @@
                       <option value="">پزشک را انتخاب کنید</option>
                       @foreach ($doctors as $doctor)
                         <option value="{{ $doctor->id }}">{{ $doctor->first_name }} {{ $doctor->last_name }}
-                          ({{ $doctor->mobile }})</option>
+                          ({{ $doctor->mobile }})
+                        </option>
                       @endforeach
                     </select>
                     <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
