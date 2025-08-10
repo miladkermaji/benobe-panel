@@ -30,35 +30,35 @@
             <div class="card-body">
               <div class="row g-3">
                 <div class="col-12">
-                  <label class="form-label fw-medium">نام و نام خانوادگی:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">نام و نام خانوادگی:</label>
                   <p class="form-control-plaintext">{{ $contact->full_name }}</p>
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-medium">ایمیل:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">ایمیل:</label>
                   <p class="form-control-plaintext">{{ $contact->email }}</p>
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-medium">شماره تماس:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">شماره تماس:</label>
                   <p class="form-control-plaintext">{{ $contact->full_phone }}</p>
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-medium">موضوع:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">موضوع:</label>
                   <p class="form-control-plaintext">{{ $contact->subject }}</p>
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-medium">پیام:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">پیام:</label>
                   <div class="border rounded p-3 bg-light">
                     {{ $contact->message }}
                   </div>
                 </div>
                 <div class="col-12">
-                  <label class="form-label fw-medium">تاریخ ارسال:</label>
+                  <label class="label-top-input-special-takhasos fw-medium">تاریخ ارسال:</label>
                   <p class="form-control-plaintext">{{ $contact->created_at ? jdate($contact->created_at)->format('Y/m/d H:i') : 'نامشخص' }}</p>
                   
                 </div>
                 @if ($contact->replied_at)
                   <div class="col-12">
-                    <label class="form-label fw-medium">تاریخ پاسخ:</label>
+                    <label class="label-top-input-special-takhasos fw-medium">تاریخ پاسخ:</label>
                     <p class="form-control-plaintext">{{ $contact->replied_at ? jdate($contact->replied_at)->format('Y/m/d H:i') : 'نامشخص' }}</p>
                   </div>
                 @endif
@@ -76,7 +76,7 @@
             <div class="card-body">
               <!-- وضعیت -->
               <div class="mb-4">
-                <label class="form-label fw-medium">وضعیت:</label>
+                <label class="label-top-input-special-takhasos fw-medium">وضعیت:</label>
                 <div class="d-flex gap-2 flex-wrap">
                   <button type="button" wire:click="updateStatus('new')"
                     class="btn btn-sm {{ $status === 'new' ? 'btn-danger' : 'btn-outline-danger' }}">
@@ -99,7 +99,7 @@
 
               <!-- پاسخ -->
               <div class="mb-4">
-                <label for="adminReply" class="form-label fw-medium">پاسخ:</label>
+                <label for="adminReply" class="label-top-input-special-takhasos fw-medium">پاسخ:</label>
                 <textarea wire:model="adminReply" id="adminReply" rows="8"
                   class="form-control @error('adminReply') is-invalid @enderror" placeholder="پاسخ خود را اینجا بنویسید..."></textarea>
                 @error('adminReply')
