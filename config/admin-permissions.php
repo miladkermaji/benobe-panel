@@ -134,6 +134,7 @@ return [
             'admin.panel.menus.index' => 'منوها',
             'admin.panel.banner-texts.index' => 'بنر صفحه اصلی',
             'admin.panel.footer-contents.index' => 'فوتر',
+            'admin.panel.faqs.index' => 'سوالات متداول',
             'admin.panel.setting.index' => 'تنظیمات عمومی',
         ],
     ],

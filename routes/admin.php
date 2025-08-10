@@ -28,7 +28,6 @@ use App\Http\Controllers\Admin\Panel\Tools\PaymentGateways\PaymentGatewaysContro
 use App\Http\Controllers\Admin\Panel\Tools\DataMigrationTool\DataMigrationToolController;
 use App\Http\Controllers\Dr\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
 
-
 /* login manager routes */
 Route::prefix('admin-panel/')->middleware('throttle:10,1')->group(function () {
     Route::get('login', LoginRegister::class)->name('admin.auth.login-register-form');
@@ -234,6 +233,11 @@ Route::prefix('admin')
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'index'])->name('admin.panel.doctors.index');
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'create'])->name('admin.panel.doctors.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'edit'])->name('admin.panel.doctors.edit');
+        });
+        Route::prefix('faqs')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Faq\FaqController::class, 'index'])->name('admin.panel.faqs.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Faq\FaqController::class, 'create'])->name('admin.panel.faqs.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Faq\FaqController::class, 'edit'])->name('admin.panel.faqs.edit');
         });
         Route::prefix('stories')->group(function () {
             Route::get('/', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'index'])->name('admin.panel.stories.index');
