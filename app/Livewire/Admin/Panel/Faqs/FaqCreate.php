@@ -55,8 +55,8 @@ class FaqCreate extends Component
 
             $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت ایجاد شد!');
 
-            // ریدایرکت به لیست
-            return redirect()->route('admin.panel.faqs.index');
+            // ریدایرکت به لیست بعد از 1 ثانیه
+            $this->dispatch('redirect', url: route('admin.panel.faqs.index'));
         } catch (\Exception $e) {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ایجاد سوال متداول: ' . $e->getMessage());
         }

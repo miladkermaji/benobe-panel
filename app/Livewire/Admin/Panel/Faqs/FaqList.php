@@ -26,14 +26,12 @@ class FaqList extends Component
     public $selectAll = false;
     public $groupAction = '';
     public $statusFilter = '';
-    public $categoryFilter = '';
     public $applyToAllFiltered = false;
     public $totalFilteredCount = 0;
 
     protected $queryString = [
         'search' => ['except' => ''],
         'statusFilter' => ['except' => ''],
-        'categoryFilter' => ['except' => ''],
     ];
 
     public function mount()
@@ -75,7 +73,7 @@ class FaqList extends Component
             $this->dispatch('show-alert', type: 'info', message: 'سوال متداول غیرفعال شد!');
         }
 
-        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_category_' . $this->categoryFilter . '_page_' . $this->getPage());
+        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
         $this->resetPage();
     }
 
@@ -101,7 +99,7 @@ class FaqList extends Component
         $item->delete();
         $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت حذف شد!');
 
-        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_category_' . $this->categoryFilter . '_page_' . $this->getPage());
+        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
         $this->resetPage();
     }
 
@@ -111,11 +109,6 @@ class FaqList extends Component
     }
 
     public function updatedStatusFilter()
-    {
-        $this->resetPage();
-    }
-
-    public function updatedCategoryFilter()
     {
         $this->resetPage();
     }
@@ -155,7 +148,7 @@ class FaqList extends Component
 
         $this->dispatch('show-alert', type: 'success', message: "{$count} سوال متداول با موفقیت حذف شد!");
 
-        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_category_' . $this->categoryFilter . '_page_' . $this->getPage());
+        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
         $this->resetPage();
     }
 
@@ -204,7 +197,7 @@ class FaqList extends Component
         $statusText = $status ? 'فعال' : 'غیرفعال';
         $this->dispatch('show-alert', type: 'success', message: "{$count} سوال متداول {$statusText} شد!");
 
-        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_category_' . $this->categoryFilter . '_page_' . $this->getPage());
+        Cache::forget('faqs_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
         $this->resetPage();
     }
 
@@ -220,11 +213,18 @@ class FaqList extends Component
         }
 
         if ($this->statusFilter !== '') {
-            $query->where('is_active', $this->statusFilter);
-        }
+            // Parse combined filter format: "status_category" (e.g., "1_citizens", "0_doctors")
+            $filterParts = explode('_', $this->statusFilter);
+            if (count($filterParts) === 2) {
+                $status = $filterParts[0];
+                $category = $filterParts[1];
 
-        if ($this->categoryFilter) {
-            $query->where('category', $this->categoryFilter);
+                $query->where('is_active', $status);
+                $query->where('category', $category);
+            } else {
+                // Fallback for old format
+                $query->where('is_active', $this->statusFilter);
+            }
         }
 
         return $query;

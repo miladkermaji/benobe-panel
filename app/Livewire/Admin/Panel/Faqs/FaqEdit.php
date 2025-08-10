@@ -60,8 +60,10 @@ class FaqEdit extends Component
 
             $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت بروزرسانی شد!');
 
-            // ریدایرکت به لیست
-            return redirect()->route('admin.panel.faqs.index');
+
+            $this->dispatch('show-alert', type: 'success', message: 'سوال متداول با موفقیت بروزرسانی شد!');
+            // ریدایرکت به لیست بعد از 1 ثانیه
+            $this->dispatch('redirect', url: route('admin.panel.faqs.index'));
         } catch (\Exception $e) {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در بروزرسانی سوال متداول: ' . $e->getMessage());
         }
