@@ -2397,7 +2397,12 @@ span.tagRemove:hover {
 .notification__box .title__noti {
     padding: 15px 0;
 }
-
+.swal2-deny {
+    display: none !important;
+}
+.swal2-close {
+    display: none !important;
+}
 /* استایل کلی سایدبار */
 
 /* بخش ثابت */
