@@ -278,6 +278,12 @@ Route::prefix('admin')
             Route::get('/create', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'create'])->name('admin.panel.doctors.create');
             Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Doctor\DoctorController::class, 'edit'])->name('admin.panel.doctors.edit');
         });
+        Route::prefix('stories')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'index'])->name('admin.panel.stories.index');
+            Route::get('/create', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'create'])->name('admin.panel.stories.create');
+            Route::get('/edit/{id}', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'edit'])->name('admin.panel.stories.edit');
+            Route::get('/analytics', [\App\Http\Controllers\Admin\Panel\Stories\StoriesController::class, 'analytics'])->name('admin.panel.stories.analytics');
+        });
         Route::get('/doctor-login/{doctor}', function (\App\Models\Doctor $doctor) {
             // لاگین کردن دکتر با گارد doctor
             Auth::guard('doctor')->login($doctor);

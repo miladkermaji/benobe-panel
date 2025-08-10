@@ -117,6 +117,16 @@ return [
             'admin.panel.reviews.index' => 'مدیریت نظرات',
         ],
     ],
+    'stories' => [
+        'title' => 'مدیریت استوری‌ها',
+        'icon' => 'i-stories',
+        'routes' => [
+            'admin.panel.stories.index' => 'لیست استوری‌ها',
+            'admin.panel.stories.create' => 'ایجاد استوری جدید',
+            'admin.panel.stories.edit' => 'ویرایش استوری',
+            'admin.panel.stories.analytics' => 'آمار و تحلیل',
+        ],
+    ],
     'site_settings' => [
         'title' => 'تنظیمات سایت',
         'icon' => 'i-site-settings',
