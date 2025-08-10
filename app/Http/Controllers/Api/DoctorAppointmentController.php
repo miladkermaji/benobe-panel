@@ -34,95 +34,99 @@ use App\Models\DoctorCounselingWorkSchedule;
 
 class DoctorAppointmentController extends Controller
 {
-    public function getAppointmentOptions(Request $request, $doctorId)
-    {
-        try {
-            $user = Auth::user();
+   public function getAppointmentOptions(Request $request, $doctorSlug)
+{
+    try {
+        $user = Auth::user();
 
-            $doctor = Doctor::find($doctorId);
-            if (!$doctor) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'پزشک یافت نشد',
-                    'data'    => null,
-                ], 404);
-            }
-
-            $selectedClinicId = $request->query('clinic_id');
-            if ($selectedClinicId !== null) {
-                if (!is_numeric($selectedClinicId) || $selectedClinicId <= 0) {
-                    $selectedClinicId = null;
-                }
-            }
-
-            $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
-                $query->where('doctor_id', $doctorId);
-            })->where('type', 'policlinic')->where('is_active', true)->select('id', 'name')->get();
-
-            $selectedClinic = null;
-            if ($selectedClinicId) {
-                $selectedClinic = $clinics->where('id', (int)$selectedClinicId)->first();
-                // اگر کلینیک پیدا نشد، selected_clinic را null بگذار و خطا نده
-            }
-
-            // اگر کلینیک انتخاب شده باشد، فقط همان کلینیک و نوبت حضوری آن را بده
-            if ($selectedClinic) {
-                $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
-            } else {
-                // اگر کلینیک انتخاب نشده یا پیدا نشد، اطلاعات همه کلینیک‌ها و نوبت حضوری همه را بده
-                $inPersonData = $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
-            }
-            $onlineData = $this->getOnlineAppointmentData($doctor);
-
-            return response()->json([
-                'status' => 'success',
-                'data'   => [
-                    'doctor' => [
-                        'name'        => $doctor->full_name,
-                        'slug'        => $doctor->slug,
-                        'specialty'   => $doctor->specialty()->value('name') ?? 'نامشخص',
-                        'province'    => $doctor->province()->value('name'),
-                        'city'        => $doctor->city()->value('name'),
-                        'views_count' => $doctor->views_count ?? 0,
-                        'rating'      => $doctor->rating ?? 0,
-                    ],
-                    'clinics' => $clinics->map(function ($clinic) {
-                        return [
-                            'id'             => $clinic->id,
-                            'name'           => $clinic->name,
-                            'province'       => $clinic->province ? $clinic->province->name : null,
-                            'city'           => $clinic->city ? $clinic->city->name : null,
-                            'address'        => $clinic->address,
-                            'phone_number'   => $clinic->phone_number,
-                            'is_main_clinic' => $clinic->is_main_clinic,
-                        ];
-                    }),
-                    'selected_clinic' => $selectedClinic ? [
-                        'id'           => $selectedClinic->id,
-                        'name'         => $selectedClinic->name,
-                        'province'     => $selectedClinic->province ? $selectedClinic->province->name : null,
-                        'city'         => $selectedClinic->city ? $selectedClinic->city->name : null,
-                        'address'      => $selectedClinic->address,
-                        'phone_number' => $selectedClinic->phone_number,
-                    ] : null,
-                    'appointment_types' => [
-                        'in_person' => $inPersonData,
-                        'online'    => array_merge(
-                            ['note' => 'This section is populated using doctor_counseling_configs for duration/calendar and doctor_counseling_work_schedules for work hours, with booked slots from counseling_appointments'],
-                            $onlineData
-                        ),
-                    ],
-                ],
-            ], 200);
-        } catch (\Exception $e) {
-
+        // پیدا کردن پزشک با slug
+        $doctor = Doctor::where('slug', $doctorSlug)->first();
+        if (!$doctor) {
             return response()->json([
                 'status'  => 'error',
-                'message' => 'خطای سرور. لطفاً دوباره تلاش کنید.',
+                'message' => 'پزشک یافت نشد',
                 'data'    => null,
-            ], 500);
+            ], 404);
         }
+
+        // دریافت clinic_slug از query string
+        $selectedClinicSlug = $request->query('clinic_slug');
+        if ($selectedClinicSlug !== null) {
+            if (empty($selectedClinicSlug) || !is_string($selectedClinicSlug)) {
+                $selectedClinicSlug = null;
+            }
+        }
+
+        // دریافت کلینیک‌های مرتبط با پزشک
+        $clinics = MedicalCenter::whereHas('doctors', function ($query) use ($doctor) {
+            $query->where('doctor_id', $doctor->id);
+        })->where('type', 'policlinic')->where('is_active', true)->select('id', 'slug', 'name')->get();
+
+        $selectedClinic = null;
+        if ($selectedClinicSlug) {
+            $selectedClinic = $clinics->where('slug', $selectedClinicSlug)->first();
+            // اگر کلینیک پیدا نشد، selected_clinic را null بگذار و خطا نده
+        }
+
+        // اگر کلینیک انتخاب شده باشد، فقط همان کلینیک و نوبت حضوری آن را بده
+        if ($selectedClinic) {
+            $inPersonData = $this->getInPersonAppointmentData($doctor, $selectedClinic);
+        } else {
+            // اگر کلینیک انتخاب نشده یا پیدا نشد، اطلاعات همه کلینیک‌ها و نوبت حضوری همه را بده
+            $inPersonData = $this->getInPersonAppointmentDataForAllClinics($doctor, $clinics);
+        }
+        $onlineData = $this->getOnlineAppointmentData($doctor);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => [
+                'doctor' => [
+                    'name'        => $doctor->full_name,
+                    'slug'        => $doctor->slug,
+                    'specialty'   => $doctor->specialty()->value('name') ?? 'نامشخص',
+                    'province'    => $doctor->province()->value('name'),
+                    'city'        => $doctor->city()->value('name'),
+                    'views_count' => $doctor->views_count ?? 0,
+                    'rating'      => $doctor->rating ?? 0,
+                ],
+                'clinics' => $clinics->map(function ($clinic) {
+                    return [
+                        'id'             => $clinic->id,
+                        'slug'           => $clinic->slug, // اضافه کردن slug کلینیک
+                        'name'           => $clinic->name,
+                        'province'       => $clinic->province ? $clinic->province->name : null,
+                        'city'           => $clinic->city ? $clinic->city->name : null,
+                        'address'        => $clinic->address,
+                        'phone_number'   => $clinic->phone_number,
+                        'is_main_clinic' => $clinic->is_main_clinic,
+                    ];
+                }),
+                'selected_clinic' => $selectedClinic ? [
+                    'id'           => $selectedClinic->id,
+                    'slug'         => $selectedClinic->slug, // اضافه کردن slug کلینیک
+                    'name'         => $selectedClinic->name,
+                    'province'     => $selectedClinic->province ? $selectedClinic->province->name : null,
+                    'city'         => $selectedClinic->city ? $selectedClinic->city->name : null,
+                    'address'      => $selectedClinic->address,
+                    'phone_number' => $selectedClinic->phone_number,
+                ] : null,
+                'appointment_types' => [
+                    'in_person' => $inPersonData,
+                    'online'    => array_merge(
+                        ['note' => 'This section is populated using doctor_counseling_configs for duration/calendar and doctor_counseling_work_schedules for work hours, with booked slots from counseling_appointments'],
+                        $onlineData
+                    ),
+                ],
+            ],
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'خطای سرور. لطفاً دوباره تلاش کنید.',
+            'data'    => null,
+        ], 500);
     }
+}
 
     // Helper to get DoctorAppointmentConfig for a doctor and clinic, strict by clinic_id
     private function getDoctorAppointmentConfig($doctorId, $clinicId = null)
