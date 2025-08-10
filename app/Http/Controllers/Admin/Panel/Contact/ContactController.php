@@ -16,4 +16,4 @@ class ContactController extends Controller
     {
         return view('admin.panel.contact.show', compact('id'));
     }
-} 
+}
