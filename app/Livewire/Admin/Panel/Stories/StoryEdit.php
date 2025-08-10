@@ -54,8 +54,8 @@ class StoryEdit extends Component
         'type' => 'required|in:image,video',
         'status' => 'required|in:active,inactive,pending',
         'is_live' => 'boolean',
-        'live_start_time' => 'nullable|date|required_if:is_live,true',
-        'live_end_time' => 'nullable|date|after:live_start_time|required_if:is_live,true',
+        'live_start_time' => 'nullable|string|required_if:is_live,true',
+        'live_end_time' => 'nullable|string|required_if:is_live,true',
         'duration' => 'nullable|integer|min:1',
         'order' => 'nullable|integer|min:0',
         'media_file' => 'nullable|file|max:102400', // 100MB max
@@ -103,8 +103,15 @@ class StoryEdit extends Component
         $this->type = $this->story->type;
         $this->status = $this->story->status;
         $this->is_live = $this->story->is_live;
-        $this->live_start_time = $this->story->live_start_time ? $this->story->live_start_time->format('Y-m-d\TH:i') : '';
-        $this->live_end_time = $this->story->live_end_time ? $this->story->live_end_time->format('Y-m-d\TH:i') : '';
+
+        // Convert Gregorian dates to Jalali for display
+        if ($this->story->live_start_time) {
+            $this->live_start_time = \Morilog\Jalali\Jalalian::fromDateTime($this->story->live_start_time)->format('Y/m/d H:i');
+        }
+        if ($this->story->live_end_time) {
+            $this->live_end_time = \Morilog\Jalali\Jalalian::fromDateTime($this->story->live_end_time)->format('Y/m/d H:i');
+        }
+
         $this->duration = $this->story->duration;
         $this->order = $this->story->order;
         $this->current_media_path = $this->story->media_path;
@@ -178,14 +185,26 @@ class StoryEdit extends Component
         $this->validate();
 
         try {
+            // Convert Jalali dates to Gregorian if provided
+            $liveStartTime = null;
+            $liveEndTime = null;
+
+            if ($this->is_live && $this->live_start_time) {
+                $liveStartTime = $this->convertJalaliToGregorian($this->live_start_time);
+            }
+
+            if ($this->is_live && $this->live_end_time) {
+                $liveEndTime = $this->convertJalaliToGregorian($this->live_end_time);
+            }
+
             $storyData = [
                 'title' => $this->title,
                 'description' => $this->description,
                 'type' => $this->type,
                 'status' => $this->status,
                 'is_live' => $this->is_live,
-                'live_start_time' => $this->is_live ? $this->live_start_time : null,
-                'live_end_time' => $this->is_live ? $this->live_end_time : null,
+                'live_start_time' => $liveStartTime,
+                'live_end_time' => $liveEndTime,
                 'duration' => $this->duration ?: null,
                 'order' => $this->order ?: 0,
                 'metadata' => array_merge($this->story->metadata ?? [], [
@@ -292,6 +311,40 @@ class StoryEdit extends Component
         $path = $file->storeAs('stories/thumbnails', $fileName, 'public');
 
         return $path;
+    }
+
+    private function convertJalaliToGregorian($jalaliDate)
+    {
+        if (empty($jalaliDate)) {
+            return null;
+        }
+
+        try {
+            // Parse Jalali date string (assuming format like "1402/12/25 14:30")
+            $parts = explode(' ', $jalaliDate);
+            $datePart = $parts[0];
+            $timePart = isset($parts[1]) ? $parts[1] : '00:00';
+
+            $dateComponents = explode('/', $datePart);
+            $timeComponents = explode(':', $timePart);
+
+            if (count($dateComponents) !== 3) {
+                return null;
+            }
+
+            $year = (int) $dateComponents[0];
+            $month = (int) $dateComponents[1];
+            $day = (int) $dateComponents[2];
+            $hour = isset($timeComponents[0]) ? (int) $timeComponents[0] : 0;
+            $minute = isset($timeComponents[1]) ? (int) $timeComponents[1] : 0;
+
+            // Convert Jalali to Gregorian using Jalalian
+            $jalalian = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d H:i', $jalaliDate);
+            return $jalalian->toCarbon();
+
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function render()

@@ -139,8 +139,9 @@
                     <div class="row g-3">
                       <div class="col-md-6">
                         <div class="position-relative">
-                          <input wire:model="live_start_time" type="datetime-local"
-                            class="form-control @error('live_start_time') is-invalid @enderror" id="live_start_time" placeholder=" ">
+                          <input wire:model="live_start_time" type="text"
+                            class="form-control jalali-datepicker text-end @error('live_start_time') is-invalid @enderror"
+                            id="live_start_time" placeholder=" " data-jdp>
                           <label for="live_start_time" class="form-label">زمان شروع لایو</label>
                           @error('live_start_time')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -149,8 +150,9 @@
                       </div>
                       <div class="col-md-6">
                         <div class="position-relative">
-                          <input wire:model="live_end_time" type="datetime-local"
-                            class="form-control @error('live_end_time') is-invalid @enderror" id="live_end_time" placeholder=" ">
+                          <input wire:model="live_end_time" type="text"
+                            class="form-control jalali-datepicker text-end @error('live_end_time') is-invalid @enderror"
+                            id="live_end_time" placeholder=" " data-jdp>
                           <label for="live_end_time" class="form-label">زمان پایان لایو</label>
                           @error('live_end_time')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -343,11 +345,33 @@
     </div>
   </div>
   <script>
-  document.addEventListener('livewire:init', () => {
-    Livewire.on('show-alert', (event) => {
-      toastr[event.type](event.message);
-    });
-  });
-</script>
-</div>
+    document.addEventListener('livewire:init', () => {
+      jalaliDatepicker.startWatch({
+        minDate: "attr",
+        maxDate: "attr",
+        showTodayBtn: true,
+        showEmptyBtn: true,
+        time: true,
+        zIndex: 1050,
+        dateFormatter: function(unix) {
+          return new Date(unix).toLocaleDateString('fa-IR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+          });
+        }
+      });
 
+      document.getElementById('live_start_time').addEventListener('change', function() {
+        @this.set('live_start_time', this.value);
+      });
+      document.getElementById('live_end_time').addEventListener('change', function() {
+        @this.set('live_end_time', this.value);
+      });
+
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+    });
+  </script>
+</div>

@@ -47,8 +47,8 @@ class StoryCreate extends Component
         'type' => 'required|in:image,video',
         'status' => 'required|in:active,inactive,pending',
         'is_live' => 'boolean',
-        'live_start_time' => 'nullable|date|required_if:is_live,true',
-        'live_end_time' => 'nullable|date|after:live_start_time|required_if:is_live,true',
+        'live_start_time' => 'nullable|string|required_if:is_live,true',
+        'live_end_time' => 'nullable|string|required_if:is_live,true',
         'duration' => 'nullable|integer|min:1',
         'order' => 'nullable|integer|min:0',
         'media_file' => 'required|file|max:102400', // 100MB max
@@ -138,6 +138,18 @@ class StoryCreate extends Component
         $this->validate();
 
         try {
+            // Convert Jalali dates to Gregorian if provided
+            $liveStartTime = null;
+            $liveEndTime = null;
+
+            if ($this->is_live && $this->live_start_time) {
+                $liveStartTime = $this->convertJalaliToGregorian($this->live_start_time);
+            }
+
+            if ($this->is_live && $this->live_end_time) {
+                $liveEndTime = $this->convertJalaliToGregorian($this->live_end_time);
+            }
+
             // Handle media file upload
             $mediaPath = null;
             if ($this->media_file) {
@@ -157,8 +169,8 @@ class StoryCreate extends Component
                 'type' => $this->type,
                 'status' => $this->status,
                 'is_live' => $this->is_live,
-                'live_start_time' => $this->is_live ? $this->live_start_time : null,
-                'live_end_time' => $this->is_live ? $this->live_end_time : null,
+                'live_start_time' => $liveStartTime,
+                'live_end_time' => $liveEndTime,
                 'duration' => $this->duration ?: null,
                 'order' => $this->order ?: 0,
                 'media_path' => $mediaPath,
@@ -240,6 +252,40 @@ class StoryCreate extends Component
         $this->doctor_id = '';
         $this->medical_center_id = '';
         $this->manager_id = '';
+    }
+
+    private function convertJalaliToGregorian($jalaliDate)
+    {
+        if (empty($jalaliDate)) {
+            return null;
+        }
+
+        try {
+            // Parse Jalali date string (assuming format like "1402/12/25 14:30")
+            $parts = explode(' ', $jalaliDate);
+            $datePart = $parts[0];
+            $timePart = isset($parts[1]) ? $parts[1] : '00:00';
+
+            $dateComponents = explode('/', $datePart);
+            $timeComponents = explode(':', $timePart);
+
+            if (count($dateComponents) !== 3) {
+                return null;
+            }
+
+            $year = (int) $dateComponents[0];
+            $month = (int) $dateComponents[1];
+            $day = (int) $dateComponents[2];
+            $hour = isset($timeComponents[0]) ? (int) $timeComponents[0] : 0;
+            $minute = isset($timeComponents[1]) ? (int) $timeComponents[1] : 0;
+
+            // Convert Jalali to Gregorian using Jalalian
+            $jalalian = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d H:i', $jalaliDate);
+            return $jalalian->toCarbon();
+
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     public function render()
