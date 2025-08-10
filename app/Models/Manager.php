@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\Models\ManagerPermission;
+use App\Models\Story;
+use App\Models\StoryView;
+use App\Models\StoryLike;
 
 class Manager extends Authenticatable implements JWTSubject
 {
@@ -189,5 +192,21 @@ class Manager extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    // روابط استوری
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
+    }
+
+    public function storyViews()
+    {
+        return $this->morphMany(StoryView::class, 'viewer');
+    }
+
+    public function storyLikes()
+    {
+        return $this->morphMany(StoryLike::class, 'liker');
     }
 }

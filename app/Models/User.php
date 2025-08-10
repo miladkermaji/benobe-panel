@@ -20,6 +20,9 @@ use App\Models\Otp;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
 use App\Models\LoginLog;
+use App\Models\Story;
+use App\Models\StoryLike;
+use App\Models\StoryView;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -149,5 +152,21 @@ class User extends Authenticatable implements JWTSubject
     public function loginLogs()
     {
         return $this->morphMany(LoginLog::class, 'loggable');
+    }
+
+    // روابط استوری
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
+    }
+
+    public function storyLikes()
+    {
+        return $this->morphMany(StoryLike::class, 'liker');
+    }
+
+    public function storyViews()
+    {
+        return $this->morphMany(StoryView::class, 'viewer');
     }
 }

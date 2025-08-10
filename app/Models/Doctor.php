@@ -520,4 +520,20 @@ class Doctor extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    // روابط استوری
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
+    }
+
+    public function storyViews()
+    {
+        return $this->morphMany(StoryView::class, 'viewer');
+    }
+
+    public function storyLikes()
+    {
+        return $this->morphMany(StoryLike::class, 'liker');
+    }
 }
