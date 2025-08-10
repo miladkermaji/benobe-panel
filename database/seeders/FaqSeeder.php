@@ -82,4 +82,4 @@ class FaqSeeder extends Seeder
             ]);
         }
     }
-} 
+}
