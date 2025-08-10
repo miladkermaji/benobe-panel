@@ -61,9 +61,7 @@ body {
     transition: all 0.3s ease;
 }
 
-.card-header:hover {
-    background: var(--primary);
-}
+
 
 .card-header h5 {
     font-size: 1.25rem;
