@@ -7,7 +7,8 @@
         <div class="d-flex align-items-center gap-2 flex-shrink-0 w-md-100 justify-content-between">
           <div class="d-flex align-items-center">
             <h2 class="mb-0 fw-bold fs-5">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="header-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="header-icon">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
                 </path>
@@ -35,8 +36,8 @@
             <div class="search-box position-relative">
               <input wire:model.live.debounce.300ms="search" type="text" class="form-control ps-5"
                 placeholder="جستجو در استوری‌ها...">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                class="search-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2" class="search-icon">
                 <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.35-4.35" />
               </svg>
@@ -46,7 +47,7 @@
                 <option value="{{ $value }}">{{ $label }}</option>
               @endforeach
             </select>
-            <select wire:model.live="selectedStory" class="form-select form-select-sm">
+            <select wire:model.live="selectedStory" class="form-select form-select-sm" id="mobile-story-select">
               <option value="">همه استوری‌ها</option>
               @foreach ($stories as $story)
                 <option value="{{ $story->id }}">{{ $story->title }}</option>
@@ -70,7 +71,8 @@
               <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
           </select>
-          <select wire:model.live="selectedStory" class="form-select form-select-sm" style="min-width: 150px;">
+          <select wire:model.live="selectedStory" class="form-select form-select-sm" style="min-width: 150px;"
+            id="desktop-story-select">
             <option value="">همه استوری‌ها</option>
             @foreach ($stories as $story)
               <option value="{{ $story->id }}">{{ $story->title }}</option>
@@ -237,7 +239,8 @@
                       @forelse($topStoriesData as $story)
                         <tr>
                           <td>
-                            <a href="{{ route('admin.panel.stories.edit', $story['id']) }}" class="text-decoration-none">
+                            <a href="{{ route('admin.panel.stories.edit', $story['id']) }}"
+                              class="text-decoration-none">
                               {{ Str::limit($story['title'], 30) }}
                             </a>
                           </td>
@@ -262,7 +265,8 @@
                 <div class="notes-cards d-md-none">
                   @forelse($topStoriesData as $story)
                     <div class="note-card mb-2" x-data="{ open: false }">
-                      <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2" @click="open = !open" style="cursor:pointer;">
+                      <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                        @click="open = !open" style="cursor:pointer;">
                         <span class="fw-bold">
                           {{ Str::limit($story['title'], 30) }}
                         </span>
@@ -275,7 +279,8 @@
                         <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                           <span class="note-card-label">عنوان:</span>
                           <span class="note-card-value">
-                            <a href="{{ route('admin.panel.stories.edit', $story['id']) }}" class="text-decoration-none">
+                            <a href="{{ route('admin.panel.stories.edit', $story['id']) }}"
+                              class="text-decoration-none">
                               {{ Str::limit($story['title'], 30) }}
                             </a>
                           </span>
@@ -300,8 +305,8 @@
                   @empty
                     <div class="text-center py-4">
                       <div class="d-flex justify-content-center align-items-center flex-column">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                          stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                          stroke-width="2" class="text-muted mb-2">
                           <path d="M5 12h14M12 5l7 7-7 7" />
                         </svg>
                         <p class="text-muted fw-medium">داده‌ای موجود نیست</p>
@@ -343,7 +348,7 @@
                 </div>
               </div>
               <div class="col-md-4 mb-2">
-                <select wire:model.live="perPage" class="form-select form-select-sm">
+                <select wire:model.live="perPage" class="form-select form-select-sm" id="per-page-select">
                   <option value="10">10 آیتم</option>
                   <option value="25">25 آیتم</option>
                   <option value="50">50 آیتم</option>
@@ -435,7 +440,8 @@
             <div class="notes-cards d-md-none">
               @forelse($this->paginatedStories as $story)
                 <div class="note-card mb-2" x-data="{ open: false }">
-                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2" @click="open = !open" style="cursor:pointer;">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
                     <span class="fw-bold">
                       {{ Str::limit($story->title, 40) }}
                     </span>
@@ -500,8 +506,8 @@
               @empty
                 <div class="text-center py-4">
                   <div class="d-flex justify-content-center align-items-center flex-column">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                      stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                     <p class="text-muted fw-medium">داده‌ای موجود نیست</p>
@@ -546,8 +552,87 @@
     document.addEventListener('livewire:init', () => {
       let viewsChart, likesChart, viewsByTypeChart;
 
+      // Initialize Select2
+      function initializeSelect2() {
+        // Mobile story select
+        if ($('#mobile-story-select').length) {
+          if ($('#mobile-story-select').hasClass('select2-hidden-accessible')) {
+            $('#mobile-story-select').select2('destroy');
+          }
+          $('#mobile-story-select').select2({
+            dir: 'rtl',
+            placeholder: 'انتخاب استوری',
+            width: '100%',
+            allowClear: true
+          });
+        }
+
+        // Desktop story select
+        if ($('#desktop-story-select').length) {
+          if ($('#desktop-story-select').hasClass('select2-hidden-accessible')) {
+            $('#desktop-story-select').select2('destroy');
+          }
+          $('#desktop-story-select').select2({
+            dir: 'rtl',
+            placeholder: 'انتخاب استوری',
+            width: '100%',
+            allowClear: true
+          });
+        }
+
+        // Per page select
+        if ($('#per-page-select').length) {
+          if ($('#per-page-select').hasClass('select2-hidden-accessible')) {
+            $('#per-page-select').select2('destroy');
+          }
+          $('#per-page-select').select2({
+            dir: 'rtl',
+            placeholder: 'انتخاب کنید',
+            width: '100%',
+            minimumResultsForSearch: Infinity
+          });
+        }
+      }
+
+      // Initialize Select2 on page load
+      initializeSelect2();
+
+      // Handle Select2 change events
+      $(document).on('select2:select select2:unselect', '#mobile-story-select, #desktop-story-select', function() {
+        @this.set('selectedStory', $(this).val());
+      });
+
+      $(document).on('select2:select select2:unselect', '#per-page-select', function() {
+        @this.set('perPage', $(this).val());
+      });
+
+      // Re-initialize Select2 after Livewire updates
+      Livewire.hook('message.processed', () => {
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
+      });
+
+      // Handle Livewire navigation
+      Livewire.hook('navigate', () => {
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
+      });
+
+      // Handle component updates
       Livewire.on('analytics-updated', () => {
         updateCharts();
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
+      });
+
+      // Additional hook for DOM updates
+      Livewire.hook('morph.updated', () => {
+        setTimeout(() => {
+          initializeSelect2();
+        }, 100);
       });
 
       function updateCharts() {
