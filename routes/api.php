@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\TeleCounselingController;
 use App\Http\Controllers\Api\DoctorAppointmentController;
 use App\Http\Controllers\Api\AppointmentBookingController;
 use App\Http\Controllers\Api\UserSubscriptionController;
+use App\Http\Controllers\Api\ContactMessageController;
 use Modules\Payment\App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use App\Services\JwtTokenService;
@@ -66,7 +67,7 @@ Route::prefix('/v2')->group(function () {
     });
 
     // مسیرهای احراز هویت شده
-  
+
 
     Route::middleware(['custom-auth.jwt'])->group(function () {
         Route::prefix('appointments')->group(function () {
@@ -240,3 +241,6 @@ Route::get('public-doctor-comments/{doctor_id}', [\App\Http\Controllers\Api\Doct
 
 // مسیر قدیمی با slug (در انتها برای جلوگیری از تداخل)
 Route::get('medical-centers/{slug}/profile', [MedicalCentersController::class, 'getProfile'])->name('api.medical-centers.profile.old');
+
+// مسیرهای عمومی - بدون نیاز به احراز هویت
+Route::post('/contact-messages', [ContactMessageController::class, 'store'])->name('api.contact-messages.store');
