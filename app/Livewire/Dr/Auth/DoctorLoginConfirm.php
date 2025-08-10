@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use App\Services\DefaultPermissionsService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -154,6 +155,10 @@ class DoctorLoginConfirm extends Component
         if (empty($user->mobile_verified_at)) {
             $user->update(['mobile_verified_at' => Carbon::now()]);
         }
+
+        // اعمال دسترسی‌های پیش‌فرض
+        $defaultPermissionsService = new DefaultPermissionsService();
+        $defaultPermissionsService->applyDefaultPermissions($user);
 
         // ورود با گارد مناسب و تعیین مسیر هدایت
         if ($user instanceof Doctor) {

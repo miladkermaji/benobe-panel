@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use App\Models\LoginSession;
 use App\Models\Manager;
 use Illuminate\Support\Facades\Auth;
+use App\Services\DefaultPermissionsService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
@@ -138,6 +139,10 @@ class LoginConfirm extends Component
         if (empty($user->mobile_verified_at)) {
             $user->update(['mobile_verified_at' => Carbon::now()]);
         }
+
+        // اعمال دسترسی‌های پیش‌فرض
+        $defaultPermissionsService = new DefaultPermissionsService();
+        $defaultPermissionsService->applyDefaultPermissions($user);
 
         if ($user instanceof Manager) {
             Auth::guard('manager')->login($user);
