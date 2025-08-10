@@ -174,7 +174,7 @@
           <!-- Sidebar -->
           <div class="col-lg-4">
             <!-- Current Media Preview -->
-            @if ($current_media_path && Storage::exists($current_media_path))
+            @if ($current_media_path && Storage::disk('public')->exists($current_media_path))
               <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-light">
                   <h6 class="mb-0 fw-bold">
@@ -208,7 +208,7 @@
               </div>
             @endif
 
-            @if ($current_thumbnail_path && Storage::exists($current_thumbnail_path))
+            @if ($current_thumbnail_path && Storage::disk('public')->exists($current_thumbnail_path))
               <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-light">
                   <h6 class="mb-0 fw-bold">
