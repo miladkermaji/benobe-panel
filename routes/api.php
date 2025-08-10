@@ -45,6 +45,12 @@ Route::prefix('/v2')->group(function () {
     // مسیرهای جستجو
     Route::get('/search', [SearchController::class, 'search'])->name('api.v2.search');
 
+    // مسیرهای عمومی استوری (بدون نیاز به احراز هویت)
+    Route::prefix('stories')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Api\StoryController::class, 'index'])->name('api.v2.stories.index');
+        Route::get('/{id}', [\App\Http\Controllers\Api\StoryController::class, 'show'])->name('api.v2.stories.show');
+    });
+
     // مسیرهای احراز هویت
     Route::prefix('/auth')->group(function () {
         Route::post('/login-register', [AuthController::class, 'loginRegister'])->name('api.v2.auth.login-register');
@@ -57,6 +63,19 @@ Route::prefix('/v2')->group(function () {
             Route::post('/update-profile', [AuthController::class, 'updateProfile'])->name('api.v2.auth.update-profile');
             Route::post('/refresh-token', [AuthController::class, 'refreshToken'])->name('api.v2.auth.refresh-token');
         });
+    });
+
+    // مسیرهای احراز هویت شده
+    Route::middleware(['custom-auth.jwt'])->group(function () {
+        // مسیرهای استوری - نیاز به احراز هویت دارند
+        Route::prefix('stories')->group(function () {
+            Route::post('/like', [\App\Http\Controllers\Api\StoryController::class, 'like'])->name('api.v2.stories.like');
+            Route::post('/unlike', [\App\Http\Controllers\Api\StoryController::class, 'unlike'])->name('api.v2.stories.unlike');
+            Route::post('/toggle-like', [\App\Http\Controllers\Api\StoryController::class, 'toggleLike'])->name('api.v2.stories.toggle-like');
+            Route::get('/check-like-status', [\App\Http\Controllers\Api\StoryController::class, 'checkLikeStatus'])->name('api.v2.stories.check-like-status');
+        });
+
+        // سایر مسیرهای احراز هویت شده...
     });
 
     Route::middleware(['custom-auth.jwt'])->group(function () {
@@ -124,6 +143,14 @@ Route::middleware(['custom-auth.jwt'])->group(function () {
     Route::prefix('doctors')->group(function () {
         Route::get('/my_doctors', [DoctorController::class, 'getMyDoctors'])->name('api.doctors.my_doctors');
         Route::post('/like', [DoctorController::class, 'likeDoctor'])->middleware('custom-auth.jwt')->name('api.doctors.like');
+    });
+
+    // مسیرهای استوری - نیاز به احراز هویت دارند
+    Route::prefix('stories')->group(function () {
+        Route::post('/like', [\App\Http\Controllers\Api\StoryController::class, 'like'])->name('api.stories.like');
+        Route::post('/unlike', [\App\Http\Controllers\Api\StoryController::class, 'unlike'])->name('api.stories.unlike');
+        Route::post('/toggle-like', [\App\Http\Controllers\Api\StoryController::class, 'toggleLike'])->name('api.stories.toggle-like');
+        Route::get('/check-like-status', [\App\Http\Controllers\Api\StoryController::class, 'checkLikeStatus'])->name('api.stories.check-like-status');
     });
 
     Route::prefix('prescriptions')->group(function () {
