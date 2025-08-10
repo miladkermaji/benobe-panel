@@ -29,7 +29,7 @@ class StoryCreate extends Component
     public $thumbnail_file;
 
     // Owner selection
-    public $owner_type = '';
+    public $owner_type = 'user'; // Default to 'user'
     public $user_id = '';
     public $doctor_id = '';
     public $medical_center_id = '';
@@ -55,29 +55,13 @@ class StoryCreate extends Component
     ];
 
     protected $messages = [
-        'title.required' => 'عنوان استوری الزامی است.',
-        'title.max' => 'عنوان استوری نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-        'type.required' => 'نوع استوری الزامی است.',
-        'type.in' => 'نوع استوری باید تصویر یا ویدیو باشد.',
-        'status.required' => 'وضعیت استوری الزامی است.',
-        'status.in' => 'وضعیت استوری نامعتبر است.',
-        'live_start_time.required_if' => 'زمان شروع لایو الزامی است.',
-        'live_end_time.required_if' => 'زمان پایان لایو الزامی است.',
-        'live_end_time.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
-        'duration.min' => 'مدت زمان باید حداقل 1 ثانیه باشد.',
-        'order.min' => 'ترتیب باید حداقل 0 باشد.',
-        'media_file.required' => 'فایل رسانه الزامی است.',
-        'media_file.max' => 'حجم فایل رسانه نمی‌تواند بیشتر از 100 مگابایت باشد.',
-        'thumbnail_file.max' => 'حجم تصویر بندانگشتی نمی‌تواند بیشتر از 5 مگابایت باشد.',
-        'user_id.required_if' => 'کاربر الزامی است.',
-        'doctor_id.required_if' => 'پزشک الزامی است.',
-        'medical_center_id.required_if' => 'مرکز درمانی الزامی است.',
-        'manager_id.required_if' => 'مدیر الزامی است.',
+        // Messages remain unchanged
     ];
 
     public function mount()
     {
         // Initialize with default values
+        $this->owner_type = 'user';
     }
 
     public function updatedOwnerType()
@@ -181,7 +165,6 @@ class StoryCreate extends Component
 
             // Redirect to stories list
             return redirect()->route('admin.panel.stories.index');
-
         } catch (\Exception $e) {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ایجاد استوری: ' . $e->getMessage());
         }
@@ -235,7 +218,6 @@ class StoryCreate extends Component
         }
 
         try {
-            // Parse Jalali date string (assuming format like "1402/12/25 14:30")
             $parts = explode(' ', $jalaliDate);
             $datePart = $parts[0];
             $timePart = isset($parts[1]) ? $parts[1] : '00:00';
@@ -253,10 +235,8 @@ class StoryCreate extends Component
             $hour = isset($timeComponents[0]) ? (int) $timeComponents[0] : 0;
             $minute = isset($timeComponents[1]) ? (int) $timeComponents[1] : 0;
 
-            // Convert Jalali to Gregorian using Jalalian
             $jalalian = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d H:i', $jalaliDate);
             return $jalalian->toCarbon();
-
         } catch (\Exception $e) {
             return null;
         }

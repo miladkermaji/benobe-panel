@@ -1,6 +1,6 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/story/story.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/select2/select2.css') }}">
 @endpush
 
 @push('scripts')
@@ -250,7 +250,7 @@
               <div class="card-body">
                 <div class="mb-3">
                   <div class="position-relative">
-                    <select wire:model="owner_type" class="form-select @error('owner_type') is-invalid @enderror"
+                    <select wire:model.live="owner_type" class="form-select @error('owner_type') is-invalid @enderror"
                       id="owner_type" required>
                       <option value="">انتخاب کنید</option>
                       <option value="user">کاربر</option>
@@ -265,82 +265,67 @@
                   </div>
                 </div>
 
-                @if ($owner_type === 'user')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="user_id"
-                      class="form-select select2-user @error('user_id') is-invalid @enderror" id="user_id" required>
-                      <option value="">کاربر را انتخاب کنید</option>
-                      @if ($user_id && $story->user)
-                        <option value="{{ $story->user->id }}" selected>
-                          {{ $story->user->first_name }} {{ $story->user->last_name }} ({{ $story->user->mobile }})
-                        </option>
-                      @endif
-                    </select>
-                    <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
-                    @error('user_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <div x-data="{ ownerType: @entangle('owner_type'), selectedOwner: @entangle('selected_owner') }">
+                  <div x-show="ownerType === 'user'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="user_id"
+                        class="form-select select2-user @error('user_id') is-invalid @enderror" id="user_id" required>
+                        <option value="">کاربر را انتخاب کنید</option>
+                        <option x-bind:value="selectedOwner?.id" x-bind:selected="selectedOwner?.id" x-text="selectedOwner?.text"></option>
+                      </select>
+                      <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
+                      @error('user_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'doctor')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="doctor_id"
-                      class="form-select select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
-                      required>
-                      <option value="">پزشک را انتخاب کنید</option>
-                      @if ($doctor_id && $story->doctor)
-                        <option value="{{ $story->doctor->id }}" selected>
-                          {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
-                          ({{ $story->doctor->mobile }})
-                        </option>
-                      @endif
-                    </select>
-                    <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
-                    @error('doctor_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'doctor'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="doctor_id"
+                        class="form-select select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
+                        required>
+                        <option value="">پزشک را انتخاب کنید</option>
+                        <option x-bind:value="selectedOwner?.id" x-bind:selected="selectedOwner?.id" x-text="selectedOwner?.text"></option>
+                      </select>
+                      <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
+                      @error('doctor_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'medical_center')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="medical_center_id"
-                      class="form-select select2-medical-center @error('medical_center_id') is-invalid @enderror"
-                      id="medical_center_id" required>
-                      <option value="">مرکز درمانی را انتخاب کنید</option>
-                      @if ($medical_center_id && $story->medicalCenter)
-                        <option value="{{ $story->medicalCenter->id }}" selected>
-                          {{ $story->medicalCenter->name }} ({{ $story->medicalCenter->title }})
-                        </option>
-                      @endif
-                    </select>
-                    <label for="medical_center_id" class="form-label">انتخاب مرکز درمانی <span
-                        class="text-danger">*</span></label>
-                    @error('medical_center_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'medical_center'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="medical_center_id"
+                        class="form-select select2-medical-center @error('medical_center_id') is-invalid @enderror"
+                        id="medical_center_id" required>
+                        <option value="">مرکز درمانی را انتخاب کنید</option>
+                        <option x-bind:value="selectedOwner?.id" x-bind:selected="selectedOwner?.id" x-text="selectedOwner?.text"></option>
+                      </select>
+                      <label for="medical_center_id" class="form-label">انتخاب مرکز درمانی <span
+                          class="text-danger">*</span></label>
+                      @error('medical_center_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'manager')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="manager_id"
-                      class="form-select select2-manager @error('manager_id') is-invalid @enderror" id="manager_id"
-                      required>
-                      <option value="">مدیر را انتخاب کنید</option>
-                      @if ($manager_id && $story->manager)
-                        <option value="{{ $story->manager->id }}" selected>
-                          {{ $story->manager->first_name }} {{ $story->manager->last_name }}
-                        </option>
-                      @endif
-                    </select>
-                    <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
-                    @error('manager_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'manager'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="manager_id"
+                        class="form-select select2-manager @error('manager_id') is-invalid @enderror" id="manager_id"
+                        required>
+                        <option value="">مدیر را انتخاب کنید</option>
+                        <option x-bind:value="selectedOwner?.id" x-bind:selected="selectedOwner?.id" x-text="selectedOwner?.text"></option>
+                      </select>
+                      <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
+                      @error('manager_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
+                </div>
               </div>
             </div>
 
@@ -417,6 +402,7 @@
       </form>
     </div>
   </div>
+
   <script>
     document.addEventListener('livewire:init', () => {
       // Jalali Datepicker
@@ -436,15 +422,15 @@
         }
       });
 
-      document.getElementById('live_start_time').addEventListener('change', function() {
+      document.getElementById('live_start_time')?.addEventListener('change', function() {
         @this.set('live_start_time', this.value);
       });
-      document.getElementById('live_end_time').addEventListener('change', function() {
+      document.getElementById('live_end_time')?.addEventListener('change', function() {
         @this.set('live_end_time', this.value);
       });
 
       // Select2 Initialization
-      function initializeSelect2() {
+      function initializeSelect2(selectedOwner, ownerType) {
         // User Select2
         if ($('#user_id').length && !$('#user_id').hasClass('select2-hidden-accessible')) {
           $('#user_id').select2({
@@ -473,9 +459,15 @@
               cache: true
             }
           });
-          setTimeout(function() {
-            @this.set('user_id', $('#user_id').val());
-          }, 200);
+
+          // Set pre-selected user if applicable
+          if (ownerType === 'user' && selectedOwner) {
+            $('#user_id').append(new Option(selectedOwner.text, selectedOwner.id, true, true)).trigger('change');
+          }
+
+          $('#user_id').on('change', function() {
+            @this.set('user_id', $(this).val());
+          });
         }
 
         // Doctor Select2
@@ -506,9 +498,15 @@
               cache: true
             }
           });
-          setTimeout(function() {
-            @this.set('doctor_id', $('#doctor_id').val());
-          }, 200);
+
+          // Set pre-selected doctor if applicable
+          if (ownerType === 'doctor' && selectedOwner) {
+            $('#doctor_id').append(new Option(selectedOwner.text, selectedOwner.id, true, true)).trigger('change');
+          }
+
+          $('#doctor_id').on('change', function() {
+            @this.set('doctor_id', $(this).val());
+          });
         }
 
         // Medical Center Select2
@@ -518,7 +516,7 @@
             placeholder: 'مرکز درمانی را انتخاب کنید',
             width: '100%',
             ajax: {
-              url: "{{ route('admin.panel.stories.ajax.medical-centers') }}",
+                           url: "{{ route('admin.panel.stories.ajax.medical-centers') }}",
               dataType: 'json',
               delay: 250,
               data: function(params) {
@@ -539,9 +537,15 @@
               cache: true
             }
           });
-          setTimeout(function() {
-            @this.set('medical_center_id', $('#medical_center_id').val());
-          }, 200);
+
+          // Set pre-selected medical center if applicable
+          if (ownerType === 'medical_center' && selectedOwner) {
+            $('#medical_center_id').append(new Option(selectedOwner.text, selectedOwner.id, true, true)).trigger('change');
+          }
+
+          $('#medical_center_id').on('change', function() {
+            @this.set('medical_center_id', $(this).val());
+          });
         }
 
         // Manager Select2
@@ -572,49 +576,52 @@
               cache: true
             }
           });
-          setTimeout(function() {
-            @this.set('manager_id', $('#manager_id').val());
-          }, 200);
+
+          // Set pre-selected manager if applicable
+          if (ownerType === 'manager' && selectedOwner) {
+            $('#manager_id').append(new Option(selectedOwner.text, selectedOwner.id, true, true)).trigger('change');
+          }
+
+          $('#manager_id').on('change', function() {
+            @this.set('manager_id', $(this).val());
+          });
         }
       }
 
       // Initialize Select2 when component loads
-      initializeSelect2();
-
-      // Re-initialize Select2 when owner type changes
-      Livewire.on('owner-type-changed', () => {
-        // Clear all Select2 instances first
-        $('select[id$="_id"]').each(function() {
-          if ($(this).hasClass('select2-hidden-accessible')) {
-            $(this).select2('destroy');
+      Livewire.on('initialize-select2', (event) => {
+        // Destroy existing Select2 instances to prevent duplicates
+        ['#user_id', '#doctor_id', '#medical_center_id', '#manager_id'].forEach(selector => {
+          if ($(selector).hasClass('select2-hidden-accessible')) {
+            $(selector).select2('destroy');
           }
         });
 
-        // Clear the select values
-        $('select[id$="_id"]').val('').trigger('change');
-
+        // Initialize Select2 with pre-selected owner
         setTimeout(() => {
-          initializeSelect2();
+          initializeSelect2(event.selectedOwner, event.ownerType);
         }, 100);
       });
 
-      // Handle Select2 changes
-      $(document).on('change', '#user_id', function() {
-        @this.set('user_id', $(this).val());
+      // Re-initialize Select2 when owner type changes
+      Livewire.on('owner-type-changed', () => {
+        // Destroy all Select2 instances
+        ['#user_id', '#doctor_id', '#medical_center_id', '#manager_id'].forEach(selector => {
+          if ($(selector).hasClass('select2-hidden-accessible')) {
+            $(selector).select2('destroy');
+          }
+        });
+
+        // Reinitialize Select2 after a short delay to ensure DOM updates
+        setTimeout(() => {
+          initializeSelect2(null, @this.owner_type);
+        }, 100);
       });
 
-      $(document).on('change', '#doctor_id', function() {
-        @this.set('doctor_id', $(this).val());
-      });
+      // Initialize Select2 on page load with pre-selected owner
+      initializeSelect2(@json($selected_owner), @json($owner_type));
 
-      $(document).on('change', '#medical_center_id', function() {
-        @this.set('medical_center_id', $(this).val());
-      });
-
-      $(document).on('change', '#manager_id', function() {
-        @this.set('manager_id', $(this).val());
-      });
-
+      // Handle alerts
       Livewire.on('show-alert', (event) => {
         toastr[event.type](event.message);
       });

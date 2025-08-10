@@ -1,6 +1,6 @@
 @push('styles')
   <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/story/story.css') }}">
-  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/selesct2/select2.css') }}">
+  <link rel="stylesheet" href="{{ asset('admin-assets/panel/css/select2/select2.css') }}">
 @endpush
 
 @push('scripts')
@@ -188,7 +188,7 @@
               <div class="card-body">
                 <div class="mb-3">
                   <div class="position-relative">
-                    <select wire:model="owner_type" class="form-select @error('owner_type') is-invalid @enderror"
+                    <select wire:model.live="owner_type" class="form-select @error('owner_type') is-invalid @enderror"
                       id="owner_type" required>
                       <option value="">انتخاب کنید</option>
                       <option value="user">کاربر</option>
@@ -203,61 +203,63 @@
                   </div>
                 </div>
 
-                @if ($owner_type === 'user')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="user_id"
-                      class="form-select select2-user @error('user_id') is-invalid @enderror" id="user_id" required>
-                      <option value="">کاربر را انتخاب کنید</option>
-                    </select>
-                    <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
-                    @error('user_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                <div x-data="{ ownerType: @entangle('owner_type') }">
+                  <div x-show="ownerType === 'user'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="user_id"
+                        class="form-select select2-user @error('user_id') is-invalid @enderror" id="user_id" required>
+                        <option value="">کاربر را انتخاب کنید</option>
+                      </select>
+                      <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
+                      @error('user_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'doctor')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="doctor_id"
-                      class="form-select select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
-                      required>
-                      <option value="">پزشک را انتخاب کنید</option>
-                    </select>
-                    <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
-                    @error('doctor_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'doctor'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="doctor_id"
+                        class="form-select select2-doctor @error('doctor_id') is-invalid @enderror" id="doctor_id"
+                        required>
+                        <option value="">پزشک را انتخاب کنید</option>
+                      </select>
+                      <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
+                      @error('doctor_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'medical_center')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="medical_center_id"
-                      class="form-select select2-medical-center @error('medical_center_id') is-invalid @enderror"
-                      id="medical_center_id" required>
-                      <option value="">مرکز درمانی را انتخاب کنید</option>
-                    </select>
-                    <label for="medical_center_id" class="form-label">انتخاب مرکز درمانی <span
-                        class="text-danger">*</span></label>
-                    @error('medical_center_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'medical_center'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="medical_center_id"
+                        class="form-select select2-medical-center @error('medical_center_id') is-invalid @enderror"
+                        id="medical_center_id" required>
+                        <option value="">مرکز درمانی را انتخاب کنید</option>
+                      </select>
+                      <label for="medical_center_id" class="form-label">انتخاب مرکز درمانی <span
+                          class="text-danger">*</span></label>
+                      @error('medical_center_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
 
-                @if ($owner_type === 'manager')
-                  <div class="position-relative" wire:ignore>
-                    <select wire:model="manager_id"
-                      class="form-select select2-manager @error('manager_id') is-invalid @enderror" id="manager_id"
-                      required>
-                      <option value="">مدیر را انتخاب کنید</option>
-                    </select>
-                    <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
-                    @error('manager_id')
-                      <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                  <div x-show="ownerType === 'manager'" x-transition>
+                    <div class="position-relative">
+                      <select wire:model.live="manager_id"
+                        class="form-select select2-manager @error('manager_id') is-invalid @enderror" id="manager_id"
+                        required>
+                        <option value="">مدیر را انتخاب کنید</option>
+                      </select>
+                      <label for="manager_id" class="form-label">انتخاب مدیر <span class="text-danger">*</span></label>
+                      @error('manager_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                      @enderror
+                    </div>
                   </div>
-                @endif
+                </div>
               </div>
             </div>
 
@@ -334,6 +336,7 @@
       </form>
     </div>
   </div>
+
   <script>
     document.addEventListener('livewire:init', () => {
       // Jalali Datepicker
@@ -353,10 +356,10 @@
         }
       });
 
-      document.getElementById('live_start_time').addEventListener('change', function() {
+      document.getElementById('live_start_time')?.addEventListener('change', function() {
         @this.set('live_start_time', this.value);
       });
-      document.getElementById('live_end_time').addEventListener('change', function() {
+      document.getElementById('live_end_time')?.addEventListener('change', function() {
         @this.set('live_end_time', this.value);
       });
 
@@ -389,10 +392,9 @@
               },
               cache: true
             }
+          }).on('change', function() {
+            @this.set('user_id', $(this).val());
           });
-          setTimeout(function() {
-            @this.set('user_id', $('#user_id').val());
-          }, 200);
         }
 
         // Doctor Select2
@@ -422,10 +424,9 @@
               },
               cache: true
             }
+          }).on('change', function() {
+            @this.set('doctor_id', $(this).val());
           });
-          setTimeout(function() {
-            @this.set('doctor_id', $('#doctor_id').val());
-          }, 200);
         }
 
         // Medical Center Select2
@@ -455,10 +456,9 @@
               },
               cache: true
             }
+          }).on('change', function() {
+            @this.set('medical_center_id', $(this).val());
           });
-          setTimeout(function() {
-            @this.set('medical_center_id', $('#medical_center_id').val());
-          }, 200);
         }
 
         // Manager Select2
@@ -488,10 +488,9 @@
               },
               cache: true
             }
+          }).on('change', function() {
+            @this.set('manager_id', $(this).val());
           });
-          setTimeout(function() {
-            @this.set('manager_id', $('#manager_id').val());
-          }, 200);
         }
       }
 
@@ -500,36 +499,17 @@
 
       // Re-initialize Select2 when owner type changes
       Livewire.on('owner-type-changed', () => {
-        // Clear all Select2 instances first
-        $('select[id$="_id"]').each(function() {
-          if ($(this).hasClass('select2-hidden-accessible')) {
-            $(this).select2('destroy');
+        // Destroy all Select2 instances
+        ['#user_id', '#doctor_id', '#medical_center_id', '#manager_id'].forEach(selector => {
+          if ($(selector).hasClass('select2-hidden-accessible')) {
+            $(selector).select2('destroy');
           }
         });
 
-        // Clear the select values
-        $('select[id$="_id"]').val('').trigger('change');
-
+        // Reinitialize Select2 after a short delay to ensure DOM updates
         setTimeout(() => {
           initializeSelect2();
         }, 100);
-      });
-
-      // Handle Select2 changes
-      $(document).on('change', '#user_id', function() {
-        @this.set('user_id', $(this).val());
-      });
-
-      $(document).on('change', '#doctor_id', function() {
-        @this.set('doctor_id', $(this).val());
-      });
-
-      $(document).on('change', '#medical_center_id', function() {
-        @this.set('medical_center_id', $(this).val());
-      });
-
-      $(document).on('change', '#manager_id', function() {
-        @this.set('manager_id', $(this).val());
       });
 
       Livewire.on('show-alert', (event) => {

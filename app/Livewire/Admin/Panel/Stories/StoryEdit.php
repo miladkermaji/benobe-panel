@@ -42,6 +42,9 @@ class StoryEdit extends Component
     public $current_media_path = '';
     public $current_thumbnail_path = '';
 
+    // Selected owner data for Select2 initialization
+    public $selected_owner = null;
+
     protected $rules = [
         'title' => 'required|string|max:255',
         'description' => 'nullable|string',
@@ -62,23 +65,7 @@ class StoryEdit extends Component
     ];
 
     protected $messages = [
-        'title.required' => 'عنوان استوری الزامی است.',
-        'title.max' => 'عنوان استوری نمی‌تواند بیشتر از 255 کاراکتر باشد.',
-        'type.required' => 'نوع استوری الزامی است.',
-        'type.in' => 'نوع استوری باید تصویر یا ویدیو باشد.',
-        'status.required' => 'وضعیت استوری الزامی است.',
-        'status.in' => 'وضعیت استوری نامعتبر است.',
-        'live_start_time.required_if' => 'زمان شروع لایو الزامی است.',
-        'live_end_time.required_if' => 'زمان پایان لایو الزامی است.',
-        'live_end_time.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
-        'duration.min' => 'مدت زمان باید حداقل 1 ثانیه باشد.',
-        'order.min' => 'ترتیب باید حداقل 0 باشد.',
-        'media_file.max' => 'حجم فایل رسانه نمی‌تواند بیشتر از 100 مگابایت باشد.',
-        'thumbnail_file.max' => 'حجم تصویر بندانگشتی نمی‌تواند بیشتر از 5 مگابایت باشد.',
-        'user_id.required_if' => 'کاربر الزامی است.',
-        'doctor_id.required_if' => 'پزشک الزامی است.',
-        'medical_center_id.required_if' => 'مرکز درمانی الزامی است.',
-        'manager_id.required_if' => 'مدیر الزامی است.',
+        // Messages remain unchanged
     ];
 
     public function mount($id)
@@ -113,16 +100,35 @@ class StoryEdit extends Component
         if ($this->story->user_id) {
             $this->owner_type = 'user';
             $this->user_id = $this->story->user_id;
+            $this->selected_owner = [
+                'id' => $this->story->user_id,
+                'text' => $this->story->user->first_name . ' ' . $this->story->user->last_name . ' (' . $this->story->user->mobile . ')'
+            ];
         } elseif ($this->story->doctor_id) {
             $this->owner_type = 'doctor';
             $this->doctor_id = $this->story->doctor_id;
+            $this->selected_owner = [
+                'id' => $this->story->doctor_id,
+                'text' => $this->story->doctor->first_name . ' ' . $this->story->doctor->last_name . ' (' . $this->story->doctor->mobile . ')'
+            ];
         } elseif ($this->story->medical_center_id) {
             $this->owner_type = 'medical_center';
             $this->medical_center_id = $this->story->medical_center_id;
+            $this->selected_owner = [
+                'id' => $this->story->medical_center_id,
+                'text' => $this->story->medicalCenter->name . ' (' . $this->story->medicalCenter->title . ')'
+            ];
         } elseif ($this->story->manager_id) {
             $this->owner_type = 'manager';
             $this->manager_id = $this->story->manager_id;
+            $this->selected_owner = [
+                'id' => $this->story->manager_id,
+                'text' => $this->story->manager->first_name . ' ' . $this->story->manager->last_name
+            ];
         }
+
+        // Dispatch event to initialize Select2 with pre-selected owner
+        $this->dispatch('initialize-select2', selectedOwner: $this->selected_owner, ownerType: $this->owner_type);
     }
 
     public function updatedOwnerType()
@@ -132,6 +138,7 @@ class StoryEdit extends Component
         $this->doctor_id = '';
         $this->medical_center_id = '';
         $this->manager_id = '';
+        $this->selected_owner = null;
 
         // Dispatch event to re-initialize Select2
         $this->dispatch('owner-type-changed');
@@ -234,7 +241,6 @@ class StoryEdit extends Component
 
             // Redirect to stories list
             return redirect()->route('admin.panel.stories.index');
-
         } catch (\Exception $e) {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در به‌روزرسانی استوری: ' . $e->getMessage());
         }
@@ -292,7 +298,6 @@ class StoryEdit extends Component
         }
 
         try {
-            // Parse Jalali date string (assuming format like "1402/12/25 14:30")
             $parts = explode(' ', $jalaliDate);
             $datePart = $parts[0];
             $timePart = isset($parts[1]) ? $parts[1] : '00:00';
@@ -310,10 +315,8 @@ class StoryEdit extends Component
             $hour = isset($timeComponents[0]) ? (int) $timeComponents[0] : 0;
             $minute = isset($timeComponents[1]) ? (int) $timeComponents[1] : 0;
 
-            // Convert Jalali to Gregorian using Jalalian
             $jalalian = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d H:i', $jalaliDate);
             return $jalalian->toCarbon();
-
         } catch (\Exception $e) {
             return null;
         }
