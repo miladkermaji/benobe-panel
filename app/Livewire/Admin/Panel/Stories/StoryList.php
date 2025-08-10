@@ -13,7 +13,7 @@ class StoryList extends Component
     use WithPagination;
 
     protected $paginationTheme = 'bootstrap';
-
+    public $storyStatus = [];
     protected $listeners = [
         'deleteStoryConfirmed' => 'deleteStory',
         'deleteSelectedConfirmed' => 'deleteSelected',
@@ -44,6 +44,13 @@ class StoryList extends Component
     public function mount()
     {
         $this->perPage = max($this->perPage, 1);
+        $this->storyStatus = [];
+        if ($this->readyToLoad) {
+            $stories = $this->getStoriesQuery()->paginate($this->perPage);
+            foreach ($stories as $story) {
+                $this->storyStatus[$story->id] = $story->status === 'active';
+            }
+        }
     }
 
     public function loadStories()
@@ -78,53 +85,7 @@ class StoryList extends Component
         Cache::forget('stories_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
     }
 
-    public function confirmApprove($id)
-    {
-        $story = Story::find($id);
-        if (!$story) {
-            $this->dispatch('show-alert', type: 'error', message: 'استوری یافت نشد.');
-            return;
-        }
 
-        $this->dispatch('confirm-approve', id: $id, name: $story->title);
-    }
-
-    public function approveStory($id)
-    {
-        $story = Story::find($id);
-        if (!$story) {
-            $this->dispatch('show-alert', type: 'error', message: 'استوری یافت نشد.');
-            return;
-        }
-
-        $story->update(['status' => 'active']);
-        $this->dispatch('show-alert', type: 'success', message: 'استوری تأیید شد!');
-        Cache::forget('stories_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
-    }
-
-    public function confirmReject($id)
-    {
-        $story = Story::find($id);
-        if (!$story) {
-            $this->dispatch('show-alert', type: 'error', message: 'استوری یافت نشد.');
-            return;
-        }
-
-        $this->dispatch('confirm-reject', id: $id, name: $story->title);
-    }
-
-    public function rejectStory($id)
-    {
-        $story = Story::find($id);
-        if (!$story) {
-            $this->dispatch('show-alert', type: 'error', message: 'استوری یافت نشد.');
-            return;
-        }
-
-        $story->update(['status' => 'inactive']);
-        $this->dispatch('show-alert', type: 'info', message: 'استوری رد شد!');
-        Cache::forget('stories_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
-    }
 
     public function confirmDelete($id)
     {
@@ -287,11 +248,11 @@ class StoryList extends Component
         }
 
         if ($this->statusFilter) {
-            $query->where('status', $this->statusFilter);
-        }
-
-        if ($this->typeFilter) {
-            $query->where('type', $this->typeFilter);
+            if (in_array($this->statusFilter, ['active', 'inactive', 'pending'])) {
+                $query->where('status', $this->statusFilter);
+            } elseif (in_array($this->statusFilter, ['image', 'video'])) {
+                $query->where('type', $this->statusFilter);
+            }
         }
 
         if ($this->ownerTypeFilter) {
@@ -313,12 +274,28 @@ class StoryList extends Component
 
         return $query;
     }
+    public function toggleStatus($id)
+    {
+        $story = Story::find($id);
+        if (!$story) {
+            $this->dispatch('show-alert', type: 'error', message: 'استوری یافت نشد.');
+            return;
+        }
 
+        $newStatus = $this->storyStatus[$id] ? 'active' : 'inactive';
+        $story->update(['status' => $newStatus]);
+
+        $this->dispatch('show-alert', type: 'success', message: $newStatus === 'active' ? 'استوری فعال شد!' : 'استوری غیرفعال شد!');
+        Cache::forget('stories_' . $this->search . '_status_' . $this->statusFilter . '_page_' . $this->getPage());
+    }
     public function render()
     {
         if ($this->readyToLoad) {
             $stories = $this->getStoriesQuery()->paginate($this->perPage);
             $this->totalFilteredCount = $this->getStoriesQuery()->count();
+            foreach ($stories as $story) {
+                $this->storyStatus[$story->id] = $story->status === 'active';
+            }
         } else {
             $stories = collect();
             $this->totalFilteredCount = 0;

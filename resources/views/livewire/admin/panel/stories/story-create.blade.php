@@ -135,12 +135,12 @@
                       </label>
                     </div>
                   </div>
-                  <div class="card-body" @if (!$is_live) style="display: none;" @endif>
+                  <div class="card-body" x-data="{ show: @entangle('is_live') }" x-show="show" x-transition>
                     <div class="row g-3">
                       <div class="col-md-6">
                         <div class="position-relative">
                           <input wire:model="live_start_time" type="datetime-local"
-                            class="form-control @error('live_start_time') is-invalid @enderror" id="live_start_time">
+                            class="form-control @error('live_start_time') is-invalid @enderror" id="live_start_time" placeholder=" ">
                           <label for="live_start_time" class="form-label">زمان شروع لایو</label>
                           @error('live_start_time')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -150,7 +150,7 @@
                       <div class="col-md-6">
                         <div class="position-relative">
                           <input wire:model="live_end_time" type="datetime-local"
-                            class="form-control @error('live_end_time') is-invalid @enderror" id="live_end_time">
+                            class="form-control @error('live_end_time') is-invalid @enderror" id="live_end_time" placeholder=" ">
                           <label for="live_end_time" class="form-label">زمان پایان لایو</label>
                           @error('live_end_time')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -284,33 +284,36 @@
               </div>
               <div class="card-body">
                 <div class="mb-3">
-                  <label for="media_file" class="form-label">
-                    فایل {{ $type === 'image' ? 'تصویر' : 'ویدیو' }} <span class="text-danger">*</span>
-                  </label>
-                  <input wire:model="media_file" type="file"
-                    class="form-control @error('media_file') is-invalid @enderror" id="media_file"
-                    accept="{{ $type === 'image' ? 'image/*' : 'video/*' }}">
-                  <div class="form-text">
-                    @if ($type === 'image')
-                      فرمت‌های مجاز: JPG, PNG, GIF - حداکثر 100MB
-                    @else
-                      فرمت‌های مجاز: MP4, AVI, MOV - حداکثر 100MB
-                    @endif
+                  <div class="position-relative">
+                    <input wire:model="media_file" type="file"
+                      class="form-control @error('media_file') is-invalid @enderror" id="media_file"
+                      accept="{{ $type === 'image' ? 'image/*' : 'video/*' }}" placeholder=" ">
+                    <label for="media_file" class="form-label">فایل {{ $type === 'image' ? 'تصویر' : 'ویدیو' }} <span
+                        class="text-danger">*</span></label>
+                    <div class="form-text">
+                      @if ($type === 'image')
+                        فرمت‌های مجاز: JPG, PNG, GIF - حداکثر 100MB
+                      @else
+                        فرمت‌های مجاز: MP4, AVI, MOV - حداکثر 100MB
+                      @endif
+                    </div>
+                    @error('media_file')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                   </div>
-                  @error('media_file')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                  @enderror
                 </div>
 
                 <div class="mb-3">
-                  <label for="thumbnail_file" class="form-label">تصویر بندانگشتی</label>
-                  <input wire:model="thumbnail_file" type="file"
-                    class="form-control @error('thumbnail_file') is-invalid @enderror" id="thumbnail_file"
-                    accept="image/*">
-                  <div class="form-text">فرمت‌های مجاز: JPG, PNG - حداکثر 5MB</div>
-                  @error('thumbnail_file')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                  @enderror
+                  <div class="position-relative">
+                    <input wire:model="thumbnail_file" type="file"
+                      class="form-control @error('thumbnail_file') is-invalid @enderror" id="thumbnail_file"
+                      accept="image/*" placeholder=" ">
+                    <label for="thumbnail_file" class="form-label">تصویر بندانگشتی</label>
+                    <div class="form-text">فرمت‌های مجاز: JPG, PNG - حداکثر 5MB</div>
+                    @error('thumbnail_file')
+                      <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                  </div>
                 </div>
               </div>
             </div>
@@ -339,16 +342,12 @@
       </form>
     </div>
   </div>
-</div>
-
-<script>
-  // Show/hide live settings based on checkbox
+  <script>
   document.addEventListener('livewire:init', () => {
-    Livewire.on('updatedIsLive', (value) => {
-      const liveSettings = document.querySelector('.card-body[style*="display: none"]');
-      if (liveSettings) {
-        liveSettings.style.display = value ? 'block' : 'none';
-      }
+    Livewire.on('show-alert', (event) => {
+      toastr[event.type](event.message);
     });
   });
 </script>
+</div>
+

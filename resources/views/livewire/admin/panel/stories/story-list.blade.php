@@ -40,13 +40,10 @@
               </svg>
             </div>
             <select class="form-select form-select-sm" wire:model.live="statusFilter">
-              <option value="">همه وضعیت‌ها</option>
+              <option value="">همه موارد</option>
               <option value="active">فعال</option>
               <option value="inactive">غیرفعال</option>
               <option value="pending">در انتظار تأیید</option>
-            </select>
-            <select class="form-select form-select-sm" wire:model.live="typeFilter">
-              <option value="">همه انواع</option>
               <option value="image">تصویر</option>
               <option value="video">ویدیو</option>
             </select>
@@ -76,13 +73,10 @@
             </svg>
           </div>
           <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="statusFilter">
-            <option value="">همه وضعیت‌ها</option>
+            <option value="">همه موارد</option>
             <option value="active">فعال</option>
             <option value="inactive">غیرفعال</option>
             <option value="pending">در انتظار تأیید</option>
-          </select>
-          <select class="form-select form-select-sm" style="min-width: 120px;" wire:model.live="typeFilter">
-            <option value="">همه انواع</option>
             <option value="image">تصویر</option>
             <option value="video">ویدیو</option>
           </select>
@@ -99,7 +93,6 @@
         </div>
       </div>
     </header>
-
     <div class="container-fluid px-0">
       <div class="card shadow-sm rounded-2">
         <div class="card-body p-0">
@@ -112,285 +105,436 @@
                 <option value="delete">حذف انتخاب شده‌ها</option>
                 <option value="activate">فعال کردن</option>
                 <option value="deactivate">غیرفعال کردن</option>
-                <option value="approve">تأیید</option>
-                <option value="reject">رد کردن</option>
               </select>
-              <div class="form-check">
-                <input wire:model="applyToAllFiltered" type="checkbox" class="form-check-input" id="applyToAll">
-                <label class="form-check-label small" for="applyToAll">
-                  اعمال به همه فیلتر شده ({{ $totalFilteredCount }})
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="applyToAllFiltered"
+                  wire:model="applyToAllFiltered">
+                <label class="form-check-label" for="applyToAllFiltered">
+                  اعمال روی همه نتایج فیلترشده ({{ $totalFilteredCount ?? 0 }})
                 </label>
               </div>
-              <button wire:click="executeGroupAction" class="btn btn-warning btn-sm"
-                @if (empty($groupAction)) disabled @endif>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="2">
-                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                </svg>
-                اجرا
+              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+                <span wire:loading.remove>اجرا</span>
+                <span wire:loading>در حال اجرا...</span>
               </button>
             </div>
           </div>
-
-          <!-- Stories List -->
-          @if ($readyToLoad)
-            @if ($stories->count() > 0)
-              <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                  <thead class="table-light">
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0">
+              <thead>
+                <tr>
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
+                  </th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                  <th class="text-center align-middle" style="width: 80px;">رسانه</th>
+                  <th class="align-middle">عنوان</th>
+                  <th class="align-middle">مالک</th>
+                  <th class="align-middle">نوع</th>
+                  <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                  <th class="align-middle">آمار</th>
+                  <th class="align-middle">تاریخ</th>
+                  <th class="text-center align-middle" style="width: 100px;">عملیات</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if ($readyToLoad)
+                  @forelse ($stories as $index => $story)
                     <tr>
-                      <th class="border-0">
-                        <div class="form-check">
-                          <input wire:model.live="selectAll" type="checkbox" class="form-check-input"
-                            id="selectAll">
-                        </div>
-                      </th>
-                      <th class="border-0 d-none d-md-table-cell">رسانه</th>
-                      <th class="border-0">عنوان</th>
-                      <th class="border-0 d-none d-lg-table-cell">مالک</th>
-                      <th class="border-0 d-none d-md-table-cell">نوع</th>
-                      <th class="border-0">وضعیت</th>
-                      <th class="border-0 d-none d-lg-table-cell">آمار</th>
-                      <th class="border-0 d-none d-md-table-cell">تاریخ</th>
-                      <th class="border-0">عملیات</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @foreach ($stories as $story)
-                      <tr>
-                        <td>
-                          <div class="form-check">
-                            <input wire:model.live="selectedStories" type="checkbox" class="form-check-input"
-                              value="{{ $story->id }}" id="story_{{ $story->id }}">
-                          </div>
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                          <div class="d-flex align-items-center">
-                            @if ($story->media_path && Storage::exists($story->media_path))
-                              @if ($story->type === 'image')
-                                <img src="{{ Storage::url($story->media_path) }}" class="rounded"
-                                  alt="{{ $story->title }}" style="width: 50px; height: 50px; object-fit: cover;">
-                              @else
-                                <div class="position-relative">
-                                  <video class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
-                                    preload="none">
-                                    <source src="{{ Storage::url($story->media_path) }}" type="video/mp4">
-                                  </video>
-                                  <div class="position-absolute top-50 start-50 translate-middle">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"
-                                      stroke="white" stroke-width="2">
-                                      <polygon points="5,3 19,12 5,21" />
-                                    </svg>
-                                  </div>
-                                </div>
-                              @endif
+                      <td class="text-center align-middle">
+                        <input type="checkbox" wire:model.live="selectedStories" value="{{ $story->id }}"
+                          class="form-check-input m-0 align-middle">
+                      </td>
+                      <td class="text-center align-middle">{{ $stories->firstItem() + $index }}</td>
+                      <td class="text-center align-middle">
+                        <div class="position-relative" style="width: 40px; height: 40px;">
+                          @if ($story->media_path && Storage::exists($story->media_path))
+                            @if ($story->type === 'image')
+                              <img src="{{ Storage::url($story->media_path) }}" class="rounded-circle"
+                                style="width: 40px; height: 40px; object-fit: cover;" alt="{{ $story->title }}">
                             @else
-                              <div class="bg-light rounded d-flex align-items-center justify-content-center"
-                                style="width: 50px; height: 50px;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              <video class="rounded-circle" style="width: 40px; height: 40px; object-fit: cover;"
+                                preload="none">
+                                <source src="{{ Storage::url($story->media_path) }}" type="video/mp4">
+                              </video>
+                              <div class="position-absolute top-50 start-50 translate-middle">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="white"
+                                  stroke="white" stroke-width="2">
+                                  <polygon points="5,3 19,12 5,21" />
                                 </svg>
                               </div>
                             @endif
-                          </div>
-                        </td>
-                        <td>
-                          <div>
-                            <div class="fw-medium">{{ Str::limit($story->title, 40) }}</div>
-                            @if ($story->description)
-                              <small
-                                class="text-muted d-none d-md-block">{{ Str::limit($story->description, 60) }}</small>
-                            @endif
-                            <!-- Mobile info -->
-                            <div class="d-md-none mt-1">
-                              <small class="text-muted">
-                                @if ($story->user)
-                                  کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
-                                @elseif($story->doctor)
-                                  پزشک: {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
-                                @elseif($story->medicalCenter)
-                                  مرکز: {{ $story->medicalCenter->name }}
-                                @elseif($story->manager)
-                                  مدیر: {{ $story->manager->first_name }} {{ $story->manager->last_name }}
-                                @endif
-                              </small>
-                              <br>
-                              <small class="text-muted">
-                                @if ($story->type === 'image')
-                                  <span class="badge bg-info">تصویر</span>
-                                @else
-                                  <span class="badge bg-primary">ویدیو</span>
-                                @endif
-                                • {{ $story->created_at->format('Y/m/d') }}
-                              </small>
-                            </div>
-                          </div>
-                        </td>
-                        <td class="d-none d-lg-table-cell">
-                          <small class="text-muted">
-                            @if ($story->user)
-                              کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
-                            @elseif($story->doctor)
-                              پزشک: {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
-                            @elseif($story->medicalCenter)
-                              مرکز: {{ $story->medicalCenter->name }}
-                            @elseif($story->manager)
-                              مدیر: {{ $story->manager->first_name }} {{ $story->manager->last_name }}
-                            @endif
-                          </small>
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                          @if ($story->type === 'image')
-                            <span class="badge bg-info">تصویر</span>
                           @else
-                            <span class="badge bg-primary">ویدیو</span>
-                          @endif
-                        </td>
-                        <td>
-                          @if ($story->status === 'active')
-                            <span class="badge bg-success">فعال</span>
-                          @elseif($story->status === 'inactive')
-                            <span class="badge bg-secondary">غیرفعال</span>
-                          @else
-                            <span class="badge bg-warning">در انتظار</span>
-                          @endif
-                          @if ($story->is_live)
-                            <span class="badge bg-danger ms-1">لایو</span>
-                          @endif
-                        </td>
-                        <td class="d-none d-lg-table-cell">
-                          <div class="d-flex flex-column">
-                            <small class="text-muted">بازدید: {{ number_format($story->views_count) }}</small>
-                            <small class="text-muted">لایک: {{ number_format($story->likes_count) }}</small>
-                          </div>
-                        </td>
-                        <td class="d-none d-md-table-cell">
-                          <small class="text-muted">{{ $story->created_at->format('Y/m/d H:i') }}</small>
-                        </td>
-                        <td>
-                          <div class="d-flex gap-1 flex-wrap">
-                            <a href="{{ route('admin.panel.stories.edit', $story->id) }}"
-                              class="btn btn-sm btn-outline-primary">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-                              </svg>
-                            </a>
-
-                            @if ($story->status === 'pending')
-                              <button wire:click="confirmApprove({{ $story->id }})"
-                                class="btn btn-sm btn-success">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <polyline points="20,6 9,17 4,12" />
-                                </svg>
-                              </button>
-                              <button wire:click="confirmReject({{ $story->id }})" class="btn btn-sm btn-warning">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <line x1="18" y1="6" x2="6" y2="18" />
-                                  <line x1="6" y1="6" x2="18" y2="18" />
-                                </svg>
-                              </button>
-                            @else
-                              <button wire:click="confirmToggleStatus({{ $story->id }})"
-                                class="btn btn-sm btn-outline-secondary">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                  stroke="currentColor" stroke-width="2">
-                                  <path d="M9 12l2 2 4-4" />
-                                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z" />
-                                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z" />
-                                </svg>
-                              </button>
-                            @endif
-
-                            <button wire:click="confirmDelete({{ $story->id }})"
-                              class="btn btn-sm btn-outline-danger">
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                                stroke="currentColor" stroke-width="2">
-                                <polyline points="3,6 5,6 21,6" />
+                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                              style="width: 40px; height: 40px; background-color: #f8f9fa;">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="#6c757d" stroke-width="2">
                                 <path
-                                  d="M19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2" />
+                                  d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
-                            </button>
+                            </div>
+                          @endif
+                        </div>
+                      </td>
+                      <td class="align-middle">
+                        <div class="fw-medium">{{ Str::limit($story->title, 40) }}</div>
+                        @if ($story->description)
+                          <small class="text-muted">{{ Str::limit($story->description, 60) }}</small>
+                        @endif
+                      </td>
+                      <td class="align-middle">
+                        <small class="text-muted">
+                          @if ($story->user)
+                            کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
+                          @elseif($story->doctor)
+                            پزشک: {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
+                          @elseif($story->medicalCenter)
+                            مرکز: {{ $story->medicalCenter->name }}
+                          @elseif($story->manager)
+                            مدیر: {{ $story->manager->first_name }} {{ $story->manager->last_name }}
+                          @endif
+                        </small>
+                      </td>
+                      <td class="align-middle">
+                        @if ($story->type === 'image')
+                          <span class="badge bg-info">تصویر</span>
+                        @else
+                          <span class="badge bg-primary">ویدیو</span>
+                        @endif
+                      </td>
+                      <td class="text-center align-middle">
+                        <label class="switch">
+                          <input type="checkbox" wire:model="storyStatus.{{ $story->id }}"
+                            wire:change="toggleStatus({{ $story->id }})"
+                            {{ $story->status === 'active' ? 'checked' : '' }}>
+                          <span class="slider round"></span>
+                        </label>
+                        @if ($story->is_live)
+                          <span class="badge bg-danger ms-1">لایو</span>
+                        @endif
+                      </td>
+                      <td class="align-middle">
+                        <div class="d-flex flex-column">
+                          <small class="text-muted">بازدید: {{ number_format($story->views_count) }}</small>
+                          <small class="text-muted">لایک: {{ number_format($story->likes_count) }}</small>
+                        </div>
+                      </td>
+                      <td class="align-middle">
+                        <small
+                          class="text-muted">{{ \Morilog\Jalali\Jalalian::fromCarbon($story->created_at)->format('Y/m/d H:i') }}</small>
+                      </td>
+                      <td class="text-center align-middle">
+                        <div class="d-flex justify-content-center gap-2">
+                          <a href="{{ route('admin.panel.stories.edit', $story->id) }}"
+                            class="btn btn-gradient-primary rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $story->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="10" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                            <path
+                              d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p class="text-muted fw-medium">هیچ استوری‌ای یافت نشد.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
+                  <tr>
+                    <td colspan="10" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
+                      </div>
+                    </td>
+                  </tr>
+                @endif
+              </tbody>
+            </table>
+          </div>
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($stories as $index => $story)
+                <div class="note-card mb-2" x-data="{ open: false }">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedStories" value="{{ $story->id }}"
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">
+                        {{ Str::limit($story->title, 40) }}
+                        <span class="text-muted">({{ $story->type === 'image' ? 'تصویر' : 'ویدیو' }})</span>
+                      </span>
+                    </div>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                  <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">رسانه:</span>
+                      <div class="note-card-value">
+                        @if ($story->media_path && Storage::exists($story->media_path))
+                          @if ($story->type === 'image')
+                            <img src="{{ Storage::url($story->media_path) }}" class="rounded"
+                              style="width: 50px; height: 50px; object-fit: cover;" alt="{{ $story->title }}">
+                          @else
+                            <video class="rounded" style="width: 50px; height: 50px; object-fit: cover;"
+                              preload="none">
+                              <source src="{{ Storage::url($story->media_path) }}" type="video/mp4">
+                            </video>
+                          @endif
+                        @else
+                          <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
                           </div>
-                        </td>
-                      </tr>
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Pagination -->
-              <div class="d-flex justify-content-center p-3">
-                {{ $stories->links() }}
-              </div>
+                        @endif
+                      </div>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">عنوان:</span>
+                      <span class="note-card-value">{{ Str::limit($story->title, 40) }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">توضیحات:</span>
+                      <span
+                        class="note-card-value">{{ $story->description ? Str::limit($story->description, 60) : '---' }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">مالک:</span>
+                      <span class="note-card-value">
+                        @if ($story->user)
+                          کاربر: {{ $story->user->first_name }} {{ $story->user->last_name }}
+                        @elseif($story->doctor)
+                          پزشک: {{ $story->doctor->first_name }} {{ $story->doctor->last_name }}
+                        @elseif($story->medicalCenter)
+                          مرکز: {{ $story->medicalCenter->name }}
+                        @elseif($story->manager)
+                          مدیر: {{ $story->manager->first_name }} {{ $story->manager->last_name }}
+                        @endif
+                      </span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">نوع:</span>
+                      <span class="note-card-value">{{ $story->type === 'image' ? 'تصویر' : 'ویدیو' }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">وضعیت:</span>
+                      <label class="switch">
+                        <input type="checkbox" wire:model="storyStatus.{{ $story->id }}"
+                          wire:change="toggleStatus({{ $story->id }})"
+                          {{ $story->status === 'active' ? 'checked' : '' }}>
+                        <span class="slider round"></span>
+                      </label>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">آمار:</span>
+                      <div class="note-card-value">
+                        بازدید: {{ number_format($story->views_count) }}<br>
+                        لایک: {{ number_format($story->likes_count) }}
+                      </div>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">تاریخ:</span>
+                      <span
+                        class="note-card-value">{{ \Morilog\Jalali\Jalalian::fromCarbon($story->created_at)->format('Y/m/d H:i') }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">عملیات:</span>
+                      <div class="d-flex gap-2">
+                        <a href="{{ route('admin.panel.stories.edit', $story->id) }}"
+                          class="btn btn-gradient-primary btn-sm rounded-pill px-3">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </a>
+                        <button wire:click="confirmDelete({{ $story->id }})"
+                          class="btn btn-gradient-danger btn-sm rounded-pill px-3">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ استوری‌ای یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
             @else
-              <div class="text-center py-5">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="1" class="text-muted mb-3">
-                  <path
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h5 class="text-muted">هیچ استوری‌ای یافت نشد!</h5>
-                <p class="text-muted">با تغییر فیلترها یا ایجاد استوری جدید شروع کنید.</p>
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
               </div>
             @endif
-          @else
-            <div class="text-center py-5">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">در حال بارگذاری...</span>
-              </div>
-              <p class="mt-3 text-muted">در حال بارگذاری استوری‌ها...</p>
+          </div>
+          <!-- Pagination -->
+          <div class="d-flex justify-content-between align-items-center px-4 flex-wrap gap-3">
+            <div class="text-muted">نمایش
+              {{ $readyToLoad && $stories instanceof \Illuminate\Pagination\LengthAwarePaginator ? $stories->firstItem() : 0 }}
+              تا
+              {{ $readyToLoad && $stories instanceof \Illuminate\Pagination\LengthAwarePaginator ? $stories->lastItem() : 0 }}
+              از
+              {{ $readyToLoad ? $stories->total() : 0 }} ردیف
             </div>
-          @endif
+            @if ($readyToLoad && $stories && $stories->hasPages())
+              <div class="pagination-container">
+                {{ $stories->onEachSide(1)->links('livewire::bootstrap') }}
+              </div>
+            @endif
+          </div>
         </div>
       </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          Livewire.on('show-alert', (event) => {
+            toastr[event.type](event.message);
+          });
+
+          Livewire.on('confirm-delete', (event) => {
+            Swal.fire({
+              title: 'حذف استوری',
+              text: `آیا مطمئن هستید که می‌خواهید استوری "${event.name}" را حذف کنید؟`,
+              showCancelButton: true,
+              confirmButtonColor: '#ef4444',
+              cancelButtonColor: '#6b7280',
+              confirmButtonText: 'بله، حذف کن',
+              cancelButtonText: 'خیر'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('deleteStoryConfirmed', {
+                  id: event.id
+                });
+              }
+            });
+          });
+
+          Livewire.on('confirm-toggle-status', (event) => {
+            Swal.fire({
+              title: event.action + ' استوری',
+              text: `آیا مطمئن هستید که می‌خواهید "${event.name}" را ${event.action} کنید؟`,
+              showCancelButton: true,
+              confirmButtonColor: '#1deb3c',
+              cancelButtonColor: '#6b7280',
+              confirmButtonText: 'بله',
+              cancelButtonText: 'خیر'
+            }).then((result) => {
+              if (result.isConfirmed) {
+                Livewire.dispatch('toggleStatusConfirmed', {
+                  id: event.id
+                });
+              }
+            });
+          });
+
+          Livewire.on('confirm-delete-selected', function(data) {
+            let text = data.allFiltered ?
+              'آیا از حذف همه استوری‌های فیلترشده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.' :
+              'آیا از حذف استوری‌های انتخاب شده مطمئن هستید؟ این عملیات غیرقابل بازگشت است.';
+            Swal.fire({
+              title: 'تایید حذف گروهی',
+              text: text,
+              showCancelButton: true,
+              confirmButtonText: 'بله، حذف شود',
+              cancelButtonText: 'لغو',
+              reverseButtons: true
+            }).then((result) => {
+              if (result.isConfirmed) {
+                if (data.allFiltered) {
+                  Livewire.dispatch('deleteSelectedConfirmed', 'allFiltered');
+                } else {
+                  Livewire.dispatch('deleteSelectedConfirmed');
+                }
+              }
+            });
+          });
+        });
+      </script>
+      <style>
+        .switch {
+          position: relative;
+          display: inline-block;
+          width: 50px;
+          height: 24px;
+        }
+
+        .switch input {
+          opacity: 0;
+          width: 0;
+          height: 0;
+        }
+
+        .slider {
+          position: absolute;
+          cursor: pointer;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-color: #ccc;
+          transition: .4s;
+          border-radius: 24px;
+        }
+
+        .slider:before {
+          position: absolute;
+          content: "";
+          height: 20px;
+          width: 20px;
+          left: 2px;
+          bottom: 2px;
+          background-color: white;
+          transition: .4s;
+          border-radius: 50%;
+        }
+
+        input:checked+.slider {
+          background-color: #28a745;
+        }
+
+        input:checked+.slider:before {
+          transform: translateX(26px);
+        }
+      </style>
     </div>
   </div>
-
-  <!-- Confirmation Modals Script -->
-  <script>
-    // Delete confirmation
-    window.addEventListener('confirm-delete', event => {
-      if (confirm(`آیا از حذف استوری "${event.detail.name}" اطمینان دارید؟`)) {
-        @this.call('deleteStory', event.detail.id);
-      }
-    });
-
-    // Toggle status confirmation
-    window.addEventListener('confirm-toggle-status', event => {
-      if (confirm(`آیا از ${event.detail.action} استوری "${event.detail.name}" اطمینان دارید؟`)) {
-        @this.call('toggleStatusConfirmed', event.detail.id);
-      }
-    });
-
-    // Approve confirmation
-    window.addEventListener('confirm-approve', event => {
-      if (confirm(`آیا از تأیید استوری "${event.detail.name}" اطمینان دارید؟`)) {
-        @this.call('approveStory', event.detail.id);
-      }
-    });
-
-    // Reject confirmation
-    window.addEventListener('confirm-reject', event => {
-      if (confirm(`آیا از رد کردن استوری "${event.detail.name}" اطمینان دارید؟`)) {
-        @this.call('rejectStory', event.detail.id);
-      }
-    });
-
-    // Delete selected confirmation
-    window.addEventListener('confirm-delete-selected', event => {
-      const message = event.detail.allFiltered === 'allFiltered' ?
-        'آیا از حذف تمام استوری‌های فیلتر شده اطمینان دارید؟' :
-        'آیا از حذف استوری‌های انتخاب شده اطمینان دارید؟';
-
-      if (confirm(message)) {
-        @this.call('deleteSelected', event.detail.allFiltered);
-      }
-    });
-  </script>
 </div>
