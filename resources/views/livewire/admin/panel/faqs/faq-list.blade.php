@@ -1,4 +1,4 @@
-<div class="faq-container" x-data="{ mobileSearchOpen: false }">
+<div class="doctor-notes-container" x-data="{ mobileSearchOpen: false }">
   <div class="container py-2 mt-3" dir="rtl" wire:init="loadFaqs">
     <!-- Header -->
     <header class="glass-header text-white p-3 rounded-3  shadow-lg">
@@ -39,14 +39,11 @@
               </svg>
             </div>
             <select class="form-select form-select-sm" wire:model.live="statusFilter">
-              <option value="">همه وضعیت‌ها</option>
-              <option value="1">فقط فعال</option>
-              <option value="0">فقط غیرفعال</option>
-            </select>
-            <select class="form-select form-select-sm" wire:model.live="categoryFilter">
-              <option value="">همه دسته‌بندی‌ها</option>
-              <option value="citizens">شهروندان</option>
-              <option value="doctors">پزشکان</option>
+              <option value="">همه وضعیت‌ها و دسته‌بندی‌ها</option>
+              <option value="1_citizens">فقط فعال - شهروندان</option>
+              <option value="1_doctors">فقط فعال - پزشکان</option>
+              <option value="0_citizens">فقط غیرفعال - شهروندان</option>
+              <option value="0_doctors">فقط غیرفعال - پزشکان</option>
             </select>
             <div class="d-flex align-items-center gap-2 justify-content-between">
               <a href="{{ route('admin.panel.faqs.create') }}"
@@ -73,15 +70,12 @@
               <path d="M21 21l-4.35-4.35" />
             </svg>
           </div>
-          <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="statusFilter">
-            <option value="">همه وضعیت‌ها</option>
-            <option value="1">فقط فعال</option>
-            <option value="0">فقط غیرفعال</option>
-          </select>
-          <select class="form-select form-select-sm" style="min-width: 150px;" wire:model.live="categoryFilter">
-            <option value="">همه دسته‌بندی‌ها</option>
-            <option value="citizens">شهروندان</option>
-            <option value="doctors">پزشکان</option>
+          <select class="form-select form-select-sm" style="min-width: 200px;" wire:model.live="statusFilter">
+            <option value="">همه وضعیت‌ها و دسته‌بندی‌ها</option>
+            <option value="1_citizens">فقط فعال - شهروندان</option>
+            <option value="1_doctors">فقط فعال - پزشکان</option>
+            <option value="0_citizens">فقط غیرفعال - شهروندان</option>
+            <option value="0_doctors">فقط غیرفعال - پزشکان</option>
           </select>
           <a href="{{ route('admin.panel.faqs.create') }}"
             class="btn btn-success px-3 py-1 d-flex align-items-center gap-1 flex-shrink-0">
@@ -109,115 +103,206 @@
                 <option value="activate">فعال کردن</option>
                 <option value="deactivate">غیرفعال کردن</option>
               </select>
-              <button class="btn btn-primary btn-sm" wire:click="executeGroupAction" wire:loading.attr="disabled">
-                <span wire:loading.remove wire:target="executeGroupAction">اجرا</span>
-                <span wire:loading wire:target="executeGroupAction">
-                  <svg class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></svg>
-                </span>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="applyToAllFiltered"
+                  wire:model="applyToAllFiltered">
+                <label class="form-check-label" for="applyToAllFiltered">
+                  اعمال روی همه نتایج فیلترشده ({{ $totalFilteredCount ?? 0 }})
+                </label>
+              </div>
+              <button class="btn btn-sm btn-primary" wire:click="executeGroupAction" wire:loading.attr="disabled">
+                <span wire:loading.remove>اجرا</span>
+                <span wire:loading>در حال اجرا...</span>
               </button>
             </div>
           </div>
-
-          <!-- Table -->
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0">
+              <thead>
                 <tr>
-                  <th class="border-0">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" wire:model="selectAll" id="selectAll">
-                    </div>
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <input type="checkbox" wire:model.live="selectAll" class="form-check-input m-0 align-middle">
                   </th>
-                  <th class="border-0">سوال</th>
-                  <th class="border-0">دسته‌بندی</th>
-                  <th class="border-0">ترتیب</th>
-                  <th class="border-0">وضعیت</th>
-                  <th class="border-0">تاریخ ایجاد</th>
-                  <th class="border-0 text-center">عملیات</th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                  <th class="align-middle">سوال</th>
+                  <th class="align-middle">دسته‌بندی</th>
+                  <th class="text-center align-middle" style="width: 80px;">ترتیب</th>
+                  <th class="text-center align-middle" style="width: 100px;">وضعیت</th>
+                  <th class="text-center align-middle" style="width: 120px;">تاریخ ایجاد</th>
+                  <th class="text-center align-middle" style="width: 150px;">عملیات</th>
                 </tr>
               </thead>
               <tbody>
-                @forelse($faqs as $faq)
-                  <tr>
-                    <td>
-                      <div class="form-check">
-                        <input class="form-check-input" type="checkbox" wire:model="selectedFaqs"
-                          value="{{ $faq->id }}">
-                      </div>
-                    </td>
-                    <td>
-                      <div class="d-flex flex-column">
-                        <span class="fw-medium text-dark">{{ Str::limit($faq->question, 60) }}</span>
-                        <small class="text-muted">{{ Str::limit($faq->answer, 80) }}</small>
-                      </div>
-                    </td>
-                    <td>
-                      <span class="badge bg-{{ $faq->category === 'citizens' ? 'info' : 'warning' }}">
-                        {{ $faq->category_display_name }}
-                      </span>
-                    </td>
-                    <td>
-                      <span class="badge bg-secondary">{{ $faq->order }}</span>
-                    </td>
-                    <td>
-                      <span class="badge bg-{{ $faq->is_active ? 'success' : 'danger' }}">
-                        {{ $faq->is_active ? 'فعال' : 'غیرفعال' }}
-                      </span>
-                    </td>
-                    <td>
-                      <small class="text-muted">{{ $faq->created_at->format('Y/m/d H:i') }}</small>
-                    </td>
-                    <td>
-                      <div class="d-flex align-items-center justify-content-center gap-1">
-                        <a href="{{ route('admin.panel.faqs.edit', $faq->id) }}"
-                          class="btn btn-sm btn-outline-primary" title="ویرایش">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-                            <path d="m18.5 2.5 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-                          </svg>
-                        </a>
-                        <button class="btn btn-sm btn-outline-{{ $faq->is_active ? 'warning' : 'success' }}"
-                          wire:click="confirmToggleStatus({{ $faq->id }})"
-                          title="{{ $faq->is_active ? 'غیرفعال کردن' : 'فعال کردن' }}">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            @if ($faq->is_active)
+                @if ($readyToLoad)
+                  @forelse ($faqs as $index => $item)
+                    <tr>
+                      <td class="text-center align-middle">
+                        <input type="checkbox" wire:model.live="selectedFaqs" value="{{ $item->id }}"
+                          class="form-check-input m-0 align-middle">
+                      </td>
+                      <td class="text-center align-middle">{{ $faqs->firstItem() + $index }}</td>
+                      <td class="align-middle">
+                        <div class="d-flex flex-column">
+                          <span class="fw-medium text-dark">{{ Str::limit($item->question, 60) }}</span>
+                          <small class="text-muted">{{ Str::limit($item->answer, 80) }}</small>
+                        </div>
+                      </td>
+                      <td class="align-middle">
+                        <span class="badge bg-{{ $item->category === 'citizens' ? 'info' : 'warning' }}">
+                          {{ $item->category_display_name }}
+                        </span>
+                      </td>
+                      <td class="text-center align-middle">
+                        <span class="badge bg-secondary">{{ $item->order }}</span>
+                      </td>
+                      <td class="text-center align-middle">
+                        <button wire:click="confirmToggleStatus({{ $item->id }})"
+                          class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                          {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
+                        </button>
+                      </td>
+                      <td class="text-center align-middle">
+                        <small class="text-muted">{{ $item->created_at->format('Y/m/d H:i') }}</small>
+                      </td>
+                      <td class="text-center align-middle">
+                        <div class="d-flex justify-content-center gap-2">
+                          <a href="{{ route('admin.panel.faqs.edit', $item->id) }}"
+                            class="btn btn-gradient-primary rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
                               <path
-                                d="M18.364 18.364A9 9 0 1 1 5.636 5.636a9 9 0 0 1 12.728 12.728zM12 8v4M12 16h.01" />
-                            @else
-                              <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 15a5 5 0 1 1 5-5 5 5 0 0 1-5 5z" />
-                            @endif
+                                d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                            </svg>
+                          </a>
+                          <button wire:click="confirmDelete({{ $item->id }})"
+                            class="btn btn-gradient-danger rounded-pill px-3">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                              stroke="currentColor" stroke-width="2">
+                              <path
+                                d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  @empty
+                    <tr>
+                      <td colspan="8" class="text-center py-4">
+                        <div class="d-flex justify-content-center align-items-center flex-column">
+                          <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="text-muted mb-2">
+                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83M22 12h-4M12 2v4" />
                           </svg>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" wire:click="confirmDelete({{ $faq->id }})"
-                          title="حذف">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <path
-                              d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                @empty
+                          <p class="text-muted fw-medium">هیچ سوال متداولی یافت نشد.</p>
+                        </div>
+                      </td>
+                    </tr>
+                  @endforelse
+                @else
                   <tr>
-                    <td colspan="7" class="text-center py-4">
-                      <div class="text-muted">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                          stroke-width="1" class="mb-3">
-                          <path d="M21.21 15.89A10 10 0 1 1 8 2.83M22 12h-4M12 2v4" />
-                        </svg>
-                        <p class="mb-0">هیچ سوال متداولی یافت نشد.</p>
+                    <td colspan="8" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">در حال بارگذاری...</span>
                       </div>
                     </td>
                   </tr>
-                @endforelse
+                @endif
               </tbody>
             </table>
           </div>
-
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @if ($readyToLoad)
+              @forelse ($faqs as $index => $item)
+                <div class="note-card mb-2" x-data="{ open: false }">
+                  <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                    @click="open = !open" style="cursor:pointer;">
+                    <div class="d-flex align-items-center gap-2">
+                      <input type="checkbox" wire:model.live="selectedFaqs" value="{{ $item->id }}"
+                        class="form-check-input m-0" @click.stop>
+                      <span class="fw-bold">
+                        {{ Str::limit($item->question, 40) }}
+                      </span>
+                    </div>
+                    <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24"
+                      fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                      <path d="M6 9l6 6 6-6" />
+                    </svg>
+                  </div>
+                  <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">سوال:</span>
+                      <span class="note-card-value">{{ $item->question }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">پاسخ:</span>
+                      <span class="note-card-value">{{ Str::limit($item->answer, 100) }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">دسته‌بندی:</span>
+                      <span class="note-card-value">
+                        <span class="badge bg-{{ $item->category === 'citizens' ? 'info' : 'warning' }}">
+                          {{ $item->category_display_name }}
+                        </span>
+                      </span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">ترتیب:</span>
+                      <span class="note-card-value">{{ $item->order }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">تاریخ ایجاد:</span>
+                      <span class="note-card-value">{{ $item->created_at->format('Y/m/d H:i') }}</span>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">وضعیت:</span>
+                      <button wire:click="confirmToggleStatus({{ $item->id }})"
+                        class="badge {{ $item->is_active ? 'bg-success' : 'bg-danger' }} border-0 cursor-pointer">
+                        {{ $item->is_active ? 'فعال' : 'غیرفعال' }}
+                      </button>
+                    </div>
+                    <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                      <span class="note-card-label">عملیات:</span>
+                      <div class="d-flex gap-2">
+                        <a href="{{ route('admin.panel.faqs.edit', $item->id) }}"
+                          class="btn btn-gradient-primary btn-sm rounded-pill px-3">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path
+                              d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                          </svg>
+                        </a>
+                        <button wire:click="confirmDelete({{ $item->id }})"
+                          class="btn btn-gradient-danger btn-sm rounded-pill px-3">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              @empty
+                <div class="text-center py-4">
+                  <div class="d-flex justify-content-center align-items-center flex-column">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                      stroke-width="2" class="text-muted mb-2">
+                      <path d="M21.21 15.89A10 10 0 1 1 8 2.83M22 12h-4M12 2v4" />
+                    </svg>
+                    <p class="text-muted fw-medium">هیچ سوال متداولی یافت نشد.</p>
+                  </div>
+                </div>
+              @endforelse
+            @else
+              <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">در حال بارگذاری...</span>
+                </div>
+              </div>
+            @endif
+          </div>
           <!-- Pagination -->
           @if ($readyToLoad && $faqs->hasPages())
             <div class="d-flex justify-content-between align-items-center p-3 border-top">
@@ -234,5 +319,3 @@
     </div>
   </div>
 </div>
-
-
