@@ -29,7 +29,7 @@ class StoryCreate extends Component
     public $thumbnail_file;
 
     // Owner selection
-    public $owner_type = 'user'; // Default to 'user'
+    public $owner_type = 'user';
     public $user_id = '';
     public $doctor_id = '';
     public $medical_center_id = '';
@@ -55,30 +55,55 @@ class StoryCreate extends Component
     ];
 
     protected $messages = [
-        // Messages remain unchanged
+        'title.required' => 'عنوان استوری الزامی است.',
+        'title.string' => 'عنوان استوری باید یک رشته متنی باشد.',
+        'title.max' => 'عنوان استوری نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
+        'description.string' => 'توضیحات باید یک رشته متنی باشد.',
+        'type.required' => 'نوع استوری الزامی است.',
+        'type.in' => 'نوع استوری باید یکی از گزینه‌های تصویر یا ویدیو باشد.',
+        'status.required' => 'وضعیت استوری الزامی است.',
+        'status.in' => 'وضعیت باید یکی از گزینه‌های فعال، غیرفعال یا در انتظار تأیید باشد.',
+        'is_live.boolean' => 'وضعیت لایو باید یک مقدار بولین باشد.',
+        'live_start_time.required_if' => 'زمان شروع لایو الزامی است.',
+        'live_end_time.required_if' => 'زمان پایان لایو الزامی است.',
+        'duration.integer' => 'مدت زمان باید یک عدد صحیح باشد.',
+        'duration.min' => 'مدت زمان باید حداقل ۱ ثانیه باشد.',
+        'order.integer' => 'ترتیب نمایش باید یک عدد صحیح باشد.',
+        'order.min' => 'ترتیب نمایش نمی‌تواند منفی باشد.',
+        'media_file.required' => 'فایل رسانه‌ای الزامی است.',
+        'media_file.file' => 'فایل رسانه‌ای باید یک فایل معتبر باشد.',
+        'media_file.max' => 'حجم فایل رسانه‌ای نمی‌تواند بیشتر از ۱۰۰ مگابایت باشد.',
+        'thumbnail_file.image' => 'فایل بندانگشتی باید یک تصویر باشد.',
+        'thumbnail_file.max' => 'حجم فایل بندانگشتی نمی‌تواند بیشتر از ۵ مگابایت باشد.',
+        'owner_type.required' => 'نوع مالک الزامی است.',
+        'owner_type.in' => 'نوع مالک باید یکی از گزینه‌های کاربر، پزشک، مرکز درمانی یا مدیر باشد.',
+        'user_id.required_if' => 'انتخاب کاربر الزامی است.',
+        'user_id.exists' => 'کاربر انتخاب‌شده معتبر نیست.',
+        'doctor_id.required_if' => 'انتخاب پزشک الزامی است.',
+        'doctor_id.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
+        'medical_center_id.required_if' => 'انتخاب مرکز درمانی الزامی است.',
+        'medical_center_id.exists' => 'مرکز درمانی انتخاب‌شده معتبر نیست.',
+        'manager_id.required_if' => 'انتخاب مدیر الزامی است.',
+        'manager_id.exists' => 'مدیر انتخاب‌شده معتبر نیست.',
     ];
 
     public function mount()
     {
-        // Initialize with default values
         $this->owner_type = 'user';
     }
 
     public function updatedOwnerType()
     {
-        // Reset owner IDs when owner type changes
         $this->user_id = '';
         $this->doctor_id = '';
         $this->medical_center_id = '';
         $this->manager_id = '';
 
-        // Dispatch event to re-initialize Select2
         $this->dispatch('owner-type-changed');
     }
 
     public function updatedType()
     {
-        // Reset files when type changes
         $this->media_file = null;
         $this->thumbnail_file = null;
     }
@@ -96,31 +121,22 @@ class StoryCreate extends Component
         $this->validate();
 
         try {
-            // Convert Jalali dates to Gregorian if provided
-            $liveStartTime = null;
-            $liveEndTime = null;
+            $liveStartTime = $this->is_live && $this->live_start_time
+                ? $this->convertJalaliToGregorian($this->live_start_time)
+                : null;
 
-            if ($this->is_live && $this->live_start_time) {
-                $liveStartTime = $this->convertJalaliToGregorian($this->live_start_time);
-            }
+            $liveEndTime = $this->is_live && $this->live_end_time
+                ? $this->convertJalaliToGregorian($this->live_end_time)
+                : null;
 
-            if ($this->is_live && $this->live_end_time) {
-                $liveEndTime = $this->convertJalaliToGregorian($this->live_end_time);
-            }
+            $mediaPath = $this->media_file
+                ? $this->uploadMediaFile($this->media_file, $this->type)
+                : null;
 
-            // Handle media file upload
-            $mediaPath = null;
-            if ($this->media_file) {
-                $mediaPath = $this->uploadMediaFile($this->media_file, $this->type);
-            }
+            $thumbnailPath = $this->thumbnail_file
+                ? $this->uploadThumbnailFile($this->thumbnail_file)
+                : null;
 
-            // Handle thumbnail file upload
-            $thumbnailPath = null;
-            if ($this->thumbnail_file) {
-                $thumbnailPath = $this->uploadThumbnailFile($this->thumbnail_file);
-            }
-
-            // Prepare story data
             $storyData = [
                 'title' => $this->title,
                 'description' => $this->description,
@@ -139,7 +155,6 @@ class StoryCreate extends Component
                 ],
             ];
 
-            // Set owner based on owner type
             switch ($this->owner_type) {
                 case 'user':
                     $storyData['user_id'] = $this->user_id;
@@ -155,15 +170,12 @@ class StoryCreate extends Component
                     break;
             }
 
-            // Create story
             Story::create($storyData);
 
             $this->dispatch('show-alert', type: 'success', message: 'استوری با موفقیت ایجاد شد!');
 
-            // Reset form
             $this->resetForm();
 
-            // Redirect to stories list
             return redirect()->route('admin.panel.stories.index');
         } catch (\Exception $e) {
             $this->dispatch('show-alert', type: 'error', message: 'خطا در ایجاد استوری: ' . $e->getMessage());
@@ -173,12 +185,9 @@ class StoryCreate extends Component
     private function uploadMediaFile($file, $type)
     {
         $fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-
-        if ($type === 'image') {
-            $path = $file->storeAs('stories/images', $fileName, 'public');
-        } else {
-            $path = $file->storeAs('stories/videos', $fileName, 'public');
-        }
+        $path = $type === 'image'
+            ? $file->storeAs('stories/images', $fileName, 'public')
+            : $file->storeAs('stories/videos', $fileName, 'public');
 
         return $path;
     }
@@ -186,29 +195,30 @@ class StoryCreate extends Component
     private function uploadThumbnailFile($file)
     {
         $fileName = 'thumb_' . time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
-        $path = $file->storeAs('stories/thumbnails', $fileName, 'public');
-
-        return $path;
+        return $file->storeAs('stories/thumbnails', $fileName, 'public');
     }
 
     private function resetForm()
     {
-        $this->title = '';
-        $this->description = '';
-        $this->type = 'image';
-        $this->status = 'active';
-        $this->is_live = false;
-        $this->live_start_time = '';
-        $this->live_end_time = '';
-        $this->duration = '';
-        $this->order = 0;
-        $this->media_file = null;
-        $this->thumbnail_file = null;
+        $this->reset([
+            'title',
+            'description',
+            'type',
+            'status',
+            'is_live',
+            'live_start_time',
+            'live_end_time',
+            'duration',
+            'order',
+            'media_file',
+            'thumbnail_file',
+            'owner_type',
+            'user_id',
+            'doctor_id',
+            'medical_center_id',
+            'manager_id',
+        ]);
         $this->owner_type = 'user';
-        $this->user_id = '';
-        $this->doctor_id = '';
-        $this->medical_center_id = '';
-        $this->manager_id = '';
     }
 
     private function convertJalaliToGregorian($jalaliDate)
@@ -220,7 +230,7 @@ class StoryCreate extends Component
         try {
             $parts = explode(' ', $jalaliDate);
             $datePart = $parts[0];
-            $timePart = isset($parts[1]) ? $parts[1] : '00:00';
+            $timePart = $parts[1] ?? '00:00';
 
             $dateComponents = explode('/', $datePart);
             $timeComponents = explode(':', $timePart);
@@ -232,8 +242,8 @@ class StoryCreate extends Component
             $year = (int) $dateComponents[0];
             $month = (int) $dateComponents[1];
             $day = (int) $dateComponents[2];
-            $hour = isset($timeComponents[0]) ? (int) $timeComponents[0] : 0;
-            $minute = isset($timeComponents[1]) ? (int) $timeComponents[1] : 0;
+            $hour = (int) ($timeComponents[0] ?? 0);
+            $minute = (int) ($timeComponents[1] ?? 0);
 
             $jalalian = \Morilog\Jalali\Jalalian::fromFormat('Y/m/d H:i', $jalaliDate);
             return $jalalian->toCarbon();

@@ -65,7 +65,32 @@ class StoryEdit extends Component
     ];
 
     protected $messages = [
-        // Messages remain unchanged
+        'title.required' => 'عنوان استوری الزامی است.',
+        'title.max' => 'عنوان استوری نباید بیشتر از 255 کاراکتر باشد.',
+        'type.required' => 'نوع استوری الزامی است.',
+        'type.in' => 'نوع استوری باید تصویر یا ویدیو باشد.',
+        'status.required' => 'وضعیت استوری الزامی است.',
+        'status.in' => 'وضعیت انتخاب شده معتبر نیست.',
+        'live_start_time.required_if' => 'زمان شروع لایو برای استوری‌های لایو الزامی است.',
+        'live_end_time.required_if' => 'زمان پایان لایو برای استوری‌های لایو الزامی است.',
+        'duration.integer' => 'مدت زمان باید عدد صحیح باشد.',
+        'duration.min' => 'مدت زمان باید حداقل 1 ثانیه باشد.',
+        'order.integer' => 'ترتیب نمایش باید عدد صحیح باشد.',
+        'order.min' => 'ترتیب نمایش نمی‌تواند منفی باشد.',
+        'media_file.file' => 'فایل رسانه معتبر نیست.',
+        'media_file.max' => 'حجم فایل رسانه نباید بیشتر از 100 مگابایت باشد.',
+        'thumbnail_file.image' => 'تصویر بندانگشتی باید یک فایل تصویری باشد.',
+        'thumbnail_file.max' => 'حجم تصویر بندانگشتی نباید بیشتر از 5 مگابایت باشد.',
+        'owner_type.required' => 'نوع مالک الزامی است.',
+        'owner_type.in' => 'نوع مالک انتخاب شده معتبر نیست.',
+        'user_id.required_if' => 'انتخاب کاربر الزامی است.',
+        'user_id.exists' => 'کاربر انتخاب شده معتبر نیست.',
+        'doctor_id.required_if' => 'انتخاب پزشک الزامی است.',
+        'doctor_id.exists' => 'پزشک انتخاب شده معتبر نیست.',
+        'medical_center_id.required_if' => 'انتخاب مرکز درمانی الزامی است.',
+        'medical_center_id.exists' => 'مرکز درمانی انتخاب شده معتبر نیست.',
+        'manager_id.required_if' => 'انتخاب مدیر الزامی است.',
+        'manager_id.exists' => 'مدیر انتخاب شده معتبر نیست.',
     ];
 
     public function mount($id)
@@ -126,9 +151,6 @@ class StoryEdit extends Component
                 'text' => $this->story->manager->first_name . ' ' . $this->story->manager->last_name
             ];
         }
-
-        // Dispatch event to initialize Select2 with pre-selected owner
-        $this->dispatch('initialize-select2', selectedOwner: $this->selected_owner, ownerType: $this->owner_type);
     }
 
     public function updatedOwnerType()
@@ -139,9 +161,6 @@ class StoryEdit extends Component
         $this->medical_center_id = '';
         $this->manager_id = '';
         $this->selected_owner = null;
-
-        // Dispatch event to re-initialize Select2
-        $this->dispatch('owner-type-changed');
     }
 
     public function updatedType()
@@ -291,7 +310,7 @@ class StoryEdit extends Component
         return $path;
     }
 
-    private function convertJalaliToGregorian($jalaliDate)
+     private function convertJalaliToGregorian($jalaliDate)
     {
         if (empty($jalaliDate)) {
             return null;
