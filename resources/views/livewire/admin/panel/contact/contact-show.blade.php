@@ -53,12 +53,13 @@
                 </div>
                 <div class="col-12">
                   <label class="form-label fw-medium">تاریخ ارسال:</label>
-                  <p class="form-control-plaintext">{{ $contact->created_at->format('Y/m/d H:i') }}</p>
+                  <p class="form-control-plaintext">{{ $contact->created_at ? jdate($contact->created_at)->format('Y/m/d H:i') : 'نامشخص' }}</p>
+                  
                 </div>
                 @if ($contact->replied_at)
                   <div class="col-12">
                     <label class="form-label fw-medium">تاریخ پاسخ:</label>
-                    <p class="form-control-plaintext">{{ $contact->replied_at->format('Y/m/d H:i') }}</p>
+                    <p class="form-control-plaintext">{{ $contact->replied_at ? jdate($contact->replied_at)->format('Y/m/d H:i') : 'نامشخص' }}</p>
                   </div>
                 @endif
               </div>
