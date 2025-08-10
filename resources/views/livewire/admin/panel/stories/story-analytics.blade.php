@@ -148,7 +148,9 @@
             <h6 class="mb-0 fw-bold">روند بازدیدها</h6>
           </div>
           <div class="card-body">
-            <canvas id="viewsChart" width="400" height="200"></canvas>
+            <div class="position-relative" style="height: 300px;">
+              <canvas id="viewsChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -159,7 +161,9 @@
             <h6 class="mb-0 fw-bold">روند لایک‌ها</h6>
           </div>
           <div class="card-body">
-            <canvas id="likesChart" width="400" height="200"></canvas>
+            <div class="position-relative" style="height: 300px;">
+              <canvas id="likesChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -218,7 +222,9 @@
             <h6 class="mb-0 fw-bold">بازدید بر اساس نوع کاربر</h6>
           </div>
           <div class="card-body">
-            <canvas id="viewsByTypeChart" width="400" height="200"></canvas>
+            <div class="position-relative" style="height: 300px;">
+              <canvas id="viewsByTypeChart"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -374,11 +380,13 @@
               borderColor: 'rgb(59, 130, 246)',
               backgroundColor: 'rgba(59, 130, 246, 0.1)',
               tension: 0.4,
-              fill: true
+              fill: true,
+              borderWidth: 2
             }]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
               legend: {
                 display: false
@@ -389,12 +397,28 @@
                 beginAtZero: true,
                 grid: {
                   color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                  font: {
+                    size: 12
+                  }
                 }
               },
               x: {
                 grid: {
                   display: false
+                },
+                ticks: {
+                  font: {
+                    size: 12
+                  }
                 }
+              }
+            },
+            elements: {
+              point: {
+                radius: 4,
+                hoverRadius: 6
               }
             }
           }
@@ -419,11 +443,13 @@
               borderColor: 'rgb(239, 68, 68)',
               backgroundColor: 'rgba(239, 68, 68, 0.1)',
               tension: 0.4,
-              fill: true
+              fill: true,
+              borderWidth: 2
             }]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
               legend: {
                 display: false
@@ -434,12 +460,28 @@
                 beginAtZero: true,
                 grid: {
                   color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                  font: {
+                    size: 12
+                  }
                 }
               },
               x: {
                 grid: {
                   display: false
+                },
+                ticks: {
+                  font: {
+                    size: 12
+                  }
                 }
+              }
+            },
+            elements: {
+              point: {
+                radius: 4,
+                hoverRadius: 6
               }
             }
           }
@@ -466,20 +508,27 @@
                 'rgba(245, 158, 11, 0.8)',
                 'rgba(16, 185, 129, 0.8)',
                 'rgba(139, 92, 246, 0.8)'
-              ]
+              ],
+              borderWidth: 2,
+              borderColor: '#ffffff'
             }]
           },
           options: {
             responsive: true,
+            maintainAspectRatio: false,
             plugins: {
               legend: {
                 position: 'bottom',
                 labels: {
                   padding: 20,
-                  usePointStyle: true
+                  usePointStyle: true,
+                  font: {
+                    size: 12
+                  }
                 }
               }
-            }
+            },
+            cutout: '60%'
           }
         });
       }
@@ -489,5 +538,12 @@
     if (@json($readyToLoad)) {
       updateCharts();
     }
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (viewsChart) viewsChart.resize();
+      if (likesChart) likesChart.resize();
+      if (viewsByTypeChart) viewsByTypeChart.resize();
+    });
   });
 </script>
