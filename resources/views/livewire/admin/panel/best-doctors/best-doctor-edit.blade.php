@@ -84,12 +84,12 @@
             <div class="col-6 position-relative mt-5">
               <div class="star-rating-container">
                 <label class="form-label">امتیاز ستاره</label>
-                <div class="star-rating" wire:ignore>
+                <div class="star-rating">
                   @for ($i = 1; $i <= 5; $i++)
                     <svg class="star-icon" data-rating="{{ $i }}" width="24" height="24"
                       viewBox="0 0 24 24" fill="{{ $i <= $star_rating ? '#ffc107' : '#e5e7eb' }}"
                       stroke="{{ $i <= $star_rating ? '#ffc107' : '#9ca3af' }}" stroke-width="1"
-                      style="cursor: pointer;">
+                      style="cursor: pointer;" wire:click="setStarRating({{ $i }})">
                       <path
                         d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                     </svg>
@@ -390,73 +390,6 @@
       document.addEventListener('livewire:update', () => {
         initializeSelect2();
       });
-
-      // Star rating functionality
-      function initializeStarRating() {
-        const starIcons = document.querySelectorAll('.star-icon');
-        const ratingText = document.querySelector('.rating-text');
-        const ratingInput = document.getElementById('star_rating_input');
-        let currentRating = parseFloat(ratingInput?.value) || 0;
-
-        function updateStars(rating) {
-          starIcons.forEach((star, index) => {
-            const starNumber = index + 1;
-            if (starNumber <= rating) {
-              star.setAttribute('fill', '#ffc107');
-              star.setAttribute('stroke', '#ffc107');
-            } else {
-              star.setAttribute('fill', '#e5e7eb');
-              star.setAttribute('stroke', '#9ca3af');
-            }
-          });
-
-          if (ratingText) {
-            ratingText.textContent = `${rating.toFixed(1)}/5.0`;
-          }
-
-          if (ratingInput) {
-            ratingInput.value = rating;
-            ratingInput.dispatchEvent(new Event('input', {
-              bubbles: true
-            }));
-          }
-        }
-
-        // Remove existing event listeners by cloning elements
-        starIcons.forEach((star) => {
-          const newStar = star.cloneNode(true);
-          star.parentNode.replaceChild(newStar, star);
-        });
-
-        // Get fresh references after cloning
-        const freshStarIcons = document.querySelectorAll('.star-icon');
-
-        freshStarIcons.forEach((star, index) => {
-          const starNumber = index + 1;
-
-          star.addEventListener('click', () => {
-            currentRating = starNumber;
-            updateStars(currentRating);
-          });
-
-          star.addEventListener('mouseenter', () => {
-            updateStars(starNumber);
-          });
-
-          star.addEventListener('mouseleave', () => {
-            updateStars(currentRating);
-          });
-        });
-
-        // Initialize stars
-        updateStars(currentRating);
-      }
-
-      // Initialize star rating on page load
-      document.addEventListener('DOMContentLoaded', initializeStarRating);
-
-      // Reinitialize star rating after Livewire updates
-      document.addEventListener('livewire:update', initializeStarRating);
 
       // Handle alerts
       Livewire.on('show-alert', (event) => {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\Panel\Bestdoctors;
+namespace App\Livewire\Admin\Panel\BestDoctors;
 
 use App\Models\BestDoctor;
 use App\Models\Doctor;
