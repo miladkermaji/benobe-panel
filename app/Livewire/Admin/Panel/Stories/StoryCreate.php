@@ -29,7 +29,7 @@ class StoryCreate extends Component
     public $thumbnail_file;
 
     // Owner selection
-    public $owner_type = 'user';
+    public $owner_type = '';
     public $user_id = '';
     public $doctor_id = '';
     public $medical_center_id = '';
@@ -77,12 +77,7 @@ class StoryCreate extends Component
 
     public function mount()
     {
-        // Owner selection
-        $this->owner_type = 'user';
-        $this->user_id = '';
-        $this->doctor_id = '';
-        $this->medical_center_id = '';
-        $this->manager_id = '';
+        // Initialize with default values
     }
 
     public function updatedOwnerType()

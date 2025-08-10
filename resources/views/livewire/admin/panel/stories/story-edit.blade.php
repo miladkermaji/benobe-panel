@@ -446,7 +446,7 @@
       // Select2 Initialization
       function initializeSelect2() {
         // User Select2
-        if ($('#user_id').length) {
+        if ($('#user_id').length && !$('#user_id').hasClass('select2-hidden-accessible')) {
           $('#user_id').select2({
             dir: 'rtl',
             placeholder: 'کاربر را انتخاب کنید',
@@ -479,7 +479,7 @@
         }
 
         // Doctor Select2
-        if ($('#doctor_id').length) {
+        if ($('#doctor_id').length && !$('#doctor_id').hasClass('select2-hidden-accessible')) {
           $('#doctor_id').select2({
             dir: 'rtl',
             placeholder: 'پزشک را انتخاب کنید',
@@ -512,7 +512,7 @@
         }
 
         // Medical Center Select2
-        if ($('#medical_center_id').length) {
+        if ($('#medical_center_id').length && !$('#medical_center_id').hasClass('select2-hidden-accessible')) {
           $('#medical_center_id').select2({
             dir: 'rtl',
             placeholder: 'مرکز درمانی را انتخاب کنید',
@@ -545,7 +545,7 @@
         }
 
         // Manager Select2
-        if ($('#manager_id').length) {
+        if ($('#manager_id').length && !$('#manager_id').hasClass('select2-hidden-accessible')) {
           $('#manager_id').select2({
             dir: 'rtl',
             placeholder: 'مدیر را انتخاب کنید',
@@ -583,6 +583,16 @@
 
       // Re-initialize Select2 when owner type changes
       Livewire.on('owner-type-changed', () => {
+        // Clear all Select2 instances first
+        $('select[id$="_id"]').each(function() {
+          if ($(this).hasClass('select2-hidden-accessible')) {
+            $(this).select2('destroy');
+          }
+        });
+
+        // Clear the select values
+        $('select[id$="_id"]').val('').trigger('change');
+
         setTimeout(() => {
           initializeSelect2();
         }, 100);
