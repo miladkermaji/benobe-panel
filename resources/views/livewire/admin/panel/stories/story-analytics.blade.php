@@ -57,7 +57,7 @@
         </div>
         <!-- Desktop Search and Actions -->
         <div class="d-none d-md-flex align-items-center gap-3 ms-auto">
-          <div class="search-box position-relative">
+          <div class="search-box position-relative" style="min-width: 250px;">
             <input wire:model.live.debounce.300ms="search" type="text" class="form-control ps-5"
               placeholder="جستجو در استوری‌ها...">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -66,12 +66,12 @@
               <path d="M21 21l-4.35-4.35" />
             </svg>
           </div>
-          <select wire:model.live="selectedPeriod" class="form-select form-select-sm" style="min-width: 150px;">
+          <select wire:model.live="selectedPeriod" class="form-select form-select-sm" style="min-width: 120px;">
             @foreach ($periods as $value => $label)
               <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
           </select>
-          <select wire:model.live="selectedStory" class="form-select form-select-sm" style="min-width: 150px;"
+          <select wire:model.live="selectedStory" class="form-select form-select-sm" style="min-width: 120px;"
             id="desktop-story-select">
             <option value="">همه استوری‌ها</option>
             @foreach ($stories as $story)
