@@ -163,7 +163,7 @@
                         </button>
                       </td>
                       <td class="text-center align-middle">
-                        <small class="text-muted">{{ $item->created_at->format('Y/m/d H:i') }}</small>
+                        <small class="text-muted">{{ $item->created_at ? jdate($item->created_at)->format('Y/m/d H:i') : 'نامشخص' }}</small>
                       </td>
                       <td class="text-center align-middle">
                         <div class="d-flex justify-content-center gap-2">
@@ -253,7 +253,7 @@
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">تاریخ ایجاد:</span>
-                      <span class="note-card-value">{{ $item->created_at->format('Y/m/d H:i') }}</span>
+                      <span class="note-card-value">{{ $item->created_at ? jdate($item->created_at)->format('Y/m/d H:i') : 'نامشخص' }}</span>
                     </div>
                     <div class="note-card-item d-flex justify-content-between align-items-center py-1">
                       <span class="note-card-label">وضعیت:</span>
