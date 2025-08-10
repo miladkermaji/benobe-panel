@@ -203,7 +203,8 @@
                       <option value="">کاربر را انتخاب کنید</option>
                       @foreach ($users as $user)
                         <option value="{{ $user->id }}">{{ $user->first_name }} {{ $user->last_name }}
-                          ({{ $user->mobile }})</option>
+                          ({{ $user->mobile }})
+                        </option>
                       @endforeach
                     </select>
                     <label for="user_id" class="form-label">انتخاب کاربر <span class="text-danger">*</span></label>
@@ -220,7 +221,8 @@
                       <option value="">پزشک را انتخاب کنید</option>
                       @foreach ($doctors as $doctor)
                         <option value="{{ $doctor->id }}">{{ $doctor->first_name }} {{ $doctor->last_name }}
-                          ({{ $doctor->mobile }})</option>
+                          ({{ $doctor->mobile }})
+                        </option>
                       @endforeach
                     </select>
                     <label for="doctor_id" class="form-label">انتخاب پزشک <span class="text-danger">*</span></label>
