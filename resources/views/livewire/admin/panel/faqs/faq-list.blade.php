@@ -318,4 +318,11 @@
       </div>
     </div>
   </div>
+  <script>
+    document.addEventListener('livewire:init', () => {
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+    });
+  </script>
 </div>

@@ -1,19 +1,3 @@
-@push('styles')
-  <link rel="stylesheet" href="{{ asset('admin-assets/css/panel/doctor/doctor.css') }}">
-@endpush
-
-@push('scripts')
-  <script>
-    document.addEventListener('livewire:init', () => {
-      Livewire.on('redirect', (event) => {
-        setTimeout(() => {
-          window.location.href = event.url;
-        }, 1000);
-      });
-    });
-  </script>
-@endpush
-
 <div class="container-fluid py-4" dir="rtl">
   <div class="card shadow-lg border-0 rounded-3 overflow-hidden">
     <div class="card-header bg-gradient-primary text-white p-4 d-flex align-items-center justify-content-between gap-3">
@@ -109,4 +93,17 @@
       </div>
     </div>
   </div>
+    <script>
+    document.addEventListener('livewire:init', () => {
+      Livewire.on('redirect', (event) => {
+        setTimeout(() => {
+          window.location.href = event.url;
+        }, 1000);
+      });
+
+      Livewire.on('show-alert', (event) => {
+        toastr[event.type](event.message);
+      });
+    });
+  </script>
 </div>
