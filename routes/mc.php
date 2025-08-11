@@ -56,7 +56,7 @@ Route::prefix('mc')
             Route::prefix('patient-contact/send-message')->group(function () {
                 Route::get('/', [DoctorSendMessageController::class, 'index'])->middleware('medical_center.permission:patient_communication')->name('mc.panel.send-message');
             });
-            Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('doctor.end-visit-counseling');
+            Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('mc-doctor.end-visit-counseling');
             Route::get('/search-appointments-counseling', [MoshavereWaitingController::class, 'searchAppointments'])->middleware('medical_center.permission:appointments')->name('search.appointments.counseling');
             Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
             Route::get('/doctor/appointments/by-date', [McDrScheduleController::class, 'getAppointmentsByDate'])
