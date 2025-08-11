@@ -76,7 +76,7 @@ Route::prefix('mc')
                 Route::prefix('schedule')->group(function () {
                     Route::get('/appointments', [McDrScheduleController::class, 'index'])->middleware('medical_center.permission:mc-appointments')->name('mc-appointments');
                     Route::get('search-appointments', [McDrScheduleController::class, 'searchAppointments'])->name('mc.search.appointments');
-                    Route::post('end-visit/{id}', [McDrScheduleController::class, 'endVisit'])->name('end.visit');
+                    Route::post('end-visit/{id}', [McDrScheduleController::class, 'endVisit'])->name('mc-end.visit');
                     Route::get('/my-appointments', [McDrScheduleController::class, 'myAppointments'])->middleware('medical_center.permission:my-mc-appointments')->name('my-mc-appointments');
                     Route::get('/my-appointments/by-date', [McDrScheduleController::class, 'showByDateAppointments'])->name('mc.turn.my-appointments.by-date');
                     Route::get('filter-appointments', [McDrScheduleController::class, 'filterAppointments'])->name('mc.turn.filter-appointments');
