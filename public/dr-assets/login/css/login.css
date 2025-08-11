@@ -104,7 +104,7 @@ body::before {
     letter-spacing: 0.5px;
 }
 
-@keyframes slideIn {
+/* @keyframes slideIn {
     from {
         transform: translateY(-20px);
         opacity: 0;
@@ -113,7 +113,7 @@ body::before {
         transform: translateY(0);
         opacity: 1;
     }
-}
+} */
 
 /* Form Control - بهبود برای موبایل */
 .form-control {
@@ -245,7 +245,7 @@ button {
     backdrop-filter: blur(10px);
 }
 
-@keyframes fadeInUp {
+/* @keyframes fadeInUp {
     from {
         transform: translateY(30px);
         opacity: 0;
@@ -254,7 +254,7 @@ button {
         transform: translateY(0);
         opacity: 1;
     }
-}
+} */
 
 /* Logo Wrapper - بهبود برای موبایل */
 .logo-wrapper {
@@ -356,7 +356,7 @@ button {
     animation: shake 0.5s ease-in-out;
 }
 
-@keyframes shake {
+/* @keyframes shake {
     0%,
     100% {
         transform: translateX(0);
@@ -367,7 +367,7 @@ button {
     75% {
         transform: translateX(5px);
     }
-}
+} */
 
 /* Loader Animation - بهبود */
 .loader {
@@ -418,7 +418,7 @@ button {
     animation: slideInUp 0.5s ease-out;
 }
 
-@keyframes slideInUp {
+/* @keyframes slideInUp {
     from {
         transform: translateY(50px);
         opacity: 0;
@@ -427,7 +427,7 @@ button {
         transform: translateY(0);
         opacity: 1;
     }
-}
+} */
 
 .modal-content {
     border: none;
@@ -437,7 +437,7 @@ button {
     background: var(--background-card);
 }
 
-@keyframes fadeIn {
+/* @keyframes fadeIn {
     from {
         opacity: 0;
     }
@@ -455,7 +455,7 @@ button {
         transform: scale(1);
         opacity: 1;
     }
-}
+} */
 
 .btn-danger {
     background: var(--text-original);
@@ -891,7 +891,7 @@ button {
 }
 
 /* بهبود انیمیشن‌ها */
-@keyframes pulse {
+/* @keyframes pulse {
     0% {
         transform: scale(1);
     }
@@ -901,7 +901,7 @@ button {
     100% {
         transform: scale(1);
     }
-}
+} */
 
 .btn.custom-gradient:focus {
     animation: pulse 0.3s ease;
