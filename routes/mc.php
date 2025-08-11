@@ -61,8 +61,8 @@ Route::prefix('mc')
             Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('mc-doctor.end-visit');
             Route::get('/doctor/appointments/by-date', [McDrScheduleController::class, 'getAppointmentsByDate'])
                 ->name('mc-doctor.appointments.by-date');
-            Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('search.patients');
-            Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('search.patients-counseling');
+            Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('mc-search.patients');
+            Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('mc-search.patients-counseling');
             Route::post('/appointments/update-date/{id}', [McDrScheduleController::class, 'updateAppointmentDate'])
                 ->name('updateAppointmentDate');
             Route::prefix('doctor-notes')->group(function () {
@@ -209,7 +209,7 @@ Route::prefix('mc')
                 Route::post('update-day-status', [McDrScheduleController::class, 'updateDayStatus'])->middleware('medical_center.permission:appointments')->name('updateDayStatus');
                 Route::get('disabled-days', [McDrScheduleController::class, 'disabledDays'])->middleware('medical_center.permission:appointments')->name('disabledDays');
                 Route::post('/convert-to-gregorian', [AppointmentController::class, 'convertToGregorian'])->middleware('medical_center.permission:appointments')->name('convert-to-gregorian');
-                Route::get('/search-appointments', [AppointmentController::class, 'searchAppointments'])->middleware('medical_center.permission:appointments')->name('search.appointments');
+                Route::get('/search-appointments', [AppointmentController::class, 'searchAppointments'])->middleware('medical_center.permission:appointments')->name('mc-search.appointments');
                 Route::get('/turnsCatByDays', [TurnsCatByDaysController::class, 'index'])->middleware('medical_center.permission:appointments')->name('mc-turnsCatByDays');
                 Route::post('/appointments/{id}/status', [AppointmentController::class, 'updateStatus'])->middleware('medical_center.permission:appointments')->name('updateStatusAppointment');
                 Route::get('/get-appointments-count/{doctorId}/{date}', [McDrScheduleController::class, 'getAppointmentsCount'])->middleware('medical_center.permission:appointments')->name('get-appointments-count');
