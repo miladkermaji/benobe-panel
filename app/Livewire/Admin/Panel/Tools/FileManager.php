@@ -20,6 +20,8 @@ class FileManager extends Component
     public $selectedImage = null;
     public $editingFile   = null;
     public $fileContent   = '';
+    public $filter        = 'all'; // all|images|text|folders
+    public $ready         = false; // lazy load gate
 
     protected $rules = [
         'newFolderName'   => 'required|string|max:255',
@@ -38,6 +40,19 @@ class FileManager extends Component
         'newName.string'           => 'نام جدید باید یک رشته متنی باشد.',
         'newName.max'              => 'نام جدید نمی‌تواند بیشتر از ۲۵۵ کاراکتر باشد.',
     ];
+
+    public function loadItems(): void
+    {
+        try {
+            // Set a shorter timeout for the initial load
+            set_time_limit(30);
+
+            // Just mark as ready - actual loading will happen in render()
+            $this->ready = true;
+        } catch (\Exception $e) {
+            $this->dispatch('toast', 'خطا در بارگذاری فایل‌ها: ' . $e->getMessage(), ['type' => 'error']);
+        }
+    }
 
     public function updatedFilesToUpload()
     {
@@ -211,36 +226,70 @@ class FileManager extends Component
     {
         $baseUrl = rtrim((string) config('filesystems.disks.public.url'), '/');
 
-        $files = collect(Storage::disk('public')->allFiles($this->currentPath))
-            ->filter(fn ($file) => !$this->search || str_contains(basename($file), $this->search))
-            ->map(function ($file) use ($baseUrl) {
-                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
-                $isText  = in_array($extension, ['txt', 'md', 'log']);
-
-                $url = $baseUrl !== ''
-                    ? $baseUrl . '/' . ltrim($file, '/')
-                    : $file; // fallback: raw path
-
-                return [
-                    'name'    => basename($file),
-                    'path'    => $file,
-                    'type'    => 'file',
-                    'url'     => $url,
-                    'isImage' => $isImage,
-                    'isText'  => $isText,
-                ];
-            });
-
-        $folders = collect(Storage::disk('public')->allDirectories($this->currentPath))
-            ->filter(fn ($folder) => !$this->search || str_contains(basename($folder), $this->search))
-            ->map(fn ($folder) => [
-                'name' => basename($folder),
-                'path' => $folder,
-                'type' => 'folder',
+        if (!$this->ready) {
+            return view('livewire.admin.panel.tools.file-manager', [
+                'items' => collect(),
             ]);
+        }
 
-        $items = $folders->merge($files)->sortBy('name')->values();
+        try {
+            // Set a reasonable timeout for file operations
+            set_time_limit(45);
+
+            $files = collect(Storage::disk('public')->allFiles($this->currentPath))
+                ->take(100) // Limit to first 100 files to prevent timeout
+                ->filter(fn ($file) => !$this->search || str_contains(basename($file), $this->search))
+                ->map(function ($file) use ($baseUrl) {
+                    $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
+                    $isText  = in_array($extension, ['txt', 'md', 'log']);
+
+                    $url = $baseUrl !== ''
+                        ? $baseUrl . '/' . ltrim($file, '/')
+                        : $file; // fallback: raw path
+
+                    return [
+                        'name'    => basename($file),
+                        'path'    => $file,
+                        'type'    => 'file',
+                        'url'     => $url,
+                        'isImage' => $isImage,
+                        'isText'  => $isText,
+                    ];
+                });
+
+            $folders = collect(Storage::disk('public')->allDirectories($this->currentPath))
+                ->take(50) // Limit to first 50 folders
+                ->filter(fn ($folder) => !$this->search || str_contains(basename($folder), $this->search))
+                ->map(fn ($folder) => [
+                    'name' => basename($folder),
+                    'path' => $folder,
+                    'type' => 'folder',
+                ]);
+
+            // Apply filter
+            switch ($this->filter) {
+                case 'images':
+                    $files = $files->filter(fn ($f) => $f['isImage']);
+                    break;
+                case 'text':
+                    $files = $files->filter(fn ($f) => $f['isText']);
+                    break;
+                case 'folders':
+                    $files = collect();
+                    break;
+                case 'all':
+                default:
+                    // no-op
+                    break;
+            }
+
+            $items = $folders->merge($files)->sortBy('name')->values();
+
+        } catch (\Exception $e) {
+            $this->dispatch('toast', 'خطا در بارگذاری فایل‌ها: ' . $e->getMessage(), ['type' => 'error']);
+            $items = collect();
+        }
 
         return view('livewire.admin.panel.tools.file-manager', [
             'items' => $items,
