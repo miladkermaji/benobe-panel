@@ -206,9 +206,7 @@
                         <!-- Loading Indicator -->
                         <div class="search-loading" id="searchLoading">
                           <div class="d-flex flex-column align-items-center">
-                            <div class="spinner-border text-primary" role="status">
-                              <span class="visually-hidden">در حال جستجو...</span>
-                            </div>
+                            <x-svg-loading-icon size="32" color="#007bff" />
                             <div class="loading-text">در حال جستجو...</div>
                           </div>
                         </div>

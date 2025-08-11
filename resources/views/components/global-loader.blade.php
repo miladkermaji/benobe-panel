@@ -2,7 +2,7 @@
     <div id="global-loader">
       <div class="loader-backdrop"></div>
       <div class="loader-content text-center">
-        <div class="medical-spinner"></div>
+        <x-svg-loading-icon size="40" color="#2196f3" />
         <p class="loader-text">در حال بارگذاری...</p>
       </div>
     </div>
@@ -37,34 +37,14 @@
         animation: fadeIn 0.3s;
       }
 
-      .medical-spinner {
-        width: 40px;
-        height: 40px;
-        border: 4px solid #e3f2fd;
-        border-top: 4px solid #2196f3;
-        border-radius: 50%;
-        animation: spin 0.9s linear infinite;
-        margin: 0 auto 14px;
-      }
-
       .loader-text {
-        margin: 0;
+        margin: 14px 0 0 0;
         font-size: 16px;
         color: #333 !important;
         font-weight: bold;
         letter-spacing: 0.2px;
         opacity: 1;
         white-space: nowrap;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-
-        100% {
-          transform: rotate(360deg);
-        }
       }
 
       @keyframes fadeIn {
