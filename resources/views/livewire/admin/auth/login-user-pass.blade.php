@@ -106,6 +106,9 @@
     Livewire.on('password-error', () => {
       toastr.error('کلمه عبور اشتباه است.');
     });
+    Livewire.on('otpAlreadySent', (data) => {
+      toastr.info(data.message);
+    })
     Livewire.on('loginSuccess', () => {
       toastr.success('با موفقیت وارد شدید');
       localStorage.removeItem('rateLimitTimerData');

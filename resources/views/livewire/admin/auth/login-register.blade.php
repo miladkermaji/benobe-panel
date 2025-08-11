@@ -89,6 +89,9 @@
       toastr.success('کد تأیید با موفقیت ارسال شد');
       localStorage.removeItem('otpTimerData');
     });
+     Livewire.on('otpAlreadySent', (data) => {
+      toastr.info(data.message);
+    })
     Livewire.on('pass-form', (data) => {
       toastr.success('موفقیت آمیز');
     });

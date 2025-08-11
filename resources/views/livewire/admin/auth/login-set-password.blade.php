@@ -101,7 +101,9 @@
         icon.style.opacity = '1';
       }
     }
-
+    Livewire.on('otpAlreadySent', (data) => {
+      toastr.info(data.message);
+    })
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });

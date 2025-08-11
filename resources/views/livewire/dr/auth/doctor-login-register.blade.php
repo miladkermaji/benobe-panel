@@ -95,7 +95,10 @@
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });
-
+   // Add missing otpAlreadySent event listener
+    Livewire.on('otpAlreadySent', (data) => {
+      toastr.info(data.message);
+    })
     // تابع جدید برای فرمت شرطی زمان
     function formatConditionalTime(seconds) {
       if (isNaN(seconds) || seconds < 0) return '0 ثانیه';
