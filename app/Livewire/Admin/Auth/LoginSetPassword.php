@@ -14,6 +14,7 @@ use App\Services\UserTypeDetectionService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
+use Illuminate\Support\Carbon;
 
 class LoginSetPassword extends Component
 {
@@ -88,6 +89,34 @@ class LoginSetPassword extends Component
             'password' => Hash::make($this->password),
             'static_password_enabled' => true,
         ]);
+
+        // جلوگیری از ارسال مجدد کد تا پایان ۲ دقیقه
+        $activeOtp = Otp::where('login_id', $user->mobile)
+            ->where('type', 0)
+            ->where('used', 0)
+            ->where('created_at', '>=', Carbon::now()->subMinutes(2))
+            ->latest('created_at')
+            ->first();
+        if ($activeOtp) {
+            $activeSession = LoginSession::where('token', $activeOtp->token)
+                ->where('step', 2)
+                ->where('expires_at', '>', now())
+                ->first();
+            if ($activeSession) {
+                $countDownDate = $activeOtp->created_at->addMinutes(2)->timestamp * 1000;
+                $remainingTime = max(0, $countDownDate - now()->timestamp * 1000);
+                $this->dispatch(
+                    'otpAlreadySent',
+                    message: 'کد تأیید قبلاً ارسال شده است. زمان باقی‌مانده: ' . ($remainingTime > 0 ? (int) round($remainingTime / 1000) . ' ثانیه' : '0 ثانیه'),
+                    remainingTime: $remainingTime,
+                    countDownDate: $countDownDate,
+                    token: $activeOtp->token,
+                );
+                session(['current_step' => 2, 'otp_token' => $activeOtp->token]);
+                $this->redirect(route('admin.auth.login-confirm-form', ['token' => $activeOtp->token]), navigate: true);
+                return;
+            }
+        }
 
         // ارسال OTP
         $otpCode = rand(1000, 9999);

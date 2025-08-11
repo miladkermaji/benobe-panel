@@ -16,6 +16,7 @@ use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 use App\Services\UserTypeDetectionService;
+use Illuminate\Support\Carbon;
 
 class LoginUserPass extends Component
 {
@@ -127,6 +128,33 @@ class LoginUserPass extends Component
 
         // بررسی احراز هویت دو مرحله‌ای
         if (($user->two_factor_enabled ?? 0) === 1) {
+            // جلوگیری از ارسال مجدد کد تا پایان ۲ دقیقه
+            $activeOtp = Otp::where('login_id', $user->mobile)
+                ->where('type', 0)
+                ->where('used', 0)
+                ->where('created_at', '>=', Carbon::now()->subMinutes(2))
+                ->latest('created_at')
+                ->first();
+            if ($activeOtp) {
+                $activeSession = LoginSession::where('token', $activeOtp->token)
+                    ->where('step', 2)
+                    ->where('expires_at', '>', now())
+                    ->first();
+                if ($activeSession) {
+                    $countDownDate = $activeOtp->created_at->addMinutes(2)->timestamp * 1000;
+                    $remainingTime = max(0, $countDownDate - now()->timestamp * 1000);
+                    $this->dispatch(
+                        'otpAlreadySent',
+                        message: 'کد تأیید قبلاً ارسال شده است. زمان باقی‌مانده: ' . $this->formatConditionalTime((int) round($remainingTime / 1000)),
+                        remainingTime: $remainingTime,
+                        countDownDate: $countDownDate,
+                        token: $activeOtp->token,
+                    );
+                    session(['current_step' => 2, 'otp_token' => $activeOtp->token]);
+                    $this->redirect(route('admin.auth.login-confirm-form', ['token' => $activeOtp->token]), navigate: true);
+                    return;
+                }
+            }
             $token = Str::random(60);
             LoginSession::create([
                 'token' => $token,
