@@ -153,7 +153,7 @@
                       <td class="align-middle">{{ $item->switch_interval ?? '-' }}</td>
                       <td class="align-middle">
                         @if ($item->image_path)
-                          <img src="{{ asset('storage/' . $item->image_path) }}" alt="تصویر بنر"
+                          <img src="{{ Storage::url($item->image_path) }}" alt="تصویر بنر"
                             style="max-width: 50px; border-radius: 5px;">
                         @else
                           -
@@ -242,7 +242,7 @@
                       <span class="note-card-label">تصویر:</span>
                       <span class="note-card-value">
                         @if ($item->image_path)
-                          <img src="{{ asset('storage/' . $item->image_path) }}" alt="تصویر بنر"
+                          <img src="{{ Storage::url($item->image_path) }}" alt="تصویر بنر"
                             style="max-width: 100px; border-radius: 5px;">
                         @else
                           -

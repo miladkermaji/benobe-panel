@@ -29,8 +29,8 @@ class FooterContentEdit extends Component
     {
         $this->footerContent = FooterContent::findOrFail($id);
         $this->fill($this->footerContent->toArray());
-        $this->current_icon  = $this->footerContent->icon_path ? asset('storage/' . $this->footerContent->icon_path) : null;
-        $this->current_image = $this->footerContent->image_path ? asset('storage/' . $this->footerContent->image_path) : null;
+        $this->current_icon  = $this->footerContent->icon_path ? Storage::url($this->footerContent->icon_path) : null;
+        $this->current_image = $this->footerContent->image_path ? Storage::url($this->footerContent->image_path) : null;
     }
 
     public function update()

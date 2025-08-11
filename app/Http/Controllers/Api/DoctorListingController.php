@@ -14,10 +14,11 @@ use Morilog\Jalali\Jalalian;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorListingController extends Controller
 {
-   /**
+    /**
  * دریافت لیست پزشکان با فیلترهای مختلف
  * @param string|null $province_slug اسلاگ استان
  * @param string|null $specialty_slug اسلاگ تخصص
@@ -118,388 +119,388 @@ class DoctorListingController extends Controller
  *   "data": null
  * }
  */
-public function getDoctors(Request $request)
-{
-    try {
-        // اعتبارسنجی ورودی‌ها
-        $validated = $request->validate([
-            'province_slug'              => 'nullable|exists:zone,slug',
-            'specialty_slug'             => 'nullable|exists:specialties,slug',
-            'sex'                        => 'nullable|in:male,female,both',
-            'has_available_appointments' => 'nullable|string|in:true,false,1,0',
-            'service_slug'               => 'nullable|exists:services,slug',
-            'insurance_slug'             => 'nullable|exists:insurances,slug',
-            'limit'                      => 'nullable|integer|min:1|max:100',
-            'page'                       => 'nullable|integer|min:1',
-            'sort'                       => 'nullable|in:rating_desc,views_desc,appointment_soonest,successful_appointments_desc,appointment_asc',
-            'service_type'               => 'nullable|in:in_person,phone,text,video',
-        ], [
-            'province_slug.exists'         => 'استان انتخاب‌شده وجود ندارد.',
-            'specialty_slug.exists'        => 'تخصص انتخاب‌شده وجود ندارد.',
-            'sex.in'                       => 'جنسیت باید یکی از مقادیر male, female, both باشد.',
-            'has_available_appointments.in' => 'مقدار نوبت‌های در دسترس باید true, false, 1 یا 0 باشد.',
-            'service_slug.exists'          => 'خدمت انتخاب‌شده وجود ندارد.',
-            'insurance_slug.exists'        => 'بیمه انتخاب‌شده وجود ندارد.',
-            'limit.integer'                => 'محدودیت باید یک عدد صحیح باشد.',
-            'limit.min'                    => 'محدودیت باید حداقل 1 باشد.',
-            'limit.max'                    => 'محدودیت نمی‌تواند بیشتر از 100 باشد.',
-            'page.integer'                 => 'شماره صفحه باید یک عدد صحیح باشد.',
-            'page.min'                     => 'شماره صفحه باید حداقل 1 باشد.',
-            'sort.in'                      => 'نوع مرتب‌سازی باید یکی از مقادیر rating_desc, views_desc, appointment_soonest, successful_appointments_desc, appointment_asc باشد.',
-            'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
-        ]);
+    public function getDoctors(Request $request)
+    {
+        try {
+            // اعتبارسنجی ورودی‌ها
+            $validated = $request->validate([
+                'province_slug'              => 'nullable|exists:zone,slug',
+                'specialty_slug'             => 'nullable|exists:specialties,slug',
+                'sex'                        => 'nullable|in:male,female,both',
+                'has_available_appointments' => 'nullable|string|in:true,false,1,0',
+                'service_slug'               => 'nullable|exists:services,slug',
+                'insurance_slug'             => 'nullable|exists:insurances,slug',
+                'limit'                      => 'nullable|integer|min:1|max:100',
+                'page'                       => 'nullable|integer|min:1',
+                'sort'                       => 'nullable|in:rating_desc,views_desc,appointment_soonest,successful_appointments_desc,appointment_asc',
+                'service_type'               => 'nullable|in:in_person,phone,text,video',
+            ], [
+                'province_slug.exists'         => 'استان انتخاب‌شده وجود ندارد.',
+                'specialty_slug.exists'        => 'تخصص انتخاب‌شده وجود ندارد.',
+                'sex.in'                       => 'جنسیت باید یکی از مقادیر male, female, both باشد.',
+                'has_available_appointments.in' => 'مقدار نوبت‌های در دسترس باید true, false, 1 یا 0 باشد.',
+                'service_slug.exists'          => 'خدمت انتخاب‌شده وجود ندارد.',
+                'insurance_slug.exists'        => 'بیمه انتخاب‌شده وجود ندارد.',
+                'limit.integer'                => 'محدودیت باید یک عدد صحیح باشد.',
+                'limit.min'                    => 'محدودیت باید حداقل 1 باشد.',
+                'limit.max'                    => 'محدودیت نمی‌تواند بیشتر از 100 باشد.',
+                'page.integer'                 => 'شماره صفحه باید یک عدد صحیح باشد.',
+                'page.min'                     => 'شماره صفحه باید حداقل 1 باشد.',
+                'sort.in'                      => 'نوع مرتب‌سازی باید یکی از مقادیر rating_desc, views_desc, appointment_soonest, successful_appointments_desc, appointment_asc باشد.',
+                'service_type.in'              => 'نوع خدمت باید یکی از مقادیر in_person, phone, text, video باشد.',
+            ]);
 
-        $provinceSlug             = $request->input('province_slug');
-        $specialtySlug            = $request->input('specialty_slug');
-        $gender                   = $request->input('sex');
-        $hasAvailableAppointments = filter_var($request->input('has_available_appointments', false), FILTER_VALIDATE_BOOLEAN);
-        $serviceSlug              = $request->input('service_slug');
-        $insuranceSlug            = $request->input('insurance_slug');
-        $limit                    = $request->input('limit', 50);
-        $page                     = $request->input('page', 1);
-        $sort                     = $request->input('sort', 'appointment_asc');
-        $serviceType              = $request->input('service_type', 'in_person');
+            $provinceSlug             = $request->input('province_slug');
+            $specialtySlug            = $request->input('specialty_slug');
+            $gender                   = $request->input('sex');
+            $hasAvailableAppointments = filter_var($request->input('has_available_appointments', false), FILTER_VALIDATE_BOOLEAN);
+            $serviceSlug              = $request->input('service_slug');
+            $insuranceSlug            = $request->input('insurance_slug');
+            $limit                    = $request->input('limit', 50);
+            $page                     = $request->input('page', 1);
+            $sort                     = $request->input('sort', 'appointment_asc');
+            $serviceType              = $request->input('service_type', 'in_person');
 
-        // اعتبارسنجی پارامترها
-        $validServiceTypes = ['in_person', 'phone', 'text', 'video'];
-        $validSorts        = ['rating_desc', 'views_desc', 'appointment_soonest', 'successful_appointments_desc', 'appointment_asc'];
+            // اعتبارسنجی پارامترها
+            $validServiceTypes = ['in_person', 'phone', 'text', 'video'];
+            $validSorts        = ['rating_desc', 'views_desc', 'appointment_soonest', 'successful_appointments_desc', 'appointment_asc'];
 
-        if (!in_array($serviceType, $validServiceTypes)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'نوع خدمت نامعتبر است. مقادیر مجاز: in_person, phone, text, video',
-                'data'    => null,
-            ], 400);
-        }
-
-        if (!in_array($sort, $validSorts)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'نوع مرتب‌سازی نامعتبر است. مقادیر مجاز: rating_desc, views_desc, appointment_soonest, successful_appointments_desc, appointment_asc',
-                'data'    => null,
-            ], 400);
-        }
-
-        // پیدا کردن province_id از province_slug
-        $provinceId = null;
-        if ($provinceSlug) {
-            $province = Zone::where('level', 1)->where('slug', $provinceSlug)->first();
-            if (!$province) {
+            if (!in_array($serviceType, $validServiceTypes)) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'استان یافت نشد.',
+                    'message' => 'نوع خدمت نامعتبر است. مقادیر مجاز: in_person, phone, text, video',
                     'data'    => null,
-                ], 404);
+                ], 400);
             }
-            $provinceId = $province->id;
-        }
 
-        // پیدا کردن specialty_id از specialty_slug
-        $specialtyId = null;
-        if ($specialtySlug) {
-            $specialty = Specialty::where('slug', $specialtySlug)->first();
-            if (!$specialty) {
+            if (!in_array($sort, $validSorts)) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'تخصص یافت نشد.',
+                    'message' => 'نوع مرتب‌سازی نامعتبر است. مقادیر مجاز: rating_desc, views_desc, appointment_soonest, successful_appointments_desc, appointment_asc',
                     'data'    => null,
-                ], 404);
-            }
-            $specialtyId = $specialty->id;
-        }
-
-        // پیدا کردن service_id از service_slug
-        $serviceId = null;
-        if ($serviceSlug) {
-            $service = Service::where('slug', $serviceSlug)->first();
-            if (!$service) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'خدمت یافت نشد.',
-                    'data'    => null,
-                ], 404);
-            }
-            $serviceId = $service->id;
-        }
-
-        // پیدا کردن insurance_id از insurance_slug
-        $insuranceId = null;
-        if ($insuranceSlug) {
-            $insurance = Insurance::where('slug', $insuranceSlug)->first();
-            if (!$insurance) {
-                return response()->json([
-                    'status'  => 'error',
-                    'message' => 'بیمه یافت نشد.',
-                    'data'    => null,
-                ], 404);
-            }
-            $insuranceId = $insurance->id;
-        }
-
-        $cacheKey = "doctors_list_{$provinceSlug}_{$specialtySlug}_{$gender}_{$hasAvailableAppointments}_{$serviceSlug}_{$insuranceSlug}_{$limit}_{$page}_{$sort}_{$serviceType}";
-
-        $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceId, $insuranceId, $limit, $page, $sort, $serviceType) {
-            $today        = Carbon::today('Asia/Tehran');
-            $calendarDays = 30;
-
-            $query = Doctor::query()
-                ->where('status', true)
-                ->whereNotNull('first_name')->where('first_name', '!=', '')
-                ->whereNotNull('last_name')->where('last_name', '!=', '')
-                ->with([
-                    'specialty'     => fn ($q) => $q->select('id', 'name', 'slug'),
-                    'province'      => fn ($q) => $q->select('id', 'name', 'slug'),
-                    'clinics'       => fn ($q) => $q->where('is_active', true)
-                        ->with(['city' => fn ($q) => $q->select('id', 'name', 'slug')])
-                        ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.payment_methods', 'medical_centers.is_main_center'),
-                    'workSchedules' => fn ($q) => $q->where('is_working', true)
-                        ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
-                    'appointments'  => fn ($q) => $q->where('status', 'scheduled')
-                        ->select('id', 'doctor_id', 'appointment_date', 'appointment_time', 'status'),
-                    'reviews'       => fn ($q) => $q->where('is_approved', true)
-                        ->select('reviewable_id', 'reviewable_type', 'rating'),
-                    'doctorTags'    => fn ($q) => $q->select('id', 'doctor_id', 'name', 'color', 'text_color'),
-                    'insurances'    => fn ($q) => $q->select('insurances.id', 'insurances.name', 'insurances.slug'),
-                    'services'      => fn ($q) => $q->select('services.id', 'services.name', 'services.slug'),
-                ]);
-
-            // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
-            if ($serviceType === 'in_person') {
-                $query->with([
-                    'appointmentConfig' => fn ($q) => $q->select(
-                        'id',
-                        'doctor_id',
-                        'calendar_days',
-                        'appointment_duration'
-                    ),
-                ]);
+                ], 400);
             }
 
-            // لود کردن رابطه counselingConfig برای نوبت‌های مشاوره
-            if (in_array($serviceType, ['phone', 'text', 'video'])) {
-                $query->with([
-                    'counselingConfig' => fn ($q) => $q->select(
-                        'id',
-                        'doctor_id',
-                        'online_consultation',
-                        'has_phone_counseling',
-                        'has_text_counseling',
-                        'has_video_counseling',
-                        'calendar_days',
-                        'appointment_duration',
-                        'active'
-                    ),
-                ]);
+            // پیدا کردن province_id از province_slug
+            $provinceId = null;
+            if ($provinceSlug) {
+                $province = Zone::where('level', 1)->where('slug', $provinceSlug)->first();
+                if (!$province) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'استان یافت نشد.',
+                        'data'    => null,
+                    ], 404);
+                }
+                $provinceId = $province->id;
             }
 
-            // فیلتر کردن بر اساس province و city
-            if ($provinceId) {
-                $cityIds = Zone::where('level', 2)
-                    ->where('parent_id', $provinceId)
-                    ->pluck('id')
-                    ->toArray();
-
-                $query->where(function ($q) use ($provinceId, $cityIds) {
-                    $q->where('province_id', $provinceId)
-                      ->orWhereIn('city_id', $cityIds);
-                });
+            // پیدا کردن specialty_id از specialty_slug
+            $specialtyId = null;
+            if ($specialtySlug) {
+                $specialty = Specialty::where('slug', $specialtySlug)->first();
+                if (!$specialty) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'تخصص یافت نشد.',
+                        'data'    => null,
+                    ], 404);
+                }
+                $specialtyId = $specialty->id;
             }
 
-            // فیلتر کردن بر اساس تخصص
-            if ($specialtyId) {
-                $query->where('specialty_id', $specialtyId);
+            // پیدا کردن service_id از service_slug
+            $serviceId = null;
+            if ($serviceSlug) {
+                $service = Service::where('slug', $serviceSlug)->first();
+                if (!$service) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'خدمت یافت نشد.',
+                        'data'    => null,
+                    ], 404);
+                }
+                $serviceId = $service->id;
             }
 
-            // فیلتر کردن بر اساس جنسیت
-            if ($gender && $gender !== 'both') {
-                $query->where('sex', $gender);
+            // پیدا کردن insurance_id از insurance_slug
+            $insuranceId = null;
+            if ($insuranceSlug) {
+                $insurance = Insurance::where('slug', $insuranceSlug)->first();
+                if (!$insurance) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'بیمه یافت نشد.',
+                        'data'    => null,
+                    ], 404);
+                }
+                $insuranceId = $insurance->id;
             }
 
-            // فیلتر کردن بر اساس نوبت باز
-            if ($hasAvailableAppointments) {
-                $query->whereHas('workSchedules', function ($q) {
-                    $q->where('is_working', true);
-                })->where(function ($q) use ($today, $calendarDays) {
-                    $q->whereHas('workSchedules', function ($scheduleQuery) {
-                        $scheduleQuery->where('is_working', true);
+            $cacheKey = "doctors_list_{$provinceSlug}_{$specialtySlug}_{$gender}_{$hasAvailableAppointments}_{$serviceSlug}_{$insuranceSlug}_{$limit}_{$page}_{$sort}_{$serviceType}";
+
+            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceId, $insuranceId, $limit, $page, $sort, $serviceType) {
+                $today        = Carbon::today('Asia/Tehran');
+                $calendarDays = 30;
+
+                $query = Doctor::query()
+                    ->where('status', true)
+                    ->whereNotNull('first_name')->where('first_name', '!=', '')
+                    ->whereNotNull('last_name')->where('last_name', '!=', '')
+                    ->with([
+                        'specialty'     => fn ($q) => $q->select('id', 'name', 'slug'),
+                        'province'      => fn ($q) => $q->select('id', 'name', 'slug'),
+                        'clinics'       => fn ($q) => $q->where('is_active', true)
+                            ->with(['city' => fn ($q) => $q->select('id', 'name', 'slug')])
+                            ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.payment_methods', 'medical_centers.is_main_center'),
+                        'workSchedules' => fn ($q) => $q->where('is_working', true)
+                            ->select('id', 'doctor_id', 'day', 'work_hours', 'appointment_settings'),
+                        'appointments'  => fn ($q) => $q->where('status', 'scheduled')
+                            ->select('id', 'doctor_id', 'appointment_date', 'appointment_time', 'status'),
+                        'reviews'       => fn ($q) => $q->where('is_approved', true)
+                            ->select('reviewable_id', 'reviewable_type', 'rating'),
+                        'doctorTags'    => fn ($q) => $q->select('id', 'doctor_id', 'name', 'color', 'text_color'),
+                        'insurances'    => fn ($q) => $q->select('insurances.id', 'insurances.name', 'insurances.slug'),
+                        'services'      => fn ($q) => $q->select('services.id', 'services.name', 'services.slug'),
+                    ]);
+
+                // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
+                if ($serviceType === 'in_person') {
+                    $query->with([
+                        'appointmentConfig' => fn ($q) => $q->select(
+                            'id',
+                            'doctor_id',
+                            'calendar_days',
+                            'appointment_duration'
+                        ),
+                    ]);
+                }
+
+                // لود کردن رابطه counselingConfig برای نوبت‌های مشاوره
+                if (in_array($serviceType, ['phone', 'text', 'video'])) {
+                    $query->with([
+                        'counselingConfig' => fn ($q) => $q->select(
+                            'id',
+                            'doctor_id',
+                            'online_consultation',
+                            'has_phone_counseling',
+                            'has_text_counseling',
+                            'has_video_counseling',
+                            'calendar_days',
+                            'appointment_duration',
+                            'active'
+                        ),
+                    ]);
+                }
+
+                // فیلتر کردن بر اساس province و city
+                if ($provinceId) {
+                    $cityIds = Zone::where('level', 2)
+                        ->where('parent_id', $provinceId)
+                        ->pluck('id')
+                        ->toArray();
+
+                    $query->where(function ($q) use ($provinceId, $cityIds) {
+                        $q->where('province_id', $provinceId)
+                          ->orWhereIn('city_id', $cityIds);
                     });
-                });
-            }
+                }
 
-            // فیلتر کردن بر اساس خدمات
-            if ($serviceId) {
-                $query->whereHas('services', function ($q) use ($serviceId) {
-                    $q->where('services.id', $serviceId);
-                });
-            }
+                // فیلتر کردن بر اساس تخصص
+                if ($specialtyId) {
+                    $query->where('specialty_id', $specialtyId);
+                }
 
-            // فیلتر کردن بر اساس بیمه
-            if ($insuranceId) {
-                $query->whereHas('insurances', function ($q) use ($insuranceId) {
-                    $q->where('insurances.id', $insuranceId);
-                });
-            }
+                // فیلتر کردن بر اساس جنسیت
+                if ($gender && $gender !== 'both') {
+                    $query->where('sex', $gender);
+                }
 
-            // فیلتر کردن بر اساس نوع خدمت (مشاوره)
-            if ($serviceType && $serviceType !== 'in_person') {
-                $query->whereHas('counselingConfig', function ($q) use ($serviceType) {
-                    $q->where('online_consultation', true)
-                      ->where('active', true);
-                    if ($serviceType === 'phone') {
-                        $q->where('has_phone_counseling', true);
-                    } elseif ($serviceType === 'text') {
-                        $q->where('has_text_counseling', true);
-                    } elseif ($serviceType === 'video') {
-                        $q->where('has_video_counseling', true);
-                    }
-                });
-            }
-
-            // مرتب‌سازی
-            switch ($sort) {
-                case 'rating_desc':
-                    $query->withAvg('reviews as avg_rating', 'rating')->orderBy('avg_rating', 'desc');
-                    break;
-                case 'views_desc':
-                    $query->orderBy('views_count', 'desc');
-                    break;
-                case 'appointment_soonest':
-                    $doctors = $query->paginate($limit, ['*'], 'page', $page);
-                    $doctors->getCollection()->sortBy(function ($doctor) {
-                        $mainClinic = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
-                        $clinicId = $mainClinic ? $mainClinic->id : null;
-                        $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
-                        return !empty($slotData['next_available_slot_gregorian']) ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
+                // فیلتر کردن بر اساس نوبت باز
+                if ($hasAvailableAppointments) {
+                    $query->whereHas('workSchedules', function ($q) {
+                        $q->where('is_working', true);
+                    })->where(function ($q) use ($today, $calendarDays) {
+                        $q->whereHas('workSchedules', function ($scheduleQuery) {
+                            $scheduleQuery->where('is_working', true);
+                        });
                     });
-                    return $doctors;
-                case 'successful_appointments_desc':
-                    $query->withCount(['appointments as successful_appointments_count' => function ($q) {
-                        $q->where('status', 'completed');
-                    }])->orderBy('successful_appointments_count', 'desc');
-                    break;
-                case 'appointment_asc':
-                    $query->orderBy('id', 'asc');
-                    break;
-                default:
-                    $query->orderBy('id', 'asc');
-                    break;
-            }
+                }
 
-            return $query->paginate($limit, ['*'], 'page', $page);
-        });
+                // فیلتر کردن بر اساس خدمات
+                if ($serviceId) {
+                    $query->whereHas('services', function ($q) use ($serviceId) {
+                        $q->where('services.id', $serviceId);
+                    });
+                }
 
-        $formattedDoctors = $doctors->map(function ($doctor) use ($serviceType) {
-            $mainClinic        = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
-            $otherClinicsCount = $doctor->clinics->count() - 1;
-            $city              = $mainClinic && $mainClinic->city ? $mainClinic->city->name : ($doctor->city ? $doctor->city->name : 'نامشخص');
+                // فیلتر کردن بر اساس بیمه
+                if ($insuranceId) {
+                    $query->whereHas('insurances', function ($q) use ($insuranceId) {
+                        $q->where('insurances.id', $insuranceId);
+                    });
+                }
 
-            $clinicId = $mainClinic ? $mainClinic->id : null;
-            $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
+                // فیلتر کردن بر اساس نوع خدمت (مشاوره)
+                if ($serviceType && $serviceType !== 'in_person') {
+                    $query->whereHas('counselingConfig', function ($q) use ($serviceType) {
+                        $q->where('online_consultation', true)
+                          ->where('active', true);
+                        if ($serviceType === 'phone') {
+                            $q->where('has_phone_counseling', true);
+                        } elseif ($serviceType === 'text') {
+                            $q->where('has_text_counseling', true);
+                        } elseif ($serviceType === 'video') {
+                            $q->where('has_video_counseling', true);
+                        }
+                    });
+                }
 
-            $tags = $doctor->doctorTags->map(function ($tag) {
+                // مرتب‌سازی
+                switch ($sort) {
+                    case 'rating_desc':
+                        $query->withAvg('reviews as avg_rating', 'rating')->orderBy('avg_rating', 'desc');
+                        break;
+                    case 'views_desc':
+                        $query->orderBy('views_count', 'desc');
+                        break;
+                    case 'appointment_soonest':
+                        $doctors = $query->paginate($limit, ['*'], 'page', $page);
+                        $doctors->getCollection()->sortBy(function ($doctor) {
+                            $mainClinic = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
+                            $clinicId = $mainClinic ? $mainClinic->id : null;
+                            $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
+                            return !empty($slotData['next_available_slot_gregorian']) ? Carbon::parse($slotData['next_available_slot_gregorian'])->timestamp : PHP_INT_MAX;
+                        });
+                        return $doctors;
+                    case 'successful_appointments_desc':
+                        $query->withCount(['appointments as successful_appointments_count' => function ($q) {
+                            $q->where('status', 'completed');
+                        }])->orderBy('successful_appointments_count', 'desc');
+                        break;
+                    case 'appointment_asc':
+                        $query->orderBy('id', 'asc');
+                        break;
+                    default:
+                        $query->orderBy('id', 'asc');
+                        break;
+                }
+
+                return $query->paginate($limit, ['*'], 'page', $page);
+            });
+
+            $formattedDoctors = $doctors->map(function ($doctor) use ($serviceType) {
+                $mainClinic        = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
+                $otherClinicsCount = $doctor->clinics->count() - 1;
+                $city              = $mainClinic && $mainClinic->city ? $mainClinic->city->name : ($doctor->city ? $doctor->city->name : 'نامشخص');
+
+                $clinicId = $mainClinic ? $mainClinic->id : null;
+                $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
+
+                $tags = $doctor->doctorTags->map(function ($tag) {
+                    return [
+                        'name'       => $tag->name,
+                        'color'      => $tag->color,
+                        'text_color' => $tag->text_color,
+                    ];
+                })->toArray();
+
+                if ($slotData['max_appointments'] > 0 && !in_array('کمترین معطلی', array_column($tags, 'name'))) {
+                    $tags[] = [
+                        'name'       => 'کمترین معطلی',
+                        'color'      => 'green-100',
+                        'text_color' => 'green-700',
+                    ];
+                }
+
+                $rating       = $doctor->reviews->avg('rating') ?: 0;
+                $reviewsCount = $doctor->reviews->count();
+                $viewsCount   = $doctor->views_count ?? 0;
+
                 return [
-                    'name'       => $tag->name,
-                    'color'      => $tag->color,
-                    'text_color' => $tag->text_color,
-                ];
-            })->toArray();
-
-            if ($slotData['max_appointments'] > 0 && !in_array('کمترین معطلی', array_column($tags, 'name'))) {
-                $tags[] = [
-                    'name'       => 'کمترین معطلی',
-                    'color'      => 'green-100',
-                    'text_color' => 'green-700',
-                ];
-            }
-
-            $rating       = $doctor->reviews->avg('rating') ?: 0;
-            $reviewsCount = $doctor->reviews->count();
-            $viewsCount   = $doctor->views_count ?? 0;
-
-            return [
-                'id'                  => $doctor->id,
-                'name'                => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
-                'slug'                => $doctor->slug,
-                'specialty'           => [
-                    'id'   => $doctor->specialty?->id,
-                    'name' => $doctor->specialty?->name,
-                    'slug' => $doctor->specialty?->slug,
-                ],
-                'avatar'              => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : '/default-avatar.png',
-                'location'            => [
-                    'province'            => [
-                        'id'   => $doctor->province?->id,
-                        'name' => $doctor->province?->name,
-                        'slug' => $doctor->province?->slug,
+                    'id'                  => $doctor->id,
+                    'name'                => $doctor->display_name ?? ($doctor->first_name . ' ' . $doctor->last_name),
+                    'slug'                => $doctor->slug,
+                    'specialty'           => [
+                        'id'   => $doctor->specialty?->id,
+                        'name' => $doctor->specialty?->name,
+                        'slug' => $doctor->specialty?->slug,
                     ],
-                    'city'                => [
-                        'name' => $city,
-                        'slug' => $mainClinic && $mainClinic->city ? $mainClinic->city->slug : ($doctor->city ? $doctor->city->slug : null),
+                    'avatar'              => $doctor->profile_photo_path ? Storage::url($doctor->profile_photo_path) : '/default-avatar.png',
+                    'location'            => [
+                        'province'            => [
+                            'id'   => $doctor->province?->id,
+                            'name' => $doctor->province?->name,
+                            'slug' => $doctor->province?->slug,
+                        ],
+                        'city'                => [
+                            'name' => $city,
+                            'slug' => $mainClinic && $mainClinic->city ? $mainClinic->city->slug : ($doctor->city ? $doctor->city->slug : null),
+                        ],
+                        'address'             => $mainClinic?->address ?? 'نامشخص',
+                        'clinic'              => $mainClinic ? [
+                            'id'   => $mainClinic->id,
+                            'name' => $mainClinic->name,
+                            'slug' => $mainClinic->slug,
+                        ] : null,
+                        'other_clinics_count' => $otherClinicsCount > 0 ? $otherClinicsCount : 0,
                     ],
-                    'address'             => $mainClinic?->address ?? 'نامشخص',
-                    'clinic'              => $mainClinic ? [
-                        'id'   => $mainClinic->id,
-                        'name' => $mainClinic->name,
-                        'slug' => $mainClinic->slug,
-                    ] : null,
-                    'other_clinics_count' => $otherClinicsCount > 0 ? $otherClinicsCount : 0,
+                    'rating'              => round($rating, 1),
+                    'reviews_count'       => $reviewsCount,
+                    'views_count'         => $viewsCount,
+                    'next_available_slot' => $slotData['next_available_slot'] ?? 'نوبت خالی ندارد',
+                    'tags'                => $tags,
+                    'services'            => $doctor->services->map(function ($service) {
+                        return [
+                            'id'   => $service->id,
+                            'name' => $service->name,
+                            'slug' => $service->slug,
+                        ];
+                    })->toArray(),
+                    'insurances'          => $doctor->insurances->map(function ($insurance) {
+                        return [
+                            'id'   => $insurance->id,
+                            'name' => $insurance->name,
+                            'slug' => $insurance->slug,
+                        ];
+                    })->toArray(),
+                    'profile_url'         => "/profile/doctor/{$doctor->slug}",
+                    'appointment_url'     => "/api/appointments/book/{$doctor->slug}",
+                    'consultation_url'    => "/api/consultations/book/{$doctor->slug}",
+                ];
+            });
+
+            return response()->json([
+                'status'     => 'success',
+                'data'       => $formattedDoctors,
+                'pagination' => [
+                    'total'        => $doctors->total(),
+                    'per_page'     => $doctors->perPage(),
+                    'current_page' => $doctors->currentPage(),
+                    'last_page'    => $doctors->lastPage(),
                 ],
-                'rating'              => round($rating, 1),
-                'reviews_count'       => $reviewsCount,
-                'views_count'         => $viewsCount,
-                'next_available_slot' => $slotData['next_available_slot'] ?? 'نوبت خالی ندارد',
-                'tags'                => $tags,
-                'services'            => $doctor->services->map(function ($service) {
-                    return [
-                        'id'   => $service->id,
-                        'name' => $service->name,
-                        'slug' => $service->slug,
-                    ];
-                })->toArray(),
-                'insurances'          => $doctor->insurances->map(function ($insurance) {
-                    return [
-                        'id'   => $insurance->id,
-                        'name' => $insurance->name,
-                        'slug' => $insurance->slug,
-                    ];
-                })->toArray(),
-                'profile_url'         => "/profile/doctor/{$doctor->slug}",
-                'appointment_url'     => "/api/appointments/book/{$doctor->slug}",
-                'consultation_url'    => "/api/consultations/book/{$doctor->slug}",
-            ];
-        });
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطای اعتبارسنجی ورودی‌ها',
+                'errors'  => $e->errors(),
+                'data'    => null,
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Doctor listing error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        return response()->json([
-            'status'     => 'success',
-            'data'       => $formattedDoctors,
-            'pagination' => [
-                'total'        => $doctors->total(),
-                'per_page'     => $doctors->perPage(),
-                'current_page' => $doctors->currentPage(),
-                'last_page'    => $doctors->lastPage(),
-            ],
-        ], 200);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'خطای اعتبارسنجی ورودی‌ها',
-            'errors'  => $e->errors(),
-            'data'    => null,
-        ], 422);
-    } catch (\Exception $e) {
-        Log::error('Doctor listing error: ' . $e->getMessage(), [
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString()
-        ]);
-
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'خطای سرور: ' . $e->getMessage(),
-            'data'    => null,
-        ], 500);
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'خطای سرور: ' . $e->getMessage(),
+                'data'    => null,
+            ], 500);
+        }
     }
-}
 
     private function getNextAvailableSlot($doctor, $clinicId)
     {

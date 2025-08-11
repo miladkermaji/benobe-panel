@@ -1,5 +1,16 @@
 <?php
 
+$rawFtpHost = env('FTP_HOST');
+$parsedFtp  = $rawFtpHost ? @parse_url($rawFtpHost) : null;
+$ftpScheme  = is_array($parsedFtp) ? ($parsedFtp['scheme'] ?? null) : null;
+$ftpHost    = is_array($parsedFtp) ? ($parsedFtp['host'] ?? $rawFtpHost) : $rawFtpHost;
+$ftpPort    = is_array($parsedFtp) && isset($parsedFtp['port']) ? (int) $parsedFtp['port'] : (int) env('FTP_PORT', 21);
+
+$sslEnv = env('FTP_SSL');
+$ftpSsl = $sslEnv !== null
+    ? filter_var($sslEnv, FILTER_VALIDATE_BOOLEAN)
+    : ($ftpScheme === 'ftps');
+
 return [
 
     /*
@@ -36,10 +47,20 @@ return [
             'throw' => false,
         ],
 
+        // Public disk now points to FTP storage for uploads and public assets
         'public' => [
-            'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => env('APP_URL').'/storage',
+            'driver' => 'ftp',
+            'host' => $ftpHost,
+            'username' => env('FTP_USERNAME'),
+            'password' => env('FTP_PASSWORD'),
+            // Optional settings with sensible defaults
+            'port' => $ftpPort,
+            'root' => env('FTP_ROOT', '/'), // e.g. '/public_html/storage'
+            'passive' => filter_var(env('FTP_PASSIVE', true), FILTER_VALIDATE_BOOLEAN),
+            'ssl' => $ftpSsl,
+            'timeout' => (int) env('FTP_TIMEOUT', 30),
+            // URL base for generating public URLs via Storage::url()
+            'url' => env('FILES_PUBLIC_URL'), // e.g. https://2870351904.cloudydl.com
             'visibility' => 'public',
             'throw' => false,
         ],

@@ -2,10 +2,11 @@
 
 namespace App\Livewire\Admin\Panel\Bannertexts;
 
-use App\Models\BannerText;
-use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
+use App\Models\BannerText;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class BannerTextEdit extends Component
 {
@@ -21,10 +22,10 @@ class BannerTextEdit extends Component
     public function mount($id)
     {
         $this->bannertext      = BannerText::findOrFail($id);
-        $this->main_text       = $this->banner-text->main_text;
-        $this->switch_words    = $this->banner-text->switch_words ?? [''];
-        $this->switch_interval = $this->banner-text->switch_interval;
-        $this->status          = $this->banner-text->status;
+        $this->main_text       = $this->bannertext->main_text;
+        $this->switch_words    = $this->bannertext->switch_words ?? [''];
+        $this->switch_interval = $this->bannertext->switch_interval;
+        $this->status          = $this->bannertext->status;
     }
 
     public function addSwitchWord()
@@ -73,10 +74,10 @@ class BannerTextEdit extends Component
             return;
         }
 
-        $imagePath = $this->banner-text->image_path;
+        $imagePath = $this->bannertext->image_path;
         if ($this->image) {
-            if ($imagePath && \Storage::disk('public')->exists($imagePath)) {
-                \Storage::disk('public')->delete($imagePath);
+            if ($imagePath && Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
             }
             $imagePath = $this->image->store('banners', 'public');
         }
@@ -84,7 +85,7 @@ class BannerTextEdit extends Component
         // فیلتر کردن مقادیر خالی از switch_words
         $filteredSwitchWords = array_filter($this->switch_words, fn ($word) => trim($word) !== '');
 
-        $this->banner-text->update([
+        $this->bannertext->update([
             'main_text'       => $this->main_text,
             'switch_words'    => ! empty($filteredSwitchWords) ? $filteredSwitchWords : null,
             'switch_interval' => $this->switch_interval,

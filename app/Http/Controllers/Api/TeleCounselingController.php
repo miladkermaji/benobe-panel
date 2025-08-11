@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\CounselingAppointment;
+use Illuminate\Support\Facades\Storage;
 
 class TeleCounselingController extends Controller
 {
@@ -51,7 +52,7 @@ class TeleCounselingController extends Controller
                         'first_name'         => $doctor->first_name,
                         'last_name'          => $doctor->last_name,
                         'display_name'       => $doctor->display_name,
-                        'profile_photo_url'  => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : null,
+                        'profile_photo_url'  => $doctor->profile_photo_path ? Storage::url($doctor->profile_photo_path) : null,
                         'specialty'          => $doctor->specialty ? $doctor->specialty->name : null,
                         'average_rating'     => $doctor->average_rating,
                         'appointment_type'   => $appointment->appointment_type,

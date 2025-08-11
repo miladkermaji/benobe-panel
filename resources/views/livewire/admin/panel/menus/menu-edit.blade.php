@@ -54,7 +54,7 @@
             <input type="file" class="form-control input-shiny" wire:model="icon" accept="image/*">
             @if ($menu->icon)
               <div class="mt-2">
-                <img src="{{ asset('storage/' . $menu->icon) }}" alt="آیکون فعلی" style="max-width: 100px;">
+                <img src="{{ Storage::url($menu->icon) }}" alt="آیکون فعلی" style="max-width: 100px;">
                 <small class="text-muted">آیکون فعلی</small>
               </div>
             @endif

@@ -8,6 +8,7 @@ use App\Models\MedicalCenterReview;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class MedicalCenterProfileController extends Controller
 {
@@ -75,7 +76,7 @@ class MedicalCenterProfileController extends Controller
                         ],
                         'recommendation_percentage' => $medicalCenter->recommendation_percentage,
                         'total_successful_appointments' => $totalSuccessfulAppointments,
-                        'image_url' => $medicalCenter->avatar ? asset('storage/' . $medicalCenter->avatar) : null,
+                        'image_url' => $medicalCenter->avatar ? Storage::url($medicalCenter->avatar) : null,
                         'description' => $medicalCenter->description,
                         'working_hours' => [
                             'start_time' => $medicalCenter->start_time,
@@ -131,7 +132,7 @@ class MedicalCenterProfileController extends Controller
                             'id' => $insurance->id,
                             'name' => $insurance->name,
                             'slug' => $insurance->slug, // اضافه کردن slug بیمه
-                            'image_url' => $insurance->image_path ? asset('storage/' . $insurance->image_path) : null
+                            'image_url' => $insurance->image_path ? Storage::url($insurance->image_path) : null
                         ];
                     })->values(),
                     'services' => $services->map(function ($service) {
@@ -143,7 +144,7 @@ class MedicalCenterProfileController extends Controller
                     })->values(),
                     'gallery' => collect($medicalCenter->galleries ?? [])->map(function ($image) {
                         return [
-                            'url' => asset('storage/' . $image),
+                            'url' => Storage::url($image),
                             'alt_text' => 'تصویر مرکز درمانی'
                         ];
                     })->values(),

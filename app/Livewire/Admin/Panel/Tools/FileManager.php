@@ -233,7 +233,7 @@ class FileManager extends Component
                     'type'    => $file->type,
                     'name'    => $file->name,
                     'path'    => $file->path,
-                    'url'     => $file->type === 'file' ? asset('storage/' . $file->path) : null,
+                    'url'     => $file->type === 'file' ? Storage::url($file->path) : null,
                     'isImage' => $file->type === 'file' && in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'gif']),
                     'isText'  => $file->type === 'file' && in_array(strtolower($file->extension), ['txt', 'md', 'log']),
                 ];

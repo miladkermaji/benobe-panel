@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorEdit extends Component
 {
@@ -133,7 +134,7 @@ class DoctorEdit extends Component
         if ($this->photo) {
             return $this->photo->temporaryUrl();
         }
-        return $this->current_photo ? asset('storage/' . $this->current_photo) : null;
+        return $this->current_photo ? Storage::url($this->current_photo) : null;
     }
 
     public function update()

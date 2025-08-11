@@ -165,7 +165,7 @@
                       </td>
                       <td class="align-middle">
                         @if ($item->image_path)
-                          <img src="{{ asset('storage/' . $item->image_path) }}" alt="تصویر"
+                          <img src="{{ Storage::url($item->image_path) }}" alt="تصویر"
                             style="max-width: 50px; height: auto;">
                         @else
                           -
@@ -173,7 +173,7 @@
                       </td>
                       <td class="align-middle">
                         @if ($item->icon_path)
-                          <img src="{{ asset('storage/' . $item->icon_path) }}" alt="آیکن"
+                          <img src="{{ Storage::url($item->icon_path) }}" alt="آیکن"
                             style="max-width: 50px; height: auto;">
                         @else
                           -
@@ -278,7 +278,7 @@
                       <span class="note-card-label">تصویر:</span>
                       <span class="note-card-value">
                         @if ($item->image_path)
-                          <img src="{{ asset('storage/' . $item->image_path) }}" alt="تصویر"
+                          <img src="{{ Storage::url($item->image_path) }}" alt="تصویر"
                             style="max-width: 100px; height: auto;">
                         @else
                           -
@@ -289,7 +289,7 @@
                       <span class="note-card-label">آیکن:</span>
                       <span class="note-card-value">
                         @if ($item->icon_path)
-                          <img src="{{ asset('storage/' . $item->icon_path) }}" alt="آیکن"
+                          <img src="{{ Storage::url($item->icon_path) }}" alt="آیکن"
                             style="max-width: 100px; height: auto;">
                         @else
                           -

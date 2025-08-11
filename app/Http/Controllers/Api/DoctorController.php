@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorController extends Controller
 {
@@ -104,7 +105,7 @@ class DoctorController extends Controller
                     'name'               => $doctor->first_name . ' ' . $doctor->last_name,
                     'specialty'          => $doctor->specialty ? $doctor->specialty->name : null,
                     'license_number'     => $doctor->license_number,
-                    'profile_photo_path' => $doctor->profile_photo_path ? asset('storage/' . $doctor->profile_photo_path) : null,
+                    'profile_photo_path' => $doctor->profile_photo_path ? Storage::url($doctor->profile_photo_path) : null,
                     'liked_at'           => $like ? $like->liked_at->toIso8601String() : null,
                 ];
             })->values();
@@ -255,7 +256,7 @@ class DoctorController extends Controller
                     'name'                => optional($bestDoctor->doctor)->first_name . ' ' . optional($bestDoctor->doctor)->last_name,
                     'specialty'           => optional(optional($bestDoctor->doctor)->specialty)->name,
                     'star_rating'         => $bestDoctor->star_rating,
-                    'image'               => optional($bestDoctor->doctor)->profile_photo_path ? asset('storage/' . optional($bestDoctor->doctor)->profile_photo_path) : null,
+                    'image'               => optional($bestDoctor->doctor)->profile_photo_path ? Storage::url(optional($bestDoctor->doctor)->profile_photo_path) : null,
                     'province'            => optional(optional($bestDoctor->doctor)->province)->name,
                     'next_available_slot' => $jalaliDate,
                 ];

@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class MedicalCenterResource extends JsonResource
 {
@@ -22,7 +23,7 @@ class MedicalCenterResource extends JsonResource
             'payment_methods' => $this->payment_methods,
             'is_active' => $this->is_active,
             'location_confirmed' => $this->location_confirmed,
-            'avatar' => $this->avatar ? asset('storage/' . $this->avatar) : null,
+            'avatar' => $this->avatar ? Storage::url($this->avatar) : null,
             'specialties' => SpecialtyResource::collection($this->specialties()),
             'insurances' => InsuranceResource::collection($this->insurances()),
             'services' => ServiceResource::collection($this->services()),

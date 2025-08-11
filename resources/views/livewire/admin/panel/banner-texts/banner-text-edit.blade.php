@@ -64,8 +64,8 @@
             <input type="file" wire:model="image" class="form-control input-shiny" id="image" accept="image/*">
             @if ($image)
               <img src="{{ $image->temporaryUrl() }}" alt="پیش‌نمایش" class="mt-2 rounded" style="max-width: 100px;">
-            @elseif ($banner - text->image_path)
-              <img src="{{ asset('storage/' . $banner - text->image_path) }}" alt="تصویر فعلی" class="mt-2 rounded"
+            @elseif ($bannertext->image_path)
+              <img src="{{ Storage::url($bannertext->image_path) }}" alt="تصویر فعلی" class="mt-2 rounded"
                 style="max-width: 100px;">
             @endif
           </div>

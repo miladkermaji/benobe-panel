@@ -149,7 +149,7 @@
                         {{ $item->url }}</td>
                       <td class="align-middle">
                         @if ($item->icon)
-                          <img src="{{ asset('storage/' . $item->icon) }}" alt="آیکون" class="img-thumbnail"
+                          <img src="{{ Storage::url($item->icon) }}" alt="آیکون" class="img-thumbnail"
                             style="width: 40px; height: 40px; border-radius: 8px;">
                         @else
                           <span class="text-muted">بدون آیکون</span>
@@ -237,7 +237,7 @@
                       <span class="note-card-label">آیکون:</span>
                       <span class="note-card-value">
                         @if ($item->icon)
-                          <img src="{{ asset('storage/' . $item->icon) }}" alt="آیکون" class="img-thumbnail"
+                          <img src="{{ Storage::url($item->icon) }}" alt="آیکون" class="img-thumbnail"
                             style="width: 40px; height: 40px; border-radius: 8px;">
                         @else
                           <span class="text-muted">بدون آیکون</span>
