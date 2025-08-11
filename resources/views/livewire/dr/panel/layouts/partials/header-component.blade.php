@@ -203,7 +203,7 @@
     </div>
 
     <script>
-      function applyDarkMode(isDark) {
+     /*  function applyDarkMode(isDark) {
         const html = document.documentElement;
         const body = document.body;
         if (isDark) {
@@ -246,17 +246,17 @@
             helpIcon.style.color = '#3f4079';
           }
         }
-      }
+      } */
 
       document.addEventListener('livewire:init', function() {
-        let isDarkMode = localStorage.getItem('darkMode') === 'true';
-        if (localStorage.getItem('darkMode') === null) {
+        /* let isDarkMode = localStorage.getItem('darkMode') === 'true'; */
+       /*  if (localStorage.getItem('darkMode') === null) {
           const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
           localStorage.setItem('darkMode', prefersDark);
           isDarkMode = prefersDark;
         }
         applyDarkMode(isDarkMode);
-        updateDarkModeButton(isDarkMode);
+        updateDarkModeButton(isDarkMode); */
 
         // Initialize notification dropdown
         initializeNotificationDropdown();
