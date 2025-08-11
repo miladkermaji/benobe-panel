@@ -71,7 +71,8 @@ class FileManager extends Component
         foreach ($this->filesToUpload as $file) {
             $fileName = $file->getClientOriginalName();
             $path     = $this->currentPath ? $this->currentPath . '/' . $fileName : $fileName;
-            Storage::disk('public')->putFileAs($this->currentPath, $file, $fileName);
+            // Store the uploaded file from Livewire's temporary storage to the FTP-backed 'public' disk
+            $file->storeAs($this->currentPath, $fileName, 'public');
 
             File::create([
                 'name'      => $fileName,
@@ -167,21 +168,23 @@ class FileManager extends Component
 
     public function editFile($path)
     {
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-        if (in_array(strtolower($extension), ['txt', 'md', 'log'])) {
+        if (Storage::disk('public')->exists($path)) {
             $this->editingFile = $path;
             $this->fileContent = Storage::disk('public')->get($path);
         } else {
-            $this->dispatch('toast', 'فقط فایل‌های متنی قابل ویرایش هستند.', ['type' => 'error']);
+            $this->dispatch('toast', 'فایل یافت نشد.', ['type' => 'error']);
         }
     }
 
     public function saveFile()
     {
-        Storage::disk('public')->put($this->editingFile, $this->fileContent);
-        $this->editingFile = null;
-        $this->fileContent = '';
-        $this->dispatch('toast', 'فایل با موفقیت ذخیره شد.', ['type' => 'success']);
+        $this->validateOnly('fileContent');
+        if ($this->editingFile) {
+            Storage::disk('public')->put($this->editingFile, $this->fileContent);
+            $this->editingFile = null;
+            $this->fileContent = '';
+            $this->dispatch('toast', 'فایل با موفقیت ذخیره شد.', ['type' => 'success']);
+        }
     }
 
     public function closeEditor()
@@ -206,45 +209,41 @@ class FileManager extends Component
 
     public function render()
     {
-        $fullPath = $this->currentPath ? $this->currentPath : '';
+        $baseUrl = rtrim((string) config('filesystems.disks.public.url'), '/');
 
-        // کوئری اصلی برای دریافت آیتم‌ها
-        $query = File::where(function ($query) use ($fullPath) {
-            $query->where('path', 'like', $fullPath . '/%')
-                ->whereRaw("CHAR_LENGTH(REPLACE(path, '$fullPath/', '')) - CHAR_LENGTH(REPLACE(REPLACE(path, '$fullPath/', ''), '/', '')) = 0");
-        })
-        ->orWhere(function ($query) use ($fullPath) {
-            if ($fullPath == '') {
-                $query->whereRaw("CHAR_LENGTH(path) - CHAR_LENGTH(REPLACE(path, '/', '')) = 0");
-            }
-        });
+        $files = collect(Storage::disk('public')->allFiles($this->currentPath))
+            ->filter(fn ($file) => !$this->search || str_contains(basename($file), $this->search))
+            ->map(function ($file) use ($baseUrl) {
+                $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
+                $isText  = in_array($extension, ['txt', 'md', 'log']);
 
-        // اعمال فیلتر جستجو اگر مقدار $search وجود داشته باشد
-        if (!empty($this->search)) {
-            $query->where('name', 'like', '%' . $this->search . '%');
-        }
+                $url = $baseUrl !== ''
+                    ? $baseUrl . '/' . ltrim($file, '/')
+                    : $file; // fallback: raw path
 
-        // اجرای کوئری و مرتب‌سازی
-        $items = $query->orderBy('type', 'desc') // نمایش پوشه‌ها در ابتدا
-            ->orderBy('name')
-            ->get()
-            ->map(function ($file) {
                 return [
-                    'type'    => $file->type,
-                    'name'    => $file->name,
-                    'path'    => $file->path,
-                    'url'     => $file->type === 'file' ? Storage::url($file->path) : null,
-                    'isImage' => $file->type === 'file' && in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'gif']),
-                    'isText'  => $file->type === 'file' && in_array(strtolower($file->extension), ['txt', 'md', 'log']),
+                    'name'    => basename($file),
+                    'path'    => $file,
+                    'type'    => 'file',
+                    'url'     => $url,
+                    'isImage' => $isImage,
+                    'isText'  => $isText,
                 ];
-            })->toArray();
+            });
 
-        // بررسی خالی بودن پوشه
-        $emptyFolder = empty($items);
+        $folders = collect(Storage::disk('public')->allDirectories($this->currentPath))
+            ->filter(fn ($folder) => !$this->search || str_contains(basename($folder), $this->search))
+            ->map(fn ($folder) => [
+                'name' => basename($folder),
+                'path' => $folder,
+                'type' => 'folder',
+            ]);
+
+        $items = $folders->merge($files)->sortBy('name')->values();
 
         return view('livewire.admin.panel.tools.file-manager', [
-            'items'       => $items,
-            'emptyFolder' => $emptyFolder,
+            'items' => $items,
         ]);
     }
 }
