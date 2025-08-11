@@ -58,7 +58,8 @@ return [
             'root' => env('FTP_ROOT', '/'), // e.g. '/public_html/storage'
             'passive' => filter_var(env('FTP_PASSIVE', true), FILTER_VALIDATE_BOOLEAN),
             'ssl' => $ftpSsl,
-            'timeout' => (int) env('FTP_TIMEOUT', 30),
+            'timeout' => (int) env('FTP_TIMEOUT', 60), // Increased timeout
+            'retries' => (int) env('FTP_RETRIES', 3), // Add retry mechanism
             // URL base for generating public URLs via Storage::url()
             'url' => env('FILES_PUBLIC_URL'), // e.g. https://2870351904.cloudydl.com
             'visibility' => 'public',

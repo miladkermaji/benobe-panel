@@ -39,7 +39,7 @@
               <span wire:loading.remove wire:target="createFolder">
                 <i class="fas fa-plus me-1"></i> ایجاد
               </span>
-              
+
               <span wire:loading wire:target="createFolder">
                 <svg class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></svg> در حال ایجاد...
               </span>
@@ -210,6 +210,52 @@
           </div>
         @endforelse
       </div>
+
+      <!-- Pagination -->
+      @if ($totalPages > 1)
+        <div class="d-flex justify-content-center mt-4">
+          <nav aria-label="صفحه‌بندی فایل‌ها">
+            <ul class="pagination">
+              <li class="page-item {{ $currentPage <= 1 ? 'disabled' : '' }}">
+                <button class="page-link d-flex align-items-center justify-content-center" wire:click="previousPage"
+                  {{ $currentPage <= 1 ? 'disabled' : '' }} style="width: 40px; height: 40px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" style="transform: rotate(180deg);">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+              </li>
+
+              @for ($i = max(1, $currentPage - 2); $i <= min($totalPages, $currentPage + 2); $i++)
+                <li class="page-item {{ $i == $currentPage ? 'active' : '' }}">
+                  <button class="page-link d-flex align-items-center justify-content-center"
+                    wire:click="goToPage({{ $i }})"
+                    style="width: 40px; height: 40px;">{{ $i }}</button>
+                </li>
+              @endfor
+
+              <li class="page-item {{ $currentPage >= $totalPages ? 'disabled' : '' }}">
+                <button class="page-link d-flex align-items-center justify-content-center" wire:click="nextPage"
+                  {{ $currentPage >= $totalPages ? 'disabled' : '' }} style="width: 40px; height: 40px;">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" style="transform: rotate(180deg);">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+
+        <div class="text-center mt-2">
+          <small class="text-gray-600">
+            نمایش {{ ($currentPage - 1) * $perPage + 1 }} تا {{ min($currentPage * $perPage, $totalItems) }} از
+            {{ $totalItems }} آیتم
+          </small>
+        </div>
+      @endif
     @endif
   </div>
   <!-- پیش‌نمایش تصویر -->
@@ -300,4 +346,35 @@
       });
     }
   </script>
+  <style>
+    .pagination .page-link {
+      border: none;
+      color: #6b7280;
+      background: transparent;
+      transition: all 0.3s ease;
+    }
+
+    .pagination .page-link:hover {
+      background: #f3f4f6;
+      color: #374151;
+      transform: translateY(-1px);
+    }
+
+    .pagination .page-item.active .page-link {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .pagination .page-item.disabled .page-link {
+      color: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    .pagination .page-item.disabled .page-link:hover {
+      background: transparent;
+      transform: none;
+    }
+  </style>
 </div>

@@ -4,6 +4,7 @@ namespace App\Livewire\Admin\Panel\Tools;
 
 use App\Models\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 
@@ -22,6 +23,9 @@ class FileManager extends Component
     public $fileContent   = '';
     public $filter        = 'all'; // all|images|text|folders
     public $ready         = false; // lazy load gate
+    public $page          = 1; // pagination
+    public $perPage       = 12; // items per page (reduced from 20)
+    public $totalItems    = 0; // total items count
 
     protected $rules = [
         'newFolderName'   => 'required|string|max:255',
@@ -44,10 +48,18 @@ class FileManager extends Component
     public function loadItems(): void
     {
         try {
-            // Set a shorter timeout for the initial load
-            set_time_limit(30);
+            // Set a longer timeout for initial load
+            set_time_limit(120);
 
-            // Just mark as ready - actual loading will happen in render()
+            // Register shutdown function to handle timeout
+            register_shutdown_function(function () {
+                $error = error_get_last();
+                if ($error && $error['type'] === E_ERROR && strpos($error['message'], 'Maximum execution time') !== false) {
+                    $this->dispatch('toast', 'زمان بارگذاری به پایان رسید. لطفاً دوباره تلاش کنید.', ['type' => 'error']);
+                }
+            });
+
+            // Just mark as ready - actual loading will happen in render() with pagination
             $this->ready = true;
         } catch (\Exception $e) {
             $this->dispatch('toast', 'خطا در بارگذاری فایل‌ها: ' . $e->getMessage(), ['type' => 'error']);
@@ -160,7 +172,7 @@ class FileManager extends Component
     public function changePath($path)
     {
         $this->currentPath = $path;
-        $this->reset(['search', 'selectedImage', 'renamingPath', 'newName', 'editingFile', 'fileContent']);
+        $this->reset(['search', 'selectedImage', 'renamingPath', 'newName', 'editingFile', 'fileContent', 'filter']);
     }
 
     public function goBack()
@@ -168,7 +180,7 @@ class FileManager extends Component
         $segments = explode('/', $this->currentPath);
         array_pop($segments);
         $this->currentPath = implode('/', array_filter($segments));
-        $this->reset(['selectedImage', 'renamingPath', 'newName', 'editingFile', 'fileContent']);
+        $this->reset(['selectedImage', 'renamingPath', 'newName', 'editingFile', 'fileContent', 'filter']);
     }
 
     public function selectImage($url)
@@ -222,6 +234,51 @@ class FileManager extends Component
         }
     }
 
+    public function nextPage()
+    {
+        $this->page++;
+    }
+
+    public function previousPage()
+    {
+        if ($this->page > 1) {
+            $this->page--;
+        }
+    }
+
+    public function goToPage($page)
+    {
+        $this->page = max(1, $page);
+    }
+
+    private function getCachedFileList($path)
+    {
+        $cacheKey = "file_manager_files_{$path}";
+        $cacheDuration = 300; // 5 minutes
+
+        return Cache::remember($cacheKey, $cacheDuration, function () use ($path) {
+            try {
+                return Storage::disk('public')->allFiles($path);
+            } catch (\Exception $e) {
+                return [];
+            }
+        });
+    }
+
+    private function getCachedFolderList($path)
+    {
+        $cacheKey = "file_manager_folders_{$path}";
+        $cacheDuration = 300; // 5 minutes
+
+        return Cache::remember($cacheKey, $cacheDuration, function () use ($path) {
+            try {
+                return Storage::disk('public')->allDirectories($path);
+            } catch (\Exception $e) {
+                return [];
+            }
+        });
+    }
+
     public function render()
     {
         $baseUrl = rtrim((string) config('filesystems.disks.public.url'), '/');
@@ -229,70 +286,102 @@ class FileManager extends Component
         if (!$this->ready) {
             return view('livewire.admin.panel.tools.file-manager', [
                 'items' => collect(),
+                'totalItems' => 0,
+                'currentPage' => 1,
+                'totalPages' => 1,
             ]);
         }
 
         try {
             // Set a reasonable timeout for file operations
-            set_time_limit(45);
+            set_time_limit(60);
 
-            $files = collect(Storage::disk('public')->allFiles($this->currentPath))
-                ->take(100) // Limit to first 100 files to prevent timeout
-                ->filter(fn ($file) => !$this->search || str_contains(basename($file), $this->search))
-                ->map(function ($file) use ($baseUrl) {
-                    $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                    $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
-                    $isText  = in_array($extension, ['txt', 'md', 'log']);
+            // Get files with error handling
+            $files = collect();
+            try {
+                $allFiles = $this->getCachedFileList($this->currentPath);
+                $files = collect($allFiles)
+                    ->filter(fn ($file) => !$this->search || stripos(basename($file), $this->search) !== false)
+                    ->map(function ($file) use ($baseUrl) {
+                        $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                        $isImage = in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']);
+                        $isText  = in_array($extension, ['txt', 'md', 'log', 'json', 'xml', 'html', 'htm', 'css', 'js', 'php', 'py', 'java', 'c', 'cpp', 'h', 'sql', 'csv', 'yml', 'yaml', 'ini', 'conf', 'config']);
 
-                    $url = $baseUrl !== ''
-                        ? $baseUrl . '/' . ltrim($file, '/')
-                        : $file; // fallback: raw path
+                        $url = $baseUrl !== ''
+                            ? $baseUrl . '/' . ltrim($file, '/')
+                            : $file; // fallback: raw path
 
-                    return [
-                        'name'    => basename($file),
-                        'path'    => $file,
-                        'type'    => 'file',
-                        'url'     => $url,
-                        'isImage' => $isImage,
-                        'isText'  => $isText,
-                    ];
-                });
+                        return [
+                            'name'    => basename($file),
+                            'path'    => $file,
+                            'type'    => 'file',
+                            'url'     => $url,
+                            'isImage' => $isImage,
+                            'isText'  => $isText,
+                        ];
+                    });
+            } catch (\Exception $e) {
+                // If files loading fails, continue with empty collection
+                $files = collect();
+            }
 
-            $folders = collect(Storage::disk('public')->allDirectories($this->currentPath))
-                ->take(50) // Limit to first 50 folders
-                ->filter(fn ($folder) => !$this->search || str_contains(basename($folder), $this->search))
-                ->map(fn ($folder) => [
-                    'name' => basename($folder),
-                    'path' => $folder,
-                    'type' => 'folder',
-                ]);
+            // Get folders with error handling
+            $folders = collect();
+            try {
+                $allFolders = $this->getCachedFolderList($this->currentPath);
+                $folders = collect($allFolders)
+                    ->filter(fn ($folder) => !$this->search || stripos(basename($folder), $this->search) !== false)
+                    ->map(fn ($folder) => [
+                        'name' => basename($folder),
+                        'path' => $folder,
+                        'type' => 'folder',
+                    ]);
+            } catch (\Exception $e) {
+                // If folders loading fails, continue with empty collection
+                $folders = collect();
+            }
 
             // Apply filter
             switch ($this->filter) {
                 case 'images':
                     $files = $files->filter(fn ($f) => $f['isImage']);
+                    $folders = collect(); // Hide folders when filtering for images
                     break;
                 case 'text':
                     $files = $files->filter(fn ($f) => $f['isText']);
+                    $folders = collect(); // Hide folders when filtering for text files
                     break;
                 case 'folders':
-                    $files = collect();
+                    $files = collect(); // Hide files when filtering for folders
+                    // Keep folders as they are
                     break;
                 case 'all':
                 default:
-                    // no-op
+                    // Show both files and folders
                     break;
             }
 
-            $items = $folders->merge($files)->sortBy('name')->values();
+            $allItems = $folders->merge($files)->sortBy('name')->values();
+            $this->totalItems = $allItems->count();
+
+            // Apply pagination
+            $totalPages = ceil($this->totalItems / $this->perPage);
+            $this->page = min($this->page, max(1, $totalPages));
+
+            $items = $allItems->forPage($this->page, $this->perPage);
 
         } catch (\Exception $e) {
             $this->dispatch('toast', 'خطا در بارگذاری فایل‌ها: ' . $e->getMessage(), ['type' => 'error']);
             $items = collect();
+            $this->totalItems = 0;
+            $totalPages = 1;
         }
 
         return view('livewire.admin.panel.tools.file-manager', [
             'items' => $items,
+            'totalItems' => $this->totalItems,
+            'currentPage' => $this->page,
+            'totalPages' => $totalPages ?? 1,
         ]);
     }
 }
