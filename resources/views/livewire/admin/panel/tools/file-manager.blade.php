@@ -28,8 +28,8 @@
         <div class="col-md-4">
           <div class="input-group">
             <span class="input-group-text bg-transparent border-0 pe-2">
-              <img src="{{ asset('admin-assets/icons/folder-add-svgrepo-com.svg') }}"
-                class="fs-4 text-primary custom-animate-bounce" alt="">
+              <img src="{{ asset('admin-assets/icons/folder-add-svgrepo-com.svg') }}" class="fs-4 text-primary"
+                alt="">
             </span>
             <input type="text" class="form-control rounded-lg shadow-sm" wire:model="newFolderName"
               placeholder="نام پوشه جدید">
@@ -45,8 +45,8 @@
         <div class="col-md-4">
           <div class="input-group align-items-center">
             <span class="input-group-text bg-transparent border-0 pe-2"><img
-                src="{{ asset('admin-assets/icons/search-folder-svgrepo-com.svg') }}"
-                class="fs-4 text-primary custom-animate-bounce" alt=""></span>
+                src="{{ asset('admin-assets/icons/search-folder-svgrepo-com.svg') }}" class="fs-4 text-primary"
+                alt=""></span>
             <input type="text" class="form-control rounded-lg shadow-sm" wire:model.live="search"
               placeholder="جستجو در فایل‌ها و پوشه‌ها">
           </div>
@@ -74,8 +74,8 @@
           <div wire:click="goBack"
             class="card comment-card border-0 rounded-xl shadow-sm bg-gradient-card h-100 cursor-pointer">
             <div class="card-body p-3 d-flex flex-column align-items-center gap-2 text-center">
-              <img src="{{ asset('admin-assets/icons/arrow-right-square-svgrepo-com.svg') }}"
-                class="fs-4 text-primary custom-animate-bounce" alt="">
+              <img src="{{ asset('admin-assets/icons/arrow-right-square-svgrepo-com.svg') }}" class="fs-4 text-primary"
+                alt="">
               <h6 class="fw-medium text-gray-700">بازگشت</h6>
             </div>
           </div>
@@ -88,7 +88,7 @@
               @if ($item['type'] === 'folder')
                 <div wire:click="changePath('{{ $item['path'] }}')" class="cursor-pointer">
                   <img src="{{ asset('admin-assets/icons/folder-with-files-svgrepo-com.svg') }}"
-                    class="fs-4 text-primary custom-animate-bounce" alt="">
+                    class="fs-4 text-primary" alt="">
                 </div>
                 @if ($renamingPath === $item['path'])
                   <input type="text" class="form-control rounded-lg shadow-sm" wire:model.live="newName"
@@ -126,13 +126,13 @@
                     style="max-height: 100px; object-fit: cover;" wire:click="selectImage('{{ $item['url'] }}')">
                 @elseif ($item['isText'])
                   <div wire:click="editFile('{{ $item['path'] }}')" class="cursor-pointer">
-                    <img src="{{ asset('admin-assets/icons/file-svgrepo-com.svg') }}"
-                      class="fs-4 text-primary custom-animate-bounce" alt="">
+                    <img src="{{ asset('admin-assets/icons/file-svgrepo-com.svg') }}" class="fs-4 text-primary"
+                      alt="">
                   </div>
                 @else
                   <div>
-                    <img src="{{ asset('admin-assets/icons/file-svgrepo-com.svg') }}"
-                      class="fs-4 text-primary custom-animate-bounce" alt="">
+                    <img src="{{ asset('admin-assets/icons/file-svgrepo-com.svg') }}" class="fs-4 text-primary"
+                      alt="">
                   </div>
                 @endif
                 @if ($renamingPath === $item['path'])
@@ -177,8 +177,8 @@
       @empty
         <div class="col-12">
           <div class="text-center py-4 d-flex justify-content-center align-items-center flex-column">
-            <img src="{{ asset('admin-assets/icons/folder-open-svgrepo-com.svg') }}"
-              class="fs-4 text-gray-500 custom-animate-bounce" alt="">
+            <img src="{{ asset('admin-assets/icons/folder-open-svgrepo-com.svg') }}" class="fs-4 text-gray-500"
+              alt="">
             <p class="text-gray-500 fw-medium">هیچ فایل یا پوشه‌ای یافت نشد.</p>
           </div>
         </div>
