@@ -23,6 +23,7 @@ class DoctorController extends Controller
      *   "data": [
      *     {
      *       "id": 1,
+     *       "slug": "dr-mohammadi",
      *       "name": "دکتر محمدی",
      *       "specialty": "متخصص قلب و عروق",
      *       "license_number": "۱۲۳۴۵۶",
@@ -57,7 +58,6 @@ class DoctorController extends Controller
 
             // احراز هویت کاربر
             try {
-
                 $user = Auth::user();
 
                 if (! $user) {
@@ -80,7 +80,7 @@ class DoctorController extends Controller
                 ->where('likeable_type', 'App\\Models\\User')
                 ->with([
                     'doctor' => function ($query) {
-                        $query->select('id', 'first_name', 'last_name', 'specialty_id', 'license_number', 'profile_photo_path')
+                        $query->select('id', 'first_name', 'last_name', 'specialty_id', 'license_number', 'profile_photo_path', 'slug')
                             ->with(['specialty' => function ($query) {
                                 $query->select('id', 'name');
                             }]);
@@ -100,6 +100,7 @@ class DoctorController extends Controller
 
                 return [
                     'id'                 => $doctor->id,
+                    'slug'               => $doctor->slug,
                     'name'               => $doctor->first_name . ' ' . $doctor->last_name,
                     'specialty'          => $doctor->specialty ? $doctor->specialty->name : null,
                     'license_number'     => $doctor->license_number,
@@ -140,16 +141,16 @@ class DoctorController extends Controller
                 ], 401);
             }
 
-            $doctorId = $request->input('doctor_id');
-            if (! $doctorId) {
+            $doctorSlug = $request->input('doctor_slug');
+            if (! $doctorSlug) {
                 return response()->json([
                     'status'  => 'error',
-                    'message' => 'doctor_id ارسال نشده است',
+                    'message' => 'doctor_slug ارسال نشده است',
                     'data'    => null,
                 ], 422);
             }
 
-            $doctor = \App\Models\Doctor::find($doctorId);
+            $doctor = \App\Models\Doctor::where('slug', $doctorSlug)->first();
             if (! $doctor) {
                 return response()->json([
                     'status'  => 'error',
@@ -161,7 +162,7 @@ class DoctorController extends Controller
             // چک کن قبلاً لایک نشده باشد
             $alreadyLiked = \App\Models\UserDoctorLike::where('likeable_id', $user->id)
                 ->where('likeable_type', get_class($user))
-                ->where('doctor_id', $doctorId)
+                ->where('doctor_id', $doctor->id)
                 ->first();
             if ($alreadyLiked) {
                 return response()->json([
@@ -174,7 +175,7 @@ class DoctorController extends Controller
             \App\Models\UserDoctorLike::create([
                 'likeable_id'   => $user->id,
                 'likeable_type' => get_class($user),
-                'doctor_id'     => $doctorId,
+                'doctor_id'     => $doctor->id,
                 'liked_at'      => now(),
             ]);
 
@@ -201,6 +202,7 @@ class DoctorController extends Controller
      *   "data": [
      *     {
      *       "id": 1,
+     *       "slug": "dr-mohammadi",
      *       "name": "دکتر محمدی",
      *       "specialty": "قلب و عروق",
      *       "hospital": "بیمارستان کسری",
@@ -221,7 +223,7 @@ class DoctorController extends Controller
             $bestDoctors = BestDoctor::where('status', true)
                 ->with([
                     'doctor'       => function ($query) {
-                        $query->select('id', 'first_name', 'last_name', 'specialty_id', 'profile_photo_path', 'province_id')
+                        $query->select('id', 'first_name', 'last_name', 'specialty_id', 'profile_photo_path', 'province_id', 'slug')
                             ->with([
                                 'specialty'     => fn ($query) => $query->select('id', 'name'),
                                 'province'      => fn ($query) => $query->select('id', 'name'),
@@ -249,6 +251,7 @@ class DoctorController extends Controller
                 }
                 $result = [
                     'id'                  => optional($bestDoctor->doctor)->id,
+                    'slug'                => optional($bestDoctor->doctor)->slug,
                     'name'                => optional($bestDoctor->doctor)->first_name . ' ' . optional($bestDoctor->doctor)->last_name,
                     'specialty'           => optional(optional($bestDoctor->doctor)->specialty)->name,
                     'star_rating'         => $bestDoctor->star_rating,
@@ -259,14 +262,12 @@ class DoctorController extends Controller
                 return $result;
             })->values();
 
-
             return response()->json([
                 'status' => 'success',
                 'data'   => $formattedDoctors,
             ], 200);
 
         } catch (\Exception $e) {
-
             return response()->json([
                 'status'  => 'error',
                 'message' => 'خطای سرور',
@@ -276,28 +277,29 @@ class DoctorController extends Controller
     }
 
     /**
-       * گرفتن لیست پزشکان جدید
-       *
-       * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
-       * @response 200 {
-       *   "status": "success",
-       *   "data": [
-       *     {
-       *       "id": 1,
-       *       "name": "میلاد کرمانجی",
-       *       "specialty": "کارشناسی ارشد علوم تغذیه",
-       *       "profile_photo_url": "http://127.0.0.1:8000/admin-assets/images/default-avatar.png",
-       *       "created_at": "1403/12/28",
-       *       "province": "دیواندره"
-       *     }
-       *   ]
-       * }
-       * @response 500 {
-       *   "status": "error",
-       *   "message": "خطای سرور",
-       *   "data": null
-       * }
-       */
+     * گرفتن لیست پزشکان جدید
+     *
+     * @queryParam limit integer تعداد آیتم‌ها (اختیاری، اگر نباشد همه برگردانده می‌شود)
+     * @response 200 {
+     *   "status": "success",
+     *   "data": [
+     *     {
+     *       "id": 1,
+     *       "slug": "milad-kermanji",
+     *       "name": "میلاد کرمانجی",
+     *       "specialty": "کارشناسی ارشد علوم تغذیه",
+     *       "profile_photo_url": "http://127.0.0.1:8000/admin-assets/images/default-avatar.png",
+     *       "created_at": "1403/12/28",
+     *       "province": "دیواندره"
+     *     }
+     *   ]
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
+     */
     public function getNewDoctors(Request $request)
     {
         try {
@@ -324,6 +326,7 @@ class DoctorController extends Controller
 
                 return [
                     'id'               => $doctor->id,
+                    'slug'             => $doctor->slug,
                     'name'             => $doctor->fullName,
                     'specialty'        => $doctor->specialty ? $doctor->specialty->name : null,
                     'profile_photo_url' => $doctor->profile_photo_url,
@@ -387,7 +390,6 @@ class DoctorController extends Controller
 
                 $workHours = is_string($schedule->work_hours) ? json_decode($schedule->work_hours, true) : $schedule->work_hours;
                 if (! is_array($workHours) || empty($workHours)) {
-
                     continue;
                 }
                 $workHour = $workHours[0];
@@ -406,7 +408,6 @@ class DoctorController extends Controller
                     });
 
                     if (! $isBooked && $currentTime->gte($now)) {
-
                         return [
                             'next_available_slot' => $currentTime->toIso8601String(),
                             'max_appointments'    => $schedule->appointment_settings[0]['max_appointments'] ?? 22,
