@@ -156,7 +156,7 @@ Route::prefix('mc')
                     // بازیابی تنظیمات ساعات کاری
                     Route::get('mc-get-work-schedule', [ScheduleSettingController::class, 'getWorkSchedule'])->middleware('medical_center.permission:appointments')->name('mc-get-work-schedule');
                     Route::post('/dr/update-work-day-status', [ScheduleSettingController::class, 'updateWorkDayStatus'])->middleware('medical_center.permission:appointments')->name('mc-update-work-day-status');
-                    Route::post('/check-day-slots', [ScheduleSettingController::class, 'checkDaySlots'])->middleware('medical_center.permission:appointments')->name('check-day-slots');
+                    Route::post('/check-day-slots', [ScheduleSettingController::class, 'checkDaySlots'])->middleware('medical_center.permission:appointments')->name('mc-check-day-slots');
                     Route::post('/update-auto-scheduling', [ScheduleSettingController::class, 'updateAutoScheduling'])->middleware('medical_center.permission:appointments')->name('mc-update-auto-scheduling');
                     // routes/web.php
                     Route::post('/copy-work-hours', [ScheduleSettingController::class, 'copyWorkHours'])->middleware('medical_center.permission:appointments')->name('mc-copy-work-hours');
