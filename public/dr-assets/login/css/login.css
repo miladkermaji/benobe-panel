@@ -891,7 +891,7 @@ button {
 }
 
 /* بهبود انیمیشن‌ها */
-/* @keyframes pulse {
+@keyframes pulse {
     0% {
         transform: scale(1);
     }
@@ -901,7 +901,7 @@ button {
     100% {
         transform: scale(1);
     }
-} */
+}
 
 .btn.custom-gradient:focus {
     animation: pulse 0.3s ease;
