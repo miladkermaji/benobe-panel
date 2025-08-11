@@ -27,11 +27,11 @@ function initializeDashboard() {
     function getChartColors() {
         if (isDarkMode()) {
             return {
-                grid: "rgba(255, 255, 255, 0.15)",
-                text: "#f9fafb",
-                textSecondary: "#d1d5db",
-                border: "#4b5563",
-                background: "rgba(55, 65, 81, 0.1)",
+                grid: "rgba(0, 0, 0, 0.2)",
+                text: "#111827",
+                textSecondary: "#374151",
+                border: "#9ca3af",
+                background: "rgba(0, 0, 0, 0.1)",
             };
         } else {
             return {
