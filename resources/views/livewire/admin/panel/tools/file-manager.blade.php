@@ -39,8 +39,9 @@
               <span wire:loading.remove wire:target="createFolder">
                 <i class="fas fa-plus me-1"></i> ایجاد
               </span>
+              
               <span wire:loading wire:target="createFolder">
-                <i class="fas fa-spinner fa-spin me-1"></i> در حال ایجاد...
+                <svg class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></svg> در حال ایجاد...
               </span>
             </button>
           </div>
