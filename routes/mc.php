@@ -61,10 +61,10 @@ Route::prefix('mc')
             Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('mc-doctor.end-visit');
             Route::get('/doctor/appointments/by-date', [McDrScheduleController::class, 'getAppointmentsByDate'])
                 ->name('mc-doctor.appointments.by-date');
-            Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('mc-search.patients');
-            Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('mc-search.patients-counseling');
+            Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('mc-doctor.search.patients');
+            Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('mc-doctor.search.patients-counseling');
             Route::post('/appointments/update-date/{id}', [McDrScheduleController::class, 'updateAppointmentDate'])
-                ->name('updateAppointmentDate');
+                ->name('mc-updateAppointmentDate');
             Route::prefix('doctor-notes')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorNote\DoctorNoteController::class, 'index'])->name('mc.panel.doctornotes.index');
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('mc.panel.doctornotes.create');
