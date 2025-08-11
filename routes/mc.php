@@ -56,11 +56,11 @@ Route::prefix('mc')
             Route::prefix('patient-contact/send-message')->group(function () {
                 Route::get('/', [DoctorSendMessageController::class, 'index'])->middleware('medical_center.permission:patient_communication')->name('mc.panel.send-message');
             });
-            Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('mc-doctor.end-visit-counseling');
+            Route::post('appointments/{id}/end-visit-counseling', [MoshavereWaitingController::class, 'endVisit'])->name('mc-mc-doctor.end-visit-counseling');
             Route::get('/search-appointments-counseling', [MoshavereWaitingController::class, 'searchAppointments'])->middleware('medical_center.permission:appointments')->name('mc-search.appointments.counseling');
-            Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('doctor.end-visit');
+            Route::post('appointments/{id}/end-visit', [McDrScheduleController::class, 'endVisit'])->name('mc-doctor.end-visit');
             Route::get('/doctor/appointments/by-date', [McDrScheduleController::class, 'getAppointmentsByDate'])
-                ->name('doctor.appointments.by-date');
+                ->name('mc-doctor.appointments.by-date');
             Route::get('/search/patients', [McDrScheduleController::class, 'searchPatients'])->name('search.patients');
             Route::get('/search/patients-counseling', [MoshavereWaitingController::class, 'searchPatients'])->name('search.patients-counseling');
             Route::post('/appointments/update-date/{id}', [McDrScheduleController::class, 'updateAppointmentDate'])
@@ -70,8 +70,8 @@ Route::prefix('mc')
                 Route::get('/create', [\App\Http\Controllers\Mc\Panel\DoctorNote\DoctorNoteController::class, 'create'])->name('mc.panel.doctornotes.create');
                 Route::get('/edit/{id}', [\App\Http\Controllers\Mc\Panel\DoctorNote\DoctorNoteController::class, 'edit'])->name('mc.panel.doctornotes.edit');
             });
-            Route::get('/doctor/appointments/filter', [McDrScheduleController::class, 'filterAppointments'])->name('doctor.appointments.filter');
-            Route::get('/doctor/appointments/filter-counseling', [MoshavereWaitingController::class, 'filterAppointments'])->name('doctor.appointments.filter.counseling');
+            Route::get('/doctor/appointments/filter', [McDrScheduleController::class, 'filterAppointments'])->name('mc-doctor.appointments.filter');
+            Route::get('/doctor/appointments/filter-counseling', [MoshavereWaitingController::class, 'filterAppointments'])->name('mc-doctor.appointments.filter.counseling');
             Route::prefix('turn')->middleware('medical_center.permission:appointments')->group(function () {
                 Route::prefix('schedule')->group(function () {
                     Route::get('/appointments', [McDrScheduleController::class, 'index'])->middleware('medical_center.permission:mc-appointments')->name('mc-appointments');
@@ -95,7 +95,7 @@ Route::prefix('mc')
                     Route::post('/delete-schedule-setting-counseling', [DrMoshavereSettingController::class, 'deleteScheduleSetting'])->middleware('medical_center.permission:mc-moshavere_setting')->name('delete-schedule-setting-counseling');
                     Route::get('/moshavere_waiting', [MoshavereWaitingController::class, 'index'])->middleware('medical_center.permission:mc-moshavere_waiting')->name('mc-moshavere_waiting');
                     Route::get('/doctor/appointments/by-date-counseling', [MoshavereWaitingController::class, 'getAppointmentsByDate'])
-                                                ->name('doctor.appointments.by-date-counseling');
+                                                ->name('mc-doctor.appointments.by-date-counseling');
                     Route::get('/manual_nobat', [ManualNobatController::class, 'index'])->middleware('medical_center.permission:mc-manual_nobat')->name('mc-manual_nobat');
                     Route::post('manual_nobat/store', [ManualNobatController::class, 'store'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-nobat.store');
                     Route::post('manual-nobat/store-with-user', [ManualNobatController::class, 'storeWithUser'])->middleware('medical_center.permission:mc-manual_nobat')->name('manual-nobat.store-with-user');
@@ -112,10 +112,10 @@ Route::prefix('mc')
                     Route::post('/{id}/end-visit', [ManualNobatController::class, 'endVisit'])->name('manual-nobat.end-visit');
                     Route::prefix('scheduleSetting/vacation')->group(function () {
                         Route::get('/', [VacationController::class, 'index'])->middleware('medical_center.permission:mc-vacation')->name('mc-vacation');
-                        Route::post('/store', [VacationController::class, 'store'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.store');
-                        Route::post('/update/{id}', [VacationController::class, 'update'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.update');
-                        Route::delete('/delete/{id}', [VacationController::class, 'destroy'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.destroy');
-                        Route::get('/doctor/vacation/{id}/edit', [VacationController::class, 'edit'])->middleware('medical_center.permission:mc-vacation')->name('doctor.vacation.edit');
+                        Route::post('/store', [VacationController::class, 'store'])->middleware('medical_center.permission:mc-vacation')->name('mc-doctor.vacation.store');
+                        Route::post('/update/{id}', [VacationController::class, 'update'])->middleware('medical_center.permission:mc-vacation')->name('mc-doctor.vacation.update');
+                        Route::delete('/delete/{id}', [VacationController::class, 'destroy'])->middleware('medical_center.permission:mc-vacation')->name('mc-doctor.vacation.destroy');
+                        Route::get('/doctor/vacation/{id}/edit', [VacationController::class, 'edit'])->middleware('medical_center.permission:mc-vacation')->name('mc-doctor.vacation.edit');
                     });
                     Route::prefix('scheduleSetting/blocking_users')->group(function () {
                         Route::get('/', [BlockingUsersController::class, 'index'])
@@ -164,39 +164,39 @@ Route::prefix('mc')
                     Route::post('/save-time-slot', [ScheduleSettingController::class, 'saveTimeSlot'])->middleware('medical_center.permission:appointments')->name('save-time-slot');
                     Route::get('/scheduleSetting/my-special-days', [ScheduleSettingController::class, 'mySpecialDays'])->middleware('medical_center.permission:appointments')->name('mc-mySpecialDays');
                     Route::get('/scheduleSetting/counseling/my-special-days', [MySpecialDaysCounselingController::class, 'mySpecialDays'])->middleware('medical_center.permission:appointments')->name('mc-mySpecialDays-counseling');
-                    Route::get('/appointments-by-date', [ScheduleSettingController::class, 'getAppointmentsByDateSpecial'])->name('doctor.get_appointments_by_date');
-                    Route::get('/appointments-by-date-counseling', [MoshavereWaitingController::class, 'getAppointmentsByDateSpecial'])->name('doctor.get_appointments_by_date_counseling');
-                    Route::get('/doctor/default-schedule', [ScheduleSettingController::class, 'getDefaultSchedule'])->name('doctor.get_default_schedule');
-                    Route::get('/doctor/default-schedule-counseling', [MoshavereWaitingController::class, 'getDefaultSchedule'])->name('doctor.get_default_schedule_counseling');
-                    Route::get('/doctor/default-schedule-counseling', [MySpecialDaysCounselingController::class, 'getDefaultSchedule'])->name('doctor.get_default_schedule_counseling');
-                    Route::post('/doctor/update-work-schedule', [ScheduleSettingController::class, 'updateWorkSchedule'])->name('doctor.update_work_schedule');
-                    Route::post('/doctor/update-work-schedule-counseling', [MoshavereWaitingController::class, 'updateWorkSchedule'])->name('doctor.update_work_schedule_counseling');
-                    Route::post('/doctor/update-work-schedule-counseling', [MySpecialDaysCounselingController::class, 'updateWorkSchedule'])->name('doctor.update_work_schedule_counseling');
+                    Route::get('/appointments-by-date', [ScheduleSettingController::class, 'getAppointmentsByDateSpecial'])->name('mc-doctor.get_appointments_by_date');
+                    Route::get('/appointments-by-date-counseling', [MoshavereWaitingController::class, 'getAppointmentsByDateSpecial'])->name('mc-doctor.get_appointments_by_date_counseling');
+                    Route::get('/doctor/default-schedule', [ScheduleSettingController::class, 'getDefaultSchedule'])->name('mc-doctor.get_default_schedule');
+                    Route::get('/doctor/default-schedule-counseling', [MoshavereWaitingController::class, 'getDefaultSchedule'])->name('mc-doctor.get_default_schedule_counseling');
+                    Route::get('/doctor/default-schedule-counseling', [MySpecialDaysCounselingController::class, 'getDefaultSchedule'])->name('mc-doctor.get_default_schedule_counseling');
+                    Route::post('/doctor/update-work-schedule', [ScheduleSettingController::class, 'updateWorkSchedule'])->name('mc-doctor.update_work_schedule');
+                    Route::post('/doctor/update-work-schedule-counseling', [MoshavereWaitingController::class, 'updateWorkSchedule'])->name('mc-doctor.update_work_schedule_counseling');
+                    Route::post('/doctor/update-work-schedule-counseling', [MySpecialDaysCounselingController::class, 'updateWorkSchedule'])->name('mc-doctor.update_work_schedule_counseling');
                     Route::get('/appointments-count', [McScheduleSettingController::class, 'getAppointmentsCountPerDay'])->middleware('medical_center.permission:appointments')->name('appointments.count');
                     Route::get('/work-days-and-config', [ScheduleSettingController::class, 'getWorkDaysAndConfig'])->name('work.days.config');
                     Route::get('/appointments-count-counseling', [MySpecialDaysCounselingController::class, 'getAppointmentsCountPerDay'])->middleware('medical_center.permission:appointments')->name('appointments.count.counseling');
                     Route::get('/appointments/by-date', [ScheduleSettingController::class, 'getAppointmentsByDate'])->middleware('medical_center.permission:appointments')->name('appointments.by_date');
-                    Route::post('/doctor/add-holiday', [ScheduleSettingController::class, 'addHoliday'])->middleware('medical_center.permission:appointments')->name('doctor.add_holiday');
-                    Route::get('/doctor/get-holidays', [ScheduleSettingController::class, 'getHolidayDates'])->middleware('medical_center.permission:appointments')->name('doctor.get_holidays');
-                    Route::get('/doctor/get-holidays-counseling', [MySpecialDaysCounselingController::class, 'getHolidayDates'])->middleware('medical_center.permission:appointments')->name('doctor.get_holidays_counseling');
-                    Route::post('/doctor/toggle-holiday', [ScheduleSettingController::class, 'toggleHolidayStatus'])->middleware('medical_center.permission:appointments')->name('doctor.toggle_holiday');
-                    Route::post('/doctor/toggle-holiday-counseling', [MySpecialDaysCounselingController::class, 'toggleHolidayStatus'])->middleware('medical_center.permission:appointments')->name('doctor.toggle_holiday_counseling');
-                    Route::post('/doctor/holiday-status', [ScheduleSettingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('doctor.get_holiday_status');
-                    Route::post('/doctor/holiday-status-counseling', [MoshavereWaitingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('doctor.get_holiday_status_counseling');
-                    Route::post('/doctor/holiday-status-counseling', [MySpecialDaysCounselingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('doctor.get_holiday_status_counseling');
-                    Route::post('/doctor/cancel-appointments', [ScheduleSettingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('doctor.cancel_appointments');
-                    Route::post('/doctor/cancel-appointments-counseling', [MoshavereWaitingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('doctor.cancel_appointments_counseling');
-                    Route::post('/doctor/cancel-appointments-counseling', [MySpecialDaysCounselingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('doctor.cancel_appointments_counseling');
-                    Route::post('/doctor/reschedule-appointment', [McScheduleSettingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.reschedule_appointment');
-                    Route::post('/doctor/reschedule-appointment-counseling', [MoshavereWaitingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.reschedule_appointment_counseling');
-                    Route::post('/doctor/reschedule-appointment-counseling', [MySpecialDaysCounselingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.reschedule_appointment_counseling');
+                    Route::post('/doctor/add-holiday', [ScheduleSettingController::class, 'addHoliday'])->middleware('medical_center.permission:appointments')->name('mc-doctor.add_holiday');
+                    Route::get('/doctor/get-holidays', [ScheduleSettingController::class, 'getHolidayDates'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_holidays');
+                    Route::get('/doctor/get-holidays-counseling', [MySpecialDaysCounselingController::class, 'getHolidayDates'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_holidays_counseling');
+                    Route::post('/doctor/toggle-holiday', [ScheduleSettingController::class, 'toggleHolidayStatus'])->middleware('medical_center.permission:appointments')->name('mc-doctor.toggle_holiday');
+                    Route::post('/doctor/toggle-holiday-counseling', [MySpecialDaysCounselingController::class, 'toggleHolidayStatus'])->middleware('medical_center.permission:appointments')->name('mc-doctor.toggle_holiday_counseling');
+                    Route::post('/doctor/holiday-status', [ScheduleSettingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_holiday_status');
+                    Route::post('/doctor/holiday-status-counseling', [MoshavereWaitingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_holiday_status_counseling');
+                    Route::post('/doctor/holiday-status-counseling', [MySpecialDaysCounselingController::class, 'getHolidayStatus'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_holiday_status_counseling');
+                    Route::post('/doctor/cancel-appointments', [ScheduleSettingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('mc-doctor.cancel_appointments');
+                    Route::post('/doctor/cancel-appointments-counseling', [MoshavereWaitingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('mc-doctor.cancel_appointments_counseling');
+                    Route::post('/doctor/cancel-appointments-counseling', [MySpecialDaysCounselingController::class, 'cancelAppointments'])->middleware('medical_center.permission:appointments')->name('mc-doctor.cancel_appointments_counseling');
+                    Route::post('/doctor/reschedule-appointment', [McScheduleSettingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.reschedule_appointment');
+                    Route::post('/doctor/reschedule-appointment-counseling', [MoshavereWaitingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.reschedule_appointment_counseling');
+                    Route::post('/doctor/reschedule-appointment-counseling', [MySpecialDaysCounselingController::class, 'rescheduleAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.reschedule_appointment_counseling');
                     Route::get('/turnContract', [ScheduleSettingController::class, 'turnContract'])->middleware('medical_center.permission:appointments')->name('mc-scheduleSetting-turnContract');
-                    Route::post('/update-first-available-appointment', [ScheduleSettingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.update_first_available_appointment');
-                    Route::post('/update-first-available-appointment-counseling', [MoshavereWaitingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.update_first_available_appointment_counseling');
-                    Route::post('/update-first-available-appointment-counseling', [MySpecialDaysCounselingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('doctor.update_first_available_appointment_counseling');
-                    Route::get('get-next-available-date', [ScheduleSettingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('doctor.get_next_available_date');
-                    Route::get('get-next-available-date-counseling', [MoshavereWaitingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('doctor.get_next_available_date_counseling');
-                    Route::get('get-next-available-date-counseling', [MySpecialDaysCounselingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('doctor.get_next_available_date_counseling');
+                    Route::post('/update-first-available-appointment', [ScheduleSettingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.update_first_available_appointment');
+                    Route::post('/update-first-available-appointment-counseling', [MoshavereWaitingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.update_first_available_appointment_counseling');
+                    Route::post('/update-first-available-appointment-counseling', [MySpecialDaysCounselingController::class, 'updateFirstAvailableAppointment'])->middleware('medical_center.permission:appointments')->name('mc-doctor.update_first_available_appointment_counseling');
+                    Route::get('get-next-available-date', [ScheduleSettingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_next_available_date');
+                    Route::get('get-next-available-date-counseling', [MoshavereWaitingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_next_available_date_counseling');
+                    Route::get('get-next-available-date-counseling', [MySpecialDaysCounselingController::class, 'getNextAvailableDate'])->middleware('medical_center.permission:appointments')->name('mc-doctor.get_next_available_date_counseling');
                     Route::delete('/appointments/destroy/{id}', [AppointmentController::class, 'destroyAppointment'])->middleware('medical_center.permission:appointments')->name('appointments.destroy');
                     Route::post('/toggle-auto-pattern/{id}', [AppointmentController::class, 'toggleAutoPattern'])->middleware('medical_center.permission:appointments')->name('toggle-auto-pattern');
                 });
@@ -319,7 +319,7 @@ Route::prefix('mc')
                 Route::delete('/dr/panel/profile/security/logs/{id}', [LoginLogsController::class, 'deleteLog'])->middleware('medical_center.permission:profile')->name('delete-log');
                 Route::get('upgrade', [DrUpgradeProfileController::class, 'index'])->middleware('medical_center.permission:profile')->name('mc-edit-profile-upgrade');
                 Route::delete('/doctor/payments/delete/{id}', [DrUpgradeProfileController::class, 'deletePayment'])->name('mc-payment-delete');
-                Route::post('/pay', [DrUpgradeProfileController::class, 'payForUpgrade'])->name('doctor.upgrade.pay');
+                Route::post('/pay', [DrUpgradeProfileController::class, 'payForUpgrade'])->name('mc-doctor.upgrade.pay');
                 Route::get('subuser', [SubUserController::class, 'index'])->middleware('medical_center.permission:profile')->name('mc-subuser');
                 Route::post('sub-users/store', [SubUserController::class, 'store'])->name('mc-sub-users-store');
                 Route::get('sub-users/edit/{id}', [SubUserController::class, 'edit'])->name('mc-sub-users-edit');
