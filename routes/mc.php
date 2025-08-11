@@ -47,7 +47,6 @@ Route::prefix('mc')
             Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorComments\DoctorCommentController::class, 'index'])->name('mc.panel.doctor-comments.index');
         });
         Route::prefix('panel')->middleware(['medical_center'])->group(function () {
-            Route::get('mc/panel', [McPanelController::class, 'index'])->name('mc-panel');
             Route::get('/', [McPanelController::class, 'index'])->middleware('medical_center.permission:dashboard')->name('mc-panel');
             Route::prefix('doctor-services')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Mc\Panel\DoctorService\DoctorServiceController::class, 'index'])->middleware('medical_center.permission:doctor_services')->name('mc.panel.doctor-services.index');
