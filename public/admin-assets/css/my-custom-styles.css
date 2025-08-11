@@ -302,9 +302,6 @@ body {
 }
 
 /* انیمیشن */
-.custom-animate-bounce {
-    animation: bounce 1.2s infinite;
-}
 
 @keyframes bounce {
     0%,
@@ -1201,10 +1198,6 @@ body {
         height: 36px;
         font-size: 0.8125rem;
     }
-
-  
-
-    
 }
 tr {
     color: #333 !important;

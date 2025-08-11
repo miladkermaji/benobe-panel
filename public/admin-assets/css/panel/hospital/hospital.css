@@ -303,9 +303,6 @@ body {
 }
 
 /* انیمیشن */
-.custom-animate-bounce {
-    animation: bounce 1.2s infinite;
-}
 
 @keyframes bounce {
     0%,

@@ -140,7 +140,7 @@
               <td colspan="2" class="text-center py-4">
                 <div class="d-flex flex-column align-items-center justify-content-center">
                   <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
-                    stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
+                    stroke="var(--text-secondary)" stroke-width="2" class="mb-3">
                     <path d="M5 12h14M12 5l7 7-7 7" />
                   </svg>
                   <p class="text-text-secondary font-medium m-0">مدیری مطابق جستجو یافت نشد.</p>
@@ -223,7 +223,7 @@
             <div class="text-center py-6">
               <div class="d-flex flex-column align-items-center justify-content-center">
                 <svg width="56" height="56" viewBox="0 0 24 24" fill="none"
-                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3 custom-animate-bounce">
+                  stroke="var(--text-secondary)" stroke-width="2" class="mb-3">
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
                 <p class="text-text-secondary font-medium m-0">مدیری مطابق جستجو یافت نشد.</p>

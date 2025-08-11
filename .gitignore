@@ -24,3 +24,4 @@ yarn-error.log
 /.zed
 git_pull_log.txt
 webhook_log.txt
+sync_config.jsonc
