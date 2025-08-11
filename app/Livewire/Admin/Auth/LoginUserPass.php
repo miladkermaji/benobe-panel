@@ -141,15 +141,6 @@ class LoginUserPass extends Component
                     ->where('expires_at', '>', now())
                     ->first();
                 if ($activeSession) {
-                    $countDownDate = $activeOtp->created_at->addMinutes(2)->timestamp * 1000;
-                    $remainingTime = max(0, $countDownDate - now()->timestamp * 1000);
-                    $this->dispatch(
-                        'otpAlreadySent',
-                        message: 'کد تأیید قبلاً ارسال شده است. زمان باقی‌مانده: ' . $this->formatConditionalTime((int) round($remainingTime / 1000)),
-                        remainingTime: $remainingTime,
-                        countDownDate: $countDownDate,
-                        token: $activeOtp->token,
-                    );
                     session(['current_step' => 2, 'otp_token' => $activeOtp->token]);
                     $this->redirect(route('admin.auth.login-confirm-form', ['token' => $activeOtp->token]), navigate: true);
                     return;
