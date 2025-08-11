@@ -121,7 +121,6 @@
     max-width: 1000px;
     background-color: var(--background-card);
     border-radius: var(--radius-card);
-    box-shadow: 0 2px 8px var(--shadow);
 }
 
 .top-appointment {

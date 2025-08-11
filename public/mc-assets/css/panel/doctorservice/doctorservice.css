@@ -1267,7 +1267,7 @@ body {
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
-        box-shadow: 0 2px 8px var(--shadow);
+
         margin-bottom: 1rem;
         overflow: hidden;
     }
@@ -1606,7 +1606,7 @@ body {
     .note-card {
         background: var(--background-card);
         border-radius: var(--radius-card);
-        box-shadow: 0 2px 8px var(--shadow);
+
         margin-bottom: 1rem;
         overflow: hidden;
     }
@@ -1888,7 +1888,7 @@ body {
 .note-card {
     background: var(--background-card);
     border-radius: var(--radius-card);
-    box-shadow: 0 2px 8px var(--shadow);
+
     overflow: hidden;
 }
 

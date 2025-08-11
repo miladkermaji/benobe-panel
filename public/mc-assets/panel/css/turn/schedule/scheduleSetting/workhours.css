@@ -122,7 +122,7 @@ body {
     background: var(--background-card);
     border-radius: var(--radius-card);
     border: 1px solid var(--border-neutral);
-    box-shadow: 0 2px 8px var(--shadow);
+
     padding: 1.5rem;
     width: 100%;
     max-width: 900px;
@@ -458,7 +458,6 @@ body {
 }
 
 .border-333:hover {
-    box-shadow: 0 2px 8px var(--shadow);
 }
 
 /* مودال‌ها */
@@ -735,7 +734,7 @@ h6 {
     #day-contents-outside label {
         font-size: 13px !important;
     }
-    .card-header h6{
+    .card-header h6 {
         font-size: 14px !important;
     }
     .label-top-input-special-takhasos {
@@ -927,7 +926,7 @@ h6 {
     [data-bs-target="#CalculatorModal"] {
         width: 70px !important;
     }
-      #day-contents-outside.gap-40 {
+    #day-contents-outside.gap-40 {
         gap: 18px !important;
     }
     #day-contents-outside label {

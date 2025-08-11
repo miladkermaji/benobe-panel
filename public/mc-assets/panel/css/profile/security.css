@@ -1,258 +1,262 @@
 :root {
-  --primary: #2E86C1;
-  --primary-light: #84CAF9;
-  --secondary: #1DEB3C;
-  --secondary-hover: #15802A;
-  --background-light: #F0F8FF;
-  --background-footer: #D4ECFD;
-  --background-card: #FFFFFF;
-  --text-primary: #000000;
-  --text-secondary: #707070;
-  --text-discount: #008000;
-  --text-original: #FF0000;
-  --border-neutral: #E5E7EB;
-  --shadow: rgba(0, 0, 0, 0.15);
-  --gradient-primary: linear-gradient(90deg, var(--primary-light) 0%, var(--primary) 100%);
-  --radius-button: 0.5rem;
-  --radius-button-large: 1rem;
-  --radius-card: 1.125rem;
-  --radius-footer: 1.875rem;
-  --radius-nav: 1.25rem;
-  --radius-circle: 9999px;
-  --success: #28a745;
-  --danger: #dc3545;
+    --primary: #2e86c1;
+    --primary-light: #84caf9;
+    --secondary: #1deb3c;
+    --secondary-hover: #15802a;
+    --background-light: #f0f8ff;
+    --background-footer: #d4ecfd;
+    --background-card: #ffffff;
+    --text-primary: #000000;
+    --text-secondary: #707070;
+    --text-discount: #008000;
+    --text-original: #ff0000;
+    --border-neutral: #e5e7eb;
+    --shadow: rgba(0, 0, 0, 0.15);
+    --gradient-primary: linear-gradient(
+        90deg,
+        var(--primary-light) 0%,
+        var(--primary) 100%
+    );
+    --radius-button: 0.5rem;
+    --radius-button-large: 1rem;
+    --radius-card: 1.125rem;
+    --radius-footer: 1.875rem;
+    --radius-nav: 1.25rem;
+    --radius-circle: 9999px;
+    --success: #28a745;
+    --danger: #dc3545;
 }
 
 .subuser-content {
-  padding: 40px 20px;
-  background: var(--background-light);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
+    padding: 40px 20px;
+    background: var(--background-light);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
 }
 
 .subuser-content-wrapper {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 .card {
-  border: none;
-  border-radius: var(--radius-card);
-  background: var(--background-card);
-  box-shadow: 0 4px 16px var(--shadow);
-  margin-bottom: 30px;
-  overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: var(--radius-card);
+    background: var(--background-card);
+    box-shadow: 0 4px 16px var(--shadow);
+    margin-bottom: 30px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px var(--shadow);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px var(--shadow);
 }
 
 .card-header {
-  background: var(--gradient-primary);
-  color: var(--background-card);
-  padding: 20px;
-  font-size: 18px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border-bottom: none;
+    background: var(--gradient-primary);
+    color: var(--background-card);
+    padding: 20px;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: none;
 }
 
 .card-body {
-  padding: 20px;
+    padding: 20px;
 }
 
 .table-responsive {
-  overflow-x: auto;
+    overflow-x: auto;
 }
 
 .table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
-  margin-bottom: 0;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+    margin-bottom: 0;
 }
 
 .table thead th {
-  background: var(--background-light);
-  color: var(--text-primary);
-  font-weight: 700;
-  font-size: 14px;
-  padding: 12px 15px;
-  text-align: right;
-  border-bottom: none;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+    background: var(--background-light);
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px 15px;
+    text-align: right;
+    border-bottom: none;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .table tbody tr {
-  background: var(--background-card);
-  box-shadow: 0 2px 8px var(--shadow);
-  border-radius: var(--radius-button);
-  transition: box-shadow 0.3s ease;
+    background: var(--background-card);
+
+    border-radius: var(--radius-button);
+    transition: box-shadow 0.3s ease;
 }
 
 .table tbody tr:hover {
-  box-shadow: 0 4px 12px var(--shadow);
+    box-shadow: 0 4px 12px var(--shadow);
 }
 
 .table tbody td {
-  padding: 12px 15px;
-  font-size: 14px;
-  color: var(--text-primary);
-  vertical-align: middle;
-  border: none;
-  text-align: right;
+    padding: 12px 15px;
+    font-size: 14px;
+    color: var(--text-primary);
+    vertical-align: middle;
+    border: none;
+    text-align: right;
 }
 
 .status-online {
-  color: var(--success);
-  font-weight: 600;
+    color: var(--success);
+    font-weight: 600;
 }
 
 .status-offline {
-  color: var(--danger);
-  font-weight: 600;
+    color: var(--danger);
+    font-weight: 600;
 }
 
 .btn-delete {
-  background: var(--background-light);
-  border: none;
-  padding: 8px;
-  border-radius: var(--radius-button);
-  transition: background-color 0.2s ease, transform 0.2s ease;
+    background: var(--background-light);
+    border: none;
+    padding: 8px;
+    border-radius: var(--radius-button);
+    transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .btn-delete:hover {
-  background: var(--danger);
-  transform: scale(1.1);
+    background: var(--danger);
+    transform: scale(1.1);
 }
 
 .btn-delete img {
-  width: 18px;
-  height: 18px;
-  filter: brightness(0) invert(1);
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
 }
 
 .pagination-links {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
 }
 
 .pagination .page-link {
-  border-radius: var(--radius-button);
-  margin: 0 4px;
-  color: var(--primary);
-  border: 1px solid var(--border-neutral);
-  padding: 8px 12px;
-  font-size: 14px;
-  transition: all 0.3s ease;
+    border-radius: var(--radius-button);
+    margin: 0 4px;
+    color: var(--primary);
+    border: 1px solid var(--border-neutral);
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
 }
 
 .pagination .page-link:hover {
-  background: var(--primary);
-  color: var(--background-card);
-  border-color: var(--primary);
+    background: var(--primary);
+    color: var(--background-card);
+    border-color: var(--primary);
 }
 
 .pagination .page-item.active .page-link {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--background-card);
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--background-card);
 }
 
 .pagination .page-item.disabled .page-link {
-  color: var(--text-secondary);
-  border-color: var(--border-neutral);
-  background: var(--background-card);
+    color: var(--text-secondary);
+    border-color: var(--border-neutral);
+    background: var(--background-card);
 }
 
 /* Responsive Design */
 @media only screen and (max-width: 991px) {
-  .subuser-content {
-    padding: 25px 12px;
-  }
-  .subuser-content-wrapper {
-    max-width: 100%;
-  }
-  .card-header {
-    font-size: 16px;
-    padding: 15px;
-  }
-  .card-body {
-    padding: 15px;
-  }
-  .table thead th {
-    font-size: 13px;
-    padding: 10px;
-  }
-  .table tbody td {
-    font-size: 13px;
-    padding: 10px;
-  }
-  .btn-delete {
-    padding: 6px;
-  }
+    .subuser-content {
+        padding: 25px 12px;
+    }
+    .subuser-content-wrapper {
+        max-width: 100%;
+    }
+    .card-header {
+        font-size: 16px;
+        padding: 15px;
+    }
+    .card-body {
+        padding: 15px;
+    }
+    .table thead th {
+        font-size: 13px;
+        padding: 10px;
+    }
+    .table tbody td {
+        font-size: 13px;
+        padding: 10px;
+    }
+    .btn-delete {
+        padding: 6px;
+    }
 }
 
 @media only screen and (max-width: 425px) {
-  .subuser-content {
-    padding: 15px 8px;
-  }
-  .subuser-content-wrapper {
-    max-width: 100%;
-    margin: 0;
-  }
-  .card {
-    margin-bottom: 15px;
-    border-radius: 4px; /* کاهش کامل radius در موبایل */
-  }
-  .card-header {
-    font-size: 14px;
-    padding: 10px;
-    gap: 6px;
-  }
-  .card-body {
-    padding: 10px;
-  }
-  .table {
-    border-spacing: 0 4px;
-  }
-  .table thead th {
-    font-size: 12px;
-    padding: 6px;
-    border-radius: 0; /* حذف radius هدر جدول در موبایل */
-  }
-  .table tbody tr {
-    border-radius: 4px; /* کاهش radius ردیف‌ها در موبایل */
-  }
-  .table tbody td {
-    font-size: 12px;
-    padding: 6px;
-  }
-  .btn-delete {
-    padding: 8px; /* افزایش پدینگ دکمه حذف برای راحتی کلیک */
-    border-radius: 4px; /* کاهش radius دکمه در موبایل */
-  }
-  .btn-delete img {
-    width: 20px; /* افزایش اندازه آیکون در موبایل */
-    height: 20px;
-  }
-  .pagination-links {
-    margin-top: 10px;
-  }
-  .pagination .page-link {
-    padding: 5px 8px;
-    font-size: 12px;
-    border-radius: 4px; /* کاهش radius پیجینیشن در موبایل */
-    margin: 0 2px;
-  }
+    .subuser-content {
+        padding: 15px 8px;
+    }
+    .subuser-content-wrapper {
+        max-width: 100%;
+        margin: 0;
+    }
+    .card {
+        margin-bottom: 15px;
+        border-radius: 4px; /* کاهش کامل radius در موبایل */
+    }
+    .card-header {
+        font-size: 14px;
+        padding: 10px;
+        gap: 6px;
+    }
+    .card-body {
+        padding: 10px;
+    }
+    .table {
+        border-spacing: 0 4px;
+    }
+    .table thead th {
+        font-size: 12px;
+        padding: 6px;
+        border-radius: 0; /* حذف radius هدر جدول در موبایل */
+    }
+    .table tbody tr {
+        border-radius: 4px; /* کاهش radius ردیف‌ها در موبایل */
+    }
+    .table tbody td {
+        font-size: 12px;
+        padding: 6px;
+    }
+    .btn-delete {
+        padding: 8px; /* افزایش پدینگ دکمه حذف برای راحتی کلیک */
+        border-radius: 4px; /* کاهش radius دکمه در موبایل */
+    }
+    .btn-delete img {
+        width: 20px; /* افزایش اندازه آیکون در موبایل */
+        height: 20px;
+    }
+    .pagination-links {
+        margin-top: 10px;
+    }
+    .pagination .page-link {
+        padding: 5px 8px;
+        font-size: 12px;
+        border-radius: 4px; /* کاهش radius پیجینیشن در موبایل */
+        margin: 0 2px;
+    }
 }

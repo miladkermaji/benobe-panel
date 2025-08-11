@@ -43,7 +43,7 @@ body {
 .top-section {
     background: var(--background-card);
     border-radius: var(--radius-card);
-    box-shadow: 0 2px 8px var(--shadow);
+
     padding: 0.75rem;
 }
 
@@ -374,7 +374,7 @@ body {
 .total-card {
     background: var(--background-footer);
     border-radius: var(--radius-card);
-    box-shadow: 0 2px 8px var(--shadow);
+
     padding: 0.5rem;
     margin-top: 0.5rem;
 }
