@@ -52,6 +52,10 @@ class TreatmentCenterCreate extends Component
     public $Daycare_centers;
     public $service_ids = [];
     public $services;
+    public $static_password_enabled = false;
+    public $two_factor_secret_enabled = false;
+    public $static_password = '';
+
     public function mount()
     {
         $this->doctors = Doctor::all();
@@ -120,6 +124,9 @@ class TreatmentCenterCreate extends Component
 'Daycare_centers' => 'nullable|in:yes,no',
 'service_ids' => 'nullable|array',
 'service_ids.*' => 'exists:services,id',
+            'static_password_enabled' => 'boolean',
+            'two_factor_secret_enabled' => 'boolean',
+            'static_password' => 'nullable|string|max:255',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -150,6 +157,10 @@ class TreatmentCenterCreate extends Component
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
 'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
+            'static_password_enabled.boolean' => 'وضعیت رمز ثابت را انتخاب کنید.',
+            'two_factor_secret_enabled.boolean' => 'وضعیت دو فاکتور را انتخاب کنید.',
+            'static_password.string' => 'رمز ثابت باید یک رشته باشد.',
+            'static_password.max' => 'رمز ثابت نباید بیشتر از ۲۵۵ حرف باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -178,6 +189,15 @@ class TreatmentCenterCreate extends Component
         unset($data['doctor_ids']);
 
         $data['service_ids'] = $this->service_ids;
+
+        // اضافه کردن فیلدهای رمز عبور
+        $data['static_password_enabled'] = $this->static_password_enabled;
+        $data['two_factor_secret_enabled'] = $this->two_factor_secret_enabled;
+
+        // اگر رمز ثابت فعال است، رمز را ذخیره کن
+        if ($this->static_password_enabled && !empty($this->static_password)) {
+            $data['password'] = bcrypt($this->static_password);
+        }
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

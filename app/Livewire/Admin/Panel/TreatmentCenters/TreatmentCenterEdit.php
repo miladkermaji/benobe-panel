@@ -54,6 +54,10 @@ class TreatmentCenterEdit extends Component
     public $Daycare_centers;
     public $service_ids = [];
     public $services;
+    public $static_password_enabled = false;
+    public $two_factor_secret_enabled = false;
+    public $static_password = '';
+
     public function mount($id)
     {
         $this->treatmentCenter = MedicalCenter::findOrFail($id);
@@ -69,6 +73,10 @@ class TreatmentCenterEdit extends Component
         $this->Daycare_centers = $this->treatmentCenter->Daycare_centers;
 
         $this->service_ids = $this->treatmentCenter->service_ids ? array_map('strval', $this->treatmentCenter->service_ids) : [];
+
+        // بارگذاری فیلدهای رمز عبور
+        $this->static_password_enabled = $this->treatmentCenter->static_password_enabled ?? false;
+        $this->two_factor_secret_enabled = $this->treatmentCenter->two_factor_secret_enabled ?? false;
 
         // تنظیم روزهای کاری
         $workingDays = $this->treatmentCenter->working_days ?? [];
@@ -152,6 +160,9 @@ class TreatmentCenterEdit extends Component
 'Daycare_centers' => 'nullable|in:yes,no',
 'service_ids' => 'nullable|array',
 'service_ids.*' => 'exists:services,id',
+            'static_password_enabled' => 'boolean',
+            'two_factor_secret_enabled' => 'boolean',
+            'static_password' => 'nullable|string|max:255',
 
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
@@ -184,6 +195,10 @@ class TreatmentCenterEdit extends Component
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
 'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
+            'static_password_enabled.boolean' => 'وضعیت رمز عبور ثابت باید یکی از گزینه‌های بله یا خیر باشد.',
+            'two_factor_secret_enabled.boolean' => 'وضعیت دو فاکتور باید یکی از گزینه‌های بله یا خیر باشد.',
+            'static_password.string' => 'رمز عبور ثابت باید یک رشته باشد.',
+            'static_password.max' => 'رمز عبور ثابت نباید بیشتر از ۲۵۵ حرف باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -220,6 +235,15 @@ class TreatmentCenterEdit extends Component
         unset($data['doctor_ids']);
 
         $data['service_ids'] = $this->service_ids;
+
+        // اضافه کردن فیلدهای رمز عبور
+        $data['static_password_enabled'] = $this->static_password_enabled;
+        $data['two_factor_secret_enabled'] = $this->two_factor_secret_enabled;
+
+        // اگر رمز ثابت فعال است و رمز جدید وارد شده، آن را به‌روزرسانی کن
+        if ($this->static_password_enabled && !empty($this->static_password)) {
+            $data['password'] = bcrypt($this->static_password);
+        }
 
         $this->treatmentCenter->update($data);
         $this->treatmentCenter->doctors()->sync($this->doctor_ids); // به‌روزرسانی رابطه چند به چند

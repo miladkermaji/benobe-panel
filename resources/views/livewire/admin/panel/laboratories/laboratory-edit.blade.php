@@ -227,6 +227,44 @@
               <label class="form-label">توضیحات</label>
               <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
             </div>
+
+            <!-- فیلدهای رمز عبور -->
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label fw-bold text-dark mb-3">تنظیمات رمز عبور</label>
+              <div class="row">
+                <div class="col-6 col-md-6 position-relative mt-3 d-flex align-items-center">
+                  <div class="form-check form-switch w-100 d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" id="static_password_enabled"
+                      wire:model.live="static_password_enabled">
+                    <label class="form-check-label fw-medium" for="static_password_enabled">
+                      کلمه عبور ثابت
+                    </label>
+                  </div>
+                </div>
+                <div class="col-6 col-md-6 position-relative mt-3 d-flex align-items-center">
+                  <div class="form-check form-switch w-100 d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" id="two_factor_secret_enabled"
+                      wire:model="two_factor_secret_enabled">
+                    <label class="form-check-label fw-medium" for="two_factor_secret_enabled">
+                      گذرواژه دو مرحله‌ای
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              @if ($static_password_enabled)
+                <div class="col-12 position-relative mt-3">
+                  <input type="password" wire:model="static_password" class="form-control" id="static_password"
+                    placeholder=" ">
+                  <label for="static_password" class="form-label">رمز عبور ثابت</label>
+                  @if ($laboratory->password)
+                    <small class="form-text text-muted">رمز عبور قبلی موجود است. برای تغییر، رمز جدید وارد
+                      کنید.</small>
+                  @endif
+                </div>
+              @endif
+            </div>
+
             <div class="text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="update"
                 class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">

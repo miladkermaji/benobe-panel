@@ -53,6 +53,9 @@ class ImagingCenterCreate extends Component
     public $Daycare_centers;
     public $service_ids = [];
     public $services;
+    public $static_password_enabled = false;
+    public $two_factor_secret_enabled = false;
+    public $static_password = '';
 
     public function mount()
     {
@@ -70,7 +73,7 @@ class ImagingCenterCreate extends Component
     {
         $this->cities = Zone::where('level', 2)->where('parent_id', $value)->get();
         $this->city_id = null;
-        $this->dispatch('refresh-select2', cities: $this->cities->toArray());
+        $this->dispatch('refresh-select2', cities: $this->cities);
     }
 
     public function addPhoneNumber()
@@ -122,6 +125,9 @@ class ImagingCenterCreate extends Component
 'Daycare_centers' => 'nullable|in:yes,no',
 'service_ids' => 'nullable|array',
 'service_ids.*' => 'exists:services,id',
+            'static_password_enabled' => 'boolean',
+            'two_factor_secret_enabled' => 'boolean',
+            'static_password' => 'nullable|string|max:255',
         ], [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
@@ -152,6 +158,10 @@ class ImagingCenterCreate extends Component
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
 'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
 'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
+            'static_password_enabled.boolean' => 'وضعیت رمز ثابت باید یکی از گزینه‌های بله یا خیر باشد.',
+            'two_factor_secret_enabled.boolean' => 'وضعیت رمز دو فاکتور باید یکی از گزینه‌های بله یا خیر باشد.',
+            'static_password.string' => 'رمز ثابت باید یک رشته باشد.',
+            'static_password.max' => 'رمز ثابت نباید بیشتر از ۲۵۵ حرف باشد.',
         ]);
 
         if ($validator->fails()) {
@@ -180,6 +190,15 @@ class ImagingCenterCreate extends Component
         unset($data['doctor_ids']);
 
         $data['service_ids'] = $this->service_ids;
+
+        // اضافه کردن فیلدهای رمز عبور
+        $data['static_password_enabled'] = $this->static_password_enabled;
+        $data['two_factor_secret_enabled'] = $this->two_factor_secret_enabled;
+
+        // اگر رمز ثابت فعال است، رمز را ذخیره کن
+        if ($this->static_password_enabled && !empty($this->static_password)) {
+            $data['password'] = bcrypt($this->static_password);
+        }
 
         $medicalCenter = MedicalCenter::create($data);
         $medicalCenter->doctors()->sync($this->doctor_ids); // ذخیره رابطه چند به چند

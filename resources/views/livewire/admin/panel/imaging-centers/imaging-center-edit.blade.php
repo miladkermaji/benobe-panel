@@ -227,6 +227,44 @@
               <label class="form-label">توضیحات</label>
               <textarea wire:model="description" class="form-control" id="description" rows="3" placeholder=" "></textarea>
             </div>
+
+            <!-- فیلدهای رمز عبور -->
+            <div class="col-12 position-relative mt-5">
+              <label class="form-label fw-bold text-dark mb-3">تنظیمات رمز عبور</label>
+              <div class="row">
+                <div class="col-6 col-md-6 position-relative mt-3 d-flex align-items-center">
+                  <div class="form-check form-switch w-100 d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" id="static_password_enabled"
+                      wire:model.live="static_password_enabled">
+                    <label class="form-check-label fw-medium" for="static_password_enabled">
+                      کلمه عبور ثابت
+                    </label>
+                  </div>
+                </div>
+                <div class="col-6 col-md-6 position-relative mt-3 d-flex align-items-center">
+                  <div class="form-check form-switch w-100 d-flex align-items-center">
+                    <input class="form-check-input" type="checkbox" id="two_factor_secret_enabled"
+                      wire:model="two_factor_secret_enabled">
+                    <label class="form-check-label fw-medium" for="two_factor_secret_enabled">
+                      گذرواژه دو مرحله‌ای
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              @if ($static_password_enabled)
+                <div class="col-12 position-relative mt-3">
+                  <input type="password" wire:model="static_password" class="form-control" id="static_password"
+                    placeholder=" ">
+                  <label for="static_password" class="form-label">رمز عبور ثابت</label>
+                  @if ($imagingCenter->password)
+                    <small class="form-text text-muted">رمز عبور قبلی موجود است. برای تغییر، رمز جدید وارد
+                      کنید.</small>
+                  @endif
+                </div>
+              @endif
+            </div>
+
             <div class="text-end mt-4 w-100 d-flex justify-content-end">
               <button wire:click="update"
                 class="btn my-btn-primary px-5 py-2 d-flex align-items-center gap-2 shadow-lg hover:shadow-xl transition-all">
@@ -270,50 +308,6 @@
         $('#city_id').select2({
           dir: 'rtl',
           placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-        $('#payment_methods').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-        $('#service_ids').select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
-          width: '100%'
-        });
-      }
-
-      setTimeout(() => {
-        initializeSelect2();
-      }, 100);
-
-      Livewire.on('set-select2-initial', (event) => {
-        setTimeout(() => {
-          const data = event || {};
-          if (data.doctor_ids && Array.isArray(data.doctor_ids)) $('#doctor_ids').val(data.doctor_ids)
-            .trigger('change');
-          if (data.specialty_ids && Array.isArray(data.specialty_ids)) $('#specialty_ids').val(data
-            .specialty_ids).trigger('change');
-          if (data.insurance_ids && Array.isArray(data.insurance_ids)) $('#insurance_ids').val(data
-            .insurance_ids).trigger('change');
-          if (data.province_id) $('#province_id').val(data.province_id).trigger('change');
-          if (data.city_id) $('#city_id').val(data.city_id).trigger('change');
-          if (data.payment_methods) $('#payment_methods').val(data.payment_methods).trigger('change');
-          if (data.Center_tariff_type) $('#Center_tariff_type').val(data.Center_tariff_type).trigger(
-            'change');
-          if (data.service_ids && Array.isArray(data.service_ids)) $('#service_ids').val(data.service_ids)
-            .trigger('change');
-          if (data.Daycare_centers) $('#Daycare_centers').val(data.Daycare_centers).trigger('change');
-        }, 200);
-      });
-
-      Livewire.on('refresh-select2', (event) => {
-        const cities = event.cities || [];
-        $('#city_id').select2('destroy');
-        $('#city_id').empty().select2({
-          dir: 'rtl',
-          placeholder: 'انتخاب کنید',
           width: '100%',
           data: [{
             id: '',
@@ -327,28 +321,21 @@
         if (cityId) $('#city_id').val(cityId).trigger('change');
       });
 
-      $('#doctor_ids').on('change', function() {
-        @this.set('doctor_ids', $(this).val());
-      });
-      $('#specialty_ids').on('change', function() {
-        @this.set('specialty_ids', $(this).val());
-      });
-      $('#insurance_ids').on('change', function() {
-        @this.set('insurance_ids', $(this).val());
-      });
-      $('#province_id').on('change', function() {
-        @this.set('province_id', $(this).val());
-      });
-      $('#city_id').on('change', function() {
-        @this.set('city_id', $(this).val());
-      });
-      $('#payment_methods').on('change', function() {
-        @this.set('payment_methods', $(this).val());
-      });
-      $('#service_ids').on('change', function() {
-        @this.set('service_ids', $(this).val());
-      });
-      Livewire.on('show-alert', (event) => toastr[event.type](event.message));
+    $('#doctor_ids').on('change', function() {
+      @this.set('doctor_ids', $(this).val());
+    }); $('#specialty_ids').on('change', function() {
+      @this.set('specialty_ids', $(this).val());
+    }); $('#insurance_ids').on('change', function() {
+      @this.set('insurance_ids', $(this).val());
+    }); $('#province_id').on('change', function() {
+      @this.set('province_id', $(this).val());
+    }); $('#city_id').on('change', function() {
+      @this.set('city_id', $(this).val());
+    }); $('#payment_methods').on('change', function() {
+      @this.set('payment_methods', $(this).val());
+    }); $('#service_ids').on('change', function() {
+      @this.set('service_ids', $(this).val());
+    }); Livewire.on('show-alert', (event) => toastr[event.type](event.message));
     });
   </script>
 </div>
