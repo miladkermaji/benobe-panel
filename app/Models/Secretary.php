@@ -25,11 +25,28 @@ class Secretary extends Authenticatable implements JWTSubject
         'email',
         'gender',
         'password',
+        'static_password_enabled',
+        'two_factor_secret',
+        'two_factor_secret_enabled',
+        'two_factor_confirmed_at',
         'is_active',
         'city_id',
         'province_id',
         'doctor_id',
         'medical_center_id',
+    ];
+
+    protected $hidden = [
+        'password',
+        'two_factor_secret',
+        'remember_token',
+    ];
+
+    protected $casts = [
+        'static_password_enabled' => 'boolean',
+        'two_factor_secret_enabled' => 'boolean',
+        'two_factor_confirmed_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     /**

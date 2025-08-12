@@ -26,7 +26,7 @@
             class="form-control  h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
             inputmode="numeric" placeholder="09123456789" maxlength="11">
           @error('mobile')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="invalid-feedback d-block mt-2 text-danger fw-bold">{{ $message }}</div>
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled"
@@ -89,7 +89,7 @@
       toastr.success('کد تأیید با موفقیت ارسال شد');
       localStorage.removeItem('otpTimerData');
     });
-     Livewire.on('otpAlreadySent', (data) => {
+    Livewire.on('otpAlreadySent', (data) => {
       toastr.info(data.message);
     })
     Livewire.on('pass-form', (data) => {

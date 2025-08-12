@@ -26,7 +26,7 @@
             class="form-control  h-50 border-3 border-gray-300 @error('mobile') is-invalid @enderror"
             inputmode="numeric" placeholder="09123456789" maxlength="11">
           @error('mobile')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="invalid-feedback d-block mt-2 text-danger fw-bold">{{ $message }}</div>
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled"
@@ -95,7 +95,7 @@
     Livewire.on('navigateTo', (event) => {
       window.Livewire.navigate(event.url);
     });
-   // Add missing otpAlreadySent event listener
+    // Add missing otpAlreadySent event listener
     Livewire.on('otpAlreadySent', (data) => {
       toastr.info(data.message);
     })

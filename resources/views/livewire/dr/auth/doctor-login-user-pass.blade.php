@@ -30,13 +30,13 @@
           </div>
           <div class="position-relative">
             <input wire:model="password"
-              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror"
-              type="password" placeholder="رمز عبور خود را وارد کنید" id="password-input">
+              class="form-control  custom-shadow h-50 text-end @error('password') is-invalid @enderror" type="password"
+              placeholder="رمز عبور خود را وارد کنید" id="password-input">
             <img src="{{ asset('dr-assets/login/images/visible.svg') }}" alt="نمایش رمز" class="password-toggle"
               onclick="togglePasswordVisibility('password-input')">
           </div>
           @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
+            <div class="invalid-feedback d-block mt-2 text-danger fw-bold">{{ $message }}</div>
           @enderror
         </div>
         <button type="submit" wire:loading.attr="disabled" wire:target="loginWithMobilePass"
@@ -134,7 +134,7 @@
     document.addEventListener('livewire:initialized', () => {
       document.querySelector('input[wire\\:model="password"]').focus();
     });
-      document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
       if (typeof toastr !== 'undefined') {
         toastr.options = {
           timeOut: 10000,
@@ -144,9 +144,9 @@
           newestOnTop: true,
           maxOpened: 1, // فقط یک توستر در هر لحظه
           closeButton: false,
-          
+
         };
-        
+
       }
       toastr.options.rtl = true;
     });

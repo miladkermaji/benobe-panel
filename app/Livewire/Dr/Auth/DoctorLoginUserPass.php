@@ -99,8 +99,18 @@ class DoctorLoginUserPass extends Component
 
         $user = $userInfo['model'];
 
+        // Debug: بررسی مقادیر static_password_enabled
+        Log::info('Login debug - static_password_enabled check', [
+            'user_type' => $userInfo['type'],
+            'user_id' => $userInfo['model_id'],
+            'static_password_enabled' => $user->static_password_enabled,
+            'static_password_enabled_type' => gettype($user->static_password_enabled),
+            'static_password_enabled_raw' => $user->getRawOriginal('static_password_enabled'),
+            'has_password' => !empty($user->password),
+        ]);
+
         // بررسی فعال بودن قابلیت ورود با رمز عبور
-        if (($user->static_password_enabled ?? 0) !== 1) {
+        if (!($user->static_password_enabled ?? false)) {
             $this->addError('password', 'شما قابلیت ورود با رمز عبور را فعال نکرده‌اید.');
             return;
         }
