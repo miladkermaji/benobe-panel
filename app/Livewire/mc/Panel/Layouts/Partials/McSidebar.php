@@ -12,14 +12,15 @@ use App\Models\MedicalCenterPermission;
 class McSidebar extends Component
 {
     public $permissions = [];
+    public $medical_center = null;
 
     public function mount()
     {
         if (Auth::guard('medical_center')->check()) {
-            $medicalCenter = Auth::guard('medical_center')->user();
+            $this->medical_center = Auth::guard('medical_center')->user();
 
             // دریافت دسترسی‌ها از دیتابیس
-            $permissionRecord = MedicalCenterPermission::where('medical_center_id', $medicalCenter->id)->first();
+            $permissionRecord = MedicalCenterPermission::where('medical_center_id', $this->medical_center->id)->first();
             $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
 
             // تبدیل آرایه با کلیدهای عددی به آرایه ساده
@@ -40,14 +41,6 @@ class McSidebar extends Component
 
     public function render()
     {
-        $medical_center = null;
-
-        if (Auth::guard('medical_center')->check()) {
-            $medical_center = Auth::guard('medical_center')->user();
-        }
-
-        return view('livewire.mc.panel.layouts.partials.mc-sidebar', [
-            'medical_center' => $medical_center,
-        ]);
+        return view('livewire.mc.panel.layouts.partials.mc-sidebar');
     }
 }
