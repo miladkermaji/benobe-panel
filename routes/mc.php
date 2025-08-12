@@ -25,7 +25,7 @@ use App\Http\Controllers\Mc\Panel\Turn\Schedule\ManualNobat\ManualNobatControlle
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\VacationController;
 use App\Http\Controllers\Mc\Panel\SecretaryPermission\SecretaryPermissionController;
 use App\Http\Controllers\Mc\Panel\NoskheElectronic\Favorite\Service\ServiceController;
-use App\Http\Controllers\mc\Panel\Turn\DrScheduleController as McDrScheduleController;
+use App\Http\Controllers\Mc\Panel\Turn\DrScheduleController as McDrScheduleController;
 use App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Duration\DurationController;
 use App\Http\Controllers\Mc\Panel\NoskheElectronic\Prescription\PrescriptionController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController;
@@ -36,7 +36,7 @@ use App\Http\Controllers\Mc\Panel\NoskheElectronic\Favorite\Templates\FavoriteTe
 use App\Http\Controllers\Mc\Panel\DoctorsClinic\Activation\Workhours\ActivationWorkhoursController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MySpecialDaysCounselingController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\BlockingUsers\BlockingUsersController;
-use App\Http\Controllers\mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
+use App\Http\Controllers\Mc\Panel\Turn\Schedule\ScheduleSetting\ScheduleSettingController as McScheduleSettingController;
 use App\Http\Controllers\Mc\Panel\Turn\Schedule\MoshavereSetting\MoshavereSettingController as DrMoshavereSettingController;
 
 // dr routes
@@ -242,13 +242,13 @@ Route::prefix('mc')
                 Route::patch('update-status', [SecretaryManagementController::class, 'updateStatus'])->name('mc-secretary-update-status');
             });
             Route::group(['prefix' => 'doctors-clinic'], function () {
-               
-                
-                
-               
-              
-             
-    
+
+
+
+
+
+
+
                 Route::get('gallery', [DoctorsClinicManagementController::class, 'gallery'])->middleware('medical_center.permission:clinic_management')->name('mc-office-gallery');
                 Route::get('medicalDoc', [DoctorsClinicManagementController::class, 'medicalDoc'])->middleware('medical_center.permission:clinic_management')->name('mc-office-medicalDoc');
                 Route::get('/', [DoctorsClinicManagementController::class, 'index'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-management');
