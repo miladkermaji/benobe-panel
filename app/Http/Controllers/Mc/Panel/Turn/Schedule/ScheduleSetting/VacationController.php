@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Morilog\Jalali\CalendarUtils;
 use Morilog\Jalali\Jalalian;
-
+use App\Traits\HasSelectedDoctor;
 class VacationController extends Controller
 {
     use HasSelectedClinic;
-
+    use HasSelectedDoctor;
     public function index(Request $request)
     {
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId = $this->getSelectedDoctorId();
         $selectedClinicId = $this->getSelectedMedicalCenterId();
 
         // Get doctor's medical centers (clinics)
