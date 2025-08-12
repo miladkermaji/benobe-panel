@@ -23,7 +23,7 @@ use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use Livewire\Attributes\On;
 
-class Workhours extends Component
+class WorkHours extends Component
 {
     use HasSelectedDoctor;
     public $showSaveButton = false;
