@@ -21,58 +21,10 @@
             <p class="alert alert-warning font-size-13 fw-bold mt-2">شما می‌توانید برای ساعاتی که طبق ساعت کاری
               خود حضور ندارید، مرخصی اعمال کنید.</p>
             <div class="w-100">
-              <button data-bs-toggle="modal" data-bs-target="#exampleModalCenterAddVacation"
-                class="h-50 w-100 btn btn-outline-primary" tabindex="0" type="button" id=":r18:">اضافه کردن
+              <button onclick="openXModal('addVacationModal')" class="h-50 w-100 btn btn-outline-primary" tabindex="0"
+                type="button" id=":r18:">اضافه کردن
                 مرخصی<span class=""></span>
               </button>
-              <div class="modal fade " id="exampleModalCenterAddVacation" tabindex="-1" role="dialog"
-                aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered " role="document">
-                  <div class="modal-content border-radius-6">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="exampleModalLongTitle"> ثبت مرخصی </h5>
-                      <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <form id="add-vacation-form" method="POST">
-                        @csrf
-                        <div class="position-relative">
-                          <label class="label-top-input-special-takhasos">تاریخ :</label>
-                          <input id="vacation-date" data-jdp="" type="text" name="date"
-                            class="form-control h-50" placeholder="1403/05/02">
-                        </div>
-                        <div class="d-flex justify-content-between gap-4 mt-3">
-                          <div class="mt-3 position-relative timepicker-ui w-100">
-                            <label class="label-top-input-special-takhasos"> از ساعت:</label>
-                            <input data-timepicker type="text" name="start_time" id="start-time"
-                              class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
-                          </div>
-                          <div class="mt-3 position-relative timepicker-ui w-100">
-                            <label class="label-top-input-special-takhasos"> تا ساعت:</label>
-                            <input data-timepicker type="text" name="end_time" id="end-time"
-                              class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
-                          </div>
-                        </div>
-                        <div class="form-check mt-3">
-                          <input type="checkbox" class="form-check-input" id="full-day-vacation" name="is_full_day"
-                            value="1">
-                          <label class="form-check-label" for="full-day-vacation">ثبت مرخصی برای تمام روز</label>
-                        </div>
-
-                        <div class="w-100">
-                          <button type="submit"
-                            class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
-                            <span class="button_text">ثبت مرخصی</span>
-                            <div class="loader"></div>
-                          </button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -125,54 +77,80 @@
     </div>
   </div>
 </div>
-<div class="modal fade" id="exampleModalCenterEditVacation" tabindex="-1" role="dialog"
-  aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content border-radius-6">
-      <div class="modal-header">
-        <h5 class="modal-title">ویرایش مرخصی</h5>
-        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">×</span>
-        </button>
+
+<!-- Add Vacation Modal -->
+<x-custom-modal id="addVacationModal" title="ثبت مرخصی" size="md">
+  <form id="add-vacation-form" method="POST">
+    @csrf
+    <div class="position-relative">
+      <label class="label-top-input-special-takhasos">تاریخ :</label>
+      <input id="vacation-date" data-jdp="" type="text" name="date" class="form-control h-50"
+        placeholder="1403/05/02">
+    </div>
+    <div class="d-flex justify-content-between gap-4 mt-3">
+      <div class="mt-3 position-relative timepicker-ui w-100">
+        <label class="label-top-input-special-takhasos"> از ساعت:</label>
+        <input data-timepicker type="text" name="start_time" id="start-time"
+          class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
       </div>
-      <div class="modal-body">
-        <form id="edit-vacation-form" method="POST">
-          @csrf
-          <input type="hidden" id="edit-vacation-id" name="id">
-          <div class="mt-3 position-relative">
-            <label class="label-top-input-special-takhasos">تاریخ:</label>
-            <input id="edit-date" type="text" name="date" class="form-control h-50" placeholder="1403/05/02"
-              data-jdp>
-          </div>
-          <div class="d-flex justify-content-between gap-4 mt-3">
-            <div class="mt-3 position-relative timepicker-ui w-100">
-              <label class="label-top-input-special-takhasos">از ساعت:</label>
-              <input data-timepicker id="edit-start-time" type="text" name="start_time"
-                class="form-control w-100 h-50" style="width: 100% !important">
-            </div>
-            <div class="mt-3 position-relative timepicker-ui w-100">
-              <label class="label-top-input-special-takhasos">تا ساعت:</label>
-              <input data-timepicker id="edit-end-time" type="text" name="end_time"
-                class="form-control w-100 h-50" style="width: 100% !important">
-            </div>
-          </div>
-          <div class="form-check mt-3">
-            <input type="checkbox" id="edit-full-day-vacation" value="1" name="is_full_day"
-              class="form-check-input">
-            <label class="form-check-label" for="edit-full-day-vacation">تمام روز</label>
-          </div>
-          <div class="w-100">
-            <button type="submit"
-              class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
-              <span class="button_text">ذخیره</span>
-              <div class="loader"></div>
-            </button>
-          </div>
-        </form>
+      <div class="mt-3 position-relative timepicker-ui w-100">
+        <label class="label-top-input-special-takhasos"> تا ساعت:</label>
+        <input data-timepicker type="text" name="end_time" id="end-time"
+          class="form-control w-100 h-50 timepicker-ui-input" style="width: 100% !important">
       </div>
     </div>
-  </div>
-</div>
+    <div class="form-check mt-3">
+      <input type="checkbox" class="form-check-input" id="full-day-vacation" name="is_full_day" value="1">
+      <label class="form-check-label" for="full-day-vacation">ثبت مرخصی برای تمام روز</label>
+    </div>
+
+    <div class="w-100">
+      <button type="submit"
+        class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
+        <span class="button_text">ثبت مرخصی</span>
+        <div class="loader"></div>
+      </button>
+    </div>
+  </form>
+</x-custom-modal>
+
+<!-- Edit Vacation Modal -->
+<x-custom-modal id="editVacationModal" title="ویرایش مرخصی" size="md">
+  <form id="edit-vacation-form" method="POST">
+    @csrf
+    <input type="hidden" id="edit-vacation-id" name="id">
+    <div class="mt-3 position-relative">
+      <label class="label-top-input-special-takhasos">تاریخ:</label>
+      <input id="edit-date" type="text" name="date" class="form-control h-50" placeholder="1403/05/02"
+        data-jdp>
+    </div>
+    <div class="d-flex justify-content-between gap-4 mt-3">
+      <div class="mt-3 position-relative timepicker-ui w-100">
+        <label class="label-top-input-special-takhasos">از ساعت:</label>
+        <input data-timepicker id="edit-start-time" type="text" name="start_time" class="form-control w-100 h-50"
+          style="width: 100% !important">
+      </div>
+      <div class="mt-3 position-relative timepicker-ui w-100">
+        <label class="label-top-input-special-takhasos">تا ساعت:</label>
+        <input data-timepicker id="edit-end-time" type="text" name="end_time" class="form-control w-100 h-50"
+          style="width: 100% !important">
+      </div>
+    </div>
+    <div class="form-check mt-3">
+      <input type="checkbox" id="edit-full-day-vacation" value="1" name="is_full_day"
+        class="form-check-input">
+      <label class="form-check-label" for="edit-full-day-vacation">تمام روز</label>
+    </div>
+    <div class="w-100">
+      <button type="submit"
+        class="btn my-btn-primary w-100 h-50 mt-3 d-flex justify-content-center align-items-center">
+        <span class="button_text">ذخیره</span>
+        <div class="loader"></div>
+      </button>
+    </div>
+  </form>
+</x-custom-modal>
+
 @endsection
 @section('scripts')
 <script src="{{ asset('dr-assets/panel/jalali-datepicker/run-jalali.js') }}"></script>
@@ -283,8 +261,8 @@
     }
   });
 
-  const modal = $('#exampleModalCenterAddVacation');
-  modal.on('show.bs.modal', function() {
+  // Listen for modal show event to reset form
+  document.getElementById('addVacationModal').addEventListener('x-modal:show', function() {
     $("#full-day-vacation").prop('checked', false);
     $('#start-time, #end-time').prop('disabled', false);
   });
@@ -317,7 +295,7 @@
       },
       success: function(response) {
         toastr.success(response.message);
-        $('#exampleModalCenterAddVacation').modal('hide');
+        closeXModal('addVacationModal');
         loadVacations($('#filter-year').val(), $('#filter-month').val());
       },
       error: function(xhr) {
@@ -365,7 +343,7 @@
         } else {
           $('#edit-start-time, #edit-end-time').prop('disabled', false);
         }
-        $('#exampleModalCenterEditVacation').modal('show');
+        openXModal('editVacationModal');
       },
       error: function(xhr) {
         toastr.error("خطا در بارگذاری اطلاعات!");
@@ -400,7 +378,7 @@
       success: function(response) {
         if (response.success) {
           toastr.success(response.message);
-          $('#exampleModalCenterEditVacation').modal('hide');
+          closeXModal('editVacationModal');
           loadVacations($('#filter-year').val(), $('#filter-month').val());
         } else {
           toastr.error(response.message);
