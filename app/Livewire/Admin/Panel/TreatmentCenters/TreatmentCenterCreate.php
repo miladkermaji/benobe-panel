@@ -88,7 +88,7 @@ class TreatmentCenterCreate extends Component
 
     public function store()
     {
-        $validator = Validator::make($this->all(), [
+        $rules = [
             'doctor_ids' => 'required|array',
             'doctor_ids.*' => 'exists:doctors,id',
             'name' => 'required|string|max:255',
@@ -109,9 +109,6 @@ class TreatmentCenterCreate extends Component
             'payment_methods' => 'nullable|in:cash,card,online',
             'is_active' => 'boolean',
             'working_days' => 'nullable|array',
-            'avatar' => 'nullable|image',
-            'documents' => 'nullable|array',
-            'documents.*' => 'file|mimes:pdf,doc,docx|max:10240',
             'phone_numbers' => 'nullable|array',
             'phone_numbers.*' => 'string|regex:/^09[0-9]{9}$/',
             'location_confirmed' => 'boolean',
@@ -121,13 +118,25 @@ class TreatmentCenterCreate extends Component
             'insurance_ids' => 'nullable|array',
             'insurance_ids.*' => 'exists:insurances,id',
             'Center_tariff_type' => 'nullable|in:governmental,special,else',
-'Daycare_centers' => 'nullable|in:yes,no',
-'service_ids' => 'nullable|array',
-'service_ids.*' => 'exists:services,id',
+            'Daycare_centers' => 'nullable|in:yes,no',
+            'service_ids' => 'nullable|array',
+            'service_ids.*' => 'exists:services,id',
             'static_password_enabled' => 'boolean',
             'two_factor_secret_enabled' => 'boolean',
             'static_password' => 'nullable|string|max:255',
-        ], [
+        ];
+
+        // اضافه کردن validation برای فایل‌ها فقط در صورت وجود
+        if ($this->avatar) {
+            $rules['avatar'] = 'image|mimes:jpeg,png,jpg,gif|max:2048';
+        }
+
+        if ($this->documents && count(array_filter($this->documents))) {
+            $rules['documents'] = 'array';
+            $rules['documents.*'] = 'file|mimes:pdf,doc,docx|max:10240';
+        }
+
+        $errorMessages = [
             'doctor_ids.required' => 'لطفاً حداقل یک پزشک را انتخاب کنید.',
             'doctor_ids.*.exists' => 'پزشک انتخاب‌شده معتبر نیست.',
             'name.required' => 'لطفاً نام آزمایشگاه  را وارد کنید.',
@@ -147,21 +156,32 @@ class TreatmentCenterCreate extends Component
             'consultation_fee.numeric' => 'هزینه خدمات باید عدد باشد.',
             'consultation_fee.min' => 'هزینه خدمات نمی‌تواند منفی باشد.',
             'payment_methods.in' => 'روش پرداخت باید یکی از گزینه‌های نقدی، کارت یا آنلاین باشد.',
-            'avatar.image' => 'تصویر اصلی باید یک فایل تصویری باشد.',
-            'avatar.max' => 'تصویر اصلی نباید بزرگ‌تر از ۲ مگابایت باشد.',
-            'documents.*.mimes' => 'مدارک باید از نوع PDF، DOC یا DOCX باشند.',
-            'documents.*.max' => 'هر مدرک نباید بزرگ‌تر از ۱۰ مگابایت باشد.',
             'phone_numbers.*.regex' => 'شماره‌های تماس باید با ۰۹ شروع شوند و ۱۱ رقم باشند.',
             'specialty_ids.*.exists' => 'تخصص انتخاب‌شده معتبر نیست.',
             'insurance_ids.*.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
             'Center_tariff_type.in' => 'نوع تعرفه مرکز باید یکی از گزینه‌های دولتی، ویژه یا سایر باشد.',
-'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
-'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
+            'Daycare_centers.in' => 'وضعیت مرکز شبانه‌روزی باید بله یا خیر باشد.',
+            'service_ids.*.exists' => 'خدمت انتخاب‌شده معتبر نیست.',
             'static_password_enabled.boolean' => 'وضعیت رمز ثابت را انتخاب کنید.',
             'two_factor_secret_enabled.boolean' => 'وضعیت دو فاکتور را انتخاب کنید.',
             'static_password.string' => 'رمز ثابت باید یک رشته باشد.',
             'static_password.max' => 'رمز ثابت نباید بیشتر از ۲۵۵ حرف باشد.',
-        ]);
+        ];
+
+        // اضافه کردن error messages برای فایل‌ها فقط در صورت وجود validation rules
+        if ($this->avatar) {
+            $errorMessages['avatar.image'] = 'فایل انتخاب شده باید تصویر باشد.';
+            $errorMessages['avatar.mimes'] = 'فرمت تصویر باید یکی از موارد JPEG، PNG، JPG یا GIF باشد.';
+            $errorMessages['avatar.max'] = 'حجم تصویر نباید بیشتر از ۲ مگابایت باشد.';
+        }
+
+        if ($this->documents && count(array_filter($this->documents))) {
+            $errorMessages['documents.*.file'] = 'فایل انتخاب شده معتبر نیست.';
+            $errorMessages['documents.*.mimes'] = 'فرمت مدرک باید یکی از موارد PDF، DOC یا DOCX باشد.';
+            $errorMessages['documents.*.max'] = 'حجم هر مدرک نباید بیشتر از ۱۰ مگابایت باشد.';
+        }
+
+        $validator = Validator::make($this->all(), $rules, $errorMessages);
 
         if ($validator->fails()) {
             $this->dispatch('show-alert', type: 'error', message: $validator->errors()->first());
