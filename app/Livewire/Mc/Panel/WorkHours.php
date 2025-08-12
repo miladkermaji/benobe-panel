@@ -590,17 +590,17 @@ class WorkHours extends Component
                     ->where('day', $day)
                     ->where('medical_center_id', $this->activeMedicalCenterId)
                     ->first();
-            if (!$schedule) {
-                $schedule = DoctorWorkSchedule::create([
-                        'doctor_id' => $this->selectedDoctorId,
-                        'day' => $day,
-                        'medical_center_id' => $this->activeMedicalCenterId,
-                    'is_working' => true,
-                    'work_hours' => json_encode([]),
-                    'appointment_settings' => json_encode([]),
-                ]);
-            }
-            $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
+                if (!$schedule) {
+                    $schedule = DoctorWorkSchedule::create([
+                            'doctor_id' => $this->selectedDoctorId,
+                            'day' => $day,
+                            'medical_center_id' => $this->activeMedicalCenterId,
+                        'is_working' => true,
+                        'work_hours' => json_encode([]),
+                        'appointment_settings' => json_encode([]),
+                    ]);
+                }
+                $appointmentSettings = json_decode($schedule->appointment_settings, true) ?? [];
                 // حذف تنظیمات قبلی با همان work_hour_key
                 $appointmentSettings = array_filter(
                     $appointmentSettings,
@@ -1285,10 +1285,10 @@ class WorkHours extends Component
                     ]
                 );
             }
-                DB::commit();
+            DB::commit();
             $this->showSuccessMessage('برنامه کاری با موفقیت ذخیره شد');
-            } catch (\Exception $e) {
-                DB::rollBack();
+        } catch (\Exception $e) {
+            DB::rollBack();
             $this->showErrorMessage('خطا در ذخیره برنامه کاری: ' . $e->getMessage());
         }
     }
@@ -1343,10 +1343,10 @@ class WorkHours extends Component
                     'end_time.date_format' => 'فرمت زمان پایان نامعتبر است.',
                     'end_time.after' => 'زمان پایان باید بعد از زمان شروع باشد.',
                 ]);
-            if ($validator->fails()) {
+                if ($validator->fails()) {
                     $this->showErrorMessage(implode(' ', $validator->errors()->all()));
-                return;
-            }
+                    return;
+                }
             }
             // بررسی تداخل زمانی
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->selectedDoctorId)
@@ -1374,7 +1374,7 @@ class WorkHours extends Component
                         'work_hours' => json_encode([]),
                         'appointment_settings' => json_encode([]),
                     ]);
-                }
+            }
             $workHours = json_decode($schedule->work_hours, true) ?? [];
             // به‌روزرسانی یا افزودن slot
             if (isset($workHours[$index])) {
@@ -1391,8 +1391,8 @@ class WorkHours extends Component
                 ];
             }
             $schedule->update(['work_hours' => json_encode($workHours)]);
-                $this->refreshWorkSchedules();
-            } catch (\Exception $e) {
+            $this->refreshWorkSchedules();
+        } catch (\Exception $e) {
             $this->showErrorMessage('خطا در ذخیره زمان: ' . $e->getMessage());
         }
     }
@@ -2065,18 +2065,18 @@ class WorkHours extends Component
                     ->first();
             if ($schedule) {
                 $schedule->update(['is_working' => $isWorking]);
-                } else {
-                    DoctorWorkSchedule::create([
-                    'doctor_id' => $this->selectedDoctorId,
-                    'day' => $day,
-                    'medical_center_id' => $this->activeMedicalCenterId,
-                        'is_working' => $isWorking,
-                        'work_hours' => json_encode([]),
-                    'appointment_settings' => json_encode([]),
-                    ]);
-                }
-                $this->refreshWorkSchedules();
-            } catch (\Exception $e) {
+            } else {
+                DoctorWorkSchedule::create([
+                'doctor_id' => $this->selectedDoctorId,
+                'day' => $day,
+                'medical_center_id' => $this->activeMedicalCenterId,
+                    'is_working' => $isWorking,
+                    'work_hours' => json_encode([]),
+                'appointment_settings' => json_encode([]),
+                ]);
+            }
+            $this->refreshWorkSchedules();
+        } catch (\Exception $e) {
             $this->showErrorMessage('خطا در به‌روزرسانی وضعیت روز کاری: ' . $e->getMessage());
         }
     }
@@ -2122,11 +2122,11 @@ class WorkHours extends Component
             // بررسی وجود پزشک انتخاب‌شده
             if (!$this->selectedDoctorId) {
                 $this->showErrorMessage('لطفاً ابتدا یک پزشک انتخاب کنید');
-            return;
-        }
+                return;
+            }
 
             $day = $key;
-        $isWorking = (bool) $value;
+            $isWorking = (bool) $value;
 
             $schedule = DoctorWorkSchedule::where('doctor_id', $this->selectedDoctorId)
                 ->where('day', $day)
