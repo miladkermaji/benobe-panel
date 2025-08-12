@@ -18,8 +18,8 @@ class TransactionList extends Component
 
     public $search = '';
     public $readyToLoad = false;
-    public $perPage = 5;
-    public $transactionsPerPage = 5;
+    public $perPage = 50; // Changed from 5 to 50
+    public $transactionsPerPage = 50; // Changed from 5 to 50
     public $entityPages = [];
     public $statusFilter = '';
     public $groupAction = '';
@@ -28,6 +28,7 @@ class TransactionList extends Component
     public $selectedTransactions = [];
     public $selectAll = false;
     public $entityTypeFilter = 'all';
+    public $isLoading = false; // New loading state
 
     protected $queryString = [
         'search' => ['except' => ''],
@@ -42,24 +43,29 @@ class TransactionList extends Component
 
     public function mount()
     {
-        $this->readyToLoad = true;
+        // Don't load transactions immediately - wait for user interaction
+        $this->readyToLoad = false;
     }
 
     public function loadTransactions()
     {
+        $this->isLoading = true;
         $this->readyToLoad = true;
+        $this->isLoading = false;
     }
 
     public function updatedSearch()
     {
         $this->resetPage();
         $this->entityPages = [];
+        $this->loadTransactions();
     }
 
     public function updatedStatusFilter()
     {
         $this->resetPage();
         $this->entityPages = [];
+        $this->loadTransactions();
     }
 
     public function updatedEntityTypeFilter()
@@ -68,6 +74,24 @@ class TransactionList extends Component
         $this->entityPages = [];
         $this->selectedTransactions = [];
         $this->selectAll = false;
+        $this->loadTransactions();
+    }
+
+    public function goToPage($entityType, $entityId, $page)
+    {
+        $key = $entityType . '-' . $entityId;
+        $this->entityPages[$key] = $page;
+        $this->selectedTransactions = [];
+        $this->selectAll = false;
+    }
+
+    public function refreshData()
+    {
+        $this->resetPage();
+        $this->entityPages = [];
+        $this->selectedTransactions = [];
+        $this->selectAll = false;
+        $this->loadTransactions();
     }
 
     public function updatedSelectAll($value)
@@ -92,6 +116,7 @@ class TransactionList extends Component
         $transaction = Transaction::findOrFail($id);
         $transaction->delete();
         $this->dispatch('show-alert', type: 'success', message: 'تراکنش حذف شد!');
+        $this->loadTransactions(); // Reload after deletion
     }
 
     public function deleteSelected($allFiltered = null)
@@ -105,6 +130,7 @@ class TransactionList extends Component
             $this->groupAction = '';
             $this->resetPage();
             $this->dispatch('show-alert', type: 'success', message: 'همه تراکنش‌های فیلترشده حذف شدند!');
+            $this->loadTransactions(); // Reload after deletion
             return;
         }
         if (empty($this->selectedTransactions)) {
@@ -115,6 +141,7 @@ class TransactionList extends Component
         $this->selectedTransactions = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'تراکنش‌های انتخاب شده حذف شدند!');
+        $this->loadTransactions(); // Reload after deletion
     }
 
     public function executeGroupAction()
@@ -151,6 +178,7 @@ class TransactionList extends Component
             $this->applyToAllFiltered = false;
             $this->groupAction = '';
             $this->resetPage();
+            $this->loadTransactions(); // Reload after action
             return;
         }
         switch ($this->groupAction) {
@@ -177,6 +205,7 @@ class TransactionList extends Component
         $this->selectedTransactions = [];
         $this->selectAll = false;
         $this->dispatch('show-alert', type: 'success', message: 'وضعیت تراکنش‌های انتخاب‌شده با موفقیت تغییر کرد.');
+        $this->loadTransactions(); // Reload after status update
     }
 
     protected function getTransactionsQuery()
@@ -203,100 +232,126 @@ class TransactionList extends Component
 
     public function render()
     {
-        $this->totalFilteredCount = $this->readyToLoad ? $this->getTransactionsQuery()->count() : 0;
+        if (!$this->readyToLoad) {
+            return view('livewire.admin.panel.transactions.transaction-list', [
+                'users' => collect(),
+                'doctors' => collect(),
+                'secretaries' => collect(),
+                'totalFilteredCount' => 0,
+                'transactionsPerPage' => $this->transactionsPerPage,
+                'isLoading' => false,
+            ]);
+        }
+
+        $this->totalFilteredCount = $this->getTransactionsQuery()->count();
+
         $users = collect();
         $doctors = collect();
         $secretaries = collect();
-        if ($this->readyToLoad && ($this->entityTypeFilter === 'user' || $this->entityTypeFilter === 'all')) {
+
+        if ($this->entityTypeFilter === 'user' || $this->entityTypeFilter === 'all') {
             $users = User::whereHas('transactions')->get()->map(function ($entity) {
                 $key = 'user-' . $entity->id;
                 $currentPage = $this->entityPages[$key] ?? 1;
-                $transactions = $entity->transactions()
+
+                $transactionsQuery = $entity->transactions()
                     ->when($this->search, function ($query) {
                         $search = trim($this->search);
                         $query->where(function ($q) use ($search) {
                             $q->where('gateway', 'like', "%$search%")
                                 ->orWhere('transaction_id', 'like', "%$search%")
-                                ->orWhere('amount', 'like', "%$search%") ;
+                                ->orWhere('amount', 'like', "%$search%");
                         });
                     })
                     ->when($this->statusFilter, function ($query) {
                         $query->where('status', $this->statusFilter);
-                    })
-                    ->forPage($currentPage, $this->transactionsPerPage)
-                    ->get();
+                    });
+
+                $totalTransactions = $transactionsQuery->count();
+                $transactions = $transactionsQuery->forPage($currentPage, $this->transactionsPerPage)->get();
+
                 return [
                     'entity' => $entity,
                     'type' => 'user',
                     'transactions' => $transactions,
-                    'totalTransactions' => $entity->transactions()->count(),
+                    'totalTransactions' => $totalTransactions,
                     'currentPage' => $currentPage,
-                    'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+                    'lastPage' => ceil($totalTransactions / $this->transactionsPerPage),
                 ];
             });
         }
-        if ($this->readyToLoad && ($this->entityTypeFilter === 'doctor' || $this->entityTypeFilter === 'all')) {
+
+        if ($this->entityTypeFilter === 'doctor' || $this->entityTypeFilter === 'all') {
             $doctors = Doctor::whereHas('transactions')->get()->map(function ($entity) {
                 $key = 'doctor-' . $entity->id;
                 $currentPage = $this->entityPages[$key] ?? 1;
-                $transactions = $entity->transactions()
+
+                $transactionsQuery = $entity->transactions()
                     ->when($this->search, function ($query) {
                         $search = trim($this->search);
                         $query->where(function ($q) use ($search) {
                             $q->where('gateway', 'like', "%$search%")
                                 ->orWhere('transaction_id', 'like', "%$search%")
-                                ->orWhere('amount', 'like', "%$search%") ;
+                                ->orWhere('amount', 'like', "%$search%");
                         });
                     })
                     ->when($this->statusFilter, function ($query) {
                         $query->where('status', $this->statusFilter);
-                    })
-                    ->forPage($currentPage, $this->transactionsPerPage)
-                    ->get();
+                    });
+
+                $totalTransactions = $transactionsQuery->count();
+                $transactions = $transactionsQuery->forPage($currentPage, $this->transactionsPerPage)->get();
+
                 return [
                     'entity' => $entity,
                     'type' => 'doctor',
                     'transactions' => $transactions,
-                    'totalTransactions' => $entity->transactions()->count(),
+                    'totalTransactions' => $totalTransactions,
                     'currentPage' => $currentPage,
-                    'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+                    'lastPage' => ceil($totalTransactions / $this->transactionsPerPage),
                 ];
             });
         }
-        if ($this->readyToLoad && ($this->entityTypeFilter === 'secretary' || $this->entityTypeFilter === 'all')) {
+
+        if ($this->entityTypeFilter === 'secretary' || $this->entityTypeFilter === 'all') {
             $secretaries = Secretary::whereHas('transactions')->get()->map(function ($entity) {
                 $key = 'secretary-' . $entity->id;
                 $currentPage = $this->entityPages[$key] ?? 1;
-                $transactions = $entity->transactions()
+
+                $transactionsQuery = $entity->transactions()
                     ->when($this->search, function ($query) {
                         $search = trim($this->search);
                         $query->where(function ($q) use ($search) {
                             $q->where('gateway', 'like', "%$search%")
                                 ->orWhere('transaction_id', 'like', "%$search%")
-                                ->orWhere('amount', 'like', "%$search%") ;
+                                ->orWhere('amount', 'like', "%$search%");
                         });
                     })
                     ->when($this->statusFilter, function ($query) {
                         $query->where('status', $this->statusFilter);
-                    })
-                    ->forPage($currentPage, $this->transactionsPerPage)
-                    ->get();
+                    });
+
+                $totalTransactions = $transactionsQuery->count();
+                $transactions = $transactionsQuery->forPage($currentPage, $this->transactionsPerPage)->get();
+
                 return [
                     'entity' => $entity,
                     'type' => 'secretary',
                     'transactions' => $transactions,
-                    'totalTransactions' => $entity->transactions()->count(),
+                    'totalTransactions' => $totalTransactions,
                     'currentPage' => $currentPage,
-                    'lastPage' => ceil($entity->transactions()->count() / $this->transactionsPerPage),
+                    'lastPage' => ceil($totalTransactions / $this->transactionsPerPage),
                 ];
             });
         }
+
         return view('livewire.admin.panel.transactions.transaction-list', [
             'users' => $users,
             'doctors' => $doctors,
             'secretaries' => $secretaries,
             'totalFilteredCount' => $this->totalFilteredCount,
             'transactionsPerPage' => $this->transactionsPerPage,
+            'isLoading' => $this->isLoading,
         ]);
     }
 }
