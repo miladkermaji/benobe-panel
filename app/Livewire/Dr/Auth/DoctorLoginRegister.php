@@ -127,13 +127,38 @@ class DoctorLoginRegister extends Component
 
         session(['step1_completed' => true, 'login_mobile' => $formattedMobile]);
 
+        // Debug: بررسی وضعیت static_password_enabled
+        Log::info('Login attempt debug', [
+            'user_type' => $userInfo['type'],
+            'user_id' => $userInfo['model_id'],
+            'static_password_enabled' => $user->static_password_enabled,
+            'static_password_enabled_type' => gettype($user->static_password_enabled),
+            'has_password' => !empty($user->password),
+        ]);
+
         // بررسی فعال بودن رمز عبور ثابت
-        if (($user->static_password_enabled ?? 0) === 1) {
+        $staticPasswordEnabled = $user->static_password_enabled ?? false;
+        $hasPassword = !empty($user->password);
+
+        if ($staticPasswordEnabled && $hasPassword) {
+            Log::info('Static password enabled and password exists, redirecting to password form');
             session(['current_step' => 3]);
             $this->redirect(route('dr.auth.login-user-pass-form'), navigate: true);
             $this->dispatch('pass-form');
             return;
         }
+
+        // اگر رمز عبور ثابت فعال است اما رمز تنظیم نشده
+        if ($staticPasswordEnabled && !$hasPassword) {
+            Log::warning('Static password enabled but no password set', [
+                'user_type' => $userInfo['type'],
+                'user_id' => $userInfo['model_id']
+            ]);
+            $this->addError('mobile', 'رمز عبور ثابت فعال است اما تنظیم نشده. لطفاً با ادمین تماس بگیرید.');
+            return;
+        }
+
+        Log::info('Static password disabled or no password, sending OTP');
 
         // ارسال OTP
         $otpCode = rand(1000, 9999);
