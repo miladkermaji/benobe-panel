@@ -6,13 +6,15 @@ use App\Models\SmsTemplate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Mc\Controller;
+use App\Traits\HasSelectedDoctor;
 
 class DoctorSendMessageController extends Controller
 {
+    use HasSelectedDoctor;
     public function index(Request $request)
     {
 
-        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+        $doctorId = $this->getSelectedDoctorId() ;
         $clinicId = ($request->input('selectedClinicId') === 'default') ? null : $request->input('selectedClinicId');
 
 
