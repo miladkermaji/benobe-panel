@@ -256,7 +256,7 @@ Route::prefix('mc')
                 Route::get('/medical-documents', [DoctorsClinicManagementController::class, 'medicalDoc'])->name('mc.panel.clinics.medical-documents');
                 Route::get('/edit/{id}/gallery', [DoctorsClinicManagementController::class, 'gallery'])->name('mc.panel.clinics.gallery');
                 Route::post('/store', [DoctorsClinicManagementController::class, 'store'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-store');
-                Route::get('/dr/panel/DoctorsClinic/edit/{id}', [DoctorsClinicManagementController::class, 'edit'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-edit');
+                Route::get('/mc/panel/DoctorsClinic/edit/{id}', [DoctorsClinicManagementController::class, 'edit'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-edit');
                 Route::post('/update/{id}', [DoctorsClinicManagementController::class, 'update'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-update');
                 Route::delete('/delete/{id}', [DoctorsClinicManagementController::class, 'destroy'])->middleware('medical_center.permission:clinic_management')->name('mc-clinic-destroy');
                 Route::get('/create', [DoctorsClinicManagementController::class, 'create'])->name('mc.panel.clinics.create');
@@ -314,9 +314,9 @@ Route::prefix('mc')
                 Route::post('mc-two-factor-update', [DrProfileController::class, 'updateTwoFactorAuth'])->middleware('medical_center.permission:profile')->name('mc-two-factor-update');
                 Route::get('niceId', [DrProfileController::class, 'niceId'])->middleware('medical_center.permission:profile')->name('mc-edit-profile-niceId');
                 Route::get('security', [LoginLogsController::class, 'security'])->middleware('medical_center.permission:profile')->name('mc-edit-profile-security');
-                Route::get('/dr/panel/profile/security/doctor-logs', [LoginLogsController::class, 'getDoctorLogs'])->name('mc-get-doctor-logs');
-                Route::get('/dr/panel/profile/security/secretary-logs', [LoginLogsController::class, 'getSecretaryLogs'])->name('mc-get-secretary-logs');
-                Route::delete('/dr/panel/profile/security/logs/{id}', [LoginLogsController::class, 'deleteLog'])->middleware('medical_center.permission:profile')->name('mc-delete-log');
+                Route::get('/mc/panel/profile/security/doctor-logs', [LoginLogsController::class, 'getDoctorLogs'])->name('mc-get-doctor-logs');
+                Route::get('/mc/panel/profile/security/secretary-logs', [LoginLogsController::class, 'getSecretaryLogs'])->name('mc-get-secretary-logs');
+                Route::delete('/mc/panel/profile/security/logs/{id}', [LoginLogsController::class, 'deleteLog'])->middleware('medical_center.permission:profile')->name('mc-delete-log');
                 Route::get('upgrade', [DrUpgradeProfileController::class, 'index'])->middleware('medical_center.permission:profile')->name('mc-edit-profile-upgrade');
                 Route::delete('/doctor/payments/delete/{id}', [DrUpgradeProfileController::class, 'deletePayment'])->name('mc-payment-delete');
                 Route::post('/pay', [DrUpgradeProfileController::class, 'payForUpgrade'])->name('mc-doctor.upgrade.pay');

@@ -177,14 +177,17 @@ class WorkHours extends Component
         if (!$this->selectedDoctorId) {
             // اگر پزشکی انتخاب نشده، اولین پزشک فعال را انتخاب کن
             try {
-                $activeDoctor = $this->medicalCenter->doctors()
+                $activeDoctor = \App\Models\Doctor::where('medical_center_id', $this->medicalCenter->id)
                     ->where('doctors.is_active', true)
                     ->first();
 
                 if ($activeDoctor) {
                     $this->selectedDoctorId = $activeDoctor->id;
                     // ذخیره پزشک انتخاب‌شده در دیتابیس
-                    $this->medicalCenter->setSelectedDoctor($activeDoctor->id);
+                    \App\Models\MedicalCenterSelectedDoctor::updateOrCreate(
+                        ['medical_center_id' => $this->medicalCenter->id],
+                        ['doctor_id' => $activeDoctor->id]
+                    );
                 } else {
                     // اگر هیچ پزشک فعالی وجود ندارد، پیام مناسب نمایش بده
                     session()->flash('warning', 'هیچ پزشک فعالی در این مرکز درمانی وجود ندارد. لطفاً ابتدا یک پزشک اضافه کنید.');

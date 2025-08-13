@@ -2,7 +2,8 @@
 
 @section('styles')
   <link type="text/css" href="{{ asset('dr-assets/panel/css/panel.css') }}" rel="stylesheet" />
-  <link type="text/css" href="{{ asset('dr-assets/panel/comunication/send-message/send-message.css') }}" rel="stylesheet" />
+
+  <link type="text/css" href="{{ asset('dr-assets/css/panel/doctornote/doctornote.css') }}" rel="stylesheet" />
 @endsection
 
 @section('site-header')
@@ -13,43 +14,189 @@
 @section('bread-crumb-title', 'ارسال پیام')
 @include('dr.panel.my-tools.loader-btn')
 
-<div class="blocking_users_content">
-  <div class="container-fluid mt-4">
-    <!-- جدول پیام‌های ارسالی -->
-    <div class="mt-4">
-      <div class="border-0 shadow-sm rounded-3">
-        <div class="card-header text-white p-4">
-          <h5 class="mb-0 fw-bold">پیام‌های ارسالی</h5>
-        </div>
-        <div class="card-body p-4">
-          <div class="w-100 d-flex justify-content-end mb-3 flex-wrap gap-2">
-            <button class="btn my-btn-primary h-50 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#sendSmsModal">
-              ارسال پیام جدید
+<div class="doctor-notes-container" x-data="{ mobileSearchOpen: false }">
+  <div class="container py-2 mt-3" dir="rtl">
+    <!-- Header -->
+    <div class="glass-header text-white p-2 shadow-lg">
+      <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center gap-3 w-100">
+        <div class="d-flex flex-column flex-md-row gap-2 w-100 align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <h1 class="m-0 h4 font-thin text-nowrap mb-md-0">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              پیام‌های ارسالی
+            </h1>
+            <!-- Mobile Toggle Button -->
+            <button class="btn btn-link text-white p-0 d-md-none mobile-toggle-btn" type="button"
+              @click="mobileSearchOpen = !mobileSearchOpen" :aria-expanded="mobileSearchOpen">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                class="toggle-icon" :class="{ 'rotate-180': mobileSearchOpen }">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
             </button>
-            <button id="delete-multiple" class="btn btn-danger h-50">حذف انتخاب شده ها<img
-                src="{{ asset('dr-assets/icons/trash.svg') }}" alt=""></button>
           </div>
-          <div class="table-responsive">
-            <table id="messagesTable" class="table  table-hover align-middle text-center">
-              <thead class="table-light">
-                <tr>
-                  <th><input type="checkbox" class="form-check-input" id="select-all"></th>
-                  <th>عنوان پیام</th>
-                  <th>متن پیام</th>
-                  <th>تاریخ ارسال</th>
-                  <th>گیرنده</th>
-                  <th>عملیات</th>
+          <!-- Mobile Collapsible Section -->
+          <div x-show="mobileSearchOpen" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2" class="w-100 d-md-none">
+            <div class="d-flex flex-column gap-2">
+              <div class="search-container position-relative" style="max-width: 100%;">
+                <input type="text"
+                  class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50"
+                  placeholder="جستجو در پیام‌ها..."
+                  style="padding-right: 20px; text-align: right; direction: rtl;">
+                <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                  style="z-index: 5; top: 50%; right: 8px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                    <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                  </svg>
+                </span>
+              </div>
+              <button class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 h-50"
+                onclick="openXModal('sendMessageModal')">
+                <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                <span>ارسال پیام جدید</span>
+              </button>
+            </div>
+          </div>
+          <!-- Desktop Actions -->
+          <div class="d-none d-md-flex gap-2 flex-shrink-0 justify-content-center">
+            <div class="search-container position-relative" style="max-width: 300px;">
+              <input type="text"
+                class="form-control search-input border-0 shadow-none bg-white text-dark ps-4 rounded-2 text-start h-50"
+                placeholder="جستجو در پیام‌ها..."
+                style="padding-right: 20px; text-align: right; direction: rtl;">
+              <span class="search-icon position-absolute top-50 start-0 translate-middle-y ms-2"
+                style="z-index: 5; top: 50%; right: 8px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7280" stroke-width="2">
+                  <path d="M11 3a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12zm5-1l5 5" />
+                </svg>
+              </span>
+            </div>
+            <button class="btn btn-gradient-success btn-gradient-success-576 rounded-1 px-3 py-1 d-flex align-items-center gap-1 h-50"
+              onclick="openXModal('sendMessageModal')">
+              <svg style="transform: rotate(180deg)" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              <span>ارسال پیام جدید</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
+    <div class="container-fluid px-0">
+      <div class="card shadow-sm rounded-2">
+        <div class="card-body p-0">
+          <!-- Group Actions -->
+          <div class="group-actions p-2 border-bottom" x-data="{ show: false }" id="groupActions" style="display: none;">
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <button id="delete-multiple" class="btn btn-gradient-danger btn-sm">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                  <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                </svg>
+                حذف انتخاب شده‌ها
+              </button>
+            </div>
+          </div>
+
+          <!-- Desktop Table View -->
+          <div class="table-responsive text-nowrap d-none d-md-block">
+            <table class="table table-hover w-100 m-0">
+              <thead>
+                <tr>
+                  <th class="text-center align-middle" style="width: 40px;">
+                    <div class="d-flex justify-content-center align-items-center">
+                      <input type="checkbox" class="form-check-input m-0 align-middle" id="select-all">
+                    </div>
+                  </th>
+                  <th class="text-center align-middle" style="width: 60px;">ردیف</th>
+                  <th class="align-middle">عنوان پیام</th>
+                  <th class="align-middle">متن پیام</th>
+                  <th class="align-middle">تاریخ ارسال</th>
+                  <th class="align-middle">گیرنده</th>
+                  <th class="text-center align-middle" style="width: 120px;">عملیات</th>
                 </tr>
               </thead>
               <tbody id="messagesTableBody">
-                @foreach ($messages as $message)
-                  <tr data-id="{{ $message->id }}">
-                    <td><input type="checkbox" class="form-check-input" id="select-single"></td>
-                    <td>{{ $message->title }}</td>
-                    <td>{{ $message->content }}</td>
+                @foreach ($messages as $index => $message)
+                  <tr class="align-middle" data-id="{{ $message->id }}">
+                    <td class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <input type="checkbox" class="form-check-input m-0 align-middle select-single">
+                      </div>
+                    </td>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>
+                      <div class="text-truncate" style="max-width: 200px;" title="{{ $message->title }}">
+                        {{ $message->title }}
+                      </div>
+                    </td>
+                    <td>
+                      <div class="text-truncate" style="max-width: 300px;" title="{{ $message->content }}">
+                        {{ $message->content }}
+                      </div>
+                    </td>
                     <td>{{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }}</td>
                     <td>
+                      @if ($message->recipient_type === 'all')
+                        <span class="badge bg-primary-subtle text-primary">همه کاربران</span>
+                      @elseif ($message->recipient_type === 'blocked')
+                        <span class="badge bg-warning-subtle text-warning">کاربران مسدود</span>
+                      @elseif ($message->recipient_type === 'specific' && $message->user)
+                        <span class="badge bg-info-subtle text-info">
+                          {{ $message->user->first_name . ' ' . $message->user->last_name }}
+                        </span>
+                      @else
+                        <span class="badge bg-secondary-subtle text-secondary">نامشخص</span>
+                      @endif
+                    </td>
+                    <td class="text-center">
+                      <button class="btn btn-outline-danger btn-sm rounded-circle delete-message-btn"
+                        onclick="deleteMessage({{ $message->id }}, this)" aria-label="حذف پیام">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Card View -->
+          <div class="notes-cards d-md-none">
+            @foreach ($messages as $index => $message)
+              <div class="note-card mb-2" x-data="{ open: false }">
+                <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2"
+                  @click="open = !open" style="cursor:pointer;">
+                  <div class="d-flex align-items-center gap-2">
+                    <input type="checkbox" class="form-check-input m-0 align-middle select-single" @click.stop>
+                    <span class="fw-bold">{{ $message->title }}</span>
+                    <span class="text-muted">({{ \Morilog\Jalali\Jalalian::fromDateTime($message->created_at)->format('Y/m/d') }})</span>
+                  </div>
+                  <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </div>
+                <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">متن پیام:</span>
+                    <span class="note-card-value">{{ $message->content }}</span>
+                  </div>
+                  <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                    <span class="note-card-label">گیرنده:</span>
+                    <span class="note-card-value">
                       @if ($message->recipient_type === 'all')
                         همه کاربران
                       @elseif ($message->recipient_type === 'blocked')
@@ -60,81 +207,72 @@
                       @else
                         نامشخص
                       @endif
-                    </td>
-                    <td>
-                      <button class="btn btn-light btn-sm delete-message-btn rounded-circle"
-                        onclick="deleteMessage({{ $message->id }}, this)" aria-label="حذف پیام">
-                        <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
-                      </button>
-                    </td>
-                  </tr>
-                @endforeach
-              </tbody>
-            </table>
+                    </span>
+                  </div>
+                  <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top">
+                    <button class="btn btn-outline-danger btn-sm flex-fill delete-message-btn"
+                      onclick="deleteMessage({{ $message->id }}, this)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                      </svg>
+                      حذف
+                    </button>
+                  </div>
+                </div>
+              </div>
+            @endforeach
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- مودال ارسال پیام -->
-  <div class="modal fade" id="sendSmsModal" tabindex="-1" aria-labelledby="sendSmsModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-radius-6 shadow-sm">
-        <div class="modal-header">
-          <h5 class="modal-title fw-bold text-dark" id="sendSmsModalLabel">ارسال پیام جدید</h5>
-          <button type="button" class="close" data-bs-dismiss="modal" aria-label="بستن">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body p-4">
-          <form id="sendSmsForm">
-            @csrf
-            <div class="form-group position-relative mb-4">
-              <label class="label-top-input-special-takhasos fw-bold" for="smsTitle">عنوان پیام</label>
-              <input type="text" id="smsTitle" name="title" class="form-control h-50 shadow-sm"
-                placeholder="عنوان پیام">
-            </div>
-            <div class="form-group mb-4 mt-3">
-              <textarea id="smsMessage" name="content" class="form-control shadow-sm" rows="4" placeholder="متن پیام"></textarea>
-            </div>
-            <div class="form-group position-relative mb-4">
-              <label class="label-top-input-special-takhasos fw-bold" for="smsRecipient">گیرنده</label>
-              <select id="smsRecipient" name="recipient_type" class="form-control form-select h-50 shadow-sm">
-                <option value="all">همه کاربران</option>
-                <option value="blocked">کاربران مسدود</option>
-                <option value="specific">کاربر خاص</option>
-              </select>
-            </div>
-            <div class="form-group position-relative mb-4 mt-3" id="specificRecipientField" style="display: none;">
-              <label class="label-top-input-special-takhasos fw-bold" for="specificRecipient">شماره موبایل
-                گیرنده</label>
-              <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 shadow-sm"
-                placeholder="09123456789">
-            </div>
-            <div class="mt-2 w-100">
-              <button type="submit"
-                class="btn my-btn-primary w-100 h-50 d-flex justify-content-center align-items-center">
-                <span class="button_text">ارسال</span>
-                <div class="loader" style="display: none;"></div>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
+
+<!-- Custom Modal for Send Message -->
+<x-custom-modal id="sendMessageModal" title="ارسال پیام جدید" size="md">
+  <form id="sendSmsForm">
+    @csrf
+    <div class="form-group position-relative mb-4">
+      <label class="label-top-input-special-takhasos fw-bold" for="smsTitle">عنوان پیام</label>
+      <input type="text" id="smsTitle" name="title" class="form-control h-50 shadow-sm" placeholder="عنوان پیام">
+    </div>
+    <div class="form-group mb-4 mt-3">
+      <textarea id="smsMessage" name="content" class="form-control shadow-sm" rows="4" placeholder="متن پیام"></textarea>
+    </div>
+    <div class="form-group position-relative mb-4">
+      <label class="label-top-input-special-takhasos fw-bold" for="smsRecipient">گیرنده</label>
+      <select id="smsRecipient" name="recipient_type" class="form-control form-select h-50 shadow-sm">
+        <option value="all">همه کاربران</option>
+        <option value="blocked">کاربران مسدود</option>
+        <option value="specific">کاربر خاص</option>
+      </select>
+    </div>
+    <div class="form-group position-relative mb-4 mt-3" id="specificRecipientField" style="display: none;">
+      <label class="label-top-input-special-takhasos fw-bold" for="specificRecipient">شماره موبایل گیرنده</label>
+      <input type="text" id="specificRecipient" name="specific_recipient" class="form-control h-50 shadow-sm"
+        placeholder="09123456789">
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-gradient-success flex-fill h-50 d-flex justify-content-center align-items-center">
+        <span class="button_text">ارسال</span>
+        <div class="loader" style="display: none;"></div>
+      </button>
+      <button type="button" class="btn btn-outline-secondary h-50" onclick="closeXModal('sendMessageModal')">
+        لغو
+      </button>
+    </div>
+  </form>
+</x-custom-modal>
 @endsection
 
 @section('scripts')
-<script src="{{ asset('dr-assets/panel/js/dr-panel.js') }}"></script>
+<script src="{{ asset('mc-assets/panel/js/mc-panel.js') }}"></script>
 <script>
   function deleteMessage(messageId, element) {
     Swal.fire({
       title: 'آیا مطمئن هستید؟',
       text: 'این پیام برای همیشه حذف خواهد شد!',
-
+      icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'بله، حذف کن',
       cancelButtonText: 'لغو',
@@ -152,7 +290,7 @@
           },
           success: function(response) {
             if (response.success) {
-              $(element).closest('tr').remove();
+              $(element).closest('tr, .note-card').remove();
               toastr.success(response.message);
               toggleDeleteButton();
             } else {
@@ -238,8 +376,16 @@
   }
 
   function toggleDeleteButton() {
-    const checkedCount = $('#messagesTableBody .form-check-input:checked').length;
-    $('#delete-multiple').prop('disabled', checkedCount === 0);
+    const checkedCount = $('.select-single:checked').length;
+    const groupActions = $('#groupActions');
+    
+    if (checkedCount > 0) {
+      groupActions.show();
+      $('#delete-multiple').prop('disabled', false);
+    } else {
+      groupActions.hide();
+      $('#delete-multiple').prop('disabled', true);
+    }
   }
 
   function deleteMultipleMessages(messageIds) {
@@ -254,7 +400,7 @@
       success: function(response) {
         if (response.success) {
           messageIds.forEach(id => {
-            $(`tr[data-id="${id}"]`).remove();
+            $(`tr[data-id="${id}"], .note-card[data-id="${id}"]`).remove();
           });
           toastr.success(response.message);
           $('#select-all').prop('checked', false);
@@ -279,16 +425,24 @@
       },
       success: function(messages) {
         const tableBody = $('#messagesTableBody');
+        const cardsContainer = $('.notes-cards');
+        
         tableBody.empty();
-        messages.forEach(message => {
+        cardsContainer.empty();
+        
+        messages.forEach((message, index) => {
           let recipientText = 'نامشخص';
+          let recipientBadge = '<span class="badge bg-secondary-subtle text-secondary">نامشخص</span>';
+          
           if (message.recipient_type === 'all') {
             recipientText = 'همه کاربران';
+            recipientBadge = '<span class="badge bg-primary-subtle text-primary">همه کاربران</span>';
           } else if (message.recipient_type === 'blocked') {
             recipientText = 'کاربران مسدود';
+            recipientBadge = '<span class="badge bg-warning-subtle text-warning">کاربران مسدود</span>';
           } else if (message.recipient_type === 'specific' && message.user) {
-            recipientText =
-              `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
+            recipientText = `${message.user.first_name} ${message.user.last_name} (${message.user.mobile})`;
+            recipientBadge = `<span class="badge bg-info-subtle text-info">${message.user.first_name} ${message.user.last_name}</span>`;
           }
 
           const jalaliDate = new Intl.DateTimeFormat('fa-IR', {
@@ -297,20 +451,70 @@
             day: '2-digit'
           }).format(new Date(message.created_at));
 
+          // Desktop table row
           tableBody.append(`
-              <tr data-id="${message.id}">
-                <td><input type="checkbox" class="form-check-input" id="select-single"></td>
-                <td>${message.title}</td>
-                <td>${message.content}</td>
-                <td>${jalaliDate}</td>
-                <td>${recipientText}</td>
-                <td>
-                  <button class="btn btn-light btn-sm delete-message-btn rounded-circle" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
-                    <img src="{{ asset('dr-assets/icons/trash.svg') }}" alt="حذف">
+            <tr class="align-middle" data-id="${message.id}">
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center">
+                  <input type="checkbox" class="form-check-input m-0 align-middle select-single">
+                </div>
+              </td>
+              <td class="text-center">${index + 1}</td>
+              <td>
+                <div class="text-truncate" style="max-width: 200px;" title="${message.title}">
+                  ${message.title}
+                </div>
+              </td>
+              <td>
+                <div class="text-truncate" style="max-width: 300px;" title="${message.content}">
+                  ${message.content}
+                </div>
+              </td>
+              <td>${jalaliDate}</td>
+              <td>${recipientBadge}</td>
+              <td class="text-center">
+                <button class="btn btn-outline-danger btn-sm rounded-circle delete-message-btn" onclick="deleteMessage(${message.id}, this)" aria-label="حذف پیام">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `);
+
+          // Mobile card
+          cardsContainer.append(`
+            <div class="note-card mb-2" x-data="{ open: false }" data-id="${message.id}">
+              <div class="note-card-header d-flex justify-content-between align-items-center px-2 py-2" @click="open = !open" style="cursor:pointer;">
+                <div class="d-flex align-items-center gap-2">
+                  <input type="checkbox" class="form-check-input m-0 align-middle select-single" @click.stop>
+                  <span class="fw-bold">${message.title}</span>
+                  <span class="text-muted">(${jalaliDate})</span>
+                </div>
+                <svg :class="{ 'rotate-180': open }" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.2s;">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </div>
+              <div class="note-card-body px-2 py-2" x-show="open" x-transition>
+                <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                  <span class="note-card-label">متن پیام:</span>
+                  <span class="note-card-value">${message.content}</span>
+                </div>
+                <div class="note-card-item d-flex justify-content-between align-items-center py-1">
+                  <span class="note-card-label">گیرنده:</span>
+                  <span class="note-card-value">${recipientText}</span>
+                </div>
+                <div class="note-card-actions d-flex gap-1 mt-2 pt-2 border-top">
+                  <button class="btn btn-outline-danger btn-sm flex-fill delete-message-btn" onclick="deleteMessage(${message.id}, this)">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1">
+                      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                    </svg>
+                    حذف
                   </button>
-                </td>
-              </tr>
-            `);
+                </div>
+              </div>
+            </div>
+          `);
         });
         toggleDeleteButton();
       },
@@ -319,6 +523,7 @@
       }
     });
   }
+
   $(document).ready(function() {
     // نمایش/مخفی کردن فیلد گیرنده خاص
     $('#smsRecipient').on('change', function() {
@@ -332,9 +537,6 @@
         specificInput.prop('required', false).val('');
       }
     });
-
-    // اعتبارسنجی سمت کلاینت
-
 
     // ارسال فرم
     $('#sendSmsForm').on('submit', function(e) {
@@ -372,7 +574,7 @@
           if (response.success) {
             toastr.success(response.message);
             form[0].reset();
-            $('#sendSmsModal').modal('hide');
+            closeXModal('sendMessageModal');
             $('#specificRecipientField').hide();
             loadMessages();
           }
@@ -398,29 +600,25 @@
     // مدیریت انتخاب همه چک‌باکس‌ها
     $('#select-all').on('change', function() {
       const isChecked = $(this).is(':checked');
-      $('#messagesTableBody .form-check-input').prop('checked', isChecked);
+      $('.select-single').prop('checked', isChecked);
       toggleDeleteButton();
     });
 
     // مدیریت تغییر وضعیت چک‌باکس‌های تکی
-    $(document).on('change', '#messagesTableBody .form-check-input', function() {
+    $(document).on('change', '.select-single', function() {
       if (!$(this).is(':checked')) {
         $('#select-all').prop('checked', false);
       }
-      const allChecked = $('#messagesTableBody .form-check-input').length === $(
-        '#messagesTableBody .form-check-input:checked').length;
+      const allChecked = $('.select-single').length === $('.select-single:checked').length;
       $('#select-all').prop('checked', allChecked);
       toggleDeleteButton();
     });
 
-    // فعال/غیرفعال کردن دکمه حذف
-
-
     // حذف گروهی پیام‌ها
     $('#delete-multiple').on('click', function() {
       const selectedIds = [];
-      $('#messagesTableBody .form-check-input:checked').each(function() {
-        selectedIds.push($(this).closest('tr').data('id'));
+      $('.select-single:checked').each(function() {
+        selectedIds.push($(this).closest('tr, .note-card').data('id'));
       });
 
       if (selectedIds.length === 0) {
@@ -431,7 +629,7 @@
       Swal.fire({
         title: 'آیا مطمئن هستید؟',
         text: `می‌خواهید ${selectedIds.length} پیام را حذف کنید؟`,
-
+        icon: 'warning',
         showCancelButton: true,
         confirmButtonText: 'بله، حذف کن',
         cancelButtonText: 'لغو',
@@ -444,13 +642,10 @@
       });
     });
 
-    // تابع حذف گروهی پیام‌ها
-
+    // بارگذاری اولیه پیام‌ها
     loadMessages();
 
-    // حذف پیام تکی
-
-
+    // تنظیم tooltip
     $(document).ready(function() {
       $('[data-toggle="tooltip"]').tooltip();
     });
