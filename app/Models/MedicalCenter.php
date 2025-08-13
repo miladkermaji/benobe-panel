@@ -248,7 +248,7 @@ class MedicalCenter extends Authenticatable
         return $this->hasOne(MedicalCenterPermission::class);
     }
 
-  public function getPermissionsAttribute()
+    public function getPermissionsAttribute()
     {
         $permissionRecord = MedicalCenterPermission::where('medical_center_id', $this->id)->first();
 

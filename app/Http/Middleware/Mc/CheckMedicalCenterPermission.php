@@ -15,12 +15,8 @@ class CheckMedicalCenterPermission
         if (Auth::guard('medical_center')->check()) {
             $user = Auth::guard('medical_center')->user();
 
-            // دریافت لیست مجوزهای مرکز درمانی مستقیماً از دیتابیس
-            $permissionRecord = MedicalCenterPermission::where('medical_center_id', $user->id)->first();
-            $permissionsArray = $permissionRecord ? ($permissionRecord->permissions ?? []) : [];
-
-            // تبدیل آرایه با کلیدهای عددی به آرایه ساده
-            $permissions = is_array($permissionsArray) ? array_values($permissionsArray) : [];
+            // استفاده از متد getPermissionsAttribute که خودکار دسترسی‌های پیش‌فرض را ایجاد می‌کند
+            $permissions = $user->permissions->permissions ?? [];
 
             // اگر مرکز درمانی مجوز لازم را دارد، اجازه‌ی عبور داده شود
             if ($permission && in_array($permission, $permissions, true)) {

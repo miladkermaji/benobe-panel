@@ -265,8 +265,8 @@ Route::prefix('mc')
                 Route::post('/deposit/update/{id}', [DoctorsClinicManagementController::class, 'updateDeposit'])->middleware('medical_center.permission:clinic_management')->name('mc-doctors.clinic.deposit.update');
                 Route::post('/deposit/destroy/{id}', [DoctorsClinicManagementController::class, 'destroyDeposit'])->middleware('medical_center.permission:clinic_management')->name('mc-doctors.clinic.deposit.destroy');
             });
-            Route::get('permission/', [SecretaryPermissionController::class, 'index'])->middleware('medical_center.permission:permissions')->name('mc-secretary-permissions');
-            Route::post('/permission/update/{secretary_id}', [SecretaryPermissionController::class, 'update'])->middleware('medical_center.permission:permissions')->name('mc-secretary-permissions-update');
+            Route::get('/permission', [SecretaryPermissionController::class, 'index'])->middleware('medical_center.permission:mc-secretary-permissions')->name('mc-secretary-permissions');
+            Route::post('/permission/update/{secretary_id}', [SecretaryPermissionController::class, 'update'])->middleware('medical_center.permission:mc-secretary-permissions')->name('mc-secretary-permissions-update');
             Route::group(['prefix' => 'noskhe-electronic'], function () {
                 Route::get('prescription/', [PrescriptionController::class, 'index'])->middleware('medical_center.permission:prescription')->name('mc-prescription.index');
                 Route::get('prescription/create', [PrescriptionController::class, 'create'])->middleware('medical_center.permission:prescription')->name('mc-prescription.create');
