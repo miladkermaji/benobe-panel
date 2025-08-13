@@ -38,7 +38,7 @@ return [
         'title' => 'نوبت اینترنتی',
         'icon' => 'i-appointments',
         'routes' => [
-            'mc-appointments' => 'لیست نوبت ها',
+            'mc-appointments' => 'لیست نوبت‌ها',
             'mc.panel.doctornotes.index' => 'توضیحات نوبت',
             'mc-mySpecialDays' => 'روزهای خاص',
             'mc-scheduleSetting' => 'تنظیمات نوبت',
@@ -47,10 +47,10 @@ return [
         ],
     ],
     'prescriptions' => [
-        'title' => 'نسخه های من',
+        'title' => 'نسخه‌های من',
         'icon' => 'i-prescriptions',
         'routes' => [
-            'mc.panel.my-prescriptions' => 'مدیریت نسخه ها',
+            'mc.panel.my-prescriptions' => 'مدیریت نسخه‌ها',
             'mc.panel.my-prescriptions.settings' => 'تنظیمات درخواست نسخه',
         ],
     ],
@@ -61,7 +61,7 @@ return [
             'mc-moshavere_setting' => 'برنامه‌ریزی مشاوره',
             'mc-moshavere_waiting' => 'گزارش مشاوره',
             'mc-mySpecialDays-counseling' => 'روزهای خاص',
-            'consult-term.index' => 'قوانین مشاوره',
+            'mc-consult-term.index' => 'قوانین مشاوره', // به‌روزرسانی نام مسیر
         ],
     ],
     'doctor_services' => [
@@ -75,10 +75,10 @@ return [
         'title' => 'نسخه الکترونیک',
         'icon' => 'i-electronic-prescription',
         'routes' => [
-            'prescription.index' => 'نسخه‌های ثبت شده',
-            'providers.index' => 'بیمه‌های من',
-            'favorite.templates.index' => 'نسخه پراستفاده',
-            'templates.favorite.service.index' => 'اقلام پراستفاده',
+            'mc-prescription.index' => 'نسخه‌های ثبت‌شده', // به‌روزرسانی نام مسیر
+            'mc-providers.index' => 'بیمه‌های من', // به‌روزرسانی نام مسیر
+            'mc-favorite.templates.index' => 'نسخه پراستفاده', // به‌روزرسانی نام مسیر
+            'mc-templates.favorite.service.index' => 'اقلام پراستفاده', // به‌روزرسانی نام مسیر
             'mc-patient-records' => 'پرونده الکترونیک',
         ],
     ],
@@ -132,7 +132,7 @@ return [
         'title' => 'آمار و نمودار',
         'icon' => 'i-statistics',
         'routes' => [
-            'mc-my-performance-chart' => 'آمار و نمودار'
+            'mc-my-performance-chart' => 'آمار و نمودار',
         ],
     ],
     'messages' => [
@@ -140,7 +140,7 @@ return [
         'icon' => 'i-messages',
         'routes' => [
             'mc-panel-tickets' => 'تیکت‌ها',
-            '#' => 'صفحه گفتگو',
+            '#' => 'صفحه گفتگو', // بدون تغییر، زیرا مسیر مشخصی در روت‌ها تعریف نشده
         ],
     ],
 ];
