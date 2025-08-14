@@ -887,20 +887,35 @@
 
       function setActiveItem() {
         const currentPath = window.location.pathname;
+        const currentUrl = window.location.href;
+
         navItems.forEach(item => {
-          const links = item.querySelectorAll('a[href]');
+          // حذف کلاس active از همه آیتم‌ها
+          item.classList.remove('active');
+
+          // بررسی لینک‌های مستقیم (بدون زیرمنو)
+          const directLink = item.querySelector('a[href]');
+          if (directLink && directLink.href && !item.hasAttribute('data-has-submenu')) {
+            if (directLink.href === currentUrl || directLink.href.endsWith(currentPath)) {
+              item.classList.add('active');
+              return;
+            }
+          }
+
+          // بررسی لینک‌های زیرمنو
+          const submenuLinks = item.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
           let isActive = false;
 
-          links.forEach(link => {
-            if (link.href.includes(currentPath)) {
-              isActive = true;
+          submenuLinks.forEach(link => {
+            if (link.href && link.href !== 'javascript:void(0)') {
+              if (link.href === currentUrl || link.href.endsWith(currentPath)) {
+                isActive = true;
+              }
             }
           });
 
           if (isActive) {
             item.classList.add('active');
-          } else {
-            item.classList.remove('active');
           }
         });
       }
@@ -1004,6 +1019,23 @@
           <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
           <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
         </div>
+      </div>
+    @endif
+
+    <!-- ساعت کاری -->
+    @if ($this->hasPermission('dr-workhours'))
+      <div class="mobile-bottom-nav__item" data-group="workhours">
+        <a href="{{ route('dr-workhours') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">ساعت کاری</div>
+        </a>
       </div>
     @endif
 
