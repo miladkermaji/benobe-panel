@@ -135,7 +135,13 @@ class ActivationWorkhoursController extends Controller
             ->whereNotNull('work_hours')
             ->first();
 
-        if (! $workSchedule || empty(json_decode($workSchedule->work_hours, true))) {
+        // بررسی اینکه آیا ساعت کاری وجود دارد و خالی نیست
+        $workHours = $workSchedule->work_hours ?? null;
+        if (is_string($workHours)) {
+            $workHours = json_decode($workHours, true);
+        }
+
+        if (! $workSchedule || empty($workHours)) {
             return response()->json(['message' => 'پزشک گرامی شما هیچ برنامه کاری تعریف نکرده اید  لطفا ابتدا برنامه کاری  را تعریف کنید تغیرات را ذخیره کنید سپس مجدد دکمه پایان را بزنید با تشکر از شما...'], 400);
         }
 
@@ -165,7 +171,12 @@ class ActivationWorkhoursController extends Controller
                 ->first();
 
             if ($schedule) {
-                $existingHours = json_decode($schedule->work_hours, true) ?: [];
+                $existingHours = $schedule->work_hours ?? [];
+                // اگر فیلد به صورت رشته است، آن را decode کن
+                if (is_string($existingHours)) {
+                    $existingHours = json_decode($existingHours, true) ?: [];
+                }
+
                 $updatedHours  = array_filter($existingHours, function ($hour) use ($request) {
                     return ! ($hour['start'] === $request->start && $hour['end'] === $request->end);
                 });
