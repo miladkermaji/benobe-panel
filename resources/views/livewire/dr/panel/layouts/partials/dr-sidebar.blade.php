@@ -538,7 +538,6 @@
         left: 0;
         width: 100vw;
         background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
         box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
         z-index: 25000;
         justify-content: space-around;
@@ -558,10 +557,16 @@
         border-radius: 20px;
         margin: 0 4px;
         overflow: visible;
+        border: 2px solid transparent;
       }
 
       .mobile-bottom-nav__item:active {
         transform: scale(0.95);
+      }
+
+      .mobile-bottom-nav__item.open {
+        border: 2px solid #667eea;
+        background: rgba(102, 126, 234, 0.05);
       }
 
       .mobile-bottom-nav__icon {
@@ -582,6 +587,12 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         transform: translateY(-8px) scale(1.1);
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
       }
 
       .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
@@ -607,7 +618,8 @@
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
 
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg,
+      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon svg {
         stroke: #ffffff;
         transform: scale(1.1);
       }
@@ -622,59 +634,61 @@
         opacity: 0.8;
       }
 
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__label,
+      .mobile-bottom-nav__item.open .mobile-bottom-nav__label {
         color: #667eea;
         font-weight: 700;
         opacity: 1;
         transform: translateY(-2px);
       }
 
-      /* Improved Dropdown Styling */
+      /* Improved Dropdown Styling - Full Width */
       .mobile-bottom-nav__dropdown {
-        position: absolute;
+        position: fixed;
         bottom: 90px;
-        left: 50%;
-        transform: translateX(-50%);
-        min-width: 180px;
-        width: fit-content;
-        max-width: 85vw;
+        left: 0;
+        right: 0;
+        width: 100vw;
         background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(20px);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        border-radius: 20px;
-        padding: 12px 0;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 16px 16px 16px;
         z-index: 20001;
         opacity: 0;
         visibility: hidden;
-        transform: translateX(-50%) translateY(20px) scale(0.8);
+        transform: translateY(100%);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: 1px solid rgba(255, 255, 255, 0.2);
         overflow: hidden;
+        max-height: 60vh;
+        overflow-y: auto;
       }
 
       .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
         opacity: 1;
         visibility: visible;
-        transform: translateX(-50%) translateY(0) scale(1);
+        transform: translateY(0);
       }
 
       .mobile-bottom-nav__dropdown a {
         display: block;
-        padding: 12px 20px;
+        padding: 16px 20px;
         color: #495057;
         text-decoration: none;
-        font-size: 14px;
+        font-size: 15px;
         font-weight: 500;
         border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         transition: all 0.3s ease;
-        margin: 0 6px;
+        margin: 0 6px 8px 6px;
         border-radius: 12px;
         position: relative;
         white-space: nowrap;
+        text-align: center;
       }
 
       .mobile-bottom-nav__dropdown a:last-child {
         border-bottom: none;
+        margin-bottom: 0;
       }
 
       .mobile-bottom-nav__dropdown a::before {
@@ -699,88 +713,70 @@
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
       }
 
-      /* Backdrop - positioned above body but below dropdown */
+      /* Enhanced Backdrop with Blur */
       .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
         content: '';
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
-        height: calc(100vh - 80px);
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
         z-index: 20000;
         animation: backdropIn 0.3s ease-out;
       }
 
-      /* Special styling for "other" menu - compact version */
+      /* Special styling for "other" menu - full width version */
       .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-        position: absolute;
+        position: fixed;
         bottom: 90px;
-        left: 50%;
-        transform: translateX(-50%);
-        min-width: 200px;
-        width: fit-content;
-        max-width: 85vw;
+        left: 0;
+        right: 0;
+        width: 100vw;
         background: rgba(255, 255, 255, 0.98);
-        backdrop-filter: blur(20px);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        border-radius: 20px;
-        padding: 12px 0;
+        border-radius: 20px 20px 0 0;
+        padding: 20px 16px 16px 16px;
         z-index: 20001;
         opacity: 0;
         visibility: hidden;
-        transform: translateX(-50%) translateY(20px) scale(0.8);
+        transform: translateY(100%);
         transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         border: 1px solid rgba(255, 255, 255, 0.2);
         overflow: hidden;
+        max-height: 60vh;
+        overflow-y: auto;
       }
 
       .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
         opacity: 1;
         visibility: visible;
-        transform: translateX(-50%) translateY(0) scale(1);
-      }
-
-      /* Fix for edge positioning - prevent dropdowns from going off-screen */
-      .mobile-bottom-nav__item:first-child .mobile-bottom-nav__dropdown {
-        left: 20px;
-        transform: translateX(0) translateY(20px) scale(0.8);
-      }
-
-      .mobile-bottom-nav__item:first-child.open .mobile-bottom-nav__dropdown {
-        transform: translateX(0) translateY(0) scale(1);
-      }
-
-      .mobile-bottom-nav__item:last-child .mobile-bottom-nav__dropdown,
-      .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-        left: 20px !important;
-        transform: translateX(0) translateY(20px) scale(0.8) !important;
-      }
-
-      .mobile-bottom-nav__item:last-child.open .mobile-bottom-nav__dropdown,
-      .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
-        transform: translateX(0) translateY(0) scale(1) !important;
+        transform: translateY(0);
       }
 
       /* Animations */
       @keyframes backdropIn {
         from {
           opacity: 0;
+          backdrop-filter: blur(0px);
         }
 
         to {
           opacity: 1;
+          backdrop-filter: blur(8px);
         }
       }
 
       @keyframes dropdownSlideIn {
         0% {
           opacity: 0;
-          transform: translateX(-50%) translateY(30px) scale(0.8);
+          transform: translateY(100%);
         }
 
         100% {
           opacity: 1;
-          transform: translateX(-50%) translateY(0) scale(1);
+          transform: translateY(0);
         }
       }
 
@@ -801,8 +797,12 @@
         }
 
         .mobile-bottom-nav__dropdown {
-          min-width: 160px;
-          max-width: 90vw;
+          padding: 16px 12px 12px 12px;
+        }
+
+        .mobile-bottom-nav__dropdown a {
+          padding: 14px 16px;
+          font-size: 14px;
         }
       }
 
@@ -818,6 +818,25 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border-radius: 50%;
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      }
+
+      /* Scrollbar styling for dropdown */
+      .mobile-bottom-nav__dropdown::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .mobile-bottom-nav__dropdown::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 2px;
+      }
+
+      .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb {
+        background: rgba(102, 126, 234, 0.3);
+        border-radius: 2px;
+      }
+
+      .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb:hover {
+        background: rgba(102, 126, 234, 0.5);
       }
     }
 
