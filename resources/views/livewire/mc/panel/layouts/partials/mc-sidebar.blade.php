@@ -24,7 +24,6 @@
             <a href="{{ route('mc-panel') }}">داشبورد</a>
           </li>
         @endif
-
         @if ($this->hasPermission('medical_center_management'))
           <li
             class="item-li i-medical-center {{ Request::routeIs('mc.panel.doctors.index') || Request::routeIs('mc.panel.doctors.create') || Request::routeIs('mc.panel.doctors.edit') || Request::routeIs('mc.panel.specialties.index') || Request::routeIs('mc.panel.specialties.create') || Request::routeIs('mc.panel.specialties.edit') || Request::routeIs('mc.panel.services.index') || Request::routeIs('mc.panel.services.create') || Request::routeIs('mc.panel.services.edit') || Request::routeIs('mc.panel.insurances.index') || Request::routeIs('mc.panel.insurances.create') || Request::routeIs('mc.panel.insurances.edit') || Request::routeIs('mc.panel.profile.edit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -74,13 +73,11 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('workhours'))
           <li class="item-li i-workhours {{ Request::routeIs('mc-workhours') ? 'is-active' : '' }}">
             <a href="{{ route('mc-workhours') }}">ساعت کاری</a>
           </li>
         @endif
-
         @if ($this->hasPermission('appointments'))
           <li
             class="item-li i-appointments {{ Request::routeIs('mc-appointments') || Request::routeIs('mc.panel.doctornotes.index') || Request::routeIs('mc-mySpecialDays') || Request::routeIs('mc-scheduleSetting') || Request::routeIs('mc-vacation') || Request::routeIs('mc-doctor-blocking-users.index') ? 'is-active' : '' }}">
@@ -129,7 +126,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('prescriptions'))
           <li class="item-li i-prescriptions {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -161,7 +157,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('consult'))
           <li
             class="item-li i-consultation {{ Request::routeIs('mc-moshavere_setting') || Request::routeIs('mc-moshavere_waiting') || Request::routeIs('consult-term.index') || Request::routeIs('mc-mySpecialDays-counseling') ? 'is-active' : '' }}">
@@ -211,13 +206,11 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('doctor_services'))
           <li class="item-li i-insurance {{ Request::routeIs('mc.panel.doctor-services.index') ? 'is-active' : '' }}">
             <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
           </li>
         @endif
-
         @if ($this->hasPermission('electronic_prescription'))
           <li
             class="item-li i-electronic-prescription {{ Request::routeIs('prescription.index') || Request::routeIs('providers.index') || Request::routeIs('favorite.templates.index') || Request::routeIs('templates.favorite.service.index') || Request::routeIs('mc-patient-records') ? 'is-active' : '' }}">
@@ -282,7 +275,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('financial_reports'))
           <li
             class="item-li i-financial-reports {{ Request::routeIs('mc-wallet') || Request::routeIs('mc-payment-setting') || Request::routeIs('mc.panel.financial-reports.index') || Request::routeIs('mc-wallet-charge') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -319,7 +311,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('patient_communication'))
           <li
             class="item-li i-patient-communication {{ Request::routeIs('mc.panel.send-message') ? 'is-active' : '' }}">
@@ -341,7 +332,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('secretary_management'))
           <li
             class="item-li i-secretary {{ Request::routeIs('mc-secretary-management') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -373,7 +363,6 @@
             </ul>
           </li>
         @endif
-
         @if ($this->hasPermission('clinic_management'))
           <li
             class="item-li i-clinic {{ Request::routeIs('mc-clinic-management') || Request::routeIs('doctors.clinic.cost') || Request::routeIs('duration.index') || Request::routeIs('activation.workhours.index') || Request::routeIs('mc.panel.clinics.medical-documents') || Request::routeIs('mc-doctors.clinic.deposit') ? 'is-active' : '' }} d-flex flex-column justify-content-center"
@@ -481,7 +470,6 @@
             <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
           </li>
         @endif
-
         @if ($this->hasPermission('mc-panel-tickets'))
           <li class="item-li i-messages {{ Request::routeIs('mc-panel-tickets') ? 'is-active' : '' }}">
             <a href="#" class="d-flex justify-content-between w-100 align-items-center">
@@ -507,8 +495,6 @@
             </ul>
           </li>
         @endif
-
-
       </ul>
     </div>
     <script>
@@ -538,7 +524,6 @@
             photoInput.click();
           });
         }
-
         function uploadPhoto(file) {
           const formData = new FormData();
           formData.append('photo', file);
@@ -580,131 +565,289 @@
           font-size: 9px !important;
         }
       }
-
       @media (max-width: 768px) {
-
         .sidebar__nav,
         .sidebar__fixed,
         .bars {
           display: none !important;
         }
-
+        /* New Modern Mobile Navigation */
         .mobile-bottom-nav {
           display: flex;
           position: fixed;
           bottom: 0;
-          overflow: hidden !important;
           left: 0;
           width: 100vw;
-          background: rgba(255, 255, 255, 0.98);
-          box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
+          background: rgba(255, 255, 255, 0.95);
+          box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
           z-index: 25000;
-          /* بالاتر از overlay */
           justify-content: space-around;
           align-items: center;
-          padding: 0;
-          height: 68px;
-          border-top: 1px solid rgba(224, 224, 224, 0.8);
-          backdrop-filter: blur(10px);
+          padding: 12px 0 8px 0;
+          height: 95px;
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
-
         .mobile-bottom-nav__item {
           position: relative;
-          flex: 1 1 0px;
+          flex: 1;
           text-align: center;
-          padding: 6px 0 0 0;
           cursor: pointer;
-          transition: all 0.3s ease;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           min-width: 0;
-          border-radius: 18px 18px 0 0;
-          margin: 0 2px;
-          overflow: hidden;
+          border-radius: 20px;
+          margin: 0 4px;
+          overflow: visible;
+          border: 2px solid transparent;
+          z-index: 25000;
         }
-
-        @media (max-width: 400px) {
-          .mobile-bottom-nav__label {
-            font-size: 10px;
-          }
-
-          .mobile-bottom-nav__item svg {
-            width: 22px;
-            height: 22px;
-          }
+        .mobile-bottom-nav__item.open {
+          background: rgba(102, 126, 234, 0.05);
+          z-index: 25001;
         }
-
-        .mobile-bottom-nav__item svg {
-          display: block;
-          margin: 0 auto 2px auto;
+        .mobile-bottom-nav__item:active {
+          transform: scale(0.95);
+        }
+        .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+        }
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 18px;
+          z-index: -1;
+          opacity: 0.3;
+          filter: blur(8px);
+        }
+        .mobile-bottom-nav__icon {
+          position: relative;
+          width: 48px;
+          height: 48px;
+          margin: 0 auto 6px auto;
+          background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+          border-radius: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__icon {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          transform: translateY(-8px) scale(1.1);
+          box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+        .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          transform: translateY(-4px) scale(1.05);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+        }
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 18px;
+          z-index: -1;
+          opacity: 0.3;
+          filter: blur(8px);
+        }
+        .mobile-bottom-nav__icon svg {
           width: 24px;
           height: 24px;
-          fill: #888;
-          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
+          stroke: #6c757d;
+          stroke-width: 2;
+          fill: none;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
-        .mobile-bottom-nav__item.active svg,
-        .mobile-bottom-nav__item:active svg,
-        .mobile-bottom-nav__item.open svg {
-          fill: #1976d2;
-          transform: scale(1.15);
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg,
+        .mobile-bottom-nav__item.open .mobile-bottom-nav__icon svg {
+          stroke: #ffffff;
+          transform: scale(1.1);
         }
-
         .mobile-bottom-nav__label {
-          font-size: 10px;
-          color: #444;
-          font-weight: 500;
-          letter-spacing: 0.2px;
-          margin-top: 4px;
-          opacity: 0.92;
-          transition: all 0.3s ease;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
+          font-size: 11px;
+          color: #6c757d;
+          font-weight: 600;
+          letter-spacing: 0.3px;
+          margin-top: 2px;
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          opacity: 0.8;
         }
-
-        .mobile-bottom-nav__item:active,
-        .mobile-bottom-nav__item.open {
-          background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
-          box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+        .mobile-bottom-nav__item.active .mobile-bottom-nav__label,
+        .mobile-bottom-nav__item.open .mobile-bottom-nav__label {
+          color: #667eea;
+          font-weight: 700;
+          opacity: 1;
+          transform: translateY(-2px);
         }
-
+        /* Improved Dropdown Styling - Full Width */
         .mobile-bottom-nav__dropdown {
-          position: absolute;
-          bottom: 68px;
-          left: 50%;
-          transform: translateX(-50%);
-          min-width: 180px;
-          width: max-content;
-          max-width: 95vw;
-          background: #fff;
-          box-shadow: 0 2px 16px rgba(25, 118, 210, 0.10);
-          border-radius: 16px;
-          padding: 8px 0;
-          z-index: 20000;
-          animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          display: none;
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+          border-radius: 0;
+          padding: 0;
+          z-index: 20001;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(100%);
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          border: none;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          max-height: 100vh;
         }
-
-        /* Special styling for "other" menu (fullscreen) */
-        .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 100vw !important;
-          height: calc(100vh - 68px) !important;
-          bottom: auto !important;
-          transform: none !important;
-          border-radius: 0 !important;
-          max-width: none !important;
-          animation: fullscreenIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        }
-
         .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
-          display: block !important;
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
         }
-
-        /* Backdrop for smaller dropdowns */
+        /* Close Button Styling */
+        .mobile-dropdown-close {
+          position: absolute;
+          top: 12px;
+          left: 12px;
+          width: 32px;
+          height: 32px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          z-index: 10;
+          box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+          transition: all 0.3s ease;
+          /* Prevent event bubbling */
+          pointer-events: auto;
+        }
+        .mobile-dropdown-close:hover {
+          transform: scale(1.05);
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        .mobile-dropdown-close svg {
+          width: 18px;
+          height: 18px;
+          stroke: white;
+          stroke-width: 2;
+          /* Ensure SVG doesn't interfere with button clicks */
+          pointer-events: none;
+        }
+        /* Header for full height dropdown */
+        .mobile-dropdown-header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 16px;
+          text-align: center;
+          font-size: 16px;
+          font-weight: 700;
+          position: relative;
+          margin-bottom: 0;
+          flex-shrink: 0;
+        }
+        /* Content container for full height with proper scrolling */
+        .mobile-dropdown-content {
+          flex: 1;
+          overflow-y: auto;
+          padding: 16px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-height: 0;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(102, 126, 234, 0.4) rgba(0, 0, 0, 0.05);
+        }
+        /* Enhanced scrollbar styling for better visibility */
+        .mobile-dropdown-content::-webkit-scrollbar {
+          width: 6px;
+        }
+        .mobile-dropdown-content::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 3px;
+          margin: 4px 0;
+        }
+        .mobile-dropdown-content::-webkit-scrollbar-thumb {
+          background: rgba(102, 126, 234, 0.4);
+          border-radius: 3px;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .mobile-dropdown-content::-webkit-scrollbar-thumb:hover {
+          background: rgba(102, 126, 234, 0.6);
+        }
+        /* Ensure all content is visible */
+        .mobile-dropdown-content>* {
+          min-width: 0;
+          flex-shrink: 0;
+        }
+        /* Fix for very long content */
+        .mobile-dropdown-content {
+          padding-bottom: 20px;
+        }
+        /* Ensure proper touch scrolling on mobile */
+        .mobile-dropdown-content {
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+          scroll-behavior: smooth;
+        }
+        .mobile-bottom-nav__dropdown a {
+          display: block;
+          padding: 10px 14px;
+          color: #495057;
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 500;
+          border: 1px solid rgba(102, 126, 234, 0.1);
+          border-radius: 8px;
+          transition: all 0.3s ease;
+          margin: 0;
+          position: relative;
+          white-space: nowrap;
+          text-align: center;
+          background: rgba(255, 255, 255, 0.9);
+        }
+        .mobile-bottom-nav__dropdown a:last-child {
+          border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+          margin-bottom: 0;
+        }
+        .mobile-bottom-nav__dropdown a::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+          transition: left 0.5s ease;
+        }
+        .mobile-bottom-nav__dropdown a:hover::before {
+          left: 100%;
+        }
+        .mobile-bottom-nav__dropdown a:hover {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+          color: #667eea;
+          transform: translateX(3px);
+          box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
+          border-color: rgba(102, 126, 234, 0.25);
+        }
+        /* Enhanced Backdrop with Blur */
         .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
           content: '';
           position: fixed;
@@ -712,208 +855,470 @@
           left: 0;
           width: 100vw;
           height: 100vh;
-          background: rgba(0, 0, 0, 0.3);
-          z-index: 19999;
-          animation: backdropIn 0.2s ease-out;
+          z-index: 20000;
+          animation: backdropIn 0.3s ease-out;
         }
-
-        .mobile-bottom-nav__dropdown a {
-          display: block;
-          padding: 12px 20px;
-          color: #333;
-          text-decoration: none;
-          font-size: 14px;
-          border-bottom: 1px solid rgba(242, 242, 242, 0.7);
-          transition: all 0.25s ease;
-          border-radius: 10px;
-          margin: 4px 8px;
-          font-weight: 500;
+        /* Special backdrop for "other" menu */
+        .mobile-bottom-nav__item--other.open::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 24998;
+          animation: backdropIn 0.3s ease-out;
         }
-
-        .mobile-bottom-nav__dropdown a:last-child {
-          border-bottom: none;
-        }
-
-        .mobile-bottom-nav__dropdown a:hover {
-          background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
-          color: #1976d2;
-          transform: translateX(3px);
-          box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
-        }
-
-        @keyframes dropdownIn {
-          0% {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px) scale(0.95);
-          }
-
-          70% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px) scale(1.02);
-          }
-
-          100% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-          }
-        }
-
-        @keyframes fullscreenIn {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.98);
-          }
-
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.01);
-          }
-
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        @keyframes backdropIn {
-          from {
-            opacity: 0;
-          }
-
-          to {
-            opacity: 1;
-          }
-        }
-
-        /* Fix for dashboard dropdown (first item, right edge) */
-        .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
-          left: auto;
-          right: 2.5vw;
-          transform: none;
-          animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes dropdownInRight {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.02);
-          }
-
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        /* Fix for other dropdown (last item, left edge) */
+        /* Special styling for "other" menu - full height version */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-          left: 2.5vw;
-          right: auto;
-          transform: none;
-          animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: fixed;
+          bottom: 95px;
+          left: 0;
+          right: 0;
+          width: 100vw;
+          height: calc(100vh - 95px);
+          background: rgba(255, 255, 255, 0.98);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+          border-radius: 0;
+          padding: 0;
+          z-index: 24999;
+          opacity: 0;
+          visibility: hidden;
+          transform: translateY(100%);
+          transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          border: none;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          max-height: calc(100vh - 95px);
         }
-
-        @keyframes dropdownInLeft {
+        .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+        /* Mobile Menu Sections Styling - Two Column Layout */
+        .mobile-menu-section {
+          margin-bottom: 12px;
+          border-radius: 10px;
+          overflow: visible;
+          background: rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(102, 126, 234, 0.15);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+          flex-shrink: 0;
+          min-width: 0;
+        }
+        .mobile-menu-section:last-child {
+          margin-bottom: 0;
+        }
+        .mobile-menu-section__header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 14px;
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+          border-bottom: 1px solid rgba(102, 126, 234, 0.15);
+          font-weight: 600;
+          font-size: 13px;
+          color: #495057;
+          position: relative;
+          flex-shrink: 0;
+        }
+        .mobile-menu-section__header svg {
+          width: 16px;
+          height: 16px;
+          stroke: #667eea;
+          stroke-width: 2;
+          flex-shrink: 0;
+        }
+        .mobile-menu-section__header .badge {
+          margin-right: auto;
+          font-size: 8px;
+          padding: 2px 5px;
+          border-radius: 8px;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+        /* Two Column Layout for Menu Items */
+        .mobile-menu-section__items {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px;
+          padding: 10px;
+          overflow: visible;
+          min-width: 0;
+        }
+        .mobile-menu-section a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px 10px;
+          color: #495057;
+          text-decoration: none;
+          font-size: 10px;
+          font-weight: 500;
+          border: 1px solid rgba(102, 126, 234, 0.1);
+          border-radius: 6px;
+          transition: all 0.3s ease;
+          position: relative;
+          background: rgba(255, 255, 255, 0.9);
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          min-height: 28px;
+          line-height: 1.2;
+          min-width: 0;
+          flex-shrink: 0;
+        }
+        .mobile-menu-section a:hover {
+          background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+          color: #667eea;
+          transform: translateY(-1px);
+          box-shadow: 0 3px 8px rgba(102, 126, 234, 0.15);
+          border-color: rgba(102, 126, 234, 0.25);
+        }
+        .mobile-menu-section a.disabled-link {
+          color: #6c757d;
+          cursor: not-allowed;
+          opacity: 0.5;
+          background: rgba(108, 117, 125, 0.05);
+          border-color: rgba(108, 117, 125, 0.1);
+        }
+        .mobile-menu-section a.disabled-link:hover {
+          transform: none;
+          box-shadow: none;
+          background: rgba(108, 117, 125, 0.05);
+          color: #6c757d;
+        }
+        .mobile-menu-section a::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+          transition: left 0.5s ease;
+        }
+        .mobile-menu-section a:hover::before {
+          left: 100%;
+        }
+        /* Responsive adjustments for two column layout */
+        @media (max-width: 400px) {
+          .mobile-menu-section {
+            margin-bottom: 10px;
+          }
+          .mobile-menu-section__header {
+            padding: 8px 12px;
+            font-size: 12px;
+          }
+          .mobile-menu-section__header svg {
+            width: 14px;
+            height: 14px;
+          }
+          .mobile-menu-section__items {
+            padding: 8px;
+            gap: 5px;
+          }
+          .mobile-menu-section a {
+            padding: 5px 8px;
+            font-size: 9px;
+            min-height: 26px;
+          }
+          .mobile-dropdown-header {
+            padding: 14px;
+            font-size: 15px;
+          }
+          .mobile-dropdown-content {
+            padding: 14px;
+          }
+        }
+        /* For very small screens, switch to single column */
+        @media (max-width: 320px) {
+          .mobile-menu-section__items {
+            grid-template-columns: 1fr;
+            gap: 5px;
+          }
+        }
+        /* Animations */
+        @keyframes dropdownSlideIn {
           0% {
             opacity: 0;
-            transform: translateY(20px) scale(0.95);
+            transform: translateY(100%);
           }
-
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.02);
-          }
-
           100% {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            transform: translateY(0);
           }
         }
+        /* Active state indicator */
+        .mobile-bottom-nav__item.active::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 6px;
+          height: 6px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          border-radius: 50%;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+        }
+        /* Scrollbar styling for dropdown */
+        .mobile-bottom-nav__dropdown::-webkit-scrollbar {
+          width: 4px;
+        }
+        .mobile-bottom-nav__dropdown::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.05);
+          border-radius: 2px;
+        }
+        .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb {
+          background: rgba(102, 126, 234, 0.3);
+          border-radius: 2px;
+        }
+        .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb:hover {
+          background: rgba(102, 126, 234, 0.5);
+        }
+        /* Responsive adjustments */
+        @media (max-width: 400px) {
+          .mobile-bottom-nav__label {
+            font-size: 9px;
+          }
+          .mobile-bottom-nav__icon {
+            width: 42px;
+            height: 42px;
+          }
+          .mobile-bottom-nav__icon svg {
+            width: 20px;
+            height: 20px;
+          }
+          .mobile-menu-section {
+            margin-bottom: 8px;
+          }
+          .mobile-menu-section__header {
+            padding: 7px 10px;
+            font-size: 11px;
+          }
+          .mobile-menu-section__header svg {
+            width: 13px;
+            height: 13px;
+          }
+          .mobile-menu-section__items {
+            padding: 7px;
+            gap: 4px;
+          }
+          .mobile-menu-section a {
+            padding: 4px 6px;
+            font-size: 8px;
+            min-height: 24px;
+          }
+          .mobile-dropdown-header {
+            padding: 12px;
+            font-size: 14px;
+          }
+          .mobile-dropdown-content {
+            padding: 12px;
+            gap: 4px;
+          }
+          .mobile-dropdown-close {
+            top: 12px;
+            left: 12px;
+            width: 32px;
+            height: 32px;
+          }
+          .mobile-dropdown-close svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+        /* Responsive adjustments for sections */
+        @media (max-width: 400px) {
+          .mobile-menu-section__header {
+            padding: 7px 10px;
+            font-size: 11px;
+          }
+          .mobile-menu-section__header svg {
+            width: 13px;
+            height: 13px;
+          }
+          .mobile-menu-section a {
+            padding: 4px 6px;
+            font-size: 8px;
+          }
+          .mobile-dropdown-header {
+            padding: 12px;
+            font-size: 14px;
+          }
+          .mobile-dropdown-content {
+            padding: 12px;
+          }
+        }
+        /* Enhanced spacing for mobile menu */
+        .mobile-bottom-nav__dropdown {
+          padding: 0;
+          max-height: none;
+        }
+        /* Responsive adjustments for two column layout */
       }
-
       @media (min-width: 769px) {
         .mobile-bottom-nav {
           display: none !important;
         }
       }
-
       .soon-label {
         font-size: 10px;
-        color: #d32f2f;
+        color: #dc3545;
         margin-right: 4px;
         vertical-align: middle;
+        background: rgba(220, 53, 69, 0.1);
+        padding: 2px 6px;
+        border-radius: 8px;
       }
     </style>
     <script>
       (function() {
         let navItems;
         let lastOpen = null;
-
         function closeAllDropdowns(e) {
           if (!e.target.closest('.mobile-bottom-nav')) {
+            // بستن همه منوها وقتی روی بیرون کلیک می‌شه
             navItems.forEach(i => i.classList.remove('open'));
             lastOpen = null;
-            // Remove backdrop
             document.body.style.overflow = '';
           }
         }
-
         function setupMobileNavDropdowns() {
           navItems = document.querySelectorAll('.mobile-bottom-nav__item');
           navItems.forEach(item => {
             item.onclick = function(e) {
-              if (e.target.closest('.mobile-bottom-nav__dropdown')) {
+              // Don't handle clicks on close buttons or dropdown content
+              if (e.target.closest('.mobile-dropdown-close') || e.target.closest('.mobile-bottom-nav__dropdown')) {
                 return;
               }
-
-              // اگر همین آیتم باز است، فقط ببند
               if (item.classList.contains('open')) {
+                // اگر همین آیتم باز است، فقط ببند
                 item.classList.remove('open');
                 lastOpen = null;
                 document.body.style.overflow = '';
               } else {
-                navItems.forEach(i => i.classList.remove('open'));
+                // بستن همه منوهای باز
+                navItems.forEach(i => {
+                  i.classList.remove('open');
+                });
+                // باز کردن منوی جدید
                 item.classList.add('open');
                 lastOpen = item;
-
-                // Check if this is the "other" menu (fullscreen)
-                if (item.classList.contains('mobile-bottom-nav__item--other')) {
+                // تنظیم overflow برای backdrop
+                if (item.querySelector('.mobile-bottom-nav__dropdown')) {
                   document.body.style.overflow = 'hidden';
                 }
               }
             };
           });
         }
-
+        // Function to close the "سایر" menu - Simple approach like doctor sidebar
+        function closeOtherMenu(event) {
+          // Prevent event bubbling
+          if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+          }
+          const otherItem = document.querySelector('.mobile-bottom-nav__item--other');
+          if (otherItem) {
+            otherItem.classList.remove('open');
+            lastOpen = null;
+            document.body.style.overflow = '';
+            // Temporarily disable click events to prevent immediate reopening
+            otherItem.style.pointerEvents = 'none';
+            setTimeout(() => {
+              otherItem.style.pointerEvents = '';
+            }, 300);
+          }
+        }
+        function setActiveItem() {
+          const currentPath = window.location.pathname;
+          const currentUrl = window.location.href;
+          navItems.forEach(item => {
+            // حذف کلاس active از همه آیتم‌ها
+            item.classList.remove('active');
+            // بررسی لینک‌های مستقیم (بدون زیرمنو)
+            const directLink = item.querySelector('a[href]');
+            if (directLink && directLink.href && !item.hasAttribute('data-has-submenu')) {
+              if (directLink.href === currentUrl || directLink.href.endsWith(currentPath)) {
+                item.classList.add('active');
+                return;
+              }
+            }
+            // بررسی لینک‌های زیرمنو
+            const submenuLinks = item.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
+            let isActive = false;
+            submenuLinks.forEach(link => {
+              if (link.href && link.href !== 'javascript:void(0)') {
+                if (link.href === currentUrl || link.href.endsWith(currentPath)) {
+                  isActive = true;
+                }
+              }
+            });
+            if (isActive) {
+              item.classList.add('active');
+            }
+          });
+        }
+        // Function to ensure proper scrolling behavior
+        function setupScrolling() {
+          const dropdownContent = document.querySelector('.mobile-dropdown-content');
+          if (dropdownContent) {
+            // Reset scroll position when opening
+            dropdownContent.scrollTop = 0;
+            // Ensure smooth scrolling
+            dropdownContent.style.scrollBehavior = 'smooth';
+            // Add touch scrolling support
+            let isScrolling = false;
+            let startY = 0;
+            let startScrollTop = 0;
+            dropdownContent.addEventListener('touchstart', function(e) {
+              startY = e.touches[0].clientY;
+              startScrollTop = this.scrollTop;
+              isScrolling = false;
+            });
+            dropdownContent.addEventListener('touchmove', function(e) {
+              if (!isScrolling) {
+                const deltaY = startY - e.touches[0].clientY;
+                if (Math.abs(deltaY) > 10) {
+                  isScrolling = true;
+                }
+              }
+            });
+          }
+        }
         document.addEventListener('DOMContentLoaded', function() {
           setupMobileNavDropdowns();
+          setActiveItem();
+          setupScrolling();
           document.addEventListener('click', closeAllDropdowns);
         });
-
         window.addEventListener('resize', function() {
           if (window.innerWidth <= 768) {
             setupMobileNavDropdowns();
+            setupScrolling();
           }
         });
-
-        // اجرای مجدد setupMobileNavDropdowns بعد از هر آپدیت Livewire
         document.addEventListener('livewire:update', function() {
           setupMobileNavDropdowns();
+          setActiveItem();
+          setupScrolling();
         });
       })();
     </script>
   </div>
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
-    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
-      <a href="{{ route('mc-panel') }}"
-        style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-        <div class="mobile-bottom-nav__activebox">
+    @if ($this->hasPermission('dashboard'))
+      <div class="mobile-bottom-nav__item" data-group="dashboard">
+        <a href="{{ route('mc-panel') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -924,54 +1329,54 @@
             </svg>
           </div>
           <div class="mobile-bottom-nav__label">داشبورد</div>
-        </div>
-      </a>
-    </div>
+        </a>
+      </div>
+    @endif
     <!-- نوبت‌ها -->
-    <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
-      <div class="mobile-bottom-nav__activebox">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-            <path d="M8 14h.01" />
-            <path d="M12 14h.01" />
-            <path d="M16 14h.01" />
-            <path d="M8 18h.01" />
-            <path d="M12 18h.01" />
-            <path d="M16 18h.01" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+    @if ($this->hasPermission('appointments'))
+      <div class="mobile-bottom-nav__item" data-group="appointments">
+        <a href="{{ route('mc-appointments') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <path d="M8 14h.01" />
+              <path d="M12 14h.01" />
+              <path d="M16 14h.01" />
+              <path d="M8 18h.01" />
+              <path d="M12 18h.01" />
+              <path d="M16 18h.01" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+        </a>
       </div>
-      <div class="mobile-bottom-nav__dropdown" style="display:none">
-        @if ($this->hasPermission('mc-appointments'))
-          <a href="{{ route('mc-appointments') }}">لیست نوبت‌ها</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.doctornotes.index'))
-          <a href="{{ route('mc.panel.doctornotes.index') }}">توضیحات نوبت</a>
-        @endif
-        @if ($this->hasPermission('mc-mySpecialDays'))
-          <a href="{{ route('mc-mySpecialDays') }}">روزهای خاص</a>
-        @endif
-        @if ($this->hasPermission('mc-scheduleSetting'))
-          <a href="{{ route('mc-scheduleSetting') }}">تنظیمات نوبت</a>
-        @endif
-        @if ($this->hasPermission('mc-vacation'))
-          <a href="{{ route('mc-vacation') }}">تعطیلات</a>
-        @endif
-        @if ($this->hasPermission('mc-doctor-blocking-users.index'))
-          <a href="{{ route('mc-doctor-blocking-users.index') }}">کاربران مسدود</a>
-        @endif
+    @endif
+    <!-- ساعت کاری -->
+    @if ($this->hasPermission('workhours'))
+      <div class="mobile-bottom-nav__item" data-group="workhours">
+        <a href="{{ route('mc-workhours') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="12,6 12,12 16,14" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">ساعت کاری</div>
+        </a>
       </div>
-    </div>
+    @endif
     <!-- نسخه‌ها -->
     @if ($this->hasPermission('prescriptions'))
-      <div class="mobile-bottom-nav__item" data-group="prescriptions" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
+      <div class="mobile-bottom-nav__item" data-group="prescriptions">
+        <a href="{{ route('mc.panel.my-prescriptions') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
@@ -983,197 +1388,305 @@
             </svg>
           </div>
           <div class="mobile-bottom-nav__label">نسخه‌ها</div>
-        </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-          <li class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions') ? 'is-active' : '' }}">
-            <a href="{{ route('mc.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
-          </li>
-          <li
-            class="item-li i-courses {{ Request::routeIs('mc.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
-            <a href="{{ route('mc.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
-          </li>
-        </div>
+        </a>
       </div>
     @endif
-    <!-- پروفایل -->
-    <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
-      <div class="mobile-bottom-nav__activebox">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">پروفایل</div>
-      </div>
-      <div class="mobile-bottom-nav__dropdown" style="display:none">
-        @if ($this->hasPermission('mc-edit-profile'))
-          <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
-        @endif
-        @if ($this->hasPermission('mc-edit-profile-security'))
-          <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
-        @endif
-        @if ($this->hasPermission('mc-my-performance'))
-          <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
-        @endif
-        @if ($this->hasPermission('mc-subuser'))
-          <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
-        @endif
-        @if ($this->hasPermission('my-mc-appointments'))
-          <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
-          <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
-        @endif
-        @if ($this->hasPermission('mc-edit-profile-upgrade'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
-              class="soon-label">به زودی</span></a>
-        @endif
-      </div>
-    </div>
-    <!-- ساعت کاری -->
-    <div class="mobile-bottom-nav__item" data-group="workhours">
-      <a href="{{ route('mc-workhours') }}"
-        style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-        <div class="mobile-bottom-nav__activebox">
+    <!-- گزارش مالی -->
+    @if ($this->hasPermission('financial_reports'))
+      <div class="mobile-bottom-nav__item" data-group="financial">
+        <a href="{{ route('mc.panel.financial-reports.index') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12,6 12,12 16,14" />
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
             </svg>
           </div>
-          <div class="mobile-bottom-nav__label">ساعت کاری</div>
-        </div>
-      </a>
-    </div>
+          <div class="mobile-bottom-nav__label">گزارش مالی</div>
+        </a>
+      </div>
+    @endif
     <!-- سایر -->
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
-      <div class="mobile-bottom-nav__activebox">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="19" cy="12" r="1" />
-            <circle cx="5" cy="12" r="1" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">سایر</div>
-      </div>
-      <div class="mobile-bottom-nav__dropdown" style="display:none">
-        @if ($this->hasPermission('mc-my-performance-chart'))
-          <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
-        @endif
-        @if ($this->hasPermission('mc-panel-tickets'))
-          <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.send-message'))
-          <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
-        @endif
-        <a href="#">صفحه گفتگو</a>
-        @if ($this->hasPermission('mc.panel.financial-reports.index'))
-          <a href="{{ route('mc.panel.financial-reports.index') }}">گزارش مالی</a>
-        @endif
-        @if ($this->hasPermission('mc-payment-setting'))
-          <a href="{{ route('mc-payment-setting') }}">پرداخت</a>
-        @endif
-        @if ($this->hasPermission('mc-wallet-charge'))
-          <a href="{{ route('mc-wallet-charge') }}">شارژ کیف پول</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.doctor-services.index'))
-          <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-        @if ($this->hasPermission('prescription.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('prescription.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('providers.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('favorite.templates.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('templates.favorite.service.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('mc-patient-records'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مشاوره</div>
-        @if ($this->hasPermission('mc-moshavere_setting'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('mc-moshavere_waiting'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('mc-mySpecialDays-counseling'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('consult-term.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
-          <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
-        @endif
-        @if ($this->hasPermission('mc-doctors.clinic.deposit'))
-          <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
-        @endif
-        @if ($this->hasPermission('mc-secretary-management'))
-          <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
-        @endif
-        @if ($this->hasPermission('mc-secretary-permissions'))
-          <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌های منشی</a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مرکز درمانی من</div>
-        @if ($this->hasPermission('mc.panel.profile.edit'))
-          <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.doctors.index'))
-          <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.specialties.index'))
-          <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.services.index'))
-          <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
-        @endif
-        @if ($this->hasPermission('mc.panel.insurances.index'))
-          <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
-        @endif
-      </div>
-    </div>
-  </div>
-  <!-- Overlay for mobile submenu -->
-  <div id="mobile-submenu-overlay" class="mobile-submenu-overlay">
-    <div class="mobile-submenu-header">
-      <button id="close-mobile-submenu" class="close-mobile-submenu-btn" aria-label="بستن">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
+      <div class="mobile-bottom-nav__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
         </svg>
-      </button>
-    </div>
-    <div class="mobile-submenu-list" id="mobile-submenu-list">
-      <!-- زیرمنوها اینجا قرار می‌گیرند -->
+      </div>
+      <div class="mobile-bottom-nav__label">سایر</div>
+      <div class="mobile-bottom-nav__dropdown">
+        <!-- Header with close button -->
+        <div class="mobile-dropdown-header">
+          <button class="mobile-dropdown-close" onclick="closeOtherMenu(event)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <!-- Content container -->
+        <div class="mobile-dropdown-content">
+          <!-- مشاوره -->
+          @if ($this->hasPermission('consult'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>مشاوره</span>
+                <span class="badge bg-warning text-dark">به زودی</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc-moshavere_setting'))
+                  <a href="javascript:void(0)" class="disabled-link">برنامه‌ریزی مشاوره</a>
+                @endif
+                @if ($this->hasPermission('mc-moshavere_waiting'))
+                  <a href="javascript:void(0)" class="disabled-link">گزارش مشاوره</a>
+                @endif
+                @if ($this->hasPermission('mc-mySpecialDays-counseling'))
+                  <a href="javascript:void(0)" class="disabled-link">روزهای خاص</a>
+                @endif
+                @if ($this->hasPermission('consult-term.index'))
+                  <a href="javascript:void(0)" class="disabled-link">قوانین مشاوره</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- نسخه الکترونیک -->
+          @if ($this->hasPermission('electronic_prescription'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
+                  <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
+                </svg>
+                <span>نسخه الکترونیک</span>
+                <span class="badge bg-warning text-dark">به زودی</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc-patient-records'))
+                  <a href="javascript:void(0)" class="disabled-link">پرونده پزشکی</a>
+                @endif
+                @if ($this->hasPermission('prescription.index'))
+                  <a href="javascript:void(0)" class="disabled-link">نسخه‌های ثبت شده</a>
+                @endif
+                @if ($this->hasPermission('providers.index'))
+                  <a href="javascript:void(0)" class="disabled-link">بیمه‌های من</a>
+                @endif
+                @if ($this->hasPermission('favorite.templates.index'))
+                  <a href="javascript:void(0)" class="disabled-link">نسخه پراستفاده</a>
+                @endif
+                @if ($this->hasPermission('templates.favorite.service.index'))
+                  <a href="javascript:void(0)" class="disabled-link">اقلام پراستفاده</a>
+                @endif
+                @if ($this->hasPermission('mc-patient-records'))
+                  <a href="javascript:void(0)" class="disabled-link">پرونده الکترونیک</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- ارتباط با بیماران -->
+          @if ($this->hasPermission('patient_communication'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                  </path>
+                </svg>
+                <span>ارتباط با بیماران</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc.panel.send-message'))
+                  <a href="{{ route('mc.panel.send-message') }}">ارسال پیام</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- منشی -->
+          @if ($this->hasPermission('secretary_management'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>منشی</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('secretary_management'))
+                  <a href="{{ route('mc-secretary-management') }}">مدیریت منشی‌ها</a>
+                @endif
+                @if ($this->hasPermission('mc-secretary-permissions'))
+                  <a href="{{ route('mc-secretary-permissions') }}">دسترسی‌ها</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- مطب -->
+          @if ($this->hasPermission('clinic_management'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                  <polyline points="9,22 9,12 15,12 15,22"></polyline>
+                </svg>
+                <span>مطب</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc-clinic-management'))
+                  <a href="{{ route('mc-clinic-management') }}">مدیریت مطب</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.clinics.medical-documents'))
+                  <a href="{{ route('mc.panel.clinics.medical-documents') }}">مدارک من</a>
+                @endif
+                @if ($this->hasPermission('mc-doctors.clinic.deposit'))
+                  <a href="{{ route('mc-doctors.clinic.deposit') }}">بیعانه</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- پروفایل -->
+          @if (
+              $this->hasPermission('mc-edit-profile') ||
+                  $this->hasPermission('mc-edit-profile-security') ||
+                  $this->hasPermission('mc-my-performance') ||
+                  $this->hasPermission('mc-subuser') ||
+                  $this->hasPermission('my-mc-appointments') ||
+                  $this->hasPermission('mc.panel.doctor-faqs.index'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>پروفایل</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc-edit-profile'))
+                  <a href="{{ route('mc-edit-profile') }}">ویرایش پروفایل</a>
+                @endif
+                @if ($this->hasPermission('mc-edit-profile-security'))
+                  <a href="{{ route('mc-edit-profile-security') }}">امنیت</a>
+                @endif
+                @if ($this->hasPermission('mc-my-performance'))
+                  <a href="{{ route('mc-my-performance') }}">عملکرد من</a>
+                @endif
+                @if ($this->hasPermission('mc-subuser'))
+                  <a href="{{ route('mc-subuser') }}">کاربران زیرمجموعه</a>
+                @endif
+                @if ($this->hasPermission('my-mc-appointments'))
+                  <a href="{{ route('my-mc-appointments') }}">نوبت‌های من</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.doctor-faqs.index'))
+                  <a href="{{ route('mc.panel.doctor-faqs.index') }}">سوالات متداول</a>
+                @endif
+                @if ($this->hasPermission('mc-edit-profile-upgrade'))
+                  <a href="javascript:void(0)" class="disabled-link">
+                    ارتقا حساب <span class="badge bg-warning text-dark mx-2">به زودی</span>
+                  </a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- آمار و نمودار -->
+          @if ($this->hasPermission('mc-my-performance-chart'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"></line>
+                  <line x1="12" y1="20" x2="12" y2="4"></line>
+                  <line x1="6" y1="20" x2="6" y2="14"></line>
+                </svg>
+                <span>آمار و نمودار</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                <a href="{{ route('mc-my-performance-chart') }}">آمار و نمودار</a>
+              </div>
+            </div>
+          @endif
+          <!-- پیام -->
+          @if ($this->hasPermission('mc-panel-tickets'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>پیام</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc-panel-tickets'))
+                  <a href="{{ route('mc-panel-tickets') }}">تیکت‌ها</a>
+                @endif
+              </div>
+            </div>
+          @endif
+          <!-- خدمات و بیمه -->
+          @if ($this->hasPermission('doctor_services'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M9 12l2 2 4-4"></path>
+                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
+                  <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
+                </svg>
+                <span>خدمات و بیمه</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                <a href="{{ route('mc.panel.doctor-services.index') }}">خدمات و بیمه</a>
+              </div>
+            </div>
+          @endif
+          <!-- مرکز درمانی من -->
+          @if ($this->hasPermission('medical_center_management'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4">
+                  </path>
+                </svg>
+                <span>مرکز درمانی من</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('mc.panel.profile.edit'))
+                  <a href="{{ route('mc.panel.profile.edit') }}">ویرایش پروفایل</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.doctors.index'))
+                  <a href="{{ route('mc.panel.doctors.index') }}">مدیریت پزشکان</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.specialties.index'))
+                  <a href="{{ route('mc.panel.specialties.index') }}">مدیریت تخصص‌ها</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.services.index'))
+                  <a href="{{ route('mc.panel.services.index') }}">مدیریت خدمات</a>
+                @endif
+                @if ($this->hasPermission('mc.panel.insurances.index'))
+                  <a href="{{ route('mc.panel.insurances.index') }}">مدیریت بیمه‌ها</a>
+                @endif
+              </div>
+            </div>
+          @endif
+        </div>
+      </div>
     </div>
   </div>
   <style>
@@ -1195,25 +1708,21 @@
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(10px);
     }
-
     .mobile-submenu-overlay.active {
       display: flex;
       opacity: 1;
       animation: overlayFadeIn 0.3s ease-out;
     }
-
     @keyframes overlayFadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
     .mobile-submenu-header {
       display: flex;
       justify-content: flex-end;
@@ -1224,7 +1733,6 @@
       top: 0;
       z-index: 1;
     }
-
     .close-mobile-submenu-btn {
       background: rgba(240, 240, 240, 0.8);
       border: none;
@@ -1238,12 +1746,10 @@
       align-items: center;
       justify-content: center;
     }
-
     .close-mobile-submenu-btn:hover {
       background: rgba(220, 220, 220, 0.9);
       transform: scale(1.05);
     }
-
     .mobile-submenu-list {
       width: 100%;
       margin-top: 20px;
@@ -1256,7 +1762,6 @@
       max-height: calc(100vh - 68px - 64px);
       /* 64px تقریبی هدر */
     }
-
     .mobile-submenu-list a {
       display: block;
       background: #f7f7fa;
@@ -1271,18 +1776,15 @@
       font-weight: 500;
       text-align: right;
     }
-
     .mobile-submenu-list a:hover {
       background: #e3f2fd;
       color: #1976d2;
     }
-
     @media (min-width: 769px) {
       .mobile-submenu-overlay {
         display: none !important;
       }
     }
-
     .mobile-bottom-nav__activebox {
       display: flex;
       flex-direction: column;
@@ -1291,20 +1793,17 @@
       padding: 0;
       transition: background 0.2s, box-shadow 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
       background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
       box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
       border-radius: 16px;
       padding: 6px 8px 4px 8px;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
       fill: #1976d2;
       transform: scale(1.12);
       transition: fill 0.2s, transform 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
       color: #1976d2;
       font-weight: bold;
@@ -1314,67 +1813,135 @@
     (function() {
       let navItems;
       let lastOpen = null;
-      let overlay = document.getElementById('mobile-submenu-overlay');
-      let closeBtn = document.getElementById('close-mobile-submenu');
-      let submenuList = document.getElementById('mobile-submenu-list');
-
-      function closeOverlay() {
-        overlay.classList.remove('active');
-        submenuList.innerHTML = '';
-        document.body.style.overflow = '';
-        // حذف کلاس active از همه آیتم‌ها
-        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
+      function closeAllDropdowns(e) {
+        if (!e.target.closest('.mobile-bottom-nav')) {
+          // بستن همه منوها وقتی روی بیرون کلیک می‌شه
+          navItems.forEach(i => i.classList.remove('open'));
+          lastOpen = null;
+          document.body.style.overflow = '';
+        }
       }
-
-      function openOverlayWithSubmenu(submenuHtml, parentItem) {
-        submenuList.innerHTML = submenuHtml;
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        // حذف active از همه و اضافه کردن به آیتم فعلی
-        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
-        if (parentItem) parentItem.classList.add('active');
-      }
-
-      function setupMobileNavOverlay() {
-        navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
+      function setupMobileNavDropdowns() {
+        navItems = document.querySelectorAll('.mobile-bottom-nav__item');
         navItems.forEach(item => {
           item.onclick = function(e) {
-            if (window.innerWidth > 768) return;
-            let dropdown = item.querySelector('.mobile-bottom-nav__dropdown');
-            if (dropdown) {
-              let links = Array.from(dropdown.querySelectorAll('a')).filter(a => a.href && a.href !==
-                'javascript:void(0)');
-              if (links.length === 1) {
-                window.location.href = links[0].href;
-                return;
+            // Don't handle clicks on close buttons or dropdown content
+            if (e.target.closest('.mobile-dropdown-close') || e.target.closest('.mobile-bottom-nav__dropdown')) {
+              return;
+            }
+            if (item.classList.contains('open')) {
+              // اگر همین آیتم باز است، فقط ببند
+              item.classList.remove('open');
+              lastOpen = null;
+              document.body.style.overflow = '';
+            } else {
+              // بستن همه منوهای باز
+              navItems.forEach(i => {
+                i.classList.remove('open');
+              });
+              // باز کردن منوی جدید
+              item.classList.add('open');
+              lastOpen = item;
+              // تنظیم overflow برای backdrop
+              if (item.querySelector('.mobile-bottom-nav__dropdown')) {
+                document.body.style.overflow = 'hidden';
               }
-              let html = dropdown.innerHTML;
-              openOverlayWithSubmenu(html, item);
             }
           };
         });
-        if (closeBtn) {
-          closeBtn.onclick = function() {
-            closeOverlay();
-          };
+      }
+      // Function to close the "سایر" menu - Simple approach like doctor sidebar
+      function closeOtherMenu(event) {
+        // Prevent event bubbling
+        if (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
         }
-        // بستن با کلیک روی بیرون overlay
-        overlay.addEventListener('click', function(e) {
-          if (e.target === overlay) {
-            closeOverlay();
+        const otherItem = document.querySelector('.mobile-bottom-nav__item--other');
+        if (otherItem) {
+          otherItem.classList.remove('open');
+          lastOpen = null;
+          document.body.style.overflow = '';
+          // Temporarily disable click events to prevent immediate reopening
+          otherItem.style.pointerEvents = 'none';
+          setTimeout(() => {
+            otherItem.style.pointerEvents = '';
+          }, 300);
+        }
+      }
+      function setActiveItem() {
+        const currentPath = window.location.pathname;
+        const currentUrl = window.location.href;
+        navItems.forEach(item => {
+          // حذف کلاس active از همه آیتم‌ها
+          item.classList.remove('active');
+          // بررسی لینک‌های مستقیم (بدون زیرمنو)
+          const directLink = item.querySelector('a[href]');
+          if (directLink && directLink.href && !item.hasAttribute('data-has-submenu')) {
+            if (directLink.href === currentUrl || directLink.href.endsWith(currentPath)) {
+              item.classList.add('active');
+              return;
+            }
+          }
+          // بررسی لینک‌های زیرمنو
+          const submenuLinks = item.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
+          let isActive = false;
+          submenuLinks.forEach(link => {
+            if (link.href && link.href !== 'javascript:void(0)') {
+              if (link.href === currentUrl || link.href.endsWith(currentPath)) {
+                isActive = true;
+              }
+            }
+          });
+          if (isActive) {
+            item.classList.add('active');
           }
         });
       }
+      // Function to ensure proper scrolling behavior
+      function setupScrolling() {
+        const dropdownContent = document.querySelector('.mobile-dropdown-content');
+        if (dropdownContent) {
+          // Reset scroll position when opening
+          dropdownContent.scrollTop = 0;
+          // Ensure smooth scrolling
+          dropdownContent.style.scrollBehavior = 'smooth';
+          // Add touch scrolling support
+          let isScrolling = false;
+          let startY = 0;
+          let startScrollTop = 0;
+          dropdownContent.addEventListener('touchstart', function(e) {
+            startY = e.touches[0].clientY;
+            startScrollTop = this.scrollTop;
+            isScrolling = false;
+          });
+          dropdownContent.addEventListener('touchmove', function(e) {
+            if (!isScrolling) {
+              const deltaY = startY - e.touches[0].clientY;
+              if (Math.abs(deltaY) > 10) {
+                isScrolling = true;
+              }
+            }
+          });
+        }
+      }
       document.addEventListener('DOMContentLoaded', function() {
-        setupMobileNavOverlay();
+        setupMobileNavDropdowns();
+        setActiveItem();
+        setupScrolling();
+        document.addEventListener('click', closeAllDropdowns);
       });
       window.addEventListener('resize', function() {
         if (window.innerWidth <= 768) {
-          setupMobileNavOverlay();
+          setupMobileNavDropdowns();
+          setupScrolling();
         }
       });
       document.addEventListener('livewire:update', function() {
-        setupMobileNavOverlay();
+        setupMobileNavDropdowns();
+        setActiveItem();
+        setupScrolling();
       });
     })();
   </script>
