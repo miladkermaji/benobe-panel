@@ -477,7 +477,6 @@
             photoInput.click();
           });
         }
-
         function uploadPhoto(file) {
           const formData = new FormData();
           formData.append('photo', file);
@@ -519,15 +518,12 @@
           font-size: 9px !important;
         }
       }
-
       @media (max-width: 768px) {
-
         .sidebar__nav,
         .sidebar__fixed,
         .bars {
           display: none !important;
         }
-
         .mobile-bottom-nav {
           display: flex;
           position: fixed;
@@ -546,7 +542,6 @@
           border-top: 1px solid rgba(224, 224, 224, 0.8);
           backdrop-filter: blur(10px);
         }
-
         .mobile-bottom-nav__item {
           position: relative;
           flex: 1 1 0px;
@@ -559,18 +554,15 @@
           margin: 0 2px;
           overflow: hidden;
         }
-
         @media (max-width: 400px) {
           .mobile-bottom-nav__label {
             font-size: 10px;
           }
-
           .mobile-bottom-nav__item svg {
             width: 22px;
             height: 22px;
           }
         }
-
         .mobile-bottom-nav__item svg {
           display: block;
           margin: 0 auto 2px auto;
@@ -580,14 +572,12 @@
           transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
         }
-
         .mobile-bottom-nav__item.active svg,
         .mobile-bottom-nav__item:active svg,
         .mobile-bottom-nav__item.open svg {
           fill: #1976d2;
           transform: scale(1.15);
         }
-
         .mobile-bottom-nav__label {
           font-size: 10px;
           color: #444;
@@ -601,13 +591,11 @@
           text-overflow: ellipsis;
           max-width: 100%;
         }
-
         .mobile-bottom-nav__item:active,
         .mobile-bottom-nav__item.open {
           background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
           box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
         }
-
         .mobile-bottom-nav__dropdown {
           position: absolute;
           bottom: 68px;
@@ -624,7 +612,6 @@
           animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           display: none;
         }
-
         /* Special styling for "other" menu (fullscreen) */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
           position: fixed !important;
@@ -638,11 +625,9 @@
           max-width: none !important;
           animation: fullscreenIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
         }
-
         .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
           display: block !important;
         }
-
         /* Backdrop for smaller dropdowns */
         .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
           content: '';
@@ -655,7 +640,6 @@
           z-index: 19999;
           animation: backdropIn 0.2s ease-out;
         }
-
         .mobile-bottom-nav__dropdown a {
           display: block;
           padding: 12px 20px;
@@ -668,62 +652,51 @@
           margin: 4px 8px;
           font-weight: 500;
         }
-
         .mobile-bottom-nav__dropdown a:last-child {
           border-bottom: none;
         }
-
         .mobile-bottom-nav__dropdown a:hover {
           background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
           color: #1976d2;
           transform: translateX(3px);
           box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
         }
-
         @keyframes dropdownIn {
           0% {
             opacity: 0;
             transform: translateX(-50%) translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateX(-50%) translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
           }
         }
-
         @keyframes fullscreenIn {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.98);
           }
-
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.01);
           }
-
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
-
         @keyframes backdropIn {
           from {
             opacity: 0;
           }
-
           to {
             opacity: 1;
           }
         }
-
         /* Fix for dashboard dropdown (first item, right edge) */
         .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
           left: auto;
@@ -731,24 +704,20 @@
           transform: none;
           animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         @keyframes dropdownInRight {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
-
         /* Fix for other dropdown (last item, left edge) */
         .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
           left: 2.5vw;
@@ -756,31 +725,26 @@
           transform: none;
           animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-
         @keyframes dropdownInLeft {
           0% {
             opacity: 0;
             transform: translateY(20px) scale(0.95);
           }
-
           70% {
             opacity: 1;
             transform: translateY(-5px) scale(1.02);
           }
-
           100% {
             opacity: 1;
             transform: translateY(0) scale(1);
           }
         }
       }
-
       @media (min-width: 769px) {
         .mobile-bottom-nav {
           display: none !important;
         }
       }
-
       .soon-label {
         font-size: 10px;
         color: #d32f2f;
@@ -792,7 +756,6 @@
       (function() {
         let navItems;
         let lastOpen = null;
-
         function closeAllDropdowns(e) {
           if (!e.target.closest('.mobile-bottom-nav')) {
             navItems.forEach(i => i.classList.remove('open'));
@@ -801,7 +764,6 @@
             document.body.style.overflow = '';
           }
         }
-
         function setupMobileNavDropdowns() {
           navItems = document.querySelectorAll('.mobile-bottom-nav__item');
           navItems.forEach(item => {
@@ -809,7 +771,6 @@
               if (e.target.closest('.mobile-bottom-nav__dropdown')) {
                 return;
               }
-
               // اگر همین آیتم باز است، فقط ببند
               if (item.classList.contains('open')) {
                 item.classList.remove('open');
@@ -819,7 +780,6 @@
                 navItems.forEach(i => i.classList.remove('open'));
                 item.classList.add('open');
                 lastOpen = item;
-
                 // Check if this is the "other" menu (fullscreen)
                 if (item.classList.contains('mobile-bottom-nav__item--other')) {
                   document.body.style.overflow = 'hidden';
@@ -828,18 +788,15 @@
             };
           });
         }
-
         document.addEventListener('DOMContentLoaded', function() {
           setupMobileNavDropdowns();
           document.addEventListener('click', closeAllDropdowns);
         });
-
         window.addEventListener('resize', function() {
           if (window.innerWidth <= 768) {
             setupMobileNavDropdowns();
           }
         });
-
         // اجرای مجدد setupMobileNavDropdowns بعد از هر آپدیت Livewire
         document.addEventListener('livewire:update', function() {
           setupMobileNavDropdowns();
@@ -1123,29 +1080,24 @@
       align-items: stretch;
       overflow-y: auto;
       transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-
       box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       backdrop-filter: blur(10px);
     }
-
     .mobile-submenu-overlay.active {
       display: flex;
       opacity: 1;
       animation: overlayFadeIn 0.3s ease-out;
     }
-
     @keyframes overlayFadeIn {
       from {
         opacity: 0;
         transform: translateY(10px);
       }
-
       to {
         opacity: 1;
         transform: translateY(0);
       }
     }
-
     .mobile-submenu-header {
       display: flex;
       justify-content: flex-end;
@@ -1156,7 +1108,6 @@
       top: 0;
       z-index: 1;
     }
-
     .close-mobile-submenu-btn {
       background: rgba(240, 240, 240, 0.8);
       border: none;
@@ -1170,12 +1121,10 @@
       align-items: center;
       justify-content: center;
     }
-
     .close-mobile-submenu-btn:hover {
       background: rgba(220, 220, 220, 0.9);
       transform: scale(1.05);
     }
-
     .mobile-submenu-list {
       width: 100%;
       margin-top: 20px;
@@ -1188,7 +1137,6 @@
       max-height: calc(100vh - 68px - 64px);
       /* 64px تقریبی هدر */
     }
-
     .mobile-submenu-list a {
       display: block;
       background: #f7f7fa;
@@ -1203,18 +1151,15 @@
       font-weight: 500;
       text-align: right;
     }
-
     .mobile-submenu-list a:hover {
       background: #e3f2fd;
       color: #1976d2;
     }
-
     @media (min-width: 769px) {
       .mobile-submenu-overlay {
         display: none !important;
       }
     }
-
     .mobile-bottom-nav__activebox {
       display: flex;
       flex-direction: column;
@@ -1223,20 +1168,17 @@
       padding: 0;
       transition: background 0.2s, box-shadow 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
       background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
       box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
       border-radius: 16px;
       padding: 6px 8px 4px 8px;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
       fill: #1976d2;
       transform: scale(1.12);
       transition: fill 0.2s, transform 0.2s;
     }
-
     .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
       color: #1976d2;
       font-weight: bold;
@@ -1249,7 +1191,6 @@
       let overlay = document.getElementById('mobile-submenu-overlay');
       let closeBtn = document.getElementById('close-mobile-submenu');
       let submenuList = document.getElementById('mobile-submenu-list');
-
       function closeOverlay() {
         overlay.classList.remove('active');
         submenuList.innerHTML = '';
@@ -1257,7 +1198,6 @@
         // حذف کلاس active از همه آیتم‌ها
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
       }
-
       function openOverlayWithSubmenu(submenuHtml, parentItem) {
         submenuList.innerHTML = submenuHtml;
         overlay.classList.add('active');
@@ -1266,7 +1206,6 @@
         document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
         if (parentItem) parentItem.classList.add('active');
       }
-
       function setupMobileNavOverlay() {
         navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
         navItems.forEach(item => {
