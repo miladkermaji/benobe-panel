@@ -1,4 +1,45 @@
 <div class="container-fluid py-2 mt-3" dir="rtl">
+
+  <!-- کامپوننت تخصیص ساعات کاری -->
+  @if ($showWorkHoursAssignment)
+    <div id="work-hours-assignment" class="card shadow-lg border-0 rounded-2 overflow-hidden mt-3"
+      style="background: #ffffff;">
+      <div class="card-header bg-gradient-success text-white p-3">
+        <h6 class="mb-0 fw-bold">تخصیص ساعات کاری برای مطب: {{ $name }}</h6>
+      </div>
+      <div class="card-body p-3">
+        <div class="row">
+          <div class="col-12">
+            <p class="text-muted mb-3">مطب با موفقیت ایجاد شد! حالا می‌توانید ساعات کاری را تخصیص دهید.</p>
+
+            @if ($hasWorkHoursWithoutClinic)
+              <div class="alert alert-info mb-3">
+                <strong>توجه:</strong> شما {{ $this->getWorkHoursWithoutClinicCount() }} ساعات کاری بدون مطب دارید که
+                می‌توانید به این مطب تخصیص دهید.
+              </div>
+            @endif
+
+            <div class="d-flex gap-2 flex-wrap">
+              <button wire:click="assignWorkHours" class="btn btn-success btn-lg">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2" class="me-2">
+                  <path
+                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                </svg>
+                تخصیص ساعات کاری
+              </button>
+              <button wire:click="skipWorkHoursAssignment" class="btn btn-outline-secondary">
+                رد کردن
+              </button>
+              <a href="{{ route('dr-clinic-management') }}" class="btn btn-primary">
+                رفتن به مدیریت مطب
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  @endif
   <div class="card shadow-lg border-0 rounded-2 overflow-hidden" style="background: #ffffff;">
     <div
       class="card-header bg-gradient-primary text-white p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
@@ -110,45 +151,6 @@
       </div>
     </div>
 
-    <!-- کامپوننت تخصیص ساعات کاری -->
-    @if ($showWorkHoursAssignment)
-      <div class="card shadow-lg border-0 rounded-2 overflow-hidden mt-3" style="background: #ffffff;">
-        <div class="card-header bg-gradient-success text-white p-3">
-          <h6 class="mb-0 fw-bold">تخصیص ساعات کاری برای مطب: {{ $name }}</h6>
-        </div>
-        <div class="card-body p-3">
-          <div class="row">
-            <div class="col-12">
-              <p class="text-muted mb-3">مطب با موفقیت ایجاد شد! حالا می‌توانید ساعات کاری را تخصیص دهید.</p>
-
-              @if ($hasWorkHoursWithoutClinic)
-                <div class="alert alert-info mb-3">
-                  <strong>توجه:</strong> شما {{ $this->getWorkHoursWithoutClinicCount() }} ساعات کاری بدون مطب دارید که
-                  می‌توانید به این مطب تخصیص دهید.
-                </div>
-              @endif
-
-              <div class="d-flex gap-2 flex-wrap">
-                <button wire:click="assignWorkHours" class="btn btn-success btn-lg">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                    stroke-width="2" class="me-2">
-                    <path
-                      d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-                  </svg>
-                  تخصیص ساعات کاری
-                </button>
-                <button wire:click="skipWorkHoursAssignment" class="btn btn-outline-secondary">
-                  رد کردن
-                </button>
-                <a href="{{ route('dr-clinic-management') }}" class="btn btn-primary">
-                  رفتن به مدیریت مطب
-                </a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    @endif
 
     <script>
       document.addEventListener('livewire:init', function() {
@@ -181,6 +183,19 @@
               text: city.name
             }))]
           });
+        });
+
+        // اسکرول خودکار به قسمت تخصیص ساعات کاری بعد از ایجاد موفقیت‌آمیز مطب
+        Livewire.on('clinic-created-successfully', () => {
+          setTimeout(() => {
+            const workHoursSection = document.getElementById('work-hours-assignment');
+            if (workHoursSection) {
+              workHoursSection.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+              });
+            }
+          }, 100); // کمی تاخیر برای اطمینان از رندر شدن کامپوننت
         });
 
         $('#province_id').on('change', function() {

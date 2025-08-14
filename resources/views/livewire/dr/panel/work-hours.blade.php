@@ -4,7 +4,7 @@
       <i class="fas fa-exclamation-triangle text-warning"></i>
       <div>
         مطب شما هنوز فعال نشده است؛ برای استفاده از امکانات بیشتر ابتدا باید فعال کنید.
-        <a href="{{ route('activation-doctor-clinic', ['clinic' => $activeMedicalCenterId]) }}" class="fw-bold">
+        <a href="{{ route('activation-doctor-clinic', ['clinic' => $activeMedicalCenterId]) }}" class="fw-bold text-primary">
           رفتن به صفحه فعال‌سازی مطب
         </a>
       </div>

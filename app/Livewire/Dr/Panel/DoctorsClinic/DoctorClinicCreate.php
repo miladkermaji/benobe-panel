@@ -154,6 +154,8 @@ class DoctorClinicCreate extends Component
             $this->createdClinicId = $medicalCenter->id;
             $this->showWorkHoursAssignment = true;
             $this->dispatch('show-toastr', type: 'success', message: 'مطب با موفقیت ایجاد شد! حالا می‌توانید ساعات کاری را تخصیص دهید.');
+            // ارسال event برای اسکرول خودکار به قسمت تخصیص ساعات کاری
+            $this->dispatch('clinic-created-successfully');
         } else {
             $this->dispatch('show-toastr', type: 'success', message: 'مطب با موفقیت ایجاد شد!');
             return redirect()->route('dr-clinic-management');
