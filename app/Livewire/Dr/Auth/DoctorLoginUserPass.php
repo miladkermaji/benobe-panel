@@ -17,6 +17,7 @@ use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use App\Http\Services\LoginAttemptsService\LoginAttemptsService;
 use App\Services\UserTypeDetectionService;
+use App\Services\DefaultPermissionsService;
 
 class DoctorLoginUserPass extends Component
 {
@@ -195,6 +196,10 @@ class DoctorLoginUserPass extends Component
             $redirectRoute = route('mc-panel');
             $userType = 'medical_center';
         }
+
+        // اعمال دسترسی‌های پیش‌فرض
+        $defaultPermissionsService = new DefaultPermissionsService();
+        $defaultPermissionsService->applyDefaultPermissions($user);
 
         // ثبت لاگ ورود
         LoginLog::create([

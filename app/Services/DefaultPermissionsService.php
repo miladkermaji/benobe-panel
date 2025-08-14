@@ -4,8 +4,10 @@ namespace App\Services;
 
 use App\Models\Doctor;
 use App\Models\Secretary;
+use App\Models\MedicalCenter;
 use App\Models\DoctorPermission;
 use App\Models\SecretaryPermission;
+use App\Models\MedicalCenterPermission;
 use Illuminate\Support\Facades\Log;
 
 class DefaultPermissionsService
@@ -111,6 +113,86 @@ class DefaultPermissionsService
     ];
 
     /**
+     * دسترسی‌های پیش‌فرض برای مراکز درمانی (از config در صورت موجود بودن)
+     */
+    private function getMedicalCenterDefaultPermissions(): array
+    {
+        $fromConfig = config('medical-center-permissions');
+        if (is_array($fromConfig) && !empty($fromConfig)) {
+            return $fromConfig;
+        }
+        return [
+            'dashboard',
+            'mc-panel',
+            'medical_center_management',
+            'mc.panel.doctors.index',
+            'mc.panel.doctors.create',
+            'mc.panel.doctors.edit',
+            'mc.panel.specialties.index',
+            'mc.panel.specialties.create',
+            'mc.panel.specialties.edit',
+            'mc.panel.services.index',
+            'mc.panel.services.create',
+            'mc.panel.services.edit',
+            'mc.panel.insurances.index',
+            'mc.panel.insurances.create',
+            'mc.panel.insurances.edit',
+            'mc.panel.profile.edit',
+            'workhours',
+            'mc-workhours',
+            'appointments',
+            'mc-appointments',
+            'mc.panel.doctornotes.index',
+            'mc-mySpecialDays',
+            'mc-scheduleSetting',
+            'mc-vacation',
+            'mc-doctor-blocking-users.index',
+            'prescriptions',
+            'mc.panel.my-prescriptions',
+            'mc.panel.my-prescriptions.settings',
+            'consult',
+            'mc-moshavere_setting',
+            'mc-moshavere_waiting',
+            'mc-mySpecialDays-counseling',
+            'mc-consult-term.index',
+            'doctor_services',
+            'mc.panel.doctor-services.index',
+            'electronic_prescription',
+            'mc-prescription.index',
+            'mc-providers.index',
+            'mc-favorite.templates.index',
+            'mc-templates.favorite.service.index',
+            'mc-patient-records',
+            'financial_reports',
+            'mc.panel.financial-reports.index',
+            'mc-payment-setting',
+            'mc-wallet-charge',
+            'patient_communication',
+            'mc.panel.send-message',
+            'secretary_management',
+            'mc-secretary-management',
+            'mc-secretary-permissions',
+            'clinic_management',
+            'mc-clinic-management',
+            'mc.panel.clinics.medical-documents',
+            'mc-doctors.clinic.deposit',
+            'profile',
+            'mc-edit-profile',
+            'mc-edit-profile-security',
+            'mc-edit-profile-upgrade',
+            'mc-my-performance',
+            'mc-subuser',
+            'my-mc-appointments',
+            'mc.panel.doctor-faqs.index',
+            'statistics',
+            'mc-my-performance-chart',
+            'messages',
+            'mc-panel-tickets',
+            '#',
+        ];
+    }
+
+    /**
      * اعمال دسترسی‌های پیش‌فرض برای پزشک
      */
     public function applyDefaultPermissionsForDoctor(Doctor $doctor): bool
@@ -123,7 +205,8 @@ class DefaultPermissionsService
                 // ایجاد دسترسی‌های پیش‌فرض
                 DoctorPermission::create([
                     'doctor_id' => $doctor->id,
-                    'permissions' => $this->doctorDefaultPermissions
+                    'permissions' => $this->doctorDefaultPermissions,
+                    'has_access' => true,
                 ]);
 
                 Log::info("Default permissions applied for doctor", [
@@ -157,7 +240,6 @@ class DefaultPermissionsService
     public function applyDefaultPermissionsForSecretary(Secretary $secretary): bool
     {
         try {
-            // بررسی اینکه آیا دسترسی‌ای قبلاً وجود دارد یا نه
             $existingPermission = SecretaryPermission::where('secretary_id', $secretary->id)->first();
 
             if (!$existingPermission) {
@@ -198,6 +280,42 @@ class DefaultPermissionsService
     }
 
     /**
+     * اعمال دسترسی‌های پیش‌فرض برای مرکز درمانی
+     */
+    public function applyDefaultPermissionsForMedicalCenter(MedicalCenter $medicalCenter): bool
+    {
+        try {
+            $existing = MedicalCenterPermission::where('medical_center_id', $medicalCenter->id)->first();
+            if ($existing) {
+                Log::info('Medical center already has permissions', [
+                    'medical_center_id' => $medicalCenter->id,
+                    'name' => $medicalCenter->name,
+                ]);
+                return false;
+            }
+
+            $defaults = $this->getMedicalCenterDefaultPermissions();
+            MedicalCenterPermission::create([
+                'medical_center_id' => $medicalCenter->id,
+                'permissions' => $defaults,
+            ]);
+
+            Log::info('Default permissions applied for medical center', [
+                'medical_center_id' => $medicalCenter->id,
+                'name' => $medicalCenter->name,
+                'permissions_count' => count($defaults),
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Error applying default permissions for medical center', [
+                'medical_center_id' => $medicalCenter->id,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
      * اعمال دسترسی‌های پیش‌فرض بر اساس نوع کاربر
      */
     public function applyDefaultPermissions($user): bool
@@ -206,13 +324,13 @@ class DefaultPermissionsService
             return $this->applyDefaultPermissionsForDoctor($user);
         } elseif ($user instanceof Secretary) {
             return $this->applyDefaultPermissionsForSecretary($user);
+        } elseif ($user instanceof MedicalCenter) {
+            return $this->applyDefaultPermissionsForMedicalCenter($user);
         }
 
         Log::warning("Unknown user type for applying default permissions", [
-            'user_type' => get_class($user),
-            'user_id' => $user->id ?? 'unknown'
+            'type' => is_object($user) ? get_class($user) : gettype($user)
         ]);
-
         return false;
     }
 }
