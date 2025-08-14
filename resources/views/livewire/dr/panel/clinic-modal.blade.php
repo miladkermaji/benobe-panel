@@ -46,23 +46,52 @@
           <div class="d-flex align-items-center">
             <i class="fas fa-exclamation-triangle text-warning me-2 fs-4"></i>
             <div>
-              <strong>هشدار:</strong> شما هیچ مطبی ندارید!
-              <br>
-              <small class="text-muted">
-                برای استفاده از این ساعات کاری، لطفاً مطب خود را تعریف کنید.
-                در صورت تمایل می‌توانید این ساعات کاری را به مطب تخصیص دهید.
-              </small>
+              @if ($hasClinic && $needsWorkHoursAssignment)
+                <strong>نیاز به تخصیص ساعات کاری:</strong>
+                <br>
+                <small class="text-muted">
+                  مطب شما
+                  <strong>{{ optional($policlinicCenter)->name ?? 'بدون نام' }}</strong>
+                  ثبت شده اما هنوز ساعات کاری به آن تخصیص داده نشده است. می‌خواهید همین الآن تخصیص دهید؟
+                </small>
+              @elseif(!$hasClinic && $needsClinicCreation)
+                <strong>هشدار: شما هیچ مطبی ندارید!</strong>
+                <br>
+                <small class="text-muted">
+                  برای استفاده از این ساعات کاری، لطفاً مطب خود را تعریف کنید. سپس می‌توانید ساعات کاری را به آن تخصیص
+                  دهید.
+                </small>
+              @else
+                <strong>توجه:</strong>
+                <br>
+                <small class="text-muted">
+                  لطفاً وضعیت مطب و ساعات کاری خود را بررسی کنید.
+                </small>
+              @endif
             </div>
           </div>
         </div>
 
         <!-- دکمه‌های عملیات -->
         <div class="modal-actions d-flex gap-2 justify-content-center">
-          <button type="button" class="btn btn-primary btn-lg px-4 w-100" wire:click="goToCreateClinic">
-            <i class="fas fa-plus me-2"></i>
-            افزودن مطب
-          </button>
-        
+          @if ($hasClinic && $needsWorkHoursAssignment)
+            <button type="button" class="btn btn-success btn-lg px-4 w-100" wire:click="assignToMyClinic">
+              <i class="fas fa-link me-2"></i>
+              تخصیص ساعات کاری به مطب {{ optional($policlinicCenter)->name ?? '' }}
+            </button>
+            <a href="{{ route('dr-clinic-management') }}" class="btn btn-outline-primary px-4 w-100">
+              مدیریت مطب‌ها
+            </a>
+          @elseif(!$hasClinic && $needsClinicCreation)
+            <button type="button" class="btn btn-primary btn-lg px-4 w-100" wire:click="goToCreateClinic">
+              <i class="fas fa-plus me-2"></i>
+              افزودن مطب
+            </button>
+          @else
+            <a href="{{ route('dr-clinic-management') }}" class="btn btn-outline-primary px-4 w-100">
+              مدیریت مطب‌ها
+            </a>
+          @endif
         </div>
       </div>
     </x-custom-modal>
@@ -118,20 +147,6 @@
     .modal-actions .btn {
       min-width: 140px;
       font-weight: 500;
-    }
-
-    @media (max-width: 768px) {
-      .work-schedule-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .modal-actions {
-        flex-direction: column;
-      }
-
-      .modal-actions .btn {
-        width: 100%;
-      }
     }
   </style>
 </div>

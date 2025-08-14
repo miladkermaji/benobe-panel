@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Str;
 use App\Models\Otp;
 use App\Models\Doctor;
 use App\Models\LoginAttempt;
@@ -17,7 +17,7 @@ use App\Models\LoginLog;
 class MedicalCenter extends Authenticatable
 {
     use SoftDeletes;
-    use Sluggable;
+    // use Sluggable; // غیرفعال کردن sluggable trait
     use Notifiable;
     use HasApiTokens;
 
@@ -68,13 +68,65 @@ class MedicalCenter extends Authenticatable
         return $this->belongsTo(Doctor::class, 'id');
     }
 
-    public function sluggable(): array
+    /**
+     * Generate a unique slug for the medical center
+     */
+    public static function generateUniqueSlug($string, $separator = '-')
     {
-        return [
-            'slug' => [
-                'source' => ['name'],
-            ],
-        ];
+        $baseSlug = Str::slug($string, $separator);
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Check if slug exists and generate unique one
+        while (static::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . $separator . $counter;
+            $counter++;
+
+            // Prevent infinite loop
+            if ($counter > 1000) {
+                $slug = $baseSlug . $separator . uniqid();
+                break;
+            }
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Alternative slug generation method using timestamp
+     */
+    public static function generateSlugWithTimestamp($string)
+    {
+        $baseSlug = Str::slug($string);
+        $timestamp = time();
+        $slug = $baseSlug . '-' . $timestamp;
+
+        // If still exists, add random string
+        if (static::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $timestamp . '-' . Str::random(4);
+        }
+
+        return $slug;
+    }
+
+    /**
+     * Boot method to handle slug generation
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($medicalCenter) {
+            if (empty($medicalCenter->slug)) {
+                $medicalCenter->slug = static::generateSlugWithTimestamp($medicalCenter->name);
+            }
+        });
+
+        static::updating(function ($medicalCenter) {
+            if ($medicalCenter->isDirty('name') && empty($medicalCenter->slug)) {
+                $medicalCenter->slug = static::generateSlugWithTimestamp($medicalCenter->name);
+            }
+        });
     }
 
     public function province()

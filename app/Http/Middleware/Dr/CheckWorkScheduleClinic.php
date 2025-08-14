@@ -63,19 +63,48 @@ class CheckWorkScheduleClinic
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
+        // بررسی وجود مطب policlinic برای این پزشک
+        $hasPoliclinic = \App\Models\MedicalCenter::whereHas('doctors', function ($query) use ($doctorId) {
+            $query->where('doctor_id', $doctorId);
+        })
+        ->where('type', 'policlinic')
+        ->exists();
+
         // بررسی وجود ساعت کاری بدون مطب
         $hasWorkScheduleWithoutClinic = DoctorWorkSchedule::where('doctor_id', $doctorId)
             ->where('is_working', true)
             ->whereNull('medical_center_id')
             ->exists();
 
-        if ($hasWorkScheduleWithoutClinic) {
+        // بررسی وجود ساعت کاری تخصیص شده به مطب policlinic
+        $hasWorkScheduleWithClinic = DoctorWorkSchedule::where('doctor_id', $doctorId)
+            ->where('is_working', true)
+            ->whereNotNull('medical_center_id')
+            ->whereHas('medicalCenter', function ($query) {
+                $query->where('type', 'policlinic');
+            })
+            ->exists();
+
+        // اگر پزشک مطب policlinic دارد ولی ساعات کاری به آن تخصیص نشده
+        if ($hasPoliclinic && !$hasWorkScheduleWithClinic) {
             // ذخیره اطلاعات در session برای نمایش مودال
             session()->put('show_clinic_modal', true);
             session()->put('doctor_work_schedule_data', [
                 'doctor_id' => $doctorId,
+                'has_work_schedule' => $hasWorkScheduleWithoutClinic,
+                'has_clinic' => true,
+                'clinic_type' => 'policlinic',
+                'needs_work_hours_assignment' => true
+            ]);
+        }
+        // اگر پزشک مطب ندارد ولی ساعات کاری بدون مطب دارد
+        elseif (!$hasPoliclinic && $hasWorkScheduleWithoutClinic) {
+            session()->put('show_clinic_modal', true);
+            session()->put('doctor_work_schedule_data', [
+                'doctor_id' => $doctorId,
                 'has_work_schedule' => true,
-                'has_clinic' => false
+                'has_clinic' => false,
+                'needs_clinic_creation' => true
             ]);
         }
 

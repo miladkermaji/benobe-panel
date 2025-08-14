@@ -8,6 +8,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Cache;
+use App\Models\Doctor; // add
 
 class DoctorClinicCreate extends Component
 {
@@ -109,6 +110,19 @@ class DoctorClinicCreate extends Component
 
         $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
 
+        // بررسی اینکه آیا مطب با همین نام در همین شهر قبلاً وجود دارد یا نه
+        $existingClinic = MedicalCenter::where('name', $this->name)
+            ->where('type', $this->type)
+            ->where('province_id', $this->province_id)
+            ->where('city_id', $this->city_id)
+            ->first();
+
+        if ($existingClinic) {
+            $this->dispatch('show-toastr', type: 'error', message: 'مطب با این نام در این شهر قبلاً وجود دارد!');
+            return;
+        }
+
+        // ایجاد مطب جدید
         $medicalCenter = MedicalCenter::create([
             'name' => $this->name,
             'title' => $this->title,
@@ -127,6 +141,10 @@ class DoctorClinicCreate extends Component
 
         // Attach the doctor to the medical center
         $medicalCenter->doctors()->attach($doctorId);
+        // Set selected clinic so WorkHours loads this clinic's schedules
+        if ($doctorId) {
+            Doctor::find($doctorId)?->setSelectedMedicalCenter($medicalCenter->id);
+        }
 
         // Dispatch event for clinic creation
         $this->dispatch('clinicCreated', clinicId: $medicalCenter->id);
@@ -142,9 +160,117 @@ class DoctorClinicCreate extends Component
         }
     }
 
+    /**
+     * به‌روزرسانی مطب موجود
+     */
+    private function updateExistingClinic()
+    {
+        $medicalCenter = MedicalCenter::find($this->createdClinicId);
+        if ($medicalCenter) {
+            $medicalCenter->update([
+                'name' => $this->name,
+                'title' => $this->title,
+                'phone_numbers' => $this->phone_numbers,
+                'secretary_phone' => $this->secretary_phone,
+                'phone_number' => $this->phone_number,
+                'province_id' => $this->province_id,
+                'city_id' => $this->city_id,
+                'postal_code' => $this->postal_code,
+                'address' => $this->address,
+                'description' => $this->description,
+                'prescription_tariff' => $this->prescription_tariff,
+                'type' => $this->type,
+            ]);
+            // ensure selected clinic remains this one
+            $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+            if ($doctorId) {
+                Doctor::find($doctorId)?->setSelectedMedicalCenter($medicalCenter->id);
+            }
+
+            $this->dispatch('show-toastr', type: 'success', message: 'اطلاعات مطب با موفقیت به‌روزرسانی شد!');
+            return redirect()->route('dr-clinic-management');
+        }
+    }
+
+    /**
+     * دریافت تعداد ساعات کاری بدون مطب
+     */
+    public function getWorkHoursWithoutClinicCount()
+    {
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        if ($doctorId) {
+            return \App\Models\DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->whereNull('medical_center_id')
+                ->where('is_working', true)
+                ->whereNotNull('work_hours')
+                ->count();
+        }
+
+        return 0;
+    }
+
+    /**
+     * تخصیص ساعات کاری به مطب جدید
+     */
+    public function assignWorkHours()
+    {
+        if (!$this->createdClinicId) {
+            $this->dispatch('show-toastr', type: 'error', message: 'مطب ایجاد نشده است!');
+            return;
+        }
+
+        $doctorId = Auth::guard('doctor')->user()->id ?? Auth::guard('secretary')->user()->doctor_id;
+
+        if (!$doctorId) {
+            $this->dispatch('show-toastr', type: 'error', message: 'پزشک شناسایی نشد!');
+            return;
+        }
+
+        try {
+            // به‌روزرسانی تمام ساعات کاری این پزشک که medical_center_id آنها null است
+            $updatedRows = \App\Models\DoctorWorkSchedule::where('doctor_id', $doctorId)
+                ->whereNull('medical_center_id')
+                ->where('is_working', true)
+                ->whereNotNull('work_hours')
+                ->update(['medical_center_id' => $this->createdClinicId]);
+
+            // set selected clinic to created clinic
+            Doctor::find($doctorId)?->setSelectedMedicalCenter($this->createdClinicId);
+
+            if ($updatedRows > 0) {
+                $this->dispatch('show-toastr', type: 'success', message: "تعداد {$updatedRows} ساعات کاری با موفقیت به مطب تخصیص داده شد!");
+            } else {
+                $this->dispatch('show-toastr', type: 'info', message: 'هیچ ساعات کاری بدون مطب یافت نشد!');
+            }
+
+            // انتقال به صفحه مدیریت مطب
+            return redirect()->route('dr-clinic-management');
+
+        } catch (\Exception $e) {
+            $this->dispatch('show-toastr', type: 'error', message: 'خطا در تخصیص ساعات کاری: ' . $e->getMessage());
+        }
+    }
+
     public function skipWorkHoursAssignment()
     {
+        $this->dispatch('show-toastr', type: 'info', message: 'تخصیص ساعات کاری رد شد. می‌توانید بعداً از صفحه مدیریت مطب انجام دهید.');
         return redirect()->route('dr-clinic-management');
+    }
+
+    /**
+     * پاک کردن فرم و ایجاد مطب جدید
+     */
+    public function resetForm()
+    {
+        $this->reset([
+            'name', 'title', 'phone_numbers', 'secretary_phone', 'phone_number',
+            'province_id', 'city_id', 'postal_code', 'address', 'description',
+            'prescription_tariff', 'showWorkHoursAssignment', 'createdClinicId'
+        ]);
+        $this->phone_numbers = [''];
+        $this->type = 'policlinic';
+        $this->cities = collect();
     }
 
     public function render()

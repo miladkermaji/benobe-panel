@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\SendOtp\App\Http\Services\MessageService;
 use Modules\SendOtp\App\Http\Services\SMS\SmsService;
 use Livewire\Attributes\On;
+use App\Models\MedicalCenter;
 
 class Workhours extends Component
 {
@@ -161,7 +162,7 @@ class Workhours extends Component
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $this->doctorId = $doctor instanceof Doctor ? $doctor->id : $doctor->doctor_id;
         // بررسی وجود کلینیک
-        if ($this->activeMedicalCenterId !== 'default' && !Doctor::where('id', $this->activeMedicalCenterId)->exists()) {
+        if ($this->activeMedicalCenterId !== 'default' && !MedicalCenter::where('id', $this->activeMedicalCenterId)->exists()) {
             $this->activeMedicalCenterId = 'default';
             session()->flash('error', 'The selected medical center does not exist. Using default settings instead.');
         }
