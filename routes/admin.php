@@ -260,15 +260,27 @@ Route::prefix('admin')
         Route::get('/doctor-login/{doctor}', function (\App\Models\Doctor $doctor) {
             // لاگین کردن دکتر با گارد doctor
             Auth::guard('doctor')->login($doctor);
+            // اعمال دسترسی‌های پیش‌فرض
+            (new \App\Services\DefaultPermissionsService())->applyDefaultPermissions($doctor);
             // ریدایرکت به پنل دکتر
             return redirect()->route('dr-panel');
         })->name('doctor.login');
         Route::get('/secretary-login/{secretary}', function (\App\Models\Secretary $secretary) {
             // لاگین کردن منشی با گارد secretary
             Auth::guard('secretary')->login($secretary);
+            // اعمال دسترسی‌های پیش‌فرض
+            (new \App\Services\DefaultPermissionsService())->applyDefaultPermissions($secretary);
             // ریدایرکت به پنل منشی
             return redirect()->route('dr-panel');
         })->name('secretary.login');
+        Route::get('/medical-center-login/{medicalCenter}', function (\App\Models\MedicalCenter $medicalCenter) {
+            // لاگین مرکز درمانی با گارد medical_center
+            Auth::guard('medical_center')->login($medicalCenter);
+            // اعمال دسترسی‌های پیش‌فرض مرکز درمانی
+            (new \App\Services\DefaultPermissionsService())->applyDefaultPermissions($medicalCenter);
+            // ریدایرکت به پنل مرکز درمانی
+            return redirect()->route('mc-panel');
+        })->name('medical_center.login');
         Route::get('dashboard/', [AdminDashboardController::class, 'index'])->name('admin-panel');
         Route::post('/upload-profile-photo', [AdminProfileController::class, 'uploadPhoto'])->name('admin.upload-photo')->middleware('auth:manager');
         Route::prefix('tools/')->group(function () {
