@@ -543,7 +543,7 @@
         justify-content: space-around;
         align-items: center;
         padding: 12px 0 8px 0;
-        height: 80px;
+        height: 95px;
         border-top: 1px solid rgba(255, 255, 255, 0.2);
       }
 
@@ -558,15 +558,37 @@
         margin: 0 4px;
         overflow: visible;
         border: 2px solid transparent;
+        z-index: 25000;
+      }
+
+      .mobile-bottom-nav__item.open {
+        
+        background: rgba(102, 126, 234, 0.05);
+        z-index: 25001;
       }
 
       .mobile-bottom-nav__item:active {
         transform: scale(0.95);
       }
 
-      .mobile-bottom-nav__item.open {
-        border: 2px solid #667eea;
-        background: rgba(102, 126, 234, 0.05);
+      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
+      }
+
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 18px;
+        z-index: -1;
+        opacity: 0.3;
+        filter: blur(8px);
       }
 
       .mobile-bottom-nav__icon {
@@ -675,10 +697,10 @@
       /* Close Button Styling */
       .mobile-dropdown-close {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        width: 36px;
-        height: 36px;
+        top: 12px;
+        left: 12px;
+        width: 32px;
+        height: 32px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: none;
         border-radius: 50%;
@@ -822,25 +844,36 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: rgba(0, 0, 0, 0.4);
-        backdrop-filter: blur(8px);
+ 
         z-index: 20000;
+        animation: backdropIn 0.3s ease-out;
+      }
+
+      /* Special backdrop for "other" menu */
+      .mobile-bottom-nav__item--other.open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 24998;
         animation: backdropIn 0.3s ease-out;
       }
 
       /* Special styling for "other" menu - full height version */
       .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
         position: fixed;
-        bottom: 0;
+        bottom: 95px;
         left: 0;
         right: 0;
         width: 100vw;
-        height: 100vh;
+        height: calc(100vh - 95px);
         background: rgba(255, 255, 255, 0.98);
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         border-radius: 0;
         padding: 0;
-        z-index: 20001;
+        z-index: 24999;
         opacity: 0;
         visibility: hidden;
         transform: translateY(100%);
@@ -849,6 +882,7 @@
         overflow: hidden;
         display: flex;
         flex-direction: column;
+        max-height: calc(100vh - 95px);
       }
 
       .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
@@ -1022,17 +1056,7 @@
       }
 
       /* Animations */
-      @keyframes backdropIn {
-        from {
-          opacity: 0;
-          backdrop-filter: blur(0px);
-        }
-
-        to {
-          opacity: 1;
-          backdrop-filter: blur(8px);
-        }
-      }
+      
 
       @keyframes dropdownSlideIn {
         0% {
@@ -1132,7 +1156,7 @@
 
         .mobile-dropdown-close {
           top: 12px;
-          right: 12px;
+          left: 12px;
           width: 32px;
           height: 32px;
         }
@@ -1462,7 +1486,6 @@
               <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
           </button>
-          <span>منوی کامل</span>
         </div>
 
         <!-- Content container -->
@@ -1631,7 +1654,7 @@
                 @endif
                 @if ($this->hasPermission('dr-edit-profile-upgrade'))
                   <a href="javascript:void(0)" class="disabled-link">
-                    ارتقا حساب <span class="badge bg-warning text-dark">به زودی</span>
+                    ارتقا حساب <span class="badge bg-warning text-dark mx-2">به زودی</span>
                   </a>
                 @endif
               </div>
