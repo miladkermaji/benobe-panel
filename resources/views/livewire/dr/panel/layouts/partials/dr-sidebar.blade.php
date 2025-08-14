@@ -838,6 +838,129 @@
       .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb:hover {
         background: rgba(102, 126, 234, 0.5);
       }
+
+      /* Mobile Menu Sections Styling */
+      .mobile-menu-section {
+        margin-bottom: 24px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(102, 126, 234, 0.1);
+      }
+
+      .mobile-menu-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .mobile-menu-section__header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+        font-weight: 700;
+        font-size: 16px;
+        color: #495057;
+        position: relative;
+      }
+
+      .mobile-menu-section__header svg {
+        width: 20px;
+        height: 20px;
+        stroke: #667eea;
+        stroke-width: 2;
+        flex-shrink: 0;
+      }
+
+      .mobile-menu-section__header .badge {
+        margin-right: auto;
+        font-size: 10px;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-weight: 600;
+      }
+
+      .mobile-menu-section a {
+        display: block;
+        padding: 14px 20px 14px 52px;
+        color: #495057;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+        transition: all 0.3s ease;
+        position: relative;
+        background: rgba(255, 255, 255, 0.8);
+      }
+
+      .mobile-menu-section a:last-child {
+        border-bottom: none;
+      }
+
+      .mobile-menu-section a:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+        color: #667eea;
+        transform: translateX(4px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.15);
+      }
+
+      .mobile-menu-section a.disabled-link {
+        color: #6c757d;
+        cursor: not-allowed;
+        opacity: 0.6;
+        background: rgba(108, 117, 125, 0.05);
+      }
+
+      .mobile-menu-section a.disabled-link:hover {
+        transform: none;
+        box-shadow: none;
+        background: rgba(108, 117, 125, 0.05);
+        color: #6c757d;
+      }
+
+      .mobile-menu-section a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: left 0.5s ease;
+      }
+
+      .mobile-menu-section a:hover::before {
+        left: 100%;
+      }
+
+      /* Enhanced spacing for mobile menu */
+      .mobile-bottom-nav__dropdown {
+        padding: 24px 16px 20px 16px;
+        max-height: 70vh;
+      }
+
+      /* Responsive adjustments for sections */
+      @media (max-width: 400px) {
+        .mobile-menu-section__header {
+          padding: 14px 16px;
+          font-size: 15px;
+        }
+
+        .mobile-menu-section__header svg {
+          width: 18px;
+          height: 18px;
+        }
+
+        .mobile-menu-section a {
+          padding: 12px 16px 12px 44px;
+          font-size: 13px;
+        }
+
+        .mobile-bottom-nav__dropdown {
+          padding: 20px 12px 16px 12px;
+        }
+      }
     }
 
     @media (min-width: 769px) {
@@ -980,64 +1103,26 @@
 
     <!-- نوبت‌ها -->
     @if ($this->hasPermission('appointments'))
-      <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-            <line x1="16" y1="2" x2="16" y2="6" />
-            <line x1="8" y1="2" x2="8" y2="6" />
-            <line x1="3" y1="10" x2="21" y2="10" />
-            <path d="M8 14h.01" />
-            <path d="M12 14h.01" />
-            <path d="M16 14h.01" />
-            <path d="M8 18h.01" />
-            <path d="M12 18h.01" />
-            <path d="M16 18h.01" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">نوبت‌ها</div>
-        <div class="mobile-bottom-nav__dropdown">
-          @if ($this->hasPermission('dr-appointments'))
-            <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
-          @endif
-          @if ($this->hasPermission('dr.panel.doctornotes.index'))
-            <a href="{{ route('dr.panel.doctornotes.index') }}">توضیحات نوبت</a>
-          @endif
-          @if ($this->hasPermission('dr-mySpecialDays'))
-            <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
-          @endif
-          @if ($this->hasPermission('dr-scheduleSetting'))
-            <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
-          @endif
-          @if ($this->hasPermission('dr-vacation'))
-            <a href="{{ route('dr-vacation') }}">تعطیلات</a>
-          @endif
-          @if ($this->hasPermission('doctor-blocking-users.index'))
-            <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
-          @endif
-        </div>
-      </div>
-    @endif
-
-    <!-- نسخه‌ها -->
-    @if ($this->hasPermission('my-prescriptions'))
-      <div class="mobile-bottom-nav__item" data-group="prescriptions" data-has-submenu="true">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14,2 14,8 20,8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-            <polyline points="10,9 9,9 8,9"></polyline>
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">نسخه‌ها</div>
-        <div class="mobile-bottom-nav__dropdown">
-          <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
-          <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
-        </div>
+      <div class="mobile-bottom-nav__item" data-group="appointments">
+        <a href="{{ route('dr-appointments') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+              <path d="M8 14h.01" />
+              <path d="M12 14h.01" />
+              <path d="M16 14h.01" />
+              <path d="M8 18h.01" />
+              <path d="M12 18h.01" />
+              <path d="M16 18h.01" />
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+        </a>
       </div>
     @endif
 
@@ -1058,42 +1143,40 @@
       </div>
     @endif
 
-    <!-- پروفایل -->
-    @if ($this->hasPermission('profile'))
-      <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-            <circle cx="12" cy="7" r="4" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">پروفایل</div>
-        <div class="mobile-bottom-nav__dropdown">
-          @if ($this->hasPermission('dr-edit-profile'))
-            <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
-          @endif
-          @if ($this->hasPermission('dr-edit-profile-security'))
-            <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
-          @endif
-          @if ($this->hasPermission('dr-my-performance'))
-            <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
-          @endif
-          @if ($this->hasPermission('dr-subuser'))
-            <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
-          @endif
-          @if ($this->hasPermission('my-dr-appointments'))
-            <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
-          @endif
-          @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
-            <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
-          @endif
-          @if ($this->hasPermission('dr-edit-profile-upgrade'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">
-              ارتقا حساب <span class="soon-label">به زودی</span>
-            </a>
-          @endif
-        </div>
+    <!-- نسخه‌ها -->
+    @if ($this->hasPermission('my-prescriptions'))
+      <div class="mobile-bottom-nav__item" data-group="prescriptions">
+        <a href="{{ route('dr.panel.my-prescriptions') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10,9 9,9 8,9"></polyline>
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">نسخه‌ها</div>
+        </a>
+      </div>
+    @endif
+
+    <!-- گزارش مالی -->
+    @if ($this->hasPermission('financial_reports'))
+      <div class="mobile-bottom-nav__item" data-group="financial">
+        <a href="{{ route('dr.panel.financial-reports.index') }}"
+          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
+          <div class="mobile-bottom-nav__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <line x1="12" y1="1" x2="12" y2="23"></line>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+            </svg>
+          </div>
+          <div class="mobile-bottom-nav__label">گزارش مالی</div>
+        </a>
       </div>
     @endif
 
@@ -1109,37 +1192,212 @@
       </div>
       <div class="mobile-bottom-nav__label">سایر</div>
       <div class="mobile-bottom-nav__dropdown">
-        @if ($this->hasPermission('statistics'))
-          <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
+        <!-- مشاوره -->
+        @if ($this->hasPermission('consult'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>مشاوره</span>
+              <span class="badge bg-warning text-dark">به زودی</span>
+            </div>
+            @if ($this->hasPermission('dr-moshavere_setting'))
+              <a href="javascript:void(0)" class="disabled-link">برنامه‌ریزی مشاوره</a>
+            @endif
+            @if ($this->hasPermission('dr-moshavere_waiting'))
+              <a href="javascript:void(0)" class="disabled-link">گزارش مشاوره</a>
+            @endif
+            @if ($this->hasPermission('dr-mySpecialDays-counseling'))
+              <a href="javascript:void(0)" class="disabled-link">روزهای خاص</a>
+            @endif
+            @if ($this->hasPermission('consult-term.index'))
+              <a href="javascript:void(0)" class="disabled-link">قوانین مشاوره</a>
+            @endif
+          </div>
         @endif
-        @if ($this->hasPermission('messages'))
-          <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
+
+        <!-- نسخه الکترونیک -->
+        @if ($this->hasPermission('prescription'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M9 12l2 2 4-4"></path>
+                <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+                <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
+                <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
+              </svg>
+              <span>نسخه الکترونیک</span>
+              <span class="badge bg-warning text-dark">به زودی</span>
+            </div>
+            @if ($this->hasPermission('dr-patient-records'))
+              <a href="javascript:void(0)" class="disabled-link">پرونده پزشکی</a>
+            @endif
+            @if ($this->hasPermission('prescription.index'))
+              <a href="javascript:void(0)" class="disabled-link">نسخه‌های ثبت شده</a>
+            @endif
+            @if ($this->hasPermission('providers.index'))
+              <a href="javascript:void(0)" class="disabled-link">بیمه‌های من</a>
+            @endif
+            @if ($this->hasPermission('favorite.templates.index'))
+              <a href="javascript:void(0)" class="disabled-link">نسخه پراستفاده</a>
+            @endif
+            @if ($this->hasPermission('templates.favorite.service.index'))
+              <a href="javascript:void(0)" class="disabled-link">اقلام پراستفاده</a>
+            @endif
+            @if ($this->hasPermission('patient_records'))
+              <a href="javascript:void(0)" class="disabled-link">پرونده الکترونیک</a>
+            @endif
+          </div>
         @endif
+
+        <!-- ارتباط با بیماران -->
         @if ($this->hasPermission('patient_communication'))
-          <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
+                </path>
+              </svg>
+              <span>ارتباط با بیماران</span>
+            </div>
+            @if ($this->hasPermission('dr.panel.send-message'))
+              <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
+            @endif
+          </div>
         @endif
-        @if ($this->hasPermission('financial_reports'))
-          <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
-          <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
-          <a href="{{ route('dr-wallet-charge') }}">شارژ کیف پول</a>
-        @endif
-        @if ($this->hasPermission('insurance'))
-          <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
-        @endif
-        @if ($this->hasPermission('clinic_management'))
-          <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
-          @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
-            <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
-          @endif
-          @if ($this->hasPermission('doctors.clinic.deposit'))
-            <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-          @endif
-        @endif
+
+        <!-- منشی -->
         @if ($this->hasPermission('secretary_management'))
-          <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
-          @if ($this->hasPermission('permissions'))
-            <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌های منشی</a>
-          @endif
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>منشی</span>
+            </div>
+            @if ($this->hasPermission('secretary_management'))
+              <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
+            @endif
+            @if ($this->hasPermission('permissions'))
+              <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
+            @endif
+          </div>
+        @endif
+
+        <!-- مطب -->
+        @if ($this->hasPermission('clinic_management'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9,22 9,12 15,12 15,22"></polyline>
+              </svg>
+              <span>مطب</span>
+            </div>
+            @if ($this->hasPermission('dr-clinic-management'))
+              <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
+            @endif
+            @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
+              <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
+            @endif
+            @if ($this->hasPermission('doctors.clinic.deposit'))
+              <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
+            @endif
+          </div>
+        @endif
+
+        <!-- حساب کاربری -->
+        @if ($this->hasPermission('profile'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <span>حساب کاربری</span>
+            </div>
+            @if ($this->hasPermission('dr-edit-profile'))
+              <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
+            @endif
+            @if ($this->hasPermission('dr-edit-profile-security'))
+              <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
+            @endif
+            @if ($this->hasPermission('dr-my-performance'))
+              <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
+            @endif
+            @if ($this->hasPermission('dr-subuser'))
+              <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
+            @endif
+            @if ($this->hasPermission('my-dr-appointments'))
+              <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
+            @endif
+            @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
+              <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
+            @endif
+            @if ($this->hasPermission('dr-edit-profile-upgrade'))
+              <a href="javascript:void(0)" class="disabled-link">
+                ارتقا حساب <span class="badge bg-warning text-dark">به زودی</span>
+              </a>
+            @endif
+          </div>
+        @endif
+
+        <!-- آمار و نمودار -->
+        @if ($this->hasPermission('statistics'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
+              <span>آمار و نمودار</span>
+            </div>
+            <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
+          </div>
+        @endif
+
+        <!-- پیام -->
+        @if ($this->hasPermission('messages'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              <span>پیام</span>
+            </div>
+            @if ($this->hasPermission('dr-panel-tickets'))
+              <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
+            @endif
+          </div>
+        @endif
+
+        <!-- خدمات و بیمه -->
+        @if ($this->hasPermission('insurance'))
+          <div class="mobile-menu-section">
+            <div class="mobile-menu-section__header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M9 12l2 2 4-4"></path>
+                <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
+                <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
+                <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
+              </svg>
+              <span>خدمات و بیمه</span>
+            </div>
+            <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
+          </div>
         @endif
       </div>
     </div>
