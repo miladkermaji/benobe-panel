@@ -87,6 +87,15 @@ class Workhours extends Component
     public $selectAllScheduleModal = false;
     public $doctorId;
     public $doctor;
+    public $isActivationPage = false;
+    // --- Manual Appointment Setting Properties ---
+    public $manualNobatActive = false;
+    public $manualNobatSendLink = 10;
+    public $manualNobatConfirmLink = 30;
+    public $manualNobatSettingId = null;
+    // Flag: inactive clinic
+    public $clinicIsInactive = false;
+
     protected $rules = [
         'selectedDay' => 'required|in:saturday,sunday,monday,tuesday,wednesday,thursday,friday',
         'startTime' => 'required|date_format:H:i',
@@ -145,12 +154,7 @@ class Workhours extends Component
         'testAvailableTimes' => 'testAvailableTimes',
         'medicalCenterSelected' => 'handleMedicalCenterSelected',
     ];
-    public $isActivationPage = false;
-    // --- Manual Appointment Setting Properties ---
-    public $manualNobatActive = false;
-    public $manualNobatSendLink = 10;
-    public $manualNobatConfirmLink = 30;
-    public $manualNobatSettingId = null;
+
     public function mount()
     {
         $this->showSaveButton = request()->routeIs('dr-workhours');
@@ -158,6 +162,8 @@ class Workhours extends Component
         $this->showSaveButton = !$this->isActivationPage;
         // تنظیم activeMedicalCenterId
         $this->activeMedicalCenterId = $this->resolveMedicalCenterId();
+        // به‌روزرسانی وضعیت فعال/غیرفعال بودن مطب انتخابی
+        $this->updateClinicActiveState();
         // دریافت اطلاعات دکتر
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $this->doctorId = $doctor instanceof Doctor ? $doctor->id : $doctor->doctor_id;
@@ -302,6 +308,8 @@ class Workhours extends Component
             // تنظیم clinicId و activeClinicId
             $this->selectedMedicalCenterId = $clinicId;
             $this->activeMedicalCenterId = $this->medicalCenterId ?? $clinicId;
+            // به‌روزرسانی وضعیت فعال/غیرفعال بودن
+            $this->updateClinicActiveState();
             // ذخیره clinicId در سشن
             session(['selectedMedicalCenterId' => $clinicId]);
             // بازنشانی پراپرتی‌ها
@@ -323,7 +331,8 @@ class Workhours extends Component
         // بروزرسانی selectedMedicalCenterId
         $this->selectedMedicalCenterId = $medicalCenterId;
         $this->activeMedicalCenterId = $this->medicalCenterId ?? $medicalCenterId;
-
+        // به‌روزرسانی وضعیت فعال/غیرفعال بودن
+        $this->updateClinicActiveState();
         // ذخیره در سشن
         session(['selectedMedicalCenterId' => $medicalCenterId]);
 
@@ -2699,5 +2708,40 @@ class Workhours extends Component
         } catch (\Exception $e) {
             $this->showErrorMessage('خطا در تنظیم مرکز درمانی: ' . ($e->getMessage() ?: 'خطای ناشناخته'));
         }
+    }
+
+    /**
+     * بروزرسانی وضعیت فعال بودن مطب انتخابی و تنظیم دکمه‌ها
+     */
+    private function updateClinicActiveState(): void
+    {
+        $this->clinicIsInactive = false;
+        if ($this->activeMedicalCenterId !== 'default') {
+            $center = MedicalCenter::find($this->activeMedicalCenterId);
+            if ($center && !$center->is_active) {
+                $this->clinicIsInactive = true;
+                $this->showSaveButton = false; // جلوگیری از ذخیره تا قبل فعال‌سازی
+            }
+        }
+    }
+
+    /**
+     * اگر کلینیک انتخاب‌شده غیرفعال باشد، باید به صفحه فعال‌سازی منتقل شود
+     */
+    private function shouldRedirectToActivation(): bool
+    {
+        if ($this->activeMedicalCenterId === 'default') {
+            return false;
+        }
+        $center = MedicalCenter::find($this->activeMedicalCenterId);
+        if ($center && !$center->is_active) {
+            // غیرفعال کردن قابلیت‌های صفحه و نمایش پیام کوتاه
+            $this->showSaveButton = false;
+            $this->modalMessage = 'مطب شما هنوز فعال نیست';
+            $this->modalType = 'error';
+            $this->modalOpen = true;
+            return true;
+        }
+        return false;
     }
 }

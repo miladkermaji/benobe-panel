@@ -1,5 +1,16 @@
 <div>
-  <div>
+  @if ($clinicIsInactive && $activeMedicalCenterId !== 'default' && !$isActivationPage)
+    <div class="alert alert-warning d-flex align-items-center gap-2 mb-3 mt-3" role="alert">
+      <i class="fas fa-exclamation-triangle text-warning"></i>
+      <div>
+        مطب شما هنوز فعال نشده است؛ برای استفاده از امکانات بیشتر ابتدا باید فعال کنید.
+        <a href="{{ route('activation-doctor-clinic', ['clinic' => $activeMedicalCenterId]) }}" class="fw-bold">
+          رفتن به صفحه فعال‌سازی مطب
+        </a>
+      </div>
+    </div>
+  @endif
+  <div class="{{ $clinicIsInactive && !$isActivationPage ? 'opacity-50 pointer-events-none' : '' }}">
     <div class="w-100 d-flex justify-content-center mt-4" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle"
