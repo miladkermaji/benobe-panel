@@ -209,6 +209,26 @@ class Doctor extends Authenticatable implements JWTSubject
     }
 
     /**
+     * Check if the selected medical center is valid (exists and not soft-deleted)
+     */
+    public function hasValidSelectedMedicalCenter()
+    {
+        return $this->selectedMedicalCenter && $this->selectedMedicalCenter->hasValidMedicalCenter();
+    }
+
+    /**
+     * Clean up invalid medical center selections
+     */
+    public function cleanupInvalidMedicalCenterSelection()
+    {
+        if ($this->selectedMedicalCenter && !$this->hasValidSelectedMedicalCenter()) {
+            $this->selectedMedicalCenter()->delete();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * تنظیم مرکز درمانی انتخاب‌شده
      */
     public function setSelectedMedicalCenter($medicalCenterId = null)

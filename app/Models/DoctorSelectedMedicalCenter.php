@@ -22,4 +22,12 @@ class DoctorSelectedMedicalCenter extends Model
     {
         return $this->belongsTo(MedicalCenter::class, 'medical_center_id');
     }
+
+    /**
+     * Check if the medical center is valid (exists and not soft-deleted)
+     */
+    public function hasValidMedicalCenter()
+    {
+        return $this->medicalCenter && !$this->medicalCenter->trashed();
+    }
 }
