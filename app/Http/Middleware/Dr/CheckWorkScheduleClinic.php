@@ -60,6 +60,21 @@ class CheckWorkScheduleClinic
             return $next($request);
         }
 
+        // اولویت تکمیل پروفایل: اگر پروفایل پزشک کامل نیست، این میدلور هیچ کاری انجام ندهد
+        $profileCompleted = false;
+        if (Auth::guard('doctor')->check()) {
+            $profileCompleted = (bool) (Auth::guard('doctor')->user()->profile_completed ?? false);
+        } elseif (Auth::guard('secretary')->check()) {
+            $secretary = Auth::guard('secretary')->user();
+            $profileCompleted = (bool) optional($secretary->doctor)->profile_completed;
+        }
+        if (!$profileCompleted) {
+            // جلوگیری از نمایش مودال/پیام‌های مربوط به کلینیک زمانی که پروفایل کامل نیست
+            session()->forget('show_clinic_modal');
+            session()->forget('doctor_work_schedule_data');
+            return $next($request);
+        }
+
         $doctor = Auth::guard('doctor')->user() ?? Auth::guard('secretary')->user();
         $doctorId = $doctor instanceof \App\Models\Doctor ? $doctor->id : $doctor->doctor_id;
 
