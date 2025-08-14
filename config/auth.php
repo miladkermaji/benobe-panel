@@ -58,6 +58,10 @@ return [
         'driver' => 'jwt',
         'provider' => 'managers',
     ],
+    'medical_center-api' => [
+        'driver' => 'jwt',
+        'provider' => 'medical_centers',
+    ],
     'custom-auth.jwt' => [
             'driver' => 'jwt',
             'provider' => 'users',

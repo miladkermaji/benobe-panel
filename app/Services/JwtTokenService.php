@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Doctor;
 use App\Models\Secretary;
 use App\Models\Manager;
+use App\Models\MedicalCenter;
 
 class JwtTokenService
 {
@@ -69,6 +70,8 @@ class JwtTokenService
                 return Secretary::find($userId);
             case 'manager-api':
                 return Manager::find($userId);
+            case 'medical_center-api':
+                return MedicalCenter::find($userId);
             default:
                 return null;
         }

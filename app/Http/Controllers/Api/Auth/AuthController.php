@@ -273,6 +273,10 @@ class AuthController extends Controller
                     $guard = 'api';
                     $userType = 'user';
                     break;
+                case MedicalCenter::class:
+                    $guard = 'medical_center-api';
+                    $userType = 'medical_center';
+                    break;
             }
         }
 

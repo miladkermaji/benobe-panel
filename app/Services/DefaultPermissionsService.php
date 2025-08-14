@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Models\Doctor;
 use App\Models\Secretary;
+use App\Models\Manager;
 use App\Models\MedicalCenter;
 use App\Models\DoctorPermission;
 use App\Models\SecretaryPermission;
+use App\Models\ManagerPermission;
 use App\Models\MedicalCenterPermission;
 use Illuminate\Support\Facades\Log;
 
@@ -109,6 +111,31 @@ class DefaultPermissionsService
         "dr-my-performance-chart",
         "messages",
         "dr-panel-tickets",
+        "#"
+    ];
+
+    /**
+     * دسترسی‌های پیش‌فرض برای مدیران
+     */
+    private array $managerDefaultPermissions = [
+        "dashboard",
+        "admin-panel",
+        "user_management",
+        "doctor_management",
+        "secretary_management",
+        "medical_center_management",
+        "appointment_management",
+        "financial_management",
+        "reports",
+        "settings",
+        "permissions",
+        "profile",
+        "admin-edit-profile",
+        "admin-edit-profile-security",
+        "admin-edit-profile-upgrade",
+        "statistics",
+        "messages",
+        "admin-panel-tickets",
         "#"
     ];
 
@@ -316,6 +343,47 @@ class DefaultPermissionsService
     }
 
     /**
+     * اعمال دسترسی‌های پیش‌فرض برای مدیران
+     */
+    public function applyDefaultPermissionsForManager(Manager $manager): bool
+    {
+        try {
+            $existingPermission = ManagerPermission::where('manager_id', $manager->id)->first();
+
+            if (!$existingPermission) {
+                // ایجاد دسترسی‌های پیش‌فرض
+                ManagerPermission::create([
+                    'manager_id' => $manager->id,
+                    'permissions' => $this->managerDefaultPermissions,
+                    'has_access' => true,
+                ]);
+
+                Log::info("Default permissions applied for manager", [
+                    'manager_id' => $manager->id,
+                    'manager_name' => $manager->first_name . ' ' . $manager->last_name,
+                    'permissions_count' => count($this->managerDefaultPermissions)
+                ]);
+
+                return true;
+            }
+
+            Log::info("Manager already has permissions", [
+                'manager_id' => $manager->id,
+                'manager_name' => $manager->first_name . ' ' . $manager->last_name
+            ]);
+
+            return false;
+        } catch (\Exception $e) {
+            Log::error("Error applying default permissions for manager", [
+                'manager_id' => $manager->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
      * اعمال دسترسی‌های پیش‌فرض بر اساس نوع کاربر
      */
     public function applyDefaultPermissions($user): bool
@@ -326,6 +394,8 @@ class DefaultPermissionsService
             return $this->applyDefaultPermissionsForSecretary($user);
         } elseif ($user instanceof MedicalCenter) {
             return $this->applyDefaultPermissionsForMedicalCenter($user);
+        } elseif ($user instanceof Manager) {
+            return $this->applyDefaultPermissionsForManager($user);
         }
 
         Log::warning("Unknown user type for applying default permissions", [

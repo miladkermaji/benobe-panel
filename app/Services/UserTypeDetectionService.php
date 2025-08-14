@@ -268,7 +268,7 @@ class UserTypeDetectionService
             'doctor' => 'doctor-api',
             'secretary' => 'secretary-api',
             'manager' => 'manager-api',
-            'medical_center' => 'medical-center-api',
+            'medical_center' => 'medical_center-api',
             'user' => 'api',
             default => 'api',
         };
