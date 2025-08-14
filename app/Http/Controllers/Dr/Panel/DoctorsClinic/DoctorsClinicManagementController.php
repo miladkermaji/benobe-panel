@@ -92,7 +92,11 @@ class DoctorsClinicManagementController extends Controller
         // Attach the doctor to the medical center
         $medicalCenter->doctors()->attach($doctorId);
 
-        return response()->json(['message' => 'مطب با موفقیت اضافه شد']);
+        return response()->json([
+            'message' => 'مطب با موفقیت اضافه شد',
+            'clinic_id' => $medicalCenter->id,
+            'success' => true
+        ]);
     }
 
     public function update(Request $request, $id)

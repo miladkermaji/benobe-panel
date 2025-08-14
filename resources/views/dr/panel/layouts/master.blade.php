@@ -26,6 +26,9 @@
     @yield('content')
   </div>
 
+  <!-- کامپوننت مودال مطب -->
+  @livewire('dr.panel.clinic-modal')
+
   @livewireScripts
   <script>
     // ثبت رویداد show-toastr

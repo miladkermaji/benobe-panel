@@ -45,6 +45,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->group('doctor', [
             \App\Http\Middleware\Dr\CheckCompleteProfile::class,
+            \App\Http\Middleware\Dr\CheckWorkScheduleClinic::class,
             \App\Http\Middleware\doctor::class,
         ]);
 
@@ -54,6 +55,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->group('secretary', [
             \App\Http\Middleware\Dr\CheckCompleteProfile::class,
+            \App\Http\Middleware\Dr\CheckWorkScheduleClinic::class,
             \App\Http\Middleware\secretary::class,
         ]);
 
