@@ -589,13 +589,17 @@
         }
 
         .mobile-bottom-nav__label {
-          font-size: 11px;
+          font-size: 10px;
           color: #444;
           font-weight: 500;
           letter-spacing: 0.2px;
           margin-top: 4px;
           opacity: 0.92;
           transition: all 0.3s ease;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 100%;
         }
 
         .mobile-bottom-nav__item:active,
@@ -621,8 +625,35 @@
           display: none;
         }
 
+        /* Special styling for "other" menu (fullscreen) */
+        .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: calc(100vh - 68px) !important;
+          bottom: auto !important;
+          transform: none !important;
+          border-radius: 0 !important;
+          max-width: none !important;
+          animation: fullscreenIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+        }
+
         .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
           display: block !important;
+        }
+
+        /* Backdrop for smaller dropdowns */
+        .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(0, 0, 0, 0.3);
+          z-index: 19999;
+          animation: backdropIn 0.2s ease-out;
         }
 
         .mobile-bottom-nav__dropdown a {
@@ -663,6 +694,33 @@
           100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
+          }
+        }
+
+        @keyframes fullscreenIn {
+          0% {
+            opacity: 0;
+            transform: translateY(20px) scale(0.98);
+          }
+
+          70% {
+            opacity: 1;
+            transform: translateY(-5px) scale(1.01);
+          }
+
+          100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes backdropIn {
+          from {
+            opacity: 0;
+          }
+
+          to {
+            opacity: 1;
           }
         }
 
@@ -739,6 +797,8 @@
           if (!e.target.closest('.mobile-bottom-nav')) {
             navItems.forEach(i => i.classList.remove('open'));
             lastOpen = null;
+            // Remove backdrop
+            document.body.style.overflow = '';
           }
         }
 
@@ -749,27 +809,37 @@
               if (e.target.closest('.mobile-bottom-nav__dropdown')) {
                 return;
               }
+
               // اگر همین آیتم باز است، فقط ببند
               if (item.classList.contains('open')) {
                 item.classList.remove('open');
                 lastOpen = null;
+                document.body.style.overflow = '';
               } else {
                 navItems.forEach(i => i.classList.remove('open'));
                 item.classList.add('open');
                 lastOpen = item;
+
+                // Check if this is the "other" menu (fullscreen)
+                if (item.classList.contains('mobile-bottom-nav__item--other')) {
+                  document.body.style.overflow = 'hidden';
+                }
               }
             };
           });
         }
+
         document.addEventListener('DOMContentLoaded', function() {
           setupMobileNavDropdowns();
           document.addEventListener('click', closeAllDropdowns);
         });
+
         window.addEventListener('resize', function() {
           if (window.innerWidth <= 768) {
             setupMobileNavDropdowns();
           }
         });
+
         // اجرای مجدد setupMobileNavDropdowns بعد از هر آپدیت Livewire
         document.addEventListener('livewire:update', function() {
           setupMobileNavDropdowns();
@@ -838,43 +908,33 @@
           @if ($this->hasPermission('doctor-blocking-users.index'))
             <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
           @endif
-          @if ($this->hasPermission('my-prescriptions'))
-            <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه‌ها</a>
-          @endif
         </div>
       </div>
     @endif
-    <!-- مشاوره -->
-    @if ($this->hasPermission('consult'))
-      <div class="mobile-bottom-nav__item" data-group="consult" data-has-submenu="true">
+    <!-- نسخه‌ها -->
+    @if ($this->hasPermission('my-prescriptions'))
+      <div class="mobile-bottom-nav__item" data-group="prescriptions" data-has-submenu="true">
         <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              <path d="M8 9h8" />
-              <path d="M8 13h6" />
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14,2 14,8 20,8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10,9 9,9 8,9"></polyline>
             </svg>
           </div>
-          <div class="mobile-bottom-nav__label">مشاوره</div>
+          <div class="mobile-bottom-nav__label">نسخه‌ها</div>
         </div>
         <div class="mobile-bottom-nav__dropdown" style="display:none">
-          @if ($this->hasPermission('dr-moshavere_setting'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی <span
-                class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('dr-moshavere_waiting'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش <span
-                class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('dr-mySpecialDays-counseling'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
-                class="soon-label">به زودی</span></a>
-          @endif
-          @if ($this->hasPermission('consult-term.index'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین <span
-                class="soon-label">به زودی</span></a>
-          @endif
+          <li class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
+            <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+          </li>
+          <li
+            class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
+            <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
+          </li>
         </div>
       </div>
     @endif
@@ -994,6 +1054,24 @@
         @if ($this->hasPermission('patient_records'))
           <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
             <span class="soon-label">به زودی</span></a>
+        @endif
+        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
+        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مشاوره</div>
+        @if ($this->hasPermission('dr-moshavere_setting'))
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره
+            <span class="soon-label">به زودی</span></a>
+        @endif
+        @if ($this->hasPermission('dr-moshavere_waiting'))
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره <span
+              class="soon-label">به زودی</span></a>
+        @endif
+        @if ($this->hasPermission('dr-mySpecialDays-counseling'))
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
+              class="soon-label">به زودی</span></a>
+        @endif
+        @if ($this->hasPermission('consult-term.index'))
+          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره <span
+              class="soon-label">به زودی</span></a>
         @endif
         <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         @if ($this->hasPermission('clinic_management'))
