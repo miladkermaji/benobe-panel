@@ -477,6 +477,7 @@
             photoInput.click();
           });
         }
+
         function uploadPhoto(file) {
           const formData = new FormData();
           formData.append('photo', file);
@@ -511,342 +512,457 @@
         }
       });
     </script>
-    <!-- Bottom Navigation for Mobile -->
-    <style>
-      @media (max-width: 425px) {
-        .mobile-bottom-nav__label {
-          font-size: 9px !important;
+  </div>
+
+  <!-- Bottom Navigation for Mobile -->
+  <style>
+    @media (max-width: 425px) {
+      .mobile-bottom-nav__label {
+        font-size: 9px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+
+      .sidebar__nav,
+      .sidebar__fixed,
+      .bars {
+        display: none !important;
+      }
+
+      /* New Modern Mobile Navigation */
+      .mobile-bottom-nav {
+        display: flex;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
+        z-index: 25000;
+        justify-content: space-around;
+        align-items: center;
+        padding: 12px 0 8px 0;
+        height: 80px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .mobile-bottom-nav__item {
+        position: relative;
+        flex: 1;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        min-width: 0;
+        border-radius: 20px;
+        margin: 0 4px;
+        overflow: visible;
+      }
+
+      .mobile-bottom-nav__item:active {
+        transform: scale(0.95);
+      }
+
+      .mobile-bottom-nav__icon {
+        position: relative;
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 6px auto;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+      }
+
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        transform: translateY(-8px) scale(1.1);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 18px;
+        z-index: -1;
+        opacity: 0.3;
+        filter: blur(8px);
+      }
+
+      .mobile-bottom-nav__icon svg {
+        width: 24px;
+        height: 24px;
+        stroke: #6c757d;
+        stroke-width: 2;
+        fill: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      }
+
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
+        stroke: #ffffff;
+        transform: scale(1.1);
+      }
+
+      .mobile-bottom-nav__label {
+        font-size: 11px;
+        color: #6c757d;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        margin-top: 2px;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        opacity: 0.8;
+      }
+
+      .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
+        color: #667eea;
+        font-weight: 700;
+        opacity: 1;
+        transform: translateY(-2px);
+      }
+
+      /* Improved Dropdown Styling */
+      .mobile-bottom-nav__dropdown {
+        position: absolute;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 180px;
+        width: fit-content;
+        max-width: 85vw;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 20px;
+        padding: 12px 0;
+        z-index: 20000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(20px) scale(0.8);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+      }
+
+      .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+
+      .mobile-bottom-nav__dropdown a {
+        display: block;
+        padding: 12px 20px;
+        color: #495057;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+        margin: 0 6px;
+        border-radius: 12px;
+        position: relative;
+        white-space: nowrap;
+      }
+
+      .mobile-bottom-nav__dropdown a:last-child {
+        border-bottom: none;
+      }
+
+      .mobile-bottom-nav__dropdown a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+        transition: left 0.5s ease;
+      }
+
+      .mobile-bottom-nav__dropdown a:hover::before {
+        left: 100%;
+      }
+
+      .mobile-bottom-nav__dropdown a:hover {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+        color: #667eea;
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      }
+
+      /* Backdrop */
+      .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 19999;
+        animation: backdropIn 0.3s ease-out;
+      }
+
+      /* Special styling for "other" menu - compact version */
+      .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
+        position: absolute;
+        bottom: 90px;
+        left: 50%;
+        transform: translateX(-50%);
+        min-width: 200px;
+        width: fit-content;
+        max-width: 85vw;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        border-radius: 20px;
+        padding: 12px 0;
+        z-index: 20000;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(20px) scale(0.8);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        overflow: hidden;
+      }
+
+      .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0) scale(1);
+      }
+
+      /* Fix for edge positioning - prevent dropdowns from going off-screen */
+      .mobile-bottom-nav__item:first-child .mobile-bottom-nav__dropdown {
+        left: 20px;
+        transform: translateX(0) translateY(20px) scale(0.8);
+      }
+
+      .mobile-bottom-nav__item:first-child.open .mobile-bottom-nav__dropdown {
+        transform: translateX(0) translateY(0) scale(1);
+      }
+
+      .mobile-bottom-nav__item:last-child .mobile-bottom-nav__dropdown {
+        left: auto;
+        right: 20px;
+        transform: translateX(0) translateY(20px) scale(0.8);
+      }
+
+      .mobile-bottom-nav__item:last-child.open .mobile-bottom-nav__dropdown {
+        transform: translateX(0) translateY(0) scale(1);
+      }
+
+      /* Animations */
+      @keyframes backdropIn {
+        from {
+          opacity: 0;
+        }
+
+        to {
+          opacity: 1;
         }
       }
-      @media (max-width: 768px) {
-        .sidebar__nav,
-        .sidebar__fixed,
-        .bars {
-          display: none !important;
+
+      @keyframes dropdownSlideIn {
+        0% {
+          opacity: 0;
+          transform: translateX(-50%) translateY(30px) scale(0.8);
         }
-        .mobile-bottom-nav {
-          display: flex;
-          position: fixed;
-          bottom: 0;
-          overflow: hidden !important;
-          left: 0;
-          width: 100vw;
-          background: rgba(255, 255, 255, 0.98);
-          box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.08);
-          z-index: 25000;
-          /* بالاتر از overlay */
-          justify-content: space-around;
-          align-items: center;
-          padding: 0;
-          height: 68px;
-          border-top: 1px solid rgba(224, 224, 224, 0.8);
-          backdrop-filter: blur(10px);
+
+        100% {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0) scale(1);
         }
-        .mobile-bottom-nav__item {
-          position: relative;
-          flex: 1 1 0px;
-          text-align: center;
-          padding: 6px 0 0 0;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          min-width: 0;
-          border-radius: 18px 18px 0 0;
-          margin: 0 2px;
-          overflow: hidden;
-        }
-        @media (max-width: 400px) {
-          .mobile-bottom-nav__label {
-            font-size: 10px;
-          }
-          .mobile-bottom-nav__item svg {
-            width: 22px;
-            height: 22px;
-          }
-        }
-        .mobile-bottom-nav__item svg {
-          display: block;
-          margin: 0 auto 2px auto;
-          width: 24px;
-          height: 24px;
-          fill: #888;
-          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.04));
-        }
-        .mobile-bottom-nav__item.active svg,
-        .mobile-bottom-nav__item:active svg,
-        .mobile-bottom-nav__item.open svg {
-          fill: #1976d2;
-          transform: scale(1.15);
-        }
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 400px) {
         .mobile-bottom-nav__label {
           font-size: 10px;
-          color: #444;
-          font-weight: 500;
-          letter-spacing: 0.2px;
-          margin-top: 4px;
-          opacity: 0.92;
-          transition: all 0.3s ease;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 100%;
         }
-        .mobile-bottom-nav__item:active,
-        .mobile-bottom-nav__item.open {
-          background: linear-gradient(135deg, #e3f2fd 0%, #fce4ec 100%);
-          box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
+
+        .mobile-bottom-nav__icon {
+          width: 44px;
+          height: 44px;
         }
+
+        .mobile-bottom-nav__icon svg {
+          width: 22px;
+          height: 22px;
+        }
+
         .mobile-bottom-nav__dropdown {
-          position: absolute;
-          bottom: 68px;
-          left: 50%;
-          transform: translateX(-50%);
-          min-width: 180px;
-          width: max-content;
-          max-width: 95vw;
-          background: #fff;
-          box-shadow: 0 2px 16px rgba(25, 118, 210, 0.10);
-          border-radius: 16px;
-          padding: 8px 0;
-          z-index: 20000;
-          animation: dropdownIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          display: none;
-        }
-        /* Special styling for "other" menu (fullscreen) */
-        .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-          position: fixed !important;
-          top: 0 !important;
-          left: 0 !important;
-          width: 100vw !important;
-          height: calc(100vh - 68px) !important;
-          bottom: auto !important;
-          transform: none !important;
-          border-radius: 0 !important;
-          max-width: none !important;
-          animation: fullscreenIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
-        }
-        .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
-          display: block !important;
-        }
-        /* Backdrop for smaller dropdowns */
-        .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
-          content: '';
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.3);
-          z-index: 19999;
-          animation: backdropIn 0.2s ease-out;
-        }
-        .mobile-bottom-nav__dropdown a {
-          display: block;
-          padding: 12px 20px;
-          color: #333;
-          text-decoration: none;
-          font-size: 14px;
-          border-bottom: 1px solid rgba(242, 242, 242, 0.7);
-          transition: all 0.25s ease;
-          border-radius: 10px;
-          margin: 4px 8px;
-          font-weight: 500;
-        }
-        .mobile-bottom-nav__dropdown a:last-child {
-          border-bottom: none;
-        }
-        .mobile-bottom-nav__dropdown a:hover {
-          background: linear-gradient(135deg, rgba(227, 242, 253, 0.7) 0%, rgba(252, 228, 236, 0.7) 100%);
-          color: #1976d2;
-          transform: translateX(3px);
-          box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08);
-        }
-        @keyframes dropdownIn {
-          0% {
-            opacity: 0;
-            transform: translateX(-50%) translateY(20px) scale(0.95);
-          }
-          70% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(-5px) scale(1.02);
-          }
-          100% {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(1);
-          }
-        }
-        @keyframes fullscreenIn {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.98);
-          }
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.01);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        @keyframes backdropIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        /* Fix for dashboard dropdown (first item, right edge) */
-        .mobile-bottom-nav__item--dashboard .mobile-bottom-nav__dropdown {
-          left: auto;
-          right: 2.5vw;
-          transform: none;
-          animation: dropdownInRight 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes dropdownInRight {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.02);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        /* Fix for other dropdown (last item, left edge) */
-        .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-          left: 2.5vw;
-          right: auto;
-          transform: none;
-          animation: dropdownInLeft 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes dropdownInLeft {
-          0% {
-            opacity: 0;
-            transform: translateY(20px) scale(0.95);
-          }
-          70% {
-            opacity: 1;
-            transform: translateY(-5px) scale(1.02);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
+          min-width: 160px;
+          max-width: 90vw;
         }
       }
-      @media (min-width: 769px) {
-        .mobile-bottom-nav {
-          display: none !important;
+
+      /* Active state indicator */
+      .mobile-bottom-nav__item.active::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 6px;
+        height: 6px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+      }
+    }
+
+    @media (min-width: 769px) {
+      .mobile-bottom-nav {
+        display: none !important;
+      }
+    }
+
+    .soon-label {
+      font-size: 10px;
+      color: #dc3545;
+      margin-right: 4px;
+      vertical-align: middle;
+      background: rgba(220, 53, 69, 0.1);
+      padding: 2px 6px;
+      border-radius: 8px;
+    }
+  </style>
+
+  <script>
+    (function() {
+      let navItems;
+      let lastOpen = null;
+
+      function closeAllDropdowns(e) {
+        if (!e.target.closest('.mobile-bottom-nav')) {
+          navItems.forEach(i => i.classList.remove('open'));
+          lastOpen = null;
+          document.body.style.overflow = '';
         }
       }
-      .soon-label {
-        font-size: 10px;
-        color: #d32f2f;
-        margin-right: 4px;
-        vertical-align: middle;
-      }
-    </style>
-    <script>
-      (function() {
-        let navItems;
-        let lastOpen = null;
-        function closeAllDropdowns(e) {
-          if (!e.target.closest('.mobile-bottom-nav')) {
-            navItems.forEach(i => i.classList.remove('open'));
-            lastOpen = null;
-            // Remove backdrop
-            document.body.style.overflow = '';
-          }
-        }
-        function setupMobileNavDropdowns() {
-          navItems = document.querySelectorAll('.mobile-bottom-nav__item');
-          navItems.forEach(item => {
-            item.onclick = function(e) {
-              if (e.target.closest('.mobile-bottom-nav__dropdown')) {
-                return;
-              }
+
+      function setupMobileNavDropdowns() {
+        navItems = document.querySelectorAll('.mobile-bottom-nav__item');
+
+        navItems.forEach(item => {
+          item.onclick = function(e) {
+            if (e.target.closest('.mobile-bottom-nav__dropdown')) {
+              return;
+            }
+
+            if (item.classList.contains('open')) {
               // اگر همین آیتم باز است، فقط ببند
-              if (item.classList.contains('open')) {
-                item.classList.remove('open');
-                lastOpen = null;
-                document.body.style.overflow = '';
-              } else {
-                navItems.forEach(i => i.classList.remove('open'));
-                item.classList.add('open');
-                lastOpen = item;
-                // Check if this is the "other" menu (fullscreen)
-                if (item.classList.contains('mobile-bottom-nav__item--other')) {
-                  document.body.style.overflow = 'hidden';
-                }
+              item.classList.remove('open');
+              lastOpen = null;
+              document.body.style.overflow = '';
+            } else {
+              // بستن همه منوهای باز
+              navItems.forEach(i => {
+                i.classList.remove('open');
+              });
+
+              // باز کردن منوی جدید
+              item.classList.add('open');
+              lastOpen = item;
+
+              // تنظیم overflow برای backdrop
+              if (item.querySelector('.mobile-bottom-nav__dropdown')) {
+                document.body.style.overflow = 'hidden';
               }
-            };
-          });
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-          setupMobileNavDropdowns();
-          document.addEventListener('click', closeAllDropdowns);
+            }
+          };
         });
-        window.addEventListener('resize', function() {
-          if (window.innerWidth <= 768) {
-            setupMobileNavDropdowns();
+      }
+
+      function setActiveItem() {
+        const currentPath = window.location.pathname;
+        navItems.forEach(item => {
+          const links = item.querySelectorAll('a[href]');
+          let isActive = false;
+
+          links.forEach(link => {
+            if (link.href.includes(currentPath)) {
+              isActive = true;
+            }
+          });
+
+          if (isActive) {
+            item.classList.add('active');
+          } else {
+            item.classList.remove('active');
           }
         });
-        // اجرای مجدد setupMobileNavDropdowns بعد از هر آپدیت Livewire
-        document.addEventListener('livewire:update', function() {
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        setupMobileNavDropdowns();
+        setActiveItem();
+        document.addEventListener('click', closeAllDropdowns);
+      });
+
+      window.addEventListener('resize', function() {
+        if (window.innerWidth <= 768) {
           setupMobileNavDropdowns();
-        });
-      })();
-    </script>
-  </div>
+        }
+      });
+
+      document.addEventListener('livewire:update', function() {
+        setupMobileNavDropdowns();
+        setActiveItem();
+      });
+    })();
+  </script>
+
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
     @if ($this->hasPermission('dashboard'))
-      <div class="mobile-bottom-nav__item mobile-bottom-nav__item--dashboard" data-group="dashboard">
+      <div class="mobile-bottom-nav__item" data-group="dashboard">
         <a href="{{ route('dr-panel') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__activebox">
-            <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-              </svg>
-            </div>
-            <div class="mobile-bottom-nav__label">داشبورد</div>
-          </div>
-        </a>
-      </div>
-    @endif
-    <!-- نوبت‌ها -->
-    @if ($this->hasPermission('appointments'))
-      <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
           <div class="mobile-bottom-nav__icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-              <path d="M8 14h.01" />
-              <path d="M12 14h.01" />
-              <path d="M16 14h.01" />
-              <path d="M8 18h.01" />
-              <path d="M12 18h.01" />
-              <path d="M16 18h.01" />
+              <rect x="3" y="3" width="7" height="7" />
+              <rect x="14" y="3" width="7" height="7" />
+              <rect x="14" y="14" width="7" height="7" />
+              <rect x="3" y="14" width="7" height="7" />
             </svg>
           </div>
-          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+          <div class="mobile-bottom-nav__label">داشبورد</div>
+        </a>
+      </div>
+    @endif
+
+    <!-- نوبت‌ها -->
+    @if ($this->hasPermission('appointments'))
+      <div class="mobile-bottom-nav__item" data-group="appointments" data-has-submenu="true">
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+            <line x1="16" y1="2" x2="16" y2="6" />
+            <line x1="8" y1="2" x2="8" y2="6" />
+            <line x1="3" y1="10" x2="21" y2="10" />
+            <path d="M8 14h.01" />
+            <path d="M12 14h.01" />
+            <path d="M16 14h.01" />
+            <path d="M8 18h.01" />
+            <path d="M12 18h.01" />
+            <path d="M16 18h.01" />
+          </svg>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
+        <div class="mobile-bottom-nav__label">نوبت‌ها</div>
+        <div class="mobile-bottom-nav__dropdown">
           @if ($this->hasPermission('dr-appointments'))
             <a href="{{ route('dr-appointments') }}">لیست نوبت‌ها</a>
           @endif
@@ -868,47 +984,40 @@
         </div>
       </div>
     @endif
+
     <!-- نسخه‌ها -->
     @if ($this->hasPermission('my-prescriptions'))
       <div class="mobile-bottom-nav__item" data-group="prescriptions" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14,2 14,8 20,8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10,9 9,9 8,9"></polyline>
-            </svg>
-          </div>
-          <div class="mobile-bottom-nav__label">نسخه‌ها</div>
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14,2 14,8 20,8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10,9 9,9 8,9"></polyline>
+          </svg>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
-          <li class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions') ? 'is-active' : '' }}">
-            <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
-          </li>
-          <li
-            class="item-li i-courses {{ Request::routeIs('dr.panel.my-prescriptions.settings') ? 'is-active' : '' }}">
-            <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
-          </li>
+        <div class="mobile-bottom-nav__label">نسخه‌ها</div>
+        <div class="mobile-bottom-nav__dropdown">
+          <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+          <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
         </div>
       </div>
     @endif
+
     <!-- پروفایل -->
     @if ($this->hasPermission('profile'))
       <div class="mobile-bottom-nav__item" data-group="profile" data-has-submenu="true">
-        <div class="mobile-bottom-nav__activebox">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
-            </svg>
-          </div>
-          <div class="mobile-bottom-nav__label">پروفایل</div>
+        <div class="mobile-bottom-nav__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="12" cy="7" r="4" />
+          </svg>
         </div>
-        <div class="mobile-bottom-nav__dropdown" style="display:none">
+        <div class="mobile-bottom-nav__label">پروفایل</div>
+        <div class="mobile-bottom-nav__dropdown">
           @if ($this->hasPermission('dr-edit-profile'))
             <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
           @endif
@@ -928,44 +1037,26 @@
             <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
           @endif
           @if ($this->hasPermission('dr-edit-profile-upgrade'))
-            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">ارتقا حساب <span
-                class="soon-label">به زودی</span></a>
+            <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">
+              ارتقا حساب <span class="soon-label">به زودی</span>
+            </a>
           @endif
         </div>
       </div>
     @endif
-    <!-- ساعت کاری -->
-    @if ($this->hasPermission('dr-workhours'))
-      <div class="mobile-bottom-nav__item" data-group="workhours">
-        <a href="{{ route('dr-workhours') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__activebox">
-            <div class="mobile-bottom-nav__icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <polyline points="12,6 12,12 16,14" />
-              </svg>
-            </div>
-            <div class="mobile-bottom-nav__label">ساعت کاری</div>
-          </div>
-        </a>
-      </div>
-    @endif
+
     <!-- سایر -->
     <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
-      <div class="mobile-bottom-nav__activebox">
-        <div class="mobile-bottom-nav__icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <circle cx="12" cy="12" r="1" />
-            <circle cx="19" cy="12" r="1" />
-            <circle cx="5" cy="12" r="1" />
-          </svg>
-        </div>
-        <div class="mobile-bottom-nav__label">سایر</div>
+      <div class="mobile-bottom-nav__icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+          <circle cx="5" cy="12" r="1" />
+        </svg>
       </div>
-      <div class="mobile-bottom-nav__dropdown" style="display:none">
+      <div class="mobile-bottom-nav__label">سایر</div>
+      <div class="mobile-bottom-nav__dropdown">
         @if ($this->hasPermission('statistics'))
           <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
         @endif
@@ -975,9 +1066,6 @@
         @if ($this->hasPermission('patient_communication'))
           <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
         @endif
-        @if ($this->hasPermission('#'))
-          <a href="#">صفحه گفتگو</a>
-        @endif
         @if ($this->hasPermission('financial_reports'))
           <a href="{{ route('dr.panel.financial-reports.index') }}">گزارش مالی</a>
           <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
@@ -986,51 +1074,6 @@
         @if ($this->hasPermission('insurance'))
           <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
         @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">نسخه الکترونیک</div>
-        @if ($this->hasPermission('dr-patient-records'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده پزشکی <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('prescription.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه‌های ثبت شده
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('providers.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">بیمه‌های من <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('favorite.templates.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">نسخه پراستفاده <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('templates.favorite.service.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">اقلام پراستفاده
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('patient_records'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">پرونده الکترونیک
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
-        <div style="font-size:12px; color:#888; padding:2px 16px 2px 0;">مشاوره</div>
-        @if ($this->hasPermission('dr-moshavere_setting'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">برنامه‌ریزی مشاوره
-            <span class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('dr-moshavere_waiting'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">گزارش مشاوره <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('dr-mySpecialDays-counseling'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">روزهای خاص <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        @if ($this->hasPermission('consult-term.index'))
-          <a href="javascript:void(0)" style="color: #6c757d; cursor: not-allowed; opacity: 0.5;">قوانین مشاوره <span
-              class="soon-label">به زودی</span></a>
-        @endif
-        <div style="border-top:1px solid #eee; margin:4px 0;"></div>
         @if ($this->hasPermission('clinic_management'))
           <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
           @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
@@ -1049,204 +1092,4 @@
       </div>
     </div>
   </div>
-  <!-- Overlay for mobile submenu -->
-  <div id="mobile-submenu-overlay" class="mobile-submenu-overlay">
-    <div class="mobile-submenu-header">
-      <button id="close-mobile-submenu" class="close-mobile-submenu-btn" aria-label="بستن">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"
-          stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    </div>
-    <div class="mobile-submenu-list" id="mobile-submenu-list">
-      <!-- زیرمنوها اینجا قرار می‌گیرند -->
-    </div>
-  </div>
-  <style>
-    .mobile-submenu-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - 68px);
-      /* ارتفاع منهای منوی پایین */
-      background: rgba(255, 255, 255, 0.98);
-      z-index: 20001;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: stretch;
-      overflow-y: auto;
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-      backdrop-filter: blur(10px);
-    }
-    .mobile-submenu-overlay.active {
-      display: flex;
-      opacity: 1;
-      animation: overlayFadeIn 0.3s ease-out;
-    }
-    @keyframes overlayFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .mobile-submenu-header {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      padding: 16px 16px 0 16px;
-      background: transparent;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-    }
-    .close-mobile-submenu-btn {
-      background: rgba(240, 240, 240, 0.8);
-      border: none;
-      cursor: pointer;
-      padding: 8px;
-      margin: 0;
-      outline: none;
-      border-radius: 50%;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .close-mobile-submenu-btn:hover {
-      background: rgba(220, 220, 220, 0.9);
-      transform: scale(1.05);
-    }
-    .mobile-submenu-list {
-      width: 100%;
-      margin-top: 20px;
-      padding: 0 24px 24px 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      overflow-y: auto;
-      flex: 1 1 0;
-      max-height: calc(100vh - 68px - 64px);
-      /* 64px تقریبی هدر */
-    }
-    .mobile-submenu-list a {
-      display: block;
-      background: #f7f7fa;
-      border-radius: 12px;
-      padding: 16px 18px;
-      font-size: 16px;
-      color: #222;
-      text-decoration: none;
-      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.04);
-      border: 1px solid #e0e0e0;
-      transition: background 0.2s, color 0.2s;
-      font-weight: 500;
-      text-align: right;
-    }
-    .mobile-submenu-list a:hover {
-      background: #e3f2fd;
-      color: #1976d2;
-    }
-    @media (min-width: 769px) {
-      .mobile-submenu-overlay {
-        display: none !important;
-      }
-    }
-    .mobile-bottom-nav__activebox {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      transition: background 0.2s, box-shadow 0.2s;
-    }
-    .mobile-bottom-nav__item.active .mobile-bottom-nav__activebox {
-      background: linear-gradient(90deg, #a7c7ff 0%, #fbc2eb 100%);
-      box-shadow: 0 2px 12px rgba(25, 118, 210, 0.08);
-      border-radius: 16px;
-      padding: 6px 8px 4px 8px;
-    }
-    .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg {
-      fill: #1976d2;
-      transform: scale(1.12);
-      transition: fill 0.2s, transform 0.2s;
-    }
-    .mobile-bottom-nav__item.active .mobile-bottom-nav__label {
-      color: #1976d2;
-      font-weight: bold;
-    }
-  </style>
-  <script>
-    (function() {
-      let navItems;
-      let lastOpen = null;
-      let overlay = document.getElementById('mobile-submenu-overlay');
-      let closeBtn = document.getElementById('close-mobile-submenu');
-      let submenuList = document.getElementById('mobile-submenu-list');
-      function closeOverlay() {
-        overlay.classList.remove('active');
-        submenuList.innerHTML = '';
-        document.body.style.overflow = '';
-        // حذف کلاس active از همه آیتم‌ها
-        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
-      }
-      function openOverlayWithSubmenu(submenuHtml, parentItem) {
-        submenuList.innerHTML = submenuHtml;
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        // حذف active از همه و اضافه کردن به آیتم فعلی
-        document.querySelectorAll('.mobile-bottom-nav__item.active').forEach(i => i.classList.remove('active'));
-        if (parentItem) parentItem.classList.add('active');
-      }
-      function setupMobileNavOverlay() {
-        navItems = document.querySelectorAll('.mobile-bottom-nav__item[data-has-submenu="true"]');
-        navItems.forEach(item => {
-          item.onclick = function(e) {
-            if (window.innerWidth > 768) return;
-            let dropdown = item.querySelector('.mobile-bottom-nav__dropdown');
-            if (dropdown) {
-              let links = Array.from(dropdown.querySelectorAll('a')).filter(a => a.href && a.href !==
-                'javascript:void(0)');
-              if (links.length === 1) {
-                window.location.href = links[0].href;
-                return;
-              }
-              let html = dropdown.innerHTML;
-              openOverlayWithSubmenu(html, item);
-            }
-          };
-        });
-        if (closeBtn) {
-          closeBtn.onclick = function() {
-            closeOverlay();
-          };
-        }
-        // بستن با کلیک روی بیرون overlay
-        overlay.addEventListener('click', function(e) {
-          if (e.target === overlay) {
-            closeOverlay();
-          }
-        });
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        setupMobileNavOverlay();
-      });
-      window.addEventListener('resize', function() {
-        if (window.innerWidth <= 768) {
-          setupMobileNavOverlay();
-        }
-      });
-      document.addEventListener('livewire:update', function() {
-        setupMobileNavOverlay();
-      });
-    })();
-  </script>
 </div>
