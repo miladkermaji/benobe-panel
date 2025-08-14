@@ -13,8 +13,9 @@ use App\Models\Doctor;
 use App\Models\LoginAttempt;
 use App\Models\LoginSession;
 use App\Models\LoginLog;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class MedicalCenter extends Authenticatable
+class MedicalCenter extends Authenticatable implements JWTSubject
 {
     use SoftDeletes;
     // use Sluggable; // غیرفعال کردن sluggable trait
@@ -398,5 +399,25 @@ class MedicalCenter extends Authenticatable
     public function storyLikes()
     {
         return $this->morphMany(StoryLike::class, 'liker');
+    }
+
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
+    public function getJWTCustomClaims()
+    {
+        return [];
     }
 }
