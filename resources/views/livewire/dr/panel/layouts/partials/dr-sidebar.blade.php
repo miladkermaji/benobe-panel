@@ -643,7 +643,7 @@
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         border-radius: 20px;
         padding: 12px 0;
-        z-index: 20000;
+        z-index: 20001;
         opacity: 0;
         visibility: hidden;
         transform: translateX(-50%) translateY(20px) scale(0.8);
@@ -699,16 +699,15 @@
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
       }
 
-      /* Backdrop */
+      /* Backdrop - positioned above body but below dropdown */
       .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
         content: '';
         position: fixed;
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.4);
-        z-index: 19999;
+        height: calc(100vh - 80px);
+        z-index: 20000;
         animation: backdropIn 0.3s ease-out;
       }
 
@@ -726,7 +725,7 @@
         box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
         border-radius: 20px;
         padding: 12px 0;
-        z-index: 20000;
+        z-index: 20001;
         opacity: 0;
         visibility: hidden;
         transform: translateX(-50%) translateY(20px) scale(0.8);
@@ -751,14 +750,15 @@
         transform: translateX(0) translateY(0) scale(1);
       }
 
-      .mobile-bottom-nav__item:last-child .mobile-bottom-nav__dropdown {
-        left: auto;
-        right: 20px;
-        transform: translateX(0) translateY(20px) scale(0.8);
+      .mobile-bottom-nav__item:last-child .mobile-bottom-nav__dropdown,
+      .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
+        left: 20px !important;
+        transform: translateX(0) translateY(20px) scale(0.8) !important;
       }
 
-      .mobile-bottom-nav__item:last-child.open .mobile-bottom-nav__dropdown {
-        transform: translateX(0) translateY(0) scale(1);
+      .mobile-bottom-nav__item:last-child.open .mobile-bottom-nav__dropdown,
+      .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
+        transform: translateX(0) translateY(0) scale(1) !important;
       }
 
       /* Animations */
@@ -845,6 +845,7 @@
 
       function closeAllDropdowns(e) {
         if (!e.target.closest('.mobile-bottom-nav')) {
+          // بستن همه منوها وقتی روی بیرون کلیک می‌شه
           navItems.forEach(i => i.classList.remove('open'));
           lastOpen = null;
           document.body.style.overflow = '';
