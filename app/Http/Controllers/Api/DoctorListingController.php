@@ -270,8 +270,8 @@ class DoctorListingController extends Controller
 
                 $query = Doctor::query()
                     ->where('status', true)
-                    ->whereNotNull('first_name')->where('first_name', '!=', '')
-                    ->whereNotNull('last_name')->where('last_name', '!=', '')
+                    // ->whereNotNull('first_name')->where('first_name', '!=', '')
+                    // ->whereNotNull('last_name')->where('last_name', '!=', '')
                     ->with([
                         'specialty'     => fn ($q) => $q->select('id', 'name', 'slug'),
                         'province'      => fn ($q) => $q->select('id', 'name', 'slug'),
@@ -293,6 +293,40 @@ class DoctorListingController extends Controller
                 // Debug: Count total doctors before filters
                 $totalDoctorsBeforeFilters = $query->count();
                 Log::info('Total doctors before filters', ['count' => $totalDoctorsBeforeFilters]);
+
+                // Debug: Check each filter step by step
+                $totalDoctors = Doctor::count();
+                Log::info('Total doctors in database', ['count' => $totalDoctors]);
+
+                $activeDoctors = Doctor::where('status', true)->count();
+                Log::info('Active doctors', ['count' => $activeDoctors]);
+
+                $doctorsWithFirstName = Doctor::where('status', true)
+                    ->whereNotNull('first_name')
+                    ->where('first_name', '!=', '')
+                    ->count();
+                Log::info('Doctors with first name', ['count' => $doctorsWithFirstName]);
+
+                $doctorsWithLastName = Doctor::where('status', true)
+                    ->whereNotNull('first_name')->where('first_name', '!=', '')
+                    ->whereNotNull('last_name')
+                    ->where('last_name', '!=', '')
+                    ->count();
+                Log::info('Doctors with last name', ['count' => $doctorsWithLastName]);
+
+                // Debug: Check doctors without any filters
+                $doctorsWithoutAnyFilter = Doctor::count();
+                Log::info('Doctors without any filter', ['count' => $doctorsWithoutAnyFilter]);
+
+                // Debug: Check doctors with different status values
+                $doctorsWithStatusTrue = Doctor::where('status', true)->count();
+                $doctorsWithStatusFalse = Doctor::where('status', false)->count();
+                $doctorsWithStatusNull = Doctor::whereNull('status')->count();
+                Log::info('Doctors by status', [
+                    'status_true' => $doctorsWithStatusTrue,
+                    'status_false' => $doctorsWithStatusFalse,
+                    'status_null' => $doctorsWithStatusNull
+                ]);
 
                 // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
                 if ($serviceType === 'in_person') {
