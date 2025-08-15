@@ -578,8 +578,9 @@
             class="mobile-nav-item {{ Request::routeIs('dr.panel.financial-reports.index') ? 'active' : '' }}">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
               xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 3V21H21V3H3ZM19 19H5V5H19V19Z" fill="currentColor" />
               <path
-                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
+                d="M7 7H9V9H7V7ZM11 7H13V9H11V7ZM15 7H17V9H15V7ZM7 11H9V13H7V11ZM11 11H13V13H11V11ZM15 11H17V13H15V11ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15Z"
                 fill="currentColor" />
             </svg>
             <span>گزارش مالی</span>
@@ -590,11 +591,11 @@
         <button class="mobile-nav-item mobile-nav-toggle" id="mobile-others-toggle">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path
-              d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H19C20.11 23 21 22.11 21 21V9ZM19 21H5V3H13V9H19V21Z"
+              d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM12 18C13.1 18 14 18.9 14 20C14 21.1 13.1 22 12 22C10.9 22 10 21.1 10 20C10 18.9 10.9 18 12 18ZM12 10C13.1 10 14 10.9 14 12C14 13.1 13.1 14 12 14C10.9 14 10 13.1 10 12C10 10.9 10.9 10 12 10Z"
               fill="currentColor" />
           </svg>
           <span>سایر</span>
-          
+
         </button>
       </div>
     </div>
@@ -945,7 +946,7 @@
     }
 
     .mobile-nav-container {
-      padding: 8px 16px;
+      padding: 6px 12px;
     }
 
     .mobile-nav-main {
@@ -960,11 +961,11 @@
       align-items: center;
       text-decoration: none;
       color: #666;
-      font-size: 11px;
-      padding: 8px 4px;
-      border-radius: 8px;
+      font-size: 10px;
+      padding: 6px 3px;
+      border-radius: 6px;
       transition: all 0.3s ease;
-      min-width: 60px;
+      min-width: 55px;
       background: none;
       border: none;
       cursor: pointer;
@@ -977,13 +978,13 @@
     }
 
     .mobile-nav-item svg {
-      margin-bottom: 4px;
+      margin-bottom: 3px;
       transition: transform 0.3s ease;
     }
 
     .mobile-nav-item span {
       text-align: center;
-      line-height: 1.2;
+      line-height: 1.1;
       white-space: nowrap;
     }
 
@@ -1024,7 +1025,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 16px;
+      padding: 16px 12px;
       border-bottom: 1px solid #e0e0e0;
       background: #f8f9fa;
       position: sticky;
@@ -1034,7 +1035,7 @@
 
     .mobile-others-header h3 {
       margin: 0;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 600;
       color: #333;
     }
@@ -1042,7 +1043,7 @@
     .mobile-close-btn {
       background: none;
       border: none;
-      padding: 8px;
+      padding: 6px;
       border-radius: 50%;
       cursor: pointer;
       color: #666;
@@ -1056,37 +1057,37 @@
 
     .mobile-others-content {
       flex: 1;
-      padding: 16px;
+      padding: 12px;
       overflow-y: auto;
     }
 
     .mobile-section {
-      margin-bottom: 24px;
+      margin-bottom: 16px;
     }
 
     .mobile-section-title {
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 600;
       color: #333;
-      margin-bottom: 12px;
-      padding-bottom: 8px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
       border-bottom: 2px solid #007bff;
     }
 
     .mobile-section-items {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 4px;
     }
 
     .mobile-section-item {
       display: block;
-      padding: 12px 16px;
+      padding: 8px 12px;
       background: #f8f9fa;
-      border-radius: 8px;
+      border-radius: 6px;
       text-decoration: none;
       color: #333;
-      font-size: 14px;
+      font-size: 13px;
       transition: all 0.3s ease;
       border: 1px solid transparent;
     }
@@ -1119,23 +1120,32 @@
     /* Responsive adjustments */
     @media (max-width: 480px) {
       .mobile-nav-item {
-        font-size: 10px;
-        min-width: 50px;
-        padding: 6px 2px;
+        font-size: 9px;
+        min-width: 45px;
+        padding: 4px 2px;
       }
 
       .mobile-nav-item svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
       }
 
       .mobile-others-content {
-        padding: 12px;
+        padding: 8px;
       }
 
       .mobile-section-item {
-        padding: 10px 12px;
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+
+      .mobile-section {
+        margin-bottom: 12px;
+      }
+
+      .mobile-section-title {
         font-size: 13px;
+        margin-bottom: 6px;
       }
     }
 
