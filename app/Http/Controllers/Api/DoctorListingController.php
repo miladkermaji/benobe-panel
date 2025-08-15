@@ -197,6 +197,13 @@ class DoctorListingController extends Controller
                     ], 404);
                 }
                 $provinceId = $province->id;
+
+                // Debug log
+                Log::info('Province filter debug', [
+                    'province_slug' => $provinceSlug,
+                    'province_id' => $provinceId,
+                    'province_name' => $province->name
+                ]);
             }
 
             // پیدا کردن city_id از city_slug
@@ -283,6 +290,10 @@ class DoctorListingController extends Controller
                         'services'      => fn ($q) => $q->select('services.id', 'services.name', 'services.slug'),
                     ]);
 
+                // Debug: Count total doctors before filters
+                $totalDoctorsBeforeFilters = $query->count();
+                Log::info('Total doctors before filters', ['count' => $totalDoctorsBeforeFilters]);
+
                 // لود کردن رابطه appointmentConfig فقط برای نوبت‌های حضوری
                 if ($serviceType === 'in_person') {
                     $query->with([
@@ -314,10 +325,48 @@ class DoctorListingController extends Controller
 
                 // فیلتر کردن بر اساس province و city
                 if ($provinceId) {
-                    $query->where('province_id', $provinceId);
+                    $query->where(function ($q) use ($provinceId) {
+                        $q->where('province_id', $provinceId)
+                          ->orWhereHas('clinics', function ($clinicQuery) use ($provinceId) {
+                              $clinicQuery->where('province_id', $provinceId);
+                          });
+                    });
+
+                    // Debug: Count after province filter
+                    $doctorsAfterProvinceFilter = (clone $query)->count();
+                    Log::info('Doctors after province filter', [
+                        'province_id' => $provinceId,
+                        'count' => $doctorsAfterProvinceFilter
+                    ]);
+
+                    // Debug: Check doctors with this province_id directly
+                    $doctorsWithProvinceId = Doctor::where('province_id', $provinceId)->count();
+                    Log::info('Doctors with province_id directly', [
+                        'province_id' => $provinceId,
+                        'count' => $doctorsWithProvinceId
+                    ]);
+
+                    // Debug: Check clinics with this province_id
+                    $clinicsWithProvinceId = \App\Models\MedicalCenter::where('province_id', $provinceId)->count();
+                    Log::info('Clinics with province_id', [
+                        'province_id' => $provinceId,
+                        'count' => $clinicsWithProvinceId
+                    ]);
                 }
                 if ($cityId) {
-                    $query->where('city_id', $cityId);
+                    $query->where(function ($q) use ($cityId) {
+                        $q->where('city_id', $cityId)
+                          ->orWhereHas('clinics', function ($clinicQuery) use ($cityId) {
+                              $clinicQuery->where('city_id', $cityId);
+                          });
+                    });
+
+                    // Debug: Count after city filter
+                    $doctorsAfterCityFilter = (clone $query)->count();
+                    Log::info('Doctors after city filter', [
+                        'city_id' => $cityId,
+                        'count' => $doctorsAfterCityFilter
+                    ]);
                 }
 
                 // فیلتر کردن بر اساس تخصص
@@ -493,6 +542,12 @@ class DoctorListingController extends Controller
                     'per_page'     => $doctors->perPage(),
                     'current_page' => $doctors->currentPage(),
                     'last_page'    => $doctors->lastPage(),
+                ],
+                'filters'    => [
+                    'province_slug' => $provinceSlug,
+                    'city_slug'     => $citySlug,
+                    'specialty_slug' => $specialtySlug,
+                    'total_doctors_before_filters' => $totalDoctorsBeforeFilters ?? 0,
                 ],
             ], 200);
         } catch (\Illuminate\Validation\ValidationException $e) {
