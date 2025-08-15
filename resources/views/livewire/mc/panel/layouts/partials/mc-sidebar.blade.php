@@ -585,33 +585,41 @@
       }
 
       .mobile-section-items {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 6px;
       }
 
       .mobile-section-item {
-        display: block;
-        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 8px;
         background: #f8f9fa;
-        border-radius: 6px;
+        border-radius: 8px;
         text-decoration: none;
         color: #333;
-        font-size: 13px;
+        font-size: 12px;
         transition: all 0.3s ease;
         border: 1px solid transparent;
+        text-align: center;
+        min-height: 40px;
+        line-height: 1.2;
       }
 
       .mobile-section-item:hover {
         background: #e9ecef;
         border-color: #007bff;
         color: #007bff;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
       }
 
       .mobile-section-item.active {
         background: #007bff;
         color: #fff;
         border-color: #007bff;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
       }
 
       .mobile-section-item.disabled {
@@ -625,6 +633,8 @@
         background: #f8f9fa;
         border-color: transparent;
         color: #6c757d;
+        transform: none;
+        box-shadow: none;
       }
 
       /* Responsive adjustments */
@@ -644,9 +654,15 @@
           padding: 8px;
         }
 
+        .mobile-section-items {
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 5px;
+        }
+
         .mobile-section-item {
-          padding: 6px 10px;
-          font-size: 12px;
+          padding: 8px 6px;
+          font-size: 11px;
+          min-height: 36px;
         }
 
         .mobile-section {
@@ -656,6 +672,19 @@
         .mobile-section-title {
           font-size: 13px;
           margin-bottom: 6px;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .mobile-section-items {
+          grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+          gap: 4px;
+        }
+
+        .mobile-section-item {
+          padding: 6px 4px;
+          font-size: 10px;
+          min-height: 32px;
         }
       }
 
