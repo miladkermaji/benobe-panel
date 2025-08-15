@@ -1578,6 +1578,38 @@
               </div>
             </div>
           @endif
+          <!-- نوبت اینترنتی -->
+          @if ($this->hasPermission('appointments'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <span>نوبت اینترنتی</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                @if ($this->hasPermission('dr.panel.doctornotes.index'))
+                  <a href="{{ route('dr.panel.doctornotes.index') }}">توضیحات نوبت</a>
+                @endif
+                @if ($this->hasPermission('dr-mySpecialDays'))
+                  <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
+                @endif
+                @if ($this->hasPermission('dr-scheduleSetting'))
+                  <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
+                @endif
+                @if ($this->hasPermission('dr-vacation'))
+                  <a href="{{ route('dr-vacation') }}">تعطیلات</a>
+                @endif
+                @if ($this->hasPermission('doctor-blocking-users.index'))
+                  <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
+                @endif
+              </div>
+            </div>
+          @endif
           <!-- نسخه الکترونیک -->
           @if ($this->hasPermission('prescription'))
             <div class="mobile-menu-section">
@@ -1616,19 +1648,26 @@
           @endif
           <!-- نسخه های من -->
           @if ($this->hasPermission('my-prescriptions'))
+            <!-- removed from Other menu because it exists in bottom navigation -->
+          @endif
+          <!-- گزارش مالی -->
+          @if ($this->hasPermission('financial_reports'))
             <div class="mobile-menu-section">
               <div class="mobile-menu-section__header">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14,2 14,8 20,8"></polyline>
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                 </svg>
-                <span>نسخه های من</span>
-                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">جدید</span>
+                <span>گزارش مالی</span>
               </div>
               <div class="mobile-menu-section__items">
-                <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
-                <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
+                @if ($this->hasPermission('dr-payment-setting'))
+                  <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
+                @endif
+                @if ($this->hasPermission('dr-wallet-charge'))
+                  <a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a>
+                @endif
               </div>
             </div>
           @endif
