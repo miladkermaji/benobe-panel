@@ -1330,7 +1330,8 @@
     <!-- سایر -->
     <div
       class="mobile-bottom-nav__item mobile-bottom-nav__item--other {{ Request::routeIs('dr-moshavere_setting') ||Request::routeIs('dr-moshavere_waiting') ||Request::routeIs('consult-term.index') ||Request::routeIs('dr-mySpecialDays-counseling') ||Request::routeIs('prescription.index') ||Request::routeIs('providers.index') ||Request::routeIs('favorite.templates.index') ||Request::routeIs('templates.favorite.service.index') ||Request::routeIs('dr-patient-records') ||Request::routeIs('dr.panel.send-message') ||Request::routeIs('dr-secretary-management') ||Request::routeIs('dr-secretary-permissions') ||Request::routeIs('dr-clinic-management') ||Request::routeIs('doctors.clinic.cost') ||Request::routeIs('duration.index') ||Request::routeIs('activation.workhours.index') ||Request::routeIs('dr.panel.clinics.medical-documents') ||Request::routeIs('doctors.clinic.deposit') ||Request::routeIs('dr-edit-profile') ||Request::routeIs('dr-edit-profile-security') ||Request::routeIs('dr-edit-profile-upgrade') ||Request::routeIs('dr-my-performance') ||Request::routeIs('dr-subuser') ||Request::routeIs('my-dr-appointments') ||Request::routeIs('dr.panel.doctor-faqs.index') ||Request::routeIs('dr-my-performance-chart') ||Request::routeIs('dr-panel-tickets') ||Request::routeIs('dr.panel.doctor-services.index')? 'active': '' }}"
-      data-group="other" data-has-submenu="true">
+      data-group="other" data-has-submenu="true" x-data="{ isOpen: false }" @click="isOpen = !isOpen"
+      @click.away="isOpen = false" :class="{ 'open': isOpen }">
       <div class="mobile-bottom-nav__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round">
@@ -1340,10 +1341,15 @@
         </svg>
       </div>
       <div class="mobile-bottom-nav__label">سایر</div>
-      <div class="mobile-bottom-nav__dropdown">
+      <div class="mobile-bottom-nav__dropdown" x-show="isOpen" x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0 transform translate-y-full"
+        x-transition:enter-end="opacity-100 transform translate-y-0"
+        x-transition:leave="transition ease-in duration-300"
+        x-transition:leave-start="opacity-100 transform translate-y-0"
+        x-transition:leave-end="opacity-0 transform translate-y-full" @click.stop>
         <!-- Header with close button -->
         <div class="mobile-dropdown-header">
-          <button class="mobile-dropdown-close" onclick="closeOtherMenu(event)">
+          <button class="mobile-dropdown-close" @click.stop="isOpen = false">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
               stroke-linejoin="round">
               <line x1="18" y1="6" x2="6" y2="18"></line>
