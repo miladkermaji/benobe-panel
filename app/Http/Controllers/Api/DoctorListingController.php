@@ -21,6 +21,7 @@ class DoctorListingController extends Controller
     /**
  * دریافت لیست پزشکان با فیلترهای مختلف
  * @param string|null $province_slug اسلاگ استان
+ * @param string|null $city_slug اسلاگ شهر
  * @param string|null $specialty_slug اسلاگ تخصص
  * @param string|null $insurance_slug اسلاگ بیمه
  * @param string|null $service_slug اسلاگ خدمت
@@ -104,7 +105,7 @@ class DoctorListingController extends Controller
  * }
  * @response 404 {
  *   "status": "error",
- *   "message": "استان، تخصص، بیمه یا خدمت یافت نشد.",
+ *   "message": "استان، شهر، تخصص، بیمه یا خدمت یافت نشد.",
  *   "data": null
  * }
  * @response 422 {
@@ -125,6 +126,7 @@ class DoctorListingController extends Controller
             // اعتبارسنجی ورودی‌ها
             $validated = $request->validate([
                 'province_slug'              => 'nullable|exists:zone,slug',
+                'city_slug'                  => 'nullable|exists:zone,slug',
                 'specialty_slug'             => 'nullable|exists:specialties,slug',
                 'sex'                        => 'nullable|in:male,female,both',
                 'has_available_appointments' => 'nullable|string|in:true,false,1,0',
@@ -136,6 +138,7 @@ class DoctorListingController extends Controller
                 'service_type'               => 'nullable|in:in_person,phone,text,video',
             ], [
                 'province_slug.exists'         => 'استان انتخاب‌شده وجود ندارد.',
+                'city_slug.exists'             => 'شهر انتخاب‌شده وجود ندارد.',
                 'specialty_slug.exists'        => 'تخصص انتخاب‌شده وجود ندارد.',
                 'sex.in'                       => 'جنسیت باید یکی از مقادیر male, female, both باشد.',
                 'has_available_appointments.in' => 'مقدار نوبت‌های در دسترس باید true, false, 1 یا 0 باشد.',
@@ -151,6 +154,7 @@ class DoctorListingController extends Controller
             ]);
 
             $provinceSlug             = $request->input('province_slug');
+            $citySlug                 = $request->input('city_slug');
             $specialtySlug            = $request->input('specialty_slug');
             $gender                   = $request->input('sex');
             $hasAvailableAppointments = filter_var($request->input('has_available_appointments', false), FILTER_VALIDATE_BOOLEAN);
@@ -195,6 +199,20 @@ class DoctorListingController extends Controller
                 $provinceId = $province->id;
             }
 
+            // پیدا کردن city_id از city_slug
+            $cityId = null;
+            if ($citySlug) {
+                $city = Zone::where('level', 2)->where('slug', $citySlug)->first();
+                if (!$city) {
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'شهر یافت نشد.',
+                        'data'    => null,
+                    ], 404);
+                }
+                $cityId = $city->id;
+            }
+
             // پیدا کردن specialty_id از specialty_slug
             $specialtyId = null;
             if ($specialtySlug) {
@@ -237,9 +255,9 @@ class DoctorListingController extends Controller
                 $insuranceId = $insurance->id;
             }
 
-            $cacheKey = "doctors_list_{$provinceSlug}_{$specialtySlug}_{$gender}_{$hasAvailableAppointments}_{$serviceSlug}_{$insuranceSlug}_{$limit}_{$page}_{$sort}_{$serviceType}";
+            $cacheKey = "doctors_list_{$provinceSlug}_{$citySlug}_{$specialtySlug}_{$gender}_{$hasAvailableAppointments}_{$serviceSlug}_{$insuranceSlug}_{$limit}_{$page}_{$sort}_{$serviceType}";
 
-            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $specialtyId, $gender, $hasAvailableAppointments, $serviceId, $insuranceId, $limit, $page, $sort, $serviceType) {
+            $doctors = Cache::remember($cacheKey, 300, function () use ($provinceId, $cityId, $specialtyId, $gender, $hasAvailableAppointments, $serviceId, $insuranceId, $limit, $page, $sort, $serviceType) {
                 $today        = Carbon::today('Asia/Tehran');
                 $calendarDays = 30;
 
@@ -250,6 +268,7 @@ class DoctorListingController extends Controller
                     ->with([
                         'specialty'     => fn ($q) => $q->select('id', 'name', 'slug'),
                         'province'      => fn ($q) => $q->select('id', 'name', 'slug'),
+                        'city'          => fn ($q) => $q->select('id', 'name', 'slug'),
                         'clinics'       => fn ($q) => $q->where('is_active', true)
                             ->with(['city' => fn ($q) => $q->select('id', 'name', 'slug')])
                             ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.province_id', 'medical_centers.city_id', 'medical_centers.payment_methods', 'medical_centers.is_main_center'),
@@ -295,15 +314,10 @@ class DoctorListingController extends Controller
 
                 // فیلتر کردن بر اساس province و city
                 if ($provinceId) {
-                    $cityIds = Zone::where('level', 2)
-                        ->where('parent_id', $provinceId)
-                        ->pluck('id')
-                        ->toArray();
-
-                    $query->where(function ($q) use ($provinceId, $cityIds) {
-                        $q->where('province_id', $provinceId)
-                          ->orWhereIn('city_id', $cityIds);
-                    });
+                    $query->where('province_id', $provinceId);
+                }
+                if ($cityId) {
+                    $query->where('city_id', $cityId);
                 }
 
                 // فیلتر کردن بر اساس تخصص
@@ -393,6 +407,7 @@ class DoctorListingController extends Controller
                 $mainClinic        = $doctor->clinics->where('is_main_center', true)->first() ?? $doctor->clinics->first();
                 $otherClinicsCount = $doctor->clinics->count() - 1;
                 $city              = $mainClinic && $mainClinic->city ? $mainClinic->city->name : ($doctor->city ? $doctor->city->name : 'نامشخص');
+                $citySlug          = $mainClinic && $mainClinic->city ? $mainClinic->city->slug : ($doctor->city ? $doctor->city->slug : null);
 
                 $clinicId = $mainClinic ? $mainClinic->id : null;
                 $slotData = $this->getNextAvailableSlot($doctor, $clinicId);
@@ -435,7 +450,7 @@ class DoctorListingController extends Controller
                         ],
                         'city'                => [
                             'name' => $city,
-                            'slug' => $mainClinic && $mainClinic->city ? $mainClinic->city->slug : ($doctor->city ? $doctor->city->slug : null),
+                            'slug' => $citySlug,
                         ],
                         'address'             => $mainClinic?->address ?? 'نامشخص',
                         'clinic'              => $mainClinic ? [
