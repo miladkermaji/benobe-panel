@@ -1225,218 +1225,11 @@
       border-radius: 8px;
     }
   </style>
-  <script>
-    (function() {
-      let navItems;
-      let lastOpen = null;
 
-      function closeAllDropdowns(e) {
-        if (!e.target.closest('.mobile-bottom-nav')) {
-          // بستن همه منوها وقتی روی بیرون کلیک می‌شه
-          navItems.forEach(i => i.classList.remove('open'));
-          lastOpen = null;
-          document.body.style.overflow = '';
-        }
-      }
-
-      function setupMobileNavDropdowns() {
-        navItems = document.querySelectorAll('.mobile-bottom-nav__item');
-        navItems.forEach(item => {
-          item.onclick = function(e) {
-            // Don't handle clicks on close buttons or dropdown content
-            if (e.target.closest('.mobile-dropdown-close') || e.target.closest('.mobile-bottom-nav__dropdown')) {
-              return;
-            }
-            if (item.classList.contains('open')) {
-              // اگر همین آیتم باز است، فقط ببند
-              item.classList.remove('open');
-              lastOpen = null;
-              document.body.style.overflow = '';
-            } else {
-              // بستن همه منوهای باز
-              navItems.forEach(i => {
-                i.classList.remove('open');
-              });
-              // باز کردن منوی جدید
-              item.classList.add('open');
-              lastOpen = item;
-              // تنظیم overflow برای backdrop
-              if (item.querySelector('.mobile-bottom-nav__dropdown')) {
-                document.body.style.overflow = 'hidden';
-              }
-            }
-          };
-        });
-      }
-      // Function to close the "سایر" menu - Simple approach like doctor sidebar
-      function closeOtherMenu(event) {
-        // Prevent event bubbling
-        if (event) {
-          event.preventDefault();
-          event.stopPropagation();
-          event.stopImmediatePropagation();
-        }
-        const otherItem = document.querySelector('.mobile-bottom-nav__item--other');
-        if (otherItem) {
-          otherItem.classList.remove('open');
-          lastOpen = null;
-          document.body.style.overflow = '';
-          // Temporarily disable click events to prevent immediate reopening
-          otherItem.style.pointerEvents = 'none';
-          setTimeout(() => {
-            otherItem.style.pointerEvents = '';
-          }, 300);
-        }
-      }
-      window.closeOtherMenu = closeOtherMenu;
-
-      function setActiveItem() {
-        const currentPath = window.location.pathname;
-        const currentUrl = window.location.href;
-        navItems.forEach(item => {
-          // حذف کلاس active از همه آیتم‌ها
-          item.classList.remove('active');
-          // بررسی لینک‌های مستقیم (بدون زیرمنو)
-          const directLink = item.querySelector('a[href]');
-          if (directLink && directLink.href && !item.hasAttribute('data-has-submenu')) {
-            if (directLink.href === currentUrl || directLink.href.endsWith(currentPath)) {
-              item.classList.add('active');
-              return;
-            }
-          }
-          // بررسی لینک‌های زیرمنو
-          const submenuLinks = item.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
-          let isActive = false;
-          submenuLinks.forEach(link => {
-            if (link.href && link.href !== 'javascript:void(0)') {
-              if (link.href === currentUrl || link.href.endsWith(currentPath)) {
-                isActive = true;
-              }
-            }
-          });
-          if (isActive) {
-            item.classList.add('active');
-          }
-        });
-      }
-      // Function to ensure proper scrolling behavior
-      function setupScrolling() {
-        const dropdownContent = document.querySelector('.mobile-dropdown-content');
-        if (dropdownContent) {
-          // Reset scroll position when opening
-          dropdownContent.scrollTop = 0;
-          // Ensure smooth scrolling
-          dropdownContent.style.scrollBehavior = 'smooth';
-          // Add touch scrolling support
-          let isScrolling = false;
-          let startY = 0;
-          let startScrollTop = 0;
-          dropdownContent.addEventListener('touchstart', function(e) {
-            startY = e.touches[0].clientY;
-            startScrollTop = this.scrollTop;
-            isScrolling = false;
-          });
-          dropdownContent.addEventListener('touchmove', function(e) {
-            if (!isScrolling) {
-              const deltaY = startY - e.touches[0].clientY;
-              if (Math.abs(deltaY) > 10) {
-                isScrolling = true;
-              }
-            }
-          });
-        }
-      }
-
-      function bindDropdownLinks() {
-        const links = document.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
-        links.forEach(link => {
-          if (link.getAttribute('data-bound') === '1') return;
-          const href = link.getAttribute('href');
-          if (!href || href === 'javascript:void(0)') return;
-          const navigate = function(e) {
-            // Allow new tab / modified clicks
-            if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (typeof e.button === 'number' && e
-                .button === 1))) {
-              return;
-            }
-            if (e) {
-              e.preventDefault();
-              e.stopPropagation();
-            }
-            document.body.style.overflow = '';
-            window.location.assign(link.href);
-          };
-          link.addEventListener('click', navigate);
-          link.addEventListener('touchend', navigate, {
-            passive: false
-          });
-          link.setAttribute('data-bound', '1');
-        });
-      }
-      document.addEventListener('DOMContentLoaded', function() {
-        setupMobileNavDropdowns();
-        setActiveItem();
-        setupScrolling();
-        // Prevent clicks inside dropdowns from bubbling and closing the menu
-        document.querySelectorAll('.mobile-bottom-nav__dropdown').forEach(function(el) {
-          el.addEventListener('click', function(e) {
-            e.stopPropagation();
-          }, {
-            capture: true
-          });
-          el.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-          }, {
-            capture: true
-          });
-        });
-        bindDropdownLinks();
-        document.addEventListener('click', closeAllDropdowns);
-      });
-      window.addEventListener('resize', function() {
-        if (window.innerWidth <= 768) {
-          setupMobileNavDropdowns();
-          setupScrolling();
-          // Re-bind stopPropagation for dynamically rendered dropdowns
-          document.querySelectorAll('.mobile-bottom-nav__dropdown').forEach(function(el) {
-            el.addEventListener('click', function(e) {
-              e.stopPropagation();
-            }, {
-              capture: true
-            });
-            el.addEventListener('touchstart', function(e) {
-              e.stopPropagation();
-            }, {
-              capture: true
-            });
-          });
-          bindDropdownLinks();
-        }
-      });
-      document.addEventListener('livewire:update', function() {
-        setupMobileNavDropdowns();
-        setActiveItem();
-        setupScrolling();
-        document.querySelectorAll('.mobile-bottom-nav__dropdown').forEach(function(el) {
-          el.addEventListener('click', function(e) {
-            e.stopPropagation();
-          }, {
-            capture: true
-          });
-          el.addEventListener('touchstart', function(e) {
-            e.stopPropagation();
-          }, {
-            capture: true
-          });
-        });
-        bindDropdownLinks();
-      });
-    })();
-  </script>
   <div class="mobile-bottom-nav" wire:ignore>
     <!-- داشبورد -->
     @if ($this->hasPermission('dashboard'))
-      <div class="mobile-bottom-nav__item" data-group="dashboard">
+      <div class="mobile-bottom-nav__item {{ Request::routeIs('dr-panel') ? 'active' : '' }}" data-group="dashboard">
         <a href="{{ route('dr-panel') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
@@ -1454,7 +1247,9 @@
     @endif
     <!-- نوبت‌ها -->
     @if ($this->hasPermission('appointments'))
-      <div class="mobile-bottom-nav__item" data-group="appointments">
+      <div
+        class="mobile-bottom-nav__item {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'active' : '' }}"
+        data-group="appointments">
         <a href="{{ route('dr-appointments') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
@@ -1478,7 +1273,8 @@
     @endif
     <!-- ساعت کاری -->
     @if ($this->hasPermission('dr-workhours'))
-      <div class="mobile-bottom-nav__item" data-group="workhours">
+      <div class="mobile-bottom-nav__item {{ Request::routeIs('dr-workhours') ? 'active' : '' }}"
+        data-group="workhours">
         <a href="{{ route('dr-workhours') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
@@ -1494,7 +1290,9 @@
     @endif
     <!-- نسخه‌ها -->
     @if ($this->hasPermission('my-prescriptions'))
-      <div class="mobile-bottom-nav__item" data-group="prescriptions">
+      <div
+        class="mobile-bottom-nav__item {{ Request::routeIs('dr.panel.my-prescriptions') || Request::routeIs('dr.panel.my-prescriptions.settings') ? 'active' : '' }}"
+        data-group="prescriptions">
         <a href="{{ route('dr.panel.my-prescriptions') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
@@ -1513,7 +1311,9 @@
     @endif
     <!-- گزارش مالی -->
     @if ($this->hasPermission('financial_reports'))
-      <div class="mobile-bottom-nav__item" data-group="financial">
+      <div
+        class="mobile-bottom-nav__item {{ Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr-wallet-charge') ? 'active' : '' }}"
+        data-group="financial">
         <a href="{{ route('dr.panel.financial-reports.index') }}"
           style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
           <div class="mobile-bottom-nav__icon">
@@ -1528,7 +1328,9 @@
       </div>
     @endif
     <!-- سایر -->
-    <div class="mobile-bottom-nav__item mobile-bottom-nav__item--other" data-group="other" data-has-submenu="true">
+    <div
+      class="mobile-bottom-nav__item mobile-bottom-nav__item--other {{ Request::routeIs('dr-moshavere_setting') ||Request::routeIs('dr-moshavere_waiting') ||Request::routeIs('consult-term.index') ||Request::routeIs('dr-mySpecialDays-counseling') ||Request::routeIs('prescription.index') ||Request::routeIs('providers.index') ||Request::routeIs('favorite.templates.index') ||Request::routeIs('templates.favorite.service.index') ||Request::routeIs('dr-patient-records') ||Request::routeIs('dr.panel.send-message') ||Request::routeIs('dr-secretary-management') ||Request::routeIs('dr-secretary-permissions') ||Request::routeIs('dr-clinic-management') ||Request::routeIs('doctors.clinic.cost') ||Request::routeIs('duration.index') ||Request::routeIs('activation.workhours.index') ||Request::routeIs('dr.panel.clinics.medical-documents') ||Request::routeIs('doctors.clinic.deposit') ||Request::routeIs('dr-edit-profile') ||Request::routeIs('dr-edit-profile-security') ||Request::routeIs('dr-edit-profile-upgrade') ||Request::routeIs('dr-my-performance') ||Request::routeIs('dr-subuser') ||Request::routeIs('my-dr-appointments') ||Request::routeIs('dr.panel.doctor-faqs.index') ||Request::routeIs('dr-my-performance-chart') ||Request::routeIs('dr-panel-tickets') ||Request::routeIs('dr.panel.doctor-services.index')? 'active': '' }}"
+      data-group="other" data-has-submenu="true">
       <div class="mobile-bottom-nav__icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
           stroke-linejoin="round">
