@@ -1183,11 +1183,12 @@
       .sidebar__nav {
         display: none;
       }
-    }
-
-    .bars {
+       .bars {
       display: none !important;
     }
+    }
+
+   
   </style>
 
   <script>
