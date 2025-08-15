@@ -268,4 +268,86 @@ class SubUserController extends Controller
             'model_type' => 'User',
         ], 201);
     }
+
+    /**
+     * حذف کاربر از زیرمجموعه
+     *
+     * @param int $subUserId شناسه کاربر زیرمجموعه
+     * @response 200 {
+     *   "status": "success",
+     *   "message": "کاربر با موفقیت از زیرمجموعه حذف شد",
+     *   "data": null
+     * }
+     * @response 401 {
+     *   "status": "error",
+     *   "message": "کاربر احراز هویت نشده است",
+     *   "data": null
+     * }
+     * @response 404 {
+     *   "status": "error",
+     *   "message": "کاربر زیرمجموعه یافت نشد",
+     *   "data": null
+     * }
+     * @response 500 {
+     *   "status": "error",
+     *   "message": "خطای سرور",
+     *   "data": null
+     * }
+     */
+    public function removeSubUser(Request $request, $subUserId)
+    {
+        try {
+            // احراز هویت کاربر
+            $owner = Auth::user() ?? Auth::guard('doctor')->user() ?? Auth::guard('manager')->user() ?? Auth::guard('secretary')->user();
+            if (!$owner) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'کاربر احراز هویت نشده است.',
+                    'data' => null,
+                ], 401);
+            }
+
+            $ownerType = get_class($owner);
+            $ownerId = $owner->id;
+
+            // پیدا کردن کاربر زیرمجموعه
+            $subUser = SubUser::where([
+                'id' => $subUserId,
+                'owner_id' => $ownerId,
+                'owner_type' => $ownerType,
+                'status' => 'active'
+            ])->first();
+
+            if (!$subUser) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'کاربر زیرمجموعه یافت نشد.',
+                    'data' => null,
+                ], 404);
+            }
+
+            // حذف کاربر از زیرمجموعه (soft delete یا تغییر status)
+            $subUser->update(['status' => 'removed']);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'کاربر با موفقیت از زیرمجموعه حذف شد.',
+                'data' => null,
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error removing sub user: ' . $e->getMessage(), [
+                'sub_user_id' => $subUserId,
+                'owner_id' => $ownerId ?? null,
+                'owner_type' => $ownerType ?? null,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'status' => 'error',
+                'message' => 'خطای سرور',
+                'data' => null,
+            ], 500);
+        }
+    }
 }
