@@ -327,7 +327,7 @@ class SubUserController extends Controller
             }
 
             // حذف کاربر از زیرمجموعه (soft delete یا تغییر status)
-            $subUser->update(['status' => 'removed']);
+            $subUser->update(['status' => 'inactive']);
 
             return response()->json([
                 'status' => 'success',
