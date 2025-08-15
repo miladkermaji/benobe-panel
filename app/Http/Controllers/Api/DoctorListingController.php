@@ -562,7 +562,15 @@ class DoctorListingController extends Controller
                 if (! is_array($workHours) || empty($workHours)) {
                     continue;
                 }
+
                 $workHour = $workHours[0];
+
+                // اطمینان از اینکه work_hour معتبر است
+                if (!isset($workHour['start']) || !isset($workHour['end']) ||
+                    empty($workHour['start']) || empty($workHour['end']) ||
+                    $workHour['start'] === 'null' || $workHour['end'] === 'null') {
+                    continue;
+                }
 
                 // استفاده از تابع کمکی برای استخراج duration
                 $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
@@ -575,6 +583,12 @@ class DoctorListingController extends Controller
                 while ($currentTime->lessThan($endTime)) {
                     $nextTime = (clone $currentTime)->addMinutes($duration);
                     $slotTime = $currentTime->format('H:i');
+
+                    // اطمینان از اینکه slotTime معتبر است
+                    if (empty($slotTime) || $slotTime === 'null') {
+                        $currentTime->addMinutes($duration);
+                        continue;
+                    }
 
                     $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
                         $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
@@ -673,6 +687,13 @@ class DoctorListingController extends Controller
                 }
                 $workHour = $workHours[0];
 
+                // اطمینان از اینکه work_hour معتبر است
+                if (!isset($workHour['start']) || !isset($workHour['end']) ||
+                    empty($workHour['start']) || empty($workHour['end']) ||
+                    $workHour['start'] === 'null' || $workHour['end'] === 'null') {
+                    continue;
+                }
+
                 $appointmentSettings = is_string($schedule->appointment_settings) ? json_decode($schedule->appointment_settings, true) : $schedule->appointment_settings;
                 $duration = $this->getAppointmentDuration($appointmentSettings, $dayName, 15);
 
@@ -683,6 +704,12 @@ class DoctorListingController extends Controller
                 while ($currentTime->lessThan($endTime)) {
                     $nextTime = (clone $currentTime)->addMinutes($duration);
                     $slotTime = $currentTime->format('H:i');
+
+                    // اطمینان از اینکه slotTime معتبر است
+                    if (empty($slotTime) || $slotTime === 'null') {
+                        $currentTime->addMinutes($duration);
+                        continue;
+                    }
 
                     $isBooked = $dayAppointments->contains(function ($appointment) use ($currentTime, $nextTime, $duration) {
                         $apptStart = Carbon::parse($appointment->appointment_date . ' ' . $appointment->appointment_time, 'Asia/Tehran');
