@@ -514,1127 +514,749 @@
     </script>
   </div>
   <!-- Bottom Navigation for Mobile -->
-  <style>
-    @media (max-width: 425px) {
-      .mobile-bottom-nav__label {
-        font-size: 9px !important;
-      }
-    }
-
-    @media (max-width: 768px) {
-
-      .sidebar__nav,
-      .sidebar__fixed,
-      .bars {
-        display: none !important;
-      }
-
-      /* New Modern Mobile Navigation */
-      .mobile-bottom-nav {
-        display: flex;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        width: 100vw;
-        background: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.12);
-        z-index: 25000;
-        justify-content: space-around;
-        align-items: center;
-        padding: 12px 0 8px 0;
-        height: 95px;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
-      }
-
-      .mobile-bottom-nav__item {
-        position: relative;
-        flex: 1;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        min-width: 0;
-        border-radius: 20px;
-        margin: 0 4px;
-        overflow: visible;
-        border: 2px solid transparent;
-        z-index: 25000;
-      }
-
-      .mobile-bottom-nav__item.open {
-        background: rgba(102, 126, 234, 0.05);
-        z-index: 25001;
-      }
-
-      .mobile-bottom-nav__item:active {
-        transform: scale(0.95);
-      }
-
-      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        transform: translateY(-4px) scale(1.05);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-      }
-
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 18px;
-        z-index: -1;
-        opacity: 0.3;
-        filter: blur(8px);
-      }
-
-      .mobile-bottom-nav__icon {
-        position: relative;
-        width: 48px;
-        height: 48px;
-        margin: 0 auto 6px auto;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      }
-
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        transform: translateY(-8px) scale(1.1);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
-      }
-
-      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        transform: translateY(-4px) scale(1.05);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.25);
-      }
-
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon::before {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 18px;
-        z-index: -1;
-        opacity: 0.3;
-        filter: blur(8px);
-      }
-
-      .mobile-bottom-nav__icon svg {
-        width: 24px;
-        height: 24px;
-        stroke: #6c757d;
-        stroke-width: 2;
-        fill: none;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      }
-
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__icon svg,
-      .mobile-bottom-nav__item.open .mobile-bottom-nav__icon svg {
-        stroke: #ffffff;
-        transform: scale(1.1);
-      }
-
-      .mobile-bottom-nav__label {
-        font-size: 11px;
-        color: #6c757d;
-        font-weight: 600;
-        letter-spacing: 0.3px;
-        margin-top: 2px;
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        opacity: 0.8;
-      }
-
-      .mobile-bottom-nav__item.active .mobile-bottom-nav__label,
-      .mobile-bottom-nav__item.open .mobile-bottom-nav__label {
-        color: #667eea;
-        font-weight: 700;
-        opacity: 1;
-        transform: translateY(-2px);
-      }
-
-      /* Improved Dropdown Styling - Full Width */
-      .mobile-bottom-nav__dropdown {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100vw;
-        height: 100vh;
-        /* fallback */
-        height: 100dvh;
-        background: rgba(255, 255, 255, 0.98);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        border-radius: 0;
-        padding: 0;
-        z-index: 20001;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(100%);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        max-height: 100vh;
-        top: 0;
-      }
-
-      .mobile-bottom-nav__item.open .mobile-bottom-nav__dropdown {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      /* Close Button Styling */
-      .mobile-dropdown-close {
-        position: absolute;
-        top: 12px;
-        right: 12px;
-        width: 32px;
-        height: 32px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 10;
-        box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
-        transition: all 0.3s ease;
-        /* Prevent event bubbling */
-        pointer-events: auto;
-      }
-
-      .mobile-dropdown-close:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-      }
-
-      .mobile-dropdown-close svg {
-        width: 18px;
-        height: 18px;
-        stroke: white;
-        stroke-width: 2;
-        /* Ensure SVG doesn't interfere with button clicks */
-        pointer-events: none;
-      }
-
-      /* Header for full height dropdown */
-      .mobile-dropdown-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: calc(16px + env(safe-area-inset-top));
-        text-align: center;
-        font-size: 16px;
-        font-weight: 700;
-        position: relative;
-        margin-bottom: 0;
-        flex-shrink: 0;
-      }
-
-      /* Content container for full height with proper scrolling */
-      .mobile-dropdown-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-        min-height: 0;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(102, 126, 234, 0.4) rgba(0, 0, 0, 0.05);
-      }
-
-      /* Enhanced scrollbar styling for better visibility */
-      .mobile-dropdown-content::-webkit-scrollbar {
-        width: 6px;
-      }
-
-      .mobile-dropdown-content::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 3px;
-        margin: 4px 0;
-      }
-
-      .mobile-dropdown-content::-webkit-scrollbar-thumb {
-        background: rgba(102, 126, 234, 0.4);
-        border-radius: 3px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
-
-      .mobile-dropdown-content::-webkit-scrollbar-thumb:hover {
-        background: rgba(102, 126, 234, 0.6);
-      }
-
-      /* Ensure all content is visible */
-      .mobile-dropdown-content>* {
-        min-width: 0;
-        flex-shrink: 0;
-      }
-
-      /* Fix for very long content */
-      .mobile-dropdown-content {
-        padding-bottom: 20px;
-      }
-
-      /* Ensure proper touch scrolling on mobile */
-      .mobile-dropdown-content {
-        overscroll-behavior: contain;
-        -webkit-overflow-scrolling: touch;
-        scroll-behavior: smooth;
-      }
-
-      .mobile-bottom-nav__dropdown a {
-        display: block;
-        padding: 10px 14px;
-        color: #495057;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 500;
-        border: 1px solid rgba(102, 126, 234, 0.1);
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        margin: 0;
-        position: relative;
-        white-space: nowrap;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.9);
-      }
-
-      .mobile-bottom-nav__dropdown a:last-child {
-        border-bottom: 1px solid rgba(102, 126, 234, 0.1);
-        margin-bottom: 0;
-      }
-
-      .mobile-bottom-nav__dropdown a::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-        transition: left 0.5s ease;
-      }
-
-      .mobile-bottom-nav__dropdown a:hover::before {
-        left: 100%;
-      }
-
-      .mobile-bottom-nav__dropdown a:hover {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
-        color: #667eea;
-        transform: translateX(3px);
-        box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
-        border-color: rgba(102, 126, 234, 0.25);
-      }
-
-      /* Enhanced Backdrop with Blur */
-      .mobile-bottom-nav__item:not(.mobile-bottom-nav__item--other).open::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 20000;
-        animation: backdropIn 0.3s ease-out;
-      }
-
-      /* Special backdrop for "other" menu */
-      .mobile-bottom-nav__item--other.open::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 24998;
-        animation: backdropIn 0.3s ease-out;
-      }
-
-      /* Special styling for "other" menu - full height version */
-      .mobile-bottom-nav__item--other .mobile-bottom-nav__dropdown {
-        position: fixed;
-        bottom: auto;
-        left: 0;
-        right: 0;
-        width: 100vw;
-        height: calc(100vh - 95px);
-        /* fallback */
-        height: calc(100dvh - 95px - env(safe-area-inset-top));
-        background: rgba(255, 255, 255, 0.98);
-        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-        border-radius: 0;
-        padding: 0;
-        z-index: 24999;
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(100%);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        border: none;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        max-height: calc(100vh - 95px);
-        top: 0;
-        padding-top: env(safe-area-inset-top);
-      }
-
-      .mobile-bottom-nav__item--other.open .mobile-bottom-nav__dropdown {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-      }
-
-      /* Mobile Menu Sections Styling - Two Column Layout */
-      .mobile-menu-section {
-        margin-bottom: 12px;
-        border-radius: 10px;
-        overflow: visible;
-        background: rgba(255, 255, 255, 0.95);
-        border: 1px solid rgba(102, 126, 234, 0.15);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        flex-shrink: 0;
-        min-width: 0;
-      }
-
-      .mobile-menu-section:last-child {
-        margin-bottom: 0;
-      }
-
-      .mobile-menu-section__header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 14px;
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-        border-bottom: 1px solid rgba(102, 126, 234, 0.15);
-        font-weight: 600;
-        font-size: 13px;
-        color: #495057;
-        position: relative;
-        flex-shrink: 0;
-      }
-
-      .mobile-menu-section__header svg {
-        width: 16px;
-        height: 16px;
-        stroke: #667eea;
-        stroke-width: 2;
-        flex-shrink: 0;
-      }
-
-      .mobile-menu-section__header .badge {
-        margin-right: auto;
-        font-size: 8px;
-        padding: 2px 5px;
-        border-radius: 8px;
-        font-weight: 600;
-        flex-shrink: 0;
-      }
-
-      /* Two Column Layout for Menu Items */
-      .mobile-menu-section__items {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
-        padding: 10px;
-        overflow: visible;
-        min-width: 0;
-      }
-
-      .mobile-menu-section a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 6px 10px;
-        color: #495057;
-        text-decoration: none;
-        font-size: 10px;
-        font-weight: 500;
-        border: 1px solid rgba(102, 126, 234, 0.1);
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        position: relative;
-        background: rgba(255, 255, 255, 0.9);
-        text-align: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        min-height: 28px;
-        line-height: 1.2;
-        min-width: 0;
-        flex-shrink: 0;
-      }
-
-      .mobile-menu-section a:hover {
-        background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
-        color: #667eea;
-        transform: translateY(-1px);
-        box-shadow: 0 3px 8px rgba(102, 126, 234, 0.15);
-        border-color: rgba(102, 126, 234, 0.25);
-      }
-
-      .mobile-menu-section a.disabled-link {
-        color: #6c757d;
-        cursor: not-allowed;
-        opacity: 0.5;
-        background: rgba(108, 117, 125, 0.05);
-        border-color: rgba(108, 117, 125, 0.1);
-      }
-
-      .mobile-menu-section a.disabled-link:hover {
-        transform: none;
-        box-shadow: none;
-        background: rgba(108, 117, 125, 0.05);
-        color: #6c757d;
-      }
-
-      .mobile-menu-section a::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
-        transition: left 0.5s ease;
-      }
-
-      .mobile-menu-section a:hover::before {
-        left: 100%;
-      }
-
-      /* Responsive adjustments for two column layout */
-      @media (max-width: 400px) {
-        .mobile-menu-section {
-          margin-bottom: 10px;
-        }
-
-        .mobile-menu-section__header {
-          padding: 8px 12px;
-          font-size: 12px;
-        }
-
-        .mobile-menu-section__header svg {
-          width: 14px;
-          height: 14px;
-        }
-
-        .mobile-menu-section__items {
-          padding: 8px;
-          gap: 5px;
-        }
-
-        .mobile-menu-section a {
-          padding: 5px 8px;
-          font-size: 9px;
-          min-height: 26px;
-        }
-
-        .mobile-dropdown-header {
-          padding: 14px;
-          font-size: 15px;
-        }
-
-        .mobile-dropdown-content {
-          padding: 14px;
-        }
-      }
-
-      /* For very small screens, switch to single column */
-      @media (max-width: 320px) {
-        .mobile-menu-section__items {
-          grid-template-columns: 1fr;
-          gap: 5px;
-        }
-      }
-
-      /* Animations */
-      @keyframes dropdownSlideIn {
-        0% {
-          opacity: 0;
-          transform: translateY(100%);
-        }
-
-        100% {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* Active state indicator */
-      .mobile-bottom-nav__item.active::after {
-        content: '';
-        position: absolute;
-        bottom: -8px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 6px;
-        height: 6px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 50%;
-        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
-      }
-
-      /* Scrollbar styling for dropdown */
-      .mobile-bottom-nav__dropdown::-webkit-scrollbar {
-        width: 4px;
-      }
-
-      .mobile-bottom-nav__dropdown::-webkit-scrollbar-track {
-        background: rgba(0, 0, 0, 0.05);
-        border-radius: 2px;
-      }
-
-      .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb {
-        background: rgba(102, 126, 234, 0.3);
-        border-radius: 2px;
-      }
-
-      .mobile-bottom-nav__dropdown::-webkit-scrollbar-thumb:hover {
-        background: rgba(102, 126, 234, 0.5);
-      }
-
-      /* Responsive adjustments */
-      @media (max-width: 400px) {
-        .mobile-bottom-nav__label {
-          font-size: 9px;
-        }
-
-        .mobile-bottom-nav__icon {
-          width: 42px;
-          height: 42px;
-        }
-
-        .mobile-bottom-nav__icon svg {
-          width: 20px;
-          height: 20px;
-        }
-
-        .mobile-menu-section {
-          margin-bottom: 8px;
-        }
-
-        .mobile-menu-section__header {
-          padding: 7px 10px;
-          font-size: 11px;
-        }
-
-        .mobile-menu-section__header svg {
-          width: 13px;
-          height: 13px;
-        }
-
-        .mobile-menu-section__items {
-          padding: 7px;
-          gap: 4px;
-        }
-
-        .mobile-menu-section a {
-          padding: 4px 6px;
-          font-size: 8px;
-          min-height: 24px;
-        }
-
-        .mobile-dropdown-header {
-          padding: 12px;
-          font-size: 14px;
-        }
-
-        .mobile-dropdown-content {
-          padding: 12px;
-          gap: 4px;
-        }
-
-        .mobile-dropdown-close {
-          top: 12px;
-          right: 12px;
-          width: 32px;
-          height: 32px;
-        }
-
-        .mobile-dropdown-close svg {
-          width: 16px;
-          height: 16px;
-        }
-      }
-
-      /* Responsive adjustments for sections */
-      @media (max-width: 400px) {
-        .mobile-menu-section__header {
-          padding: 7px 10px;
-          font-size: 11px;
-        }
-
-        .mobile-menu-section__header svg {
-          width: 13px;
-          height: 13px;
-        }
-
-        .mobile-menu-section a {
-          padding: 4px 6px;
-          font-size: 8px;
-        }
-
-        .mobile-dropdown-header {
-          padding: 12px;
-          font-size: 14px;
-        }
-
-        .mobile-dropdown-content {
-          padding: 12px;
-        }
-      }
-
-      /* Enhanced spacing for mobile menu */
-      .mobile-bottom-nav__dropdown {
-        padding: 0;
-        max-height: none;
-      }
-
-      /* Responsive adjustments for two column layout */
-    }
-
-    @media (min-width: 769px) {
-      .mobile-bottom-nav {
-        display: none !important;
-      }
-    }
-
-    .soon-label {
-      font-size: 10px;
-      color: #dc3545;
-      margin-right: 4px;
-      vertical-align: middle;
-      background: rgba(220, 53, 69, 0.1);
-      padding: 2px 6px;
-      border-radius: 8px;
-    }
-  </style>
-
-  <div class="mobile-bottom-nav" wire:ignore>
-    <!-- داشبورد -->
-    @if ($this->hasPermission('dashboard'))
-      <div class="mobile-bottom-nav__item {{ Request::routeIs('dr-panel') ? 'active' : '' }}" data-group="dashboard">
-        <a href="{{ route('dr-panel') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
+  <div class="mobile-nav d-md-none">
+    <div class="mobile-nav-container">
+      <!-- Main Mobile Navigation Items -->
+      <div class="mobile-nav-main">
+        @if ($this->hasPermission('dashboard'))
+          <a href="{{ route('dr-panel') }}"
+            class="mobile-nav-item {{ Request::routeIs('dr-panel') ? 'active' : '' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 13H11V3H3V13ZM3 21H11V15H3V21ZM13 21H21V11H13V21ZM13 3V9H21V3H13Z" fill="currentColor" />
             </svg>
+            <span>داشبورد</span>
+          </a>
+        @endif
+
+        @if ($this->hasPermission('appointments'))
+          <a href="{{ route('dr-appointments') }}"
+            class="mobile-nav-item {{ Request::routeIs('dr-appointments') ? 'active' : '' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.11 3.89 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.89 20.11 3 19 3ZM19 19H5V9H19V19ZM19 7H5V5H19V7Z"
+                fill="currentColor" />
+              <path
+                d="M7 11H9V13H7V11ZM11 11H13V13H11V11ZM15 11H17V13H15V11ZM7 15H9V17H7V15ZM11 15H13V17H11V15ZM15 15H17V17H15V15Z"
+                fill="currentColor" />
+            </svg>
+            <span>نوبت</span>
+          </a>
+        @endif
+
+        @if ($this->hasPermission('dr-workhours'))
+          <a href="{{ route('dr-workhours') }}"
+            class="mobile-nav-item {{ Request::routeIs('dr-workhours') ? 'active' : '' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"
+                fill="currentColor" />
+              <path d="M12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" fill="currentColor" />
+            </svg>
+            <span>ساعت کاری</span>
+          </a>
+        @endif
+
+        @if ($this->hasPermission('my-prescriptions'))
+          <a href="{{ route('dr.panel.my-prescriptions') }}"
+            class="mobile-nav-item {{ Request::routeIs('dr.panel.my-prescriptions') ? 'active' : '' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M19 3H5C3.89 3 3 3.89 3 5V19C3 20.11 3.89 21 5 21H19C20.11 21 21 20.11 21 19V5C21 3.89 20.11 3 19 3ZM19 19H5V5H19V19Z"
+                fill="currentColor" />
+              <path d="M7 7H17V9H7V7ZM7 11H17V13H7V11ZM7 15H14V17H7V15Z" fill="currentColor" />
+            </svg>
+            <span>نسخه</span>
+          </a>
+        @endif
+
+        @if ($this->hasPermission('financial_reports'))
+          <a href="{{ route('dr.panel.financial-reports.index') }}"
+            class="mobile-nav-item {{ Request::routeIs('dr.panel.financial-reports.index') ? 'active' : '' }}">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"
+                fill="currentColor" />
+            </svg>
+            <span>گزارش مالی</span>
+          </a>
+        @endif
+
+        <!-- Others Menu Toggle -->
+        <button class="mobile-nav-item mobile-nav-toggle" id="mobile-others-toggle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1H5C3.89 1 3 1.89 3 3V21C3 22.11 3.89 23 5 23H19C20.11 23 21 22.11 21 21V9ZM19 21H5V3H13V9H19V21Z"
+              fill="currentColor" />
+          </svg>
+          <span>سایر</span>
+          <svg class="toggle-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Full Screen Others Menu -->
+    <div class="mobile-others-menu" id="mobile-others-menu">
+      <div class="mobile-others-header">
+        <h3>منوی کامل</h3>
+        <button class="mobile-close-btn" id="mobile-close-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
+              fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="mobile-others-content">
+        <!-- Appointments Section -->
+        @if ($this->hasPermission('appointments'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">نوبت اینترنتی</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-appointments'))
+                <a href="{{ route('dr-appointments') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-appointments') ? 'active' : '' }}">
+                  لیست نوبت ها
+                </a>
+              @endif
+              @if ($this->hasPermission('dr.panel.doctornotes.index'))
+                <a href="{{ route('dr.panel.doctornotes.index') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr.panel.doctornotes.index') ? 'active' : '' }}">
+                  توضیحات نوبت
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-mySpecialDays'))
+                <a href="{{ route('dr-mySpecialDays') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-mySpecialDays') ? 'active' : '' }}">
+                  روزهای خاص
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-scheduleSetting'))
+                <a href="{{ route('dr-scheduleSetting') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-scheduleSetting') ? 'active' : '' }}">
+                  تنظیمات نوبت
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-vacation'))
+                <a href="{{ route('dr-vacation') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-vacation') ? 'active' : '' }}">
+                  تعطیلات
+                </a>
+              @endif
+              @if ($this->hasPermission('doctor-blocking-users.index'))
+                <a href="{{ route('doctor-blocking-users.index') }}"
+                  class="mobile-section-item {{ Request::routeIs('doctor-blocking-users.index') ? 'active' : '' }}">
+                  کاربران مسدود
+                </a>
+              @endif
+            </div>
           </div>
-          <div class="mobile-bottom-nav__label">داشبورد</div>
-        </a>
-      </div>
-    @endif
-    <!-- نوبت‌ها -->
-    @if ($this->hasPermission('appointments'))
-      <div
-        class="mobile-bottom-nav__item {{ Request::routeIs('dr-appointments') || Request::routeIs('dr.panel.doctornotes.index') || Request::routeIs('dr-mySpecialDays') || Request::routeIs('dr-manual_nobat_setting') || Request::routeIs('dr-scheduleSetting') || Request::routeIs('dr-vacation') || Request::routeIs('doctor-blocking-users.index') ? 'active' : '' }}"
-        data-group="appointments">
-        <a href="{{ route('dr-appointments') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-              <line x1="16" y1="2" x2="16" y2="6" />
-              <line x1="8" y1="2" x2="8" y2="6" />
-              <line x1="3" y1="10" x2="21" y2="10" />
-              <path d="M8 14h.01" />
-              <path d="M12 14h.01" />
-              <path d="M16 14h.01" />
-              <path d="M8 18h.01" />
-              <path d="M12 18h.01" />
-              <path d="M16 18h.01" />
-            </svg>
+        @endif
+
+        <!-- Prescriptions Section -->
+        @if ($this->hasPermission('my-prescriptions'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">نسخه های من</h4>
+            <div class="mobile-section-items">
+              <a href="{{ route('dr.panel.my-prescriptions') }}"
+                class="mobile-section-item {{ Request::routeIs('dr.panel.my-prescriptions') ? 'active' : '' }}">
+                مدیریت نسخه ها
+              </a>
+              <a href="{{ route('dr.panel.my-prescriptions.settings') }}"
+                class="mobile-section-item {{ Request::routeIs('dr.panel.my-prescriptions.settings') ? 'active' : '' }}">
+                تنظیمات درخواست نسخه
+              </a>
+            </div>
           </div>
-          <div class="mobile-bottom-nav__label">نوبت‌ها</div>
-        </a>
-      </div>
-    @endif
-    <!-- ساعت کاری -->
-    @if ($this->hasPermission('dr-workhours'))
-      <div class="mobile-bottom-nav__item {{ Request::routeIs('dr-workhours') ? 'active' : '' }}"
-        data-group="workhours">
-        <a href="{{ route('dr-workhours') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <polyline points="12,6 12,12 16,14" />
-            </svg>
+        @endif
+
+        <!-- Consultation Section -->
+        @if ($this->hasPermission('consult'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">مشاوره</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-moshavere_setting'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  برنامه‌ریزی مشاوره
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-moshavere_waiting'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  گزارش مشاوره
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-mySpecialDays-counseling'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  روزهای خاص
+                </a>
+              @endif
+              @if ($this->hasPermission('consult-term.index'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  قوانین مشاوره
+                </a>
+              @endif
+            </div>
           </div>
-          <div class="mobile-bottom-nav__label">ساعت کاری</div>
-        </a>
-      </div>
-    @endif
-    <!-- نسخه‌ها -->
-    @if ($this->hasPermission('my-prescriptions'))
-      <div
-        class="mobile-bottom-nav__item {{ Request::routeIs('dr.panel.my-prescriptions') || Request::routeIs('dr.panel.my-prescriptions.settings') ? 'active' : '' }}"
-        data-group="prescriptions">
-        <a href="{{ route('dr.panel.my-prescriptions') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14,2 14,8 20,8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10,9 9,9 8,9"></polyline>
-            </svg>
+        @endif
+
+        <!-- Insurance Section -->
+        @if ($this->hasPermission('insurance'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">خدمات و بیمه</h4>
+            <div class="mobile-section-items">
+              <a href="{{ route('dr.panel.doctor-services.index') }}"
+                class="mobile-section-item {{ Request::routeIs('dr.panel.doctor-services.index') ? 'active' : '' }}">
+                خدمات و بیمه
+              </a>
+            </div>
           </div>
-          <div class="mobile-bottom-nav__label">نسخه‌ها</div>
-        </a>
-      </div>
-    @endif
-    <!-- گزارش مالی -->
-    @if ($this->hasPermission('financial_reports'))
-      <div
-        class="mobile-bottom-nav__item {{ Request::routeIs('dr.panel.financial-reports.index') || Request::routeIs('dr-payment-setting') || Request::routeIs('dr-wallet-charge') ? 'active' : '' }}"
-        data-group="financial">
-        <a href="{{ route('dr.panel.financial-reports.index') }}"
-          style="display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit;">
-          <div class="mobile-bottom-nav__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <line x1="12" y1="1" x2="12" y2="23"></line>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
+        @endif
+
+        <!-- Electronic Prescription Section -->
+        @if ($this->hasPermission('prescription'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">نسخه الکترونیک</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-patient-records'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  پرونده پزشکی
+                </a>
+              @endif
+              @if ($this->hasPermission('prescription.index'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  نسخه‌های ثبت شده
+                </a>
+              @endif
+              @if ($this->hasPermission('providers.index'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  بیمه‌های من
+                </a>
+              @endif
+              @if ($this->hasPermission('favorite.templates.index'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  نسخه پراستفاده
+                </a>
+              @endif
+              @if ($this->hasPermission('templates.favorite.service.index'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  اقلام پراستفاده
+                </a>
+              @endif
+              @if ($this->hasPermission('patient_records'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  پرونده الکترونیک
+                </a>
+              @endif
+            </div>
           </div>
-          <div class="mobile-bottom-nav__label">گزارش مالی</div>
-        </a>
-      </div>
-    @endif
-    <!-- سایر -->
-    <div
-      class="mobile-bottom-nav__item mobile-bottom-nav__item--other {{ Request::routeIs('dr-moshavere_setting') ||Request::routeIs('dr-moshavere_waiting') ||Request::routeIs('consult-term.index') ||Request::routeIs('dr-mySpecialDays-counseling') ||Request::routeIs('prescription.index') ||Request::routeIs('providers.index') ||Request::routeIs('favorite.templates.index') ||Request::routeIs('templates.favorite.service.index') ||Request::routeIs('dr-patient-records') ||Request::routeIs('dr.panel.send-message') ||Request::routeIs('dr-secretary-management') ||Request::routeIs('dr-secretary-permissions') ||Request::routeIs('dr-clinic-management') ||Request::routeIs('doctors.clinic.cost') ||Request::routeIs('duration.index') ||Request::routeIs('activation.workhours.index') ||Request::routeIs('dr.panel.clinics.medical-documents') ||Request::routeIs('doctors.clinic.deposit') ||Request::routeIs('dr-edit-profile') ||Request::routeIs('dr-edit-profile-security') ||Request::routeIs('dr-edit-profile-upgrade') ||Request::routeIs('dr-my-performance') ||Request::routeIs('dr-subuser') ||Request::routeIs('my-dr-appointments') ||Request::routeIs('dr.panel.doctor-faqs.index') ||Request::routeIs('dr-my-performance-chart') ||Request::routeIs('dr-panel-tickets') ||Request::routeIs('dr.panel.doctor-services.index')? 'active': '' }}"
-      data-group="other" data-has-submenu="true" x-data="{ isOpen: false }" @click="isOpen = !isOpen"
-      @click.away="isOpen = false" :class="{ 'open': isOpen }">
-      <div class="mobile-bottom-nav__icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round">
-          <circle cx="12" cy="12" r="1" />
-          <circle cx="19" cy="12" r="1" />
-          <circle cx="5" cy="12" r="1" />
-        </svg>
-      </div>
-      <div class="mobile-bottom-nav__label">سایر</div>
-      <div class="mobile-bottom-nav__dropdown" x-show="isOpen" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 transform translate-y-full"
-        x-transition:enter-end="opacity-100 transform translate-y-0"
-        x-transition:leave="transition ease-in duration-300"
-        x-transition:leave-start="opacity-100 transform translate-y-0"
-        x-transition:leave-end="opacity-0 transform translate-y-full" @click.stop>
-        <!-- Header with close button -->
-        <div class="mobile-dropdown-header">
-          <button class="mobile-dropdown-close" @click.stop="isOpen = false">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        <!-- Content container -->
-        <div class="mobile-dropdown-content">
-          <!-- مشاوره -->
-          @if ($this->hasPermission('consult'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>مشاوره</span>
-                <span class="badge bg-warning text-dark">به زودی</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-moshavere_setting'))
-                  <a href="javascript:void(0)" class="disabled-link">برنامه‌ریزی مشاوره</a>
-                @endif
-                @if ($this->hasPermission('dr-moshavere_waiting'))
-                  <a href="javascript:void(0)" class="disabled-link">گزارش مشاوره</a>
-                @endif
-                @if ($this->hasPermission('dr-mySpecialDays-counseling'))
-                  <a href="javascript:void(0)" class="disabled-link">روزهای خاص</a>
-                @endif
-                @if ($this->hasPermission('consult-term.index'))
-                  <a href="javascript:void(0)" class="disabled-link">قوانین مشاوره</a>
-                @endif
-              </div>
+        @endif
+
+        <!-- Financial Reports Section -->
+        @if ($this->hasPermission('financial_reports'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">گزارش مالی</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr.panel.financial-reports.index'))
+                <a href="{{ route('dr.panel.financial-reports.index') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr.panel.financial-reports.index') ? 'active' : '' }}">
+                  گزارش مالی
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-payment-setting'))
+                <a href="{{ route('dr-payment-setting') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-payment-setting') ? 'active' : '' }}">
+                  پرداخت
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-wallet-charge'))
+                <a href="{{ route('dr-wallet-charge') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-wallet-charge') ? 'active' : '' }}">
+                  شارژ کیف‌پول
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- نوبت اینترنتی -->
-          @if ($this->hasPermission('appointments'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                <span>نوبت اینترنتی</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr.panel.doctornotes.index'))
-                  <a href="{{ route('dr.panel.doctornotes.index') }}">توضیحات نوبت</a>
-                @endif
-                @if ($this->hasPermission('dr-mySpecialDays'))
-                  <a href="{{ route('dr-mySpecialDays') }}">روزهای خاص</a>
-                @endif
-                @if ($this->hasPermission('dr-scheduleSetting'))
-                  <a href="{{ route('dr-scheduleSetting') }}">تنظیمات نوبت</a>
-                @endif
-                @if ($this->hasPermission('dr-vacation'))
-                  <a href="{{ route('dr-vacation') }}">تعطیلات</a>
-                @endif
-                @if ($this->hasPermission('doctor-blocking-users.index'))
-                  <a href="{{ route('doctor-blocking-users.index') }}">کاربران مسدود</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Patient Communication Section -->
+        @if ($this->hasPermission('patient_communication'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">ارتباط با بیماران</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr.panel.send-message'))
+                <a href="{{ route('dr.panel.send-message') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr.panel.send-message') ? 'active' : '' }}">
+                  ارسال پیام
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- نسخه الکترونیک -->
-          @if ($this->hasPermission('prescription'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 12l2 2 4-4"></path>
-                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
-                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
-                  <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
-                </svg>
-                <span>نسخه الکترونیک</span>
-                <span class="badge bg-warning text-dark">به زودی</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-patient-records'))
-                  <a href="javascript:void(0)" class="disabled-link">پرونده پزشکی</a>
-                @endif
-                @if ($this->hasPermission('prescription.index'))
-                  <a href="javascript:void(0)" class="disabled-link">نسخه‌های ثبت شده</a>
-                @endif
-                @if ($this->hasPermission('providers.index'))
-                  <a href="javascript:void(0)" class="disabled-link">بیمه‌های من</a>
-                @endif
-                @if ($this->hasPermission('favorite.templates.index'))
-                  <a href="javascript:void(0)" class="disabled-link">نسخه پراستفاده</a>
-                @endif
-                @if ($this->hasPermission('templates.favorite.service.index'))
-                  <a href="javascript:void(0)" class="disabled-link">اقلام پراستفاده</a>
-                @endif
-                @if ($this->hasPermission('patient_records'))
-                  <a href="javascript:void(0)" class="disabled-link">پرونده الکترونیک</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Secretary Management Section -->
+        @if ($this->hasPermission('secretary_management'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">منشی</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('secretary_management'))
+                <a href="{{ route('dr-secretary-management') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-secretary-management') ? 'active' : '' }}">
+                  مدیریت منشی‌ها
+                </a>
+              @endif
+              @if ($this->hasPermission('permissions'))
+                <a href="{{ route('dr-secretary-permissions') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-secretary-permissions') ? 'active' : '' }}">
+                  دسترسی‌ها
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- نسخه های من -->
-          @if ($this->hasPermission('my-prescriptions'))
-            <!-- removed from Other menu because it exists in bottom navigation -->
-          @endif
-          <!-- گزارش مالی -->
-          @if ($this->hasPermission('financial_reports'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="12" y1="1" x2="12" y2="23"></line>
-                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                </svg>
-                <span>گزارش مالی</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-payment-setting'))
-                  <a href="{{ route('dr-payment-setting') }}">پرداخت</a>
-                @endif
-                @if ($this->hasPermission('dr-wallet-charge'))
-                  <a href="{{ route('dr-wallet-charge') }}">شارژ کیف‌پول</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Clinic Management Section -->
+        @if ($this->hasPermission('clinic_management'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">مطب</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-clinic-management'))
+                <a href="{{ route('dr-clinic-management') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-clinic-management') ? 'active' : '' }}">
+                  مدیریت مطب
+                </a>
+              @endif
+              @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
+                <a href="{{ route('dr.panel.clinics.medical-documents') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr.panel.clinics.medical-documents') ? 'active' : '' }}">
+                  مدارک من
+                </a>
+              @endif
+              @if ($this->hasPermission('doctors.clinic.deposit'))
+                <a href="{{ route('doctors.clinic.deposit') }}"
+                  class="mobile-section-item {{ Request::routeIs('doctors.clinic.deposit') ? 'active' : '' }}">
+                  بیعانه
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- ارتباط با بیماران -->
-          @if ($this->hasPermission('patient_communication'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path
-                    d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z">
-                  </path>
-                </svg>
-                <span>ارتباط با بیماران</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr.panel.send-message'))
-                  <a href="{{ route('dr.panel.send-message') }}">ارسال پیام</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Profile Section -->
+        @if ($this->hasPermission('profile'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">حساب کاربری</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-edit-profile'))
+                <a href="{{ route('dr-edit-profile') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-edit-profile') ? 'active' : '' }}">
+                  ویرایش پروفایل
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-edit-profile-security'))
+                <a href="{{ route('dr-edit-profile-security') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-edit-profile-security') ? 'active' : '' }}">
+                  امنیت
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-edit-profile-upgrade'))
+                <a href="javascript:void(0)" class="mobile-section-item disabled">
+                  ارتقا حساب
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-my-performance'))
+                <a href="{{ route('dr-my-performance') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-my-performance') ? 'active' : '' }}">
+                  عملکرد من
+                </a>
+              @endif
+              @if ($this->hasPermission('dr-subuser'))
+                <a href="{{ route('dr-subuser') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-subuser') ? 'active' : '' }}">
+                  کاربران زیرمجموعه
+                </a>
+              @endif
+              @if ($this->hasPermission('my-dr-appointments'))
+                <a href="{{ route('my-dr-appointments') }}"
+                  class="mobile-section-item {{ Request::routeIs('my-dr-appointments') ? 'active' : '' }}">
+                  نوبت‌های من
+                </a>
+              @endif
+              @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
+                <a href="{{ route('dr.panel.doctor-faqs.index') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr.panel.doctor-faqs.index') ? 'active' : '' }}">
+                  سوالات متداول
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- منشی -->
-          @if ($this->hasPermission('secretary_management'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>منشی</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('secretary_management'))
-                  <a href="{{ route('dr-secretary-management') }}">مدیریت منشی‌ها</a>
-                @endif
-                @if ($this->hasPermission('permissions'))
-                  <a href="{{ route('dr-secretary-permissions') }}">دسترسی‌ها</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Statistics Section -->
+        @if ($this->hasPermission('statistics'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">آمار و نمودار</h4>
+            <div class="mobile-section-items">
+              <a href="{{ route('dr-my-performance-chart') }}"
+                class="mobile-section-item {{ Request::routeIs('dr-my-performance-chart') ? 'active' : '' }}">
+                آمار و نمودار
+              </a>
             </div>
-          @endif
-          <!-- مطب -->
-          @if ($this->hasPermission('clinic_management'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                  <polyline points="9,22 9,12 15,12 15,22"></polyline>
-                </svg>
-                <span>مطب</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-clinic-management'))
-                  <a href="{{ route('dr-clinic-management') }}">مدیریت مطب</a>
-                @endif
-                @if ($this->hasPermission('dr.panel.clinics.medical-documents'))
-                  <a href="{{ route('dr.panel.clinics.medical-documents') }}">مدارک من</a>
-                @endif
-                @if ($this->hasPermission('doctors.clinic.deposit'))
-                  <a href="{{ route('doctors.clinic.deposit') }}">بیعانه</a>
-                @endif
-              </div>
+          </div>
+        @endif
+
+        <!-- Messages Section -->
+        @if ($this->hasPermission('messages'))
+          <div class="mobile-section">
+            <h4 class="mobile-section-title">پیام</h4>
+            <div class="mobile-section-items">
+              @if ($this->hasPermission('dr-panel-tickets'))
+                <a href="{{ route('dr-panel-tickets') }}"
+                  class="mobile-section-item {{ Request::routeIs('dr-panel-tickets') ? 'active' : '' }}">
+                  تیکت‌ها
+                </a>
+              @endif
+              @if ($this->hasPermission('#'))
+                <a href="#" class="mobile-section-item">
+                  صفحه گفتگو
+                </a>
+              @endif
             </div>
-          @endif
-          <!-- حساب کاربری -->
-          @if ($this->hasPermission('profile'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <span>حساب کاربری</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-edit-profile'))
-                  <a href="{{ route('dr-edit-profile') }}">ویرایش پروفایل</a>
-                @endif
-                @if ($this->hasPermission('dr-edit-profile-security'))
-                  <a href="{{ route('dr-edit-profile-security') }}">امنیت</a>
-                @endif
-                @if ($this->hasPermission('dr-my-performance'))
-                  <a href="{{ route('dr-my-performance') }}">عملکرد من</a>
-                @endif
-                @if ($this->hasPermission('dr-subuser'))
-                  <a href="{{ route('dr-subuser') }}">کاربران زیرمجموعه</a>
-                @endif
-                @if ($this->hasPermission('my-dr-appointments'))
-                  <a href="{{ route('my-dr-appointments') }}">نوبت‌های من</a>
-                @endif
-                @if ($this->hasPermission('dr.panel.doctor-faqs.index'))
-                  <a href="{{ route('dr.panel.doctor-faqs.index') }}">سوالات متداول</a>
-                @endif
-                @if ($this->hasPermission('dr-edit-profile-upgrade'))
-                  <a href="javascript:void(0)" class="disabled-link">
-                    ارتقا حساب <span class="badge bg-warning text-dark mx-2">به زودی</span>
-                  </a>
-                @endif
-              </div>
-            </div>
-          @endif
-          <!-- آمار و نمودار -->
-          @if ($this->hasPermission('statistics'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="20" x2="18" y2="10"></line>
-                  <line x1="12" y1="20" x2="12" y2="4"></line>
-                  <line x1="6" y1="20" x2="6" y2="14"></line>
-                </svg>
-                <span>آمار و نمودار</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                <a href="{{ route('dr-my-performance-chart') }}">آمار و نمودار</a>
-              </div>
-            </div>
-          @endif
-          <!-- پیام -->
-          @if ($this->hasPermission('messages'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                <span>پیام</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                @if ($this->hasPermission('dr-panel-tickets'))
-                  <a href="{{ route('dr-panel-tickets') }}">تیکت‌ها</a>
-                @endif
-              </div>
-            </div>
-          @endif
-          <!-- خدمات و بیمه -->
-          @if ($this->hasPermission('insurance'))
-            <div class="mobile-menu-section">
-              <div class="mobile-menu-section__header">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 12l2 2 4-4"></path>
-                  <path d="M21 12c-1 0-2-1-2-2s1-2 2-2 2 1 2 2-1 2-2 2z"></path>
-                  <path d="M3 12c1 0 2-1 2-2s-1-2-2-2-2 1-2 2 1 2 2 2z"></path>
-                  <path d="M12 3c0 1-1 2-2 2s-2 1-2 2 1 2 2 2 2 1 2 2 1-2 2-2 2-1 2-2-1-2-2-2-2-1-2-2z"></path>
-                </svg>
-                <span>خدمات و بیمه</span>
-              </div>
-              <div class="mobile-menu-section__items">
-                <a href="{{ route('dr.panel.doctor-services.index') }}">خدمات و بیمه</a>
-              </div>
-            </div>
-          @endif
-        </div>
+          </div>
+        @endif
       </div>
     </div>
   </div>
+
+  <style>
+    /* Mobile Navigation Styles */
+    .mobile-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-top: 1px solid #e0e0e0;
+      z-index: 1000;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .mobile-nav-container {
+      padding: 8px 16px;
+    }
+
+    .mobile-nav-main {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 11px;
+      padding: 8px 4px;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      min-width: 60px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .mobile-nav-item:hover,
+    .mobile-nav-item.active {
+      color: #007bff;
+      background: rgba(0, 123, 255, 0.1);
+    }
+
+    .mobile-nav-item svg {
+      margin-bottom: 4px;
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-nav-item span {
+      text-align: center;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
+
+    .mobile-nav-toggle {
+      position: relative;
+    }
+
+    .toggle-arrow {
+      margin-top: 2px;
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-nav-toggle.active .toggle-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Full Screen Others Menu */
+    .mobile-others-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: #fff;
+      z-index: 2000;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .mobile-others-menu.active {
+      transform: translateY(0);
+    }
+
+    .mobile-others-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 16px;
+      border-bottom: 1px solid #e0e0e0;
+      background: #f8f9fa;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .mobile-others-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .mobile-close-btn {
+      background: none;
+      border: none;
+      padding: 8px;
+      border-radius: 50%;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.3s ease;
+    }
+
+    .mobile-close-btn:hover {
+      background: rgba(0, 0, 0, 0.1);
+      color: #333;
+    }
+
+    .mobile-others-content {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+    }
+
+    .mobile-section {
+      margin-bottom: 24px;
+    }
+
+    .mobile-section-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #007bff;
+    }
+
+    .mobile-section-items {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .mobile-section-item {
+      display: block;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #333;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      border: 1px solid transparent;
+    }
+
+    .mobile-section-item:hover {
+      background: #e9ecef;
+      border-color: #007bff;
+      color: #007bff;
+    }
+
+    .mobile-section-item.active {
+      background: #007bff;
+      color: #fff;
+      border-color: #007bff;
+    }
+
+    .mobile-section-item.disabled {
+      opacity: 0.5;
+      color: #6c757d;
+      cursor: not-allowed;
+      background: #f8f9fa;
+    }
+
+    .mobile-section-item.disabled:hover {
+      background: #f8f9fa;
+      border-color: transparent;
+      color: #6c757d;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .mobile-nav-item {
+        font-size: 10px;
+        min-width: 50px;
+        padding: 6px 2px;
+      }
+
+      .mobile-nav-item svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .mobile-others-content {
+        padding: 12px;
+      }
+
+      .mobile-section-item {
+        padding: 10px 12px;
+        font-size: 13px;
+      }
+    }
+
+    /* Hide desktop sidebar on mobile */
+    @media (max-width: 767px) {
+      .sidebar__nav {
+        display: none;
+      }
+    }
+
+    .bars {
+      display: none !important;
+    }
+  </style>
+
+  <script>
+    document.addEventListener('livewire:init', () => {
+      toastr.options = {
+        positionClass: 'toast-top-right',
+        timeOut: 3000,
+      };
+      const photoInput = document.getElementById('profile-photo-input');
+      const profileImg = document.getElementById('profile-photo-img');
+      if (photoInput) {
+        photoInput.addEventListener('change', function() {
+          if (this.files && this.files[0]) {
+            uploadPhoto(this.files[0]);
+          }
+        });
+        photoInput.addEventListener('dblclick', function() {
+          this.click();
+        });
+      }
+      if (profileImg) {
+        profileImg.addEventListener('dblclick', function() {
+          photoInput.click();
+        });
+        profileImg.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          photoInput.click();
+        });
+      }
+
+      function uploadPhoto(file) {
+        const formData = new FormData();
+        formData.append('photo', file);
+        formData.append('_token', '{{ csrf_token() }}');
+        fetch("{{ route('dr.upload-photo') }}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+              'Accept': 'application/json'
+            }
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Server returned status: ' + response.status);
+            }
+            return response.text();
+          })
+          .then(text => {
+            const data = JSON.parse(text);
+            if (data.success) {
+              toastr.success(data.message);
+              profileImg.src = data.path;
+              photoInput.value = '';
+            } else {
+              toastr.error(data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Upload error:', error);
+            toastr.error('خطا در آپلود عکس: ' + error.message);
+          });
+      }
+
+      // Mobile Navigation JavaScript
+      const mobileOthersToggle = document.getElementById('mobile-others-toggle');
+      const mobileOthersMenu = document.getElementById('mobile-others-menu');
+      const mobileCloseBtn = document.getElementById('mobile-close-btn');
+
+      if (mobileOthersToggle) {
+        mobileOthersToggle.addEventListener('click', function() {
+          mobileOthersMenu.classList.add('active');
+          this.classList.add('active');
+          document.body.style.overflow = 'hidden';
+        });
+      }
+
+      if (mobileCloseBtn) {
+        mobileCloseBtn.addEventListener('click', function() {
+          mobileOthersMenu.classList.remove('active');
+          mobileOthersToggle.classList.remove('active');
+          document.body.style.overflow = '';
+        });
+      }
+
+      // Close menu when clicking outside
+      if (mobileOthersMenu) {
+        mobileOthersMenu.addEventListener('click', function(e) {
+          if (e.target === this) {
+            this.classList.remove('active');
+            mobileOthersToggle.classList.remove('active');
+            document.body.style.overflow = '';
+          }
+        });
+      }
+
+      // Close menu on escape key
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && mobileOthersMenu.classList.contains('active')) {
+          mobileOthersMenu.classList.remove('active');
+          mobileOthersToggle.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      });
+    });
+  </script>
 </div>
