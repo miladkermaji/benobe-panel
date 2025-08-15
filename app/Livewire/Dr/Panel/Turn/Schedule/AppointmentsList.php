@@ -1496,15 +1496,12 @@ class AppointmentsList extends Component
             }
 
             $this->validate([
-                'selectedInsuranceId' => 'required|exists:insurances,id',
-                'selectedServiceIds' => 'required|array|min:1',
+                'selectedInsuranceId' => 'nullable|exists:insurances,id',
+                'selectedServiceIds' => 'nullable|array',
                 'paymentMethod' => 'required|in:online,cash,card_to_card,pos',
             ], [
-                'selectedInsuranceId.required' => 'لطفاً یک بیمه انتخاب کنید.',
                 'selectedInsuranceId.exists' => 'بیمه انتخاب‌شده معتبر نیست.',
-                'selectedServiceIds.required' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
                 'selectedServiceIds.array' => 'خدمات انتخاب‌شده باید به‌صورت آرایه باشد.',
-                'selectedServiceIds.min' => 'لطفاً حداقل یک خدمت انتخاب کنید.',
                 'paymentMethod.required' => 'لطفاً نوع پرداخت را انتخاب کنید.',
                 'paymentMethod.in' => 'نوع پرداخت انتخاب‌شده معتبر نیست.',
             ]);
@@ -1515,7 +1512,7 @@ class AppointmentsList extends Component
                 $appointment = Appointment::findOrFail($appointmentId);
                 $appointment->update([
                     'insurance_id' => $this->selectedInsuranceId,
-                    'service_ids' => json_encode($this->selectedServiceIds),
+                    'service_ids' => json_encode($this->selectedServiceIds ?? []),
                     'final_price' => $this->finalPrice,
                     'discount_percentage' => $this->discountPercentage,
                     'discount_amount' => $this->discountAmount,
