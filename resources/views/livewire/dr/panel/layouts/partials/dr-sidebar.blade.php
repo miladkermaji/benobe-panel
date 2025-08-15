@@ -699,7 +699,7 @@
       .mobile-dropdown-close {
         position: absolute;
         top: 12px;
-        left: 12px;
+        right: 12px;
         width: 32px;
         height: 32px;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1162,7 +1162,7 @@
 
         .mobile-dropdown-close {
           top: 12px;
-          left: 12px;
+          right: 12px;
           width: 32px;
           height: 32px;
         }
@@ -1346,6 +1346,33 @@
           });
         }
       }
+
+      function bindDropdownLinks() {
+        const links = document.querySelectorAll('.mobile-bottom-nav__dropdown a[href]');
+        links.forEach(link => {
+          if (link.getAttribute('data-bound') === '1') return;
+          const href = link.getAttribute('href');
+          if (!href || href === 'javascript:void(0)') return;
+          const navigate = function(e) {
+            // Allow new tab / modified clicks
+            if (e && (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || (typeof e.button === 'number' && e
+                .button === 1))) {
+              return;
+            }
+            if (e) {
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            document.body.style.overflow = '';
+            window.location.assign(link.href);
+          };
+          link.addEventListener('click', navigate);
+          link.addEventListener('touchend', navigate, {
+            passive: false
+          });
+          link.setAttribute('data-bound', '1');
+        });
+      }
       document.addEventListener('DOMContentLoaded', function() {
         setupMobileNavDropdowns();
         setActiveItem();
@@ -1363,6 +1390,7 @@
             capture: true
           });
         });
+        bindDropdownLinks();
         document.addEventListener('click', closeAllDropdowns);
       });
       window.addEventListener('resize', function() {
@@ -1382,6 +1410,7 @@
               capture: true
             });
           });
+          bindDropdownLinks();
         }
       });
       document.addEventListener('livewire:update', function() {
@@ -1400,6 +1429,7 @@
             capture: true
           });
         });
+        bindDropdownLinks();
       });
     })();
   </script>
@@ -1581,6 +1611,24 @@
                 @if ($this->hasPermission('patient_records'))
                   <a href="javascript:void(0)" class="disabled-link">پرونده الکترونیک</a>
                 @endif
+              </div>
+            </div>
+          @endif
+          <!-- نسخه های من -->
+          @if ($this->hasPermission('my-prescriptions'))
+            <div class="mobile-menu-section">
+              <div class="mobile-menu-section__header">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14,2 14,8 20,8"></polyline>
+                </svg>
+                <span>نسخه های من</span>
+                <span class="badge bg-danger text-white ms-2" style="font-size: 10px; padding: 2px 6px;">جدید</span>
+              </div>
+              <div class="mobile-menu-section__items">
+                <a href="{{ route('dr.panel.my-prescriptions') }}">مدیریت نسخه ها</a>
+                <a href="{{ route('dr.panel.my-prescriptions.settings') }}">تنظیمات درخواست نسخه</a>
               </div>
             </div>
           @endif
