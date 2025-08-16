@@ -119,7 +119,7 @@ class AuthController extends Controller
         Otp::create([
             'token' => $token,
             'otp_code' => $otpCode,
-            'login_id' => $formattedMobile,
+            'login_id' => $userInfo['model'] instanceof MedicalCenter ? $userInfo['model']->phone_number : $formattedMobile,
             'type' => 0, // 0 برای شماره موبایل
             'used' => 0,
             'status' => 0,
@@ -136,7 +136,7 @@ class AuthController extends Controller
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100286, $formattedMobile, [$otpCode])
+            SmsService::create(100286, $userInfo['model'] instanceof MedicalCenter ? $userInfo['model']->phone_number : $formattedMobile, [$otpCode])
         );
         $messagesService->send();
 
@@ -199,7 +199,17 @@ class AuthController extends Controller
             ->first();
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp?->otpable?->mobile ?? $otp?->otpable?->phone_number ?? $otp?->login_id ?? 'unknown';
+        $mobile = null;
+
+        if ($otp && $otp->otpable) {
+            if ($otp->otpable instanceof MedicalCenter) {
+                $mobile = $otp->otpable->phone_number;
+            } else {
+                $mobile = $otp->otpable->mobile ?? $otp->otpable->phone_number ?? $otp->login_id ?? 'unknown';
+            }
+        } else {
+            $mobile = $otp?->login_id ?? 'unknown';
+        }
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
@@ -305,7 +315,7 @@ class AuthController extends Controller
             ], 500);
         }
 
-        $loginAttempts->resetLoginAttempts($user->mobile);
+        $loginAttempts->resetLoginAttempts($user instanceof MedicalCenter ? $user->phone_number : $user->mobile);
 
         LoginSession::where('token', $token)->delete();
         LoginLog::create([
@@ -375,7 +385,17 @@ class AuthController extends Controller
         }
 
         $loginAttempts = new LoginAttemptsService();
-        $mobile = $otp->otpable?->mobile ?? $otp->otpable?->phone_number ?? $otp->login_id ?? 'unknown';
+        $mobile = null;
+
+        if ($otp && $otp->otpable) {
+            if ($otp->otpable instanceof MedicalCenter) {
+                $mobile = $otp->otpable->phone_number;
+            } else {
+                $mobile = $otp->otpable->mobile ?? $otp->otpable->phone_number ?? $otp->login_id ?? 'unknown';
+            }
+        } else {
+            $mobile = $otp?->login_id ?? 'unknown';
+        }
 
         if ($loginAttempts->isLocked($mobile)) {
             $remainingTime = $loginAttempts->getRemainingLockTime($mobile);
@@ -396,7 +416,7 @@ class AuthController extends Controller
         Otp::create([
             'token'    => $newToken,
             'otp_code' => $otpCode,
-            'login_id' => $otp->otpable->mobile ?? $otp->otpable->phone_number,
+            'login_id' => $otp->otpable instanceof MedicalCenter ? $otp->otpable->phone_number : ($otp->otpable->mobile ?? $otp->otpable->phone_number),
             'type'     => 0,
             'otpable_type' => $otp->otpable_type,
             'otpable_id' => $otp->otpable_id,
@@ -412,7 +432,7 @@ class AuthController extends Controller
         ]);
 
         $messagesService = new MessageService(
-            SmsService::create(100286, $otp->otpable->mobile ?? $otp->otpable->phone_number, [$otpCode])
+            SmsService::create(100286, $otp->otpable instanceof MedicalCenter ? $otp->otpable->phone_number : ($otp->otpable->mobile ?? $otp->otpable->phone_number), [$otpCode])
         );
         $messagesService->send();
 
