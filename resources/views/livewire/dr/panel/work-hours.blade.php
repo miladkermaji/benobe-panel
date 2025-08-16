@@ -109,10 +109,11 @@
                 style="display: none;">
                 <!-- تعداد روزهای باز تقویم -->
                 <div class="col-12">
-                    <h6 class="mb-0">تنظیمات تقویم و تعطیلات</h6>
 
                   <div class="d-flex align-items-center justify-content-between mb-2">
                     <!-- دکمه تاگل برای موبایل -->
+                    <h6 class="mb-0">تنظیمات تقویم و تعطیلات</h6>
+
                     <button class="btn btn-sm btn-outline-secondary d-md-none toggle-section-btn"
                       data-target="calendar-settings-content" type="button">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
