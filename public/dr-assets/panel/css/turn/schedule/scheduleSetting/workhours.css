@@ -1655,15 +1655,6 @@ h6 {
         flex-direction: column;
         gap: 1rem;
     }
-    .form-control.ltr.text-center.position-relative{
-        width: 90% !important;
-    }
-    .input-group input {
-        width: auto !important;
-}
-    .input-group-text {
-        height: 42px !important;
-    }
 
     .calendar-settings-content .col-md-8,
     .calendar-settings-content .col-md-4 {
@@ -1680,5 +1671,36 @@ h6 {
         width: 100%;
         min-width: auto;
         justify-content: center;
+    }
+
+    /* تنظیمات نوبت دستی - تمام عرض در موبایل */
+    .manual-settings-content .d-flex.flex-column.flex-md-row {
+        flex-direction: column !important;
+        gap: 1rem;
+    }
+
+    .manual-settings-content .flex-fill {
+        width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    .manual-settings-content .input-group {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .input-group input,
+    .input-group-text {
+        height: 42px !important;
+    }
+    .input-group {
+    .input-group-text {
+        min-width: 40px !important;
+    }
+    .manual-settings-content .form-control {
+        width: 85% !important;
+    }
+
+    .manual-settings-content .input-group-text {
+        width: auto !important;
     }
 }
