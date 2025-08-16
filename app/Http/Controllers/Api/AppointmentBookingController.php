@@ -147,15 +147,15 @@ class AppointmentBookingController extends Controller
                 ->where('is_active', true)
                 ->where('type', 'policlinic')
                 ->where('is_main_center', true)
-                ->select('id', 'name', 'slug', 'address', 'phone', 'city_id')
+                ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.phone', 'medical_centers.city_id')
                 ->first()
                 ?? $doctor->medicalCenters()
                     ->where('is_active', true)
                     ->where('type', 'policlinic')
-                    ->select('id', 'name', 'slug', 'address', 'phone', 'city_id')
+                    ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.phone', 'medical_centers.city_id')
                     ->first();
             $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
-            $province = $mainClinic && $mainClinic->city ? $mainClinic->city->province()->select('id', 'name', 'slug')->first() : null;
+            $province = $mainClinic && $mainClinic->city ? $mainClinic->city->province()->select('zones.id', 'zones.name', 'zones.slug')->first() : null;
 
             // تبدیل تاریخ به شمسی
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran'));
@@ -468,7 +468,7 @@ class AppointmentBookingController extends Controller
                         ->where('slug', $clinicSlug)
                         ->where('is_active', true)
                         ->where('type', 'policlinic')
-                        ->select('id', 'name', 'slug')
+                        ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug')
                         ->first();
                     if (!$mainClinic) {
                         return response()->json([
@@ -483,12 +483,12 @@ class AppointmentBookingController extends Controller
                         ->where('is_active', true)
                         ->where('type', 'policlinic')
                         ->where('is_main_center', true)
-                        ->select('id', 'name', 'slug')
+                        ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug')
                         ->first()
                         ?? $doctor->medicalCenters()
                             ->where('is_active', true)
                             ->where('type', 'policlinic')
-                            ->select('id', 'name', 'slug')
+                            ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug')
                             ->first();
                 }
 
