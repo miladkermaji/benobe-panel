@@ -648,6 +648,16 @@ class AuthController extends Controller
                 'national_code' => 'nullable|string|size:10|unique:users,national_code,' . $model->id,
                 'email' => 'nullable|email|unique:users,email,' . $model->id,
             ]);
+        } elseif ($model instanceof MedicalCenter) {
+            // MedicalCenter has different field structure
+            $validationRules = [
+                'name' => 'nullable|string|max:255',
+                'national_code' => 'nullable|string|size:10|unique:medical_centers,national_code,' . $model->id,
+                'email' => 'nullable|email|unique:medical_centers,email,' . $model->id,
+                'zone_city_id' => 'nullable|exists:zone,id,level,2',
+                'zone_province_id' => 'nullable|exists:zone,id,level,1',
+                'address' => 'nullable|string|max:1000',
+            ];
         } else {
             Log::error('UpdateProfile - Unknown user type', ['user_class' => get_class($model)]);
             return response()->json(['status' => 'error', 'message' => 'نوع کاربر پشتیبانی نمی‌شود.'], 400);
@@ -657,7 +667,11 @@ class AuthController extends Controller
         $request->validate($validationRules);
 
         // Get only the valid fields from the request
-        $updateData = $request->only(array_keys($commonFields));
+        if ($model instanceof MedicalCenter) {
+            $updateData = $request->only(['name', 'national_code', 'email', 'zone_city_id', 'zone_province_id', 'address']);
+        } else {
+            $updateData = $request->only(array_keys($commonFields));
+        }
         // جلوگیری از پاک شدن مقدار قبلی شهر و استان در صورت ارسال null یا خالی
         foreach (["zone_city_id", "zone_province_id"] as $field) {
             if (array_key_exists($field, $updateData) && ($updateData[$field] === null || $updateData[$field] === '')) {
