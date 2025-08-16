@@ -11,7 +11,7 @@
     </div>
   @endif
   <div class="{{ $clinicIsInactive && !$isActivationPage ? 'opacity-50 pointer-events-none' : '' }}">
-    <div class="w-100 d-flex justify-content-center mt-4" dir="ltr">
+    <div class="w-100 d-flex justify-content-center mt-1 mb-2" dir="ltr">
       <div class="auto-scheule-content-top">
         <x-my-toggle-appointment :isChecked="$autoScheduling" id="appointment-toggle"
           day="{{ $autoScheduling ? 'نوبت‌دهی آنلاین + دستی' : 'نوبت‌دهی دستی' }}" class="mt-3 custom-toggle"
