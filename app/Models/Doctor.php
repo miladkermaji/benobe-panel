@@ -188,10 +188,9 @@ class Doctor extends Authenticatable implements JWTSubject
     }
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->profile_photo_path
-        ? Storage::url($this->profile_photo_path)
-        : asset('admin-assets/images/default-avatar.png');
-    }public function transactions()
+        return \App\Helpers\ImageHelper::profilePhotoUrl($this->profile_photo_path, 'doctor');
+    }
+    public function transactions()
     {
         return $this->morphMany(Transaction::class, 'transactable');
     }

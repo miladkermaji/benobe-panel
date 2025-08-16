@@ -15,3 +15,4 @@
 <script src="{{ asset('mc-assets/panel/js/moment/jalali-moment.browser.js') }}"></script>
 <script src="{{ asset('mc-assets/panel/js/toastr/toastr.min.js') }}"></script>
 <script src="{{ asset('mc-assets/panel/js/global-loader.js') }}"></script>
+<script src="{{ asset('js/image-utils.js') }}"></script>

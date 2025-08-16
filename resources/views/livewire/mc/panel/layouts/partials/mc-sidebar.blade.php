@@ -1,12 +1,13 @@
 <div>
-  <div class="sidebar__nav border-top border-left">
+  <div class="sidebar__nav border-top border-left" data-user-type="medical-center">
     <div class="sidebar__fixed">
       <span class="bars d-none padding-0-18"></span>
       <div class="profile__info border cursor-pointer text-center">
         <div class="avatar__img cursor-pointer">
           <img id="profile-photo-img"
             src="{{ $medical_center->avatar ? Storage::url($medical_center->avatar) : asset('mc-assets/panel/img/pro.jpg') }}"
-            class="avatar___img cursor-pointer">
+            class="avatar___img cursor-pointer"
+            onerror="this.src='{{ asset('mc-assets/panel/img/pro.jpg') }}'; this.onerror=null;">
           <input type="file" accept="image/*" class="avatar-img__input" id="profile-photo-input">
           <div class="v-dialog__container" style="display: block;"></div>
           <div class="box__camera default__avatar"></div>
@@ -693,12 +694,11 @@
         .sidebar__nav {
           display: none;
         }
-         .bars {
-        display: none !important;
-      }
-      }
 
-     
+        .bars {
+          display: none !important;
+        }
+      }
     </style>
 
     <script>

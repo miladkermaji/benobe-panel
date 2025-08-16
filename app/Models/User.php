@@ -57,9 +57,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getProfilePhotoUrlAttribute()
     {
-        return $this->profile_photo_path
-            ? Storage::url($this->profile_photo_path)
-            : asset('admin-assets/images/default-avatar.png');
+        return \App\Helpers\ImageHelper::profilePhotoUrl($this->profile_photo_path, 'admin');
     }
 
     public function province()

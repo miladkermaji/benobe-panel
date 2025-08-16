@@ -1,0 +1,110 @@
+/* Smart Image Loading States */
+
+.image-fallback {
+    opacity: 0.8;
+    filter: grayscale(20%);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.image-cdn {
+    opacity: 1;
+    filter: none;
+    transition: all 0.3s ease;
+}
+
+/* Profile image specific styles */
+.avatar___img.image-fallback {
+    border: 2px solid #e0e0e0;
+    background-color: #f8f9fa;
+}
+
+.avatar___img.image-cdn {
+    border: 2px solid #28a745;
+    background-color: #d4edda;
+}
+
+/* Loading indicator for smart images */
+.image-fallback::after {
+    content: "🔄";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse 2s infinite;
+}
+
+.image-cdn::after {
+    content: "✅";
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 12px;
+    background: rgba(40, 167, 69, 0.9);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+/* Responsive image handling */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* Profile photo specific responsive handling */
+.avatar___img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    position: relative;
+}
+
+/* Sidebar profile image specific styles */
+.sidebar__nav .avatar___img {
+    transition: all 0.3s ease;
+}
+
+.sidebar__nav .avatar___img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .image-fallback::after,
+    .image-cdn::after {
+        width: 16px;
+        height: 16px;
+        font-size: 10px;
+    }
+
+    .avatar___img {
+        border-radius: 8px;
+    }
+}

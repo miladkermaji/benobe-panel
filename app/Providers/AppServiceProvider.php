@@ -7,6 +7,7 @@ use App\Models\DoctorService;
 use App\Models\MedicalCenter;
 use App\Models\Secretary;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use App\Observers\AppointmentObserver;
 use App\Observers\MedicalCenterObserver;
@@ -30,6 +31,35 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register custom Blade directive for safe image URLs
+        Blade::directive('safeImage', function ($expression) {
+            return "<?php echo \App\Helpers\ImageHelper::safeImageUrl($expression); ?>";
+        });
+
+        Blade::directive('profilePhoto', function ($expression) {
+            return "<?php echo \App\Helpers\ImageHelper::profilePhotoUrl($expression); ?>";
+        });
+
+        // New directive for progressive image loading
+        Blade::directive('progressiveImage', function ($expression) {
+            return "<?php 
+                \$imageData = \App\Helpers\ImageHelper::getProgressiveImage($expression);
+                echo \$imageData['url'];
+            ?>";
+        });
+
+        // New directive for optimized images
+        Blade::directive('optimizedImage', function ($expression) {
+            return "<?php echo \App\Helpers\ImageHelper::getOptimizedImageUrl($expression); ?>";
+        });
+
+        // New directive for image with data attributes
+        Blade::directive('smartImage', function ($expression) {
+            return "<?php 
+                \$imageData = \App\Helpers\ImageHelper::getProgressiveImage($expression);
+                echo 'src=\"' . \$imageData['url'] . '\" data-source=\"' . \$imageData['source'] . '\" data-type=\"' . \$imageData['type'] . '\"';
+            ?>";
+        });
 
         View::composer('dr.panel.layouts.master', function ($view) {
             $medicalCenters = collect(); // فعلاً خالی
