@@ -385,7 +385,7 @@ class AppointmentBookingController extends Controller
                 'patient_type'     => 'required|in:self,relative',
                 'first_name'       => 'required_if:patient_type,relative|string|max:255',
                 'last_name'        => 'required_if:patient_type,relative|string|max:255',
-                'national_code'    => 'required_if:patient_type,relative|string|size:10|regex:/^[0-9]{10}$/|unique:users,national_code',
+                'national_code'    => 'required_if:patient_type,relative|string|size:10|regex:/^[0-9]{10}$/',
                 'mobile'           => 'required_if:patient_type,relative|string|max:15|regex:/^09[0-9]{9}$/|unique:users,mobile',
                 'email'            => 'nullable|email|unique:users,email',
                 'birth_date'       => 'nullable|date_format:Y-m-d',
@@ -412,7 +412,6 @@ class AppointmentBookingController extends Controller
                 'national_code.required_if'    => 'کدملی بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'national_code.size'           => 'کدملی بیمار باید دقیقاً 10 رقم باشد.',
                 'national_code.regex'          => 'کدملی باید 10 رقم عددی باشد.',
-                'national_code.unique'         => 'این کدملی قبلاً ثبت شده است.',
                 'mobile.required_if'           => 'شماره موبایل بیمار الزامی است وقتی نوع بیمار relative باشد.',
                 'mobile.max'                   => 'شماره موبایل بیمار نمی‌تواند بیشتر از 15 رقم باشد.',
                 'mobile.regex'                 => 'شماره موبایل باید با 09 شروع شود و 11 رقم باشد.',
@@ -470,34 +469,69 @@ class AppointmentBookingController extends Controller
 
                 // پیدا کردن یا ایجاد بیمار
                 $patient = null;
+                $isNewUser = false;
+                $patientMessage = '';
+
                 if ($patientType === 'self') {
                     $patient = $authenticatedUser;
+                    $patientMessage = 'نوبت برای خود شما رزرو می‌شود.';
                 } else {
-                    // ایجاد کاربر جدید برای شخص دیگری
-                    $patient = User::create([
-                        'first_name' => $validated['first_name'],
-                        'last_name' => $validated['last_name'],
-                        'national_code' => $validated['national_code'],
-                        'mobile' => $validated['mobile'],
-                        'email' => $validated['email'] ?? null,
-                        'date_of_birth' => $validated['birth_date'] ?? null,
-                        'sex' => $validated['gender'] ?? null,
-                        'zone_province_id' => $validated['province_id'] ?? null,
-                        'zone_city_id' => $validated['city_id'] ?? null,
-                        'address' => $validated['address'] ?? null,
-                        'created_by' => $authenticatedUser->id,
-                        'user_type' => 0,
-                        'status' => 1,
-                    ]);
+                    // بررسی وجود کاربر با کد ملی
+                    $existingPatient = User::where('national_code', $validated['national_code'])->first();
 
-                    // ثبت کاربر جدید در جدول sub_users
-                    \App\Models\SubUser::create([
-                        'owner_id' => $authenticatedUser->id,
-                        'owner_type' => get_class($authenticatedUser),
-                        'subuserable_id' => $patient->id,
-                        'subuserable_type' => \App\Models\User::class,
-                        'status' => 'active',
-                    ]);
+                    if ($existingPatient) {
+                        // کاربر موجود است - استفاده از کاربر موجود
+                        $patient = $existingPatient;
+                        $patientMessage = 'کاربر قبلاً در سیستم ثبت شده است.';
+                        $isNewUser = false;
+
+                        // بررسی اینکه آیا این کاربر قبلاً در sub_users کاربر جاری ثبت شده
+                        $existingSubUser = \App\Models\SubUser::where('owner_id', $authenticatedUser->id)
+                            ->where('owner_type', get_class($authenticatedUser))
+                            ->where('subuserable_id', $existingPatient->id)
+                            ->where('subuserable_type', User::class)
+                            ->first();
+
+                        if (!$existingSubUser) {
+                            // اضافه کردن به sub_users اگر قبلاً اضافه نشده
+                            \App\Models\SubUser::create([
+                                'owner_id' => $authenticatedUser->id,
+                                'owner_type' => get_class($authenticatedUser),
+                                'subuserable_id' => $existingPatient->id,
+                                'subuserable_type' => User::class,
+                                'status' => 'active',
+                            ]);
+                        }
+                    } else {
+                        // ایجاد کاربر جدید
+                        $patient = User::create([
+                            'first_name' => $validated['first_name'],
+                            'last_name' => $validated['last_name'],
+                            'national_code' => $validated['national_code'],
+                            'mobile' => $validated['mobile'],
+                            'email' => $validated['email'] ?? null,
+                            'date_of_birth' => $validated['birth_date'] ?? null,
+                            'sex' => $validated['gender'] ?? null,
+                            'zone_province_id' => $validated['province_id'] ?? null,
+                            'zone_city_id' => $validated['city_id'] ?? null,
+                            'address' => $validated['address'] ?? null,
+                            'created_by' => $authenticatedUser->id,
+                            'user_type' => 0,
+                            'status' => 1,
+                        ]);
+
+                        // ثبت کاربر جدید در جدول sub_users
+                        \App\Models\SubUser::create([
+                            'owner_id' => $authenticatedUser->id,
+                            'owner_type' => get_class($authenticatedUser),
+                            'subuserable_id' => $patient->id,
+                            'subuserable_type' => User::class,
+                            'status' => 'active',
+                        ]);
+
+                        $patientMessage = 'کاربر جدید با موفقیت ثبت شد.';
+                        $isNewUser = true;
+                    }
                 }
 
                 if (!$patient) {
@@ -666,7 +700,7 @@ class AppointmentBookingController extends Controller
                 // پاسخ با اطلاعات اضافی
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.',
+                    'message' => 'نوبت با موفقیت رزرو شد. ' . $patientMessage . ' لطفاً به درگاه پرداخت هدایت شوید.',
                     'payment_url' => $redirection->getTargetUrl(),
                     'tracking_code' => $trackingCode,
                     'expires_in_seconds' => 600,
@@ -694,6 +728,8 @@ class AppointmentBookingController extends Controller
                             'city_id' => $patient->zone_city_id,
                             'address' => $patient->address,
                             'patient_type' => $patientType,
+                            'is_new_user' => $isNewUser,
+                            'message' => $patientMessage,
                         ],
                         'appointment' => [
                             'id' => $appointment->id,
