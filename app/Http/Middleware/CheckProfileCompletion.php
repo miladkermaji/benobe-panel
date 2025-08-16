@@ -67,8 +67,8 @@ class CheckProfileCompletion
             'mobile',
             'date_of_birth',
             'sex',
-            'province_id',
-            'city_id'
+            'zone_province_id',
+            'zone_city_id'
         ];
 
         $incompleteFields = [];

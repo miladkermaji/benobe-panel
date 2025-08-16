@@ -155,7 +155,7 @@ class AppointmentBookingController extends Controller
                     ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.address', 'medical_centers.phone', 'medical_centers.city_id')
                     ->first();
             $city = $mainClinic ? $mainClinic->city()->value('name') : 'نامشخص';
-            $province = $mainClinic && $mainClinic->city ? $mainClinic->city->province()->select('zones.id', 'zones.name', 'zones.slug')->first() : null;
+            $province = $mainClinic && $mainClinic->city ? $mainClinic->city->province()->select('zone.id', 'zone.name', 'zone.slug')->first() : null;
 
             // تبدیل تاریخ به شمسی
             $jalaliDate = Jalalian::fromCarbon(Carbon::parse("$appointmentDate $appointmentTime", 'Asia/Tehran'));
@@ -390,8 +390,8 @@ class AppointmentBookingController extends Controller
                 'email'            => 'nullable|email|unique:users,email',
                 'birth_date'       => 'nullable|date_format:Y-m-d',
                 'gender'           => 'nullable|in:male,female',
-                'province_id'      => 'nullable|exists:zones,id',
-                'city_id'          => 'nullable|exists:zones,id',
+                'province_id'      => 'nullable|exists:zone,id',
+                'city_id'          => 'nullable|exists:zone,id',
                 'address'          => 'nullable|string|max:500',
                 'success_redirect' => 'nullable|url',
                 'error_redirect'   => 'nullable|url',
