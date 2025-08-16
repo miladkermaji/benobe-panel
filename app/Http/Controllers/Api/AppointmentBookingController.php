@@ -233,6 +233,19 @@ class AppointmentBookingController extends Controller
                     ],
                     'office_phone' => $mainClinic ? $mainClinic->phone : 'نامشخص',
                 ],
+                'patient' => $authenticatedUser ? [
+                    'id' => $authenticatedUser->id,
+                    'first_name' => $authenticatedUser->first_name,
+                    'last_name' => $authenticatedUser->last_name,
+                    'national_code' => $authenticatedUser->national_code,
+                    'mobile' => $authenticatedUser->mobile,
+                    'email' => $authenticatedUser->email,
+                    'birth_date' => $authenticatedUser->birth_date,
+                    'gender' => $authenticatedUser->gender,
+                    'province_id' => $authenticatedUser->province_id,
+                    'city_id' => $authenticatedUser->city_id,
+                    'address' => $authenticatedUser->address,
+                ] : null,
                 'appointment' => [
                     'date_time' => $formattedDateTime,
                     'service_type' => $serviceType,
@@ -375,6 +388,11 @@ class AppointmentBookingController extends Controller
                 'national_code'    => 'required_if:patient_type,relative|string|size:10|regex:/^[0-9]{10}$/|unique:users,national_code',
                 'mobile'           => 'required_if:patient_type,relative|string|max:15|regex:/^09[0-9]{9}$/|unique:users,mobile',
                 'email'            => 'nullable|email|unique:users,email',
+                'birth_date'       => 'nullable|date_format:Y-m-d',
+                'gender'           => 'nullable|in:male,female',
+                'province_id'      => 'nullable|exists:zones,id',
+                'city_id'          => 'nullable|exists:zones,id',
+                'address'          => 'nullable|string|max:500',
                 'success_redirect' => 'nullable|url',
                 'error_redirect'   => 'nullable|url',
                 'clinic_slug'      => 'nullable|exists:medical_centers,slug',
@@ -401,6 +419,11 @@ class AppointmentBookingController extends Controller
                 'mobile.unique'                => 'این شماره موبایل قبلاً ثبت شده است.',
                 'email.email'                  => 'ایمیل باید فرمت معتبر داشته باشد.',
                 'email.unique'                 => 'این ایمیل قبلاً ثبت شده است.',
+                'birth_date.date_format'       => 'فرمت تاریخ تولد باید به شکل YYYY-MM-DD باشد.',
+                'gender.in'                    => 'جنسیت باید یکی از مقادیر male یا female باشد.',
+                'province_id.exists'           => 'استان انتخاب شده معتبر نیست.',
+                'city_id.exists'               => 'شهر انتخاب شده معتبر نیست.',
+                'address.max'                  => 'آدرس نمی‌تواند بیشتر از 500 کاراکتر باشد.',
                 'success_redirect.url'         => 'آدرس هدایت موفقیت باید یک URL معتبر باشد.',
                 'error_redirect.url'           => 'آدرس هدایت خطا باید یک URL معتبر باشد.',
                 'clinic_slug.exists'           => 'کلینیک انتخاب‌شده وجود ندارد.',
@@ -440,15 +463,30 @@ class AppointmentBookingController extends Controller
                 if ($patientType === 'self') {
                     $patient = $authenticatedUser;
                 } else {
+                    // ایجاد کاربر جدید برای شخص دیگری
                     $patient = User::create([
                         'first_name' => $validated['first_name'],
                         'last_name' => $validated['last_name'],
                         'national_code' => $validated['national_code'],
                         'mobile' => $validated['mobile'],
                         'email' => $validated['email'],
+                        'birth_date' => $validated['birth_date'],
+                        'gender' => $validated['gender'],
+                        'province_id' => $validated['province_id'],
+                        'city_id' => $validated['city_id'],
+                        'address' => $validated['address'],
                         'created_by' => $authenticatedUser->id,
                         'user_type' => 0,
                         'status' => 1,
+                    ]);
+
+                    // ثبت کاربر جدید در جدول sub_users
+                    \App\Models\SubUser::create([
+                        'owner_id' => $authenticatedUser->id,
+                        'owner_type' => get_class($authenticatedUser),
+                        'subuserable_id' => $patient->id,
+                        'subuserable_type' => \App\Models\User::class,
+                        'status' => 'active',
                     ]);
                 }
 
@@ -608,6 +646,27 @@ class AppointmentBookingController extends Controller
                             'slug' => $mainClinic->slug,
                             'name' => $mainClinic->name,
                         ] : null,
+                        'patient' => [
+                            'id' => $patient->id,
+                            'first_name' => $patient->first_name,
+                            'last_name' => $patient->last_name,
+                            'national_code' => $patient->national_code,
+                            'mobile' => $patient->mobile,
+                            'email' => $patient->email,
+                            'birth_date' => $patient->birth_date,
+                            'gender' => $patient->gender,
+                            'province_id' => $patient->province_id,
+                            'city_id' => $patient->city_id,
+                            'address' => $patient->address,
+                            'patient_type' => $patientType,
+                        ],
+                        'appointment' => [
+                            'id' => $appointment->id,
+                            'appointment_date' => $appointmentDate,
+                            'appointment_time' => $appointmentTime,
+                            'service_type' => $serviceType,
+                            'fee' => $totalFee,
+                        ],
                     ],
                 ], 200);
             });
