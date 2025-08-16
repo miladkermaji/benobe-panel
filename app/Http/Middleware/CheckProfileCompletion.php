@@ -36,9 +36,9 @@ class CheckProfileCompletion
         }
 
         // بررسی کامل بودن اطلاعات پروفایل
-        $isProfileComplete = $this->isProfileComplete($user);
+        $profileCheck = $this->isProfileComplete($user);
 
-        if (!$isProfileComplete) {
+        if (!$profileCheck['is_complete']) {
             // ساخت URL پروفایل با استفاده از config جدید
             $profileUrl = config('frontend.profile_url');
 
@@ -46,6 +46,7 @@ class CheckProfileCompletion
                 'status' => 'error',
                 'message' => 'لطفاً ابتدا اطلاعات پروفایل خود را تکمیل کنید.',
                 'redirect_url' => $profileUrl,
+                'incomplete_fields' => $profileCheck['incomplete_fields'],
                 'data' => null,
             ], 403);
         }
@@ -56,7 +57,7 @@ class CheckProfileCompletion
     /**
      * بررسی کامل بودن اطلاعات پروفایل کاربر
      */
-    private function isProfileComplete($user): bool
+    private function isProfileComplete($user): array
     {
         // بررسی فیلدهای ضروری
         $requiredFields = [
@@ -70,17 +71,22 @@ class CheckProfileCompletion
             'city_id'
         ];
 
+        $incompleteFields = [];
+
         foreach ($requiredFields as $field) {
             if (empty($user->$field)) {
-                return false;
+                $incompleteFields[] = $field;
             }
         }
 
         // بررسی اضافی برای آدرس (اختیاری اما توصیه شده)
         if (empty($user->address)) {
-            return false;
+            $incompleteFields[] = 'address';
         }
 
-        return true;
+        return [
+            'is_complete' => empty($incompleteFields),
+            'incomplete_fields' => $incompleteFields
+        ];
     }
 }
