@@ -1620,4 +1620,65 @@ h6 {
         max-height: none !important;
         opacity: 1 !important;
     }
+
+    /* تنظیم layout برای دسکتاپ - یک ردیف */
+    .calendar-settings-content .row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .calendar-settings-content .col-md-8 {
+        flex: 0 0 auto;
+        width: auto;
+        max-width: 70%;
+    }
+
+    .calendar-settings-content .col-md-4 {
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 200px;
+    }
+
+    .calendar-settings-content .input-group {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+.input-group input {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+/* تنظیم layout برای موبایل - دو ردیف */
+@media (max-width: 768px) {
+    .calendar-settings-content .row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    .form-control.ltr.text-center.position-relative{
+        width: 90% !important;
+    }
+    .input-group input {
+        width: auto !important;
+}
+    .input-group-text {
+        height: 42px !important;
+    }
+
+    .calendar-settings-content .col-md-8,
+    .calendar-settings-content .col-md-4 {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .calendar-settings-content .input-group {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .calendar-settings-content .p-1.rounded.bg-white {
+        width: 100%;
+        min-width: auto;
+        justify-content: center;
+    }
 }
