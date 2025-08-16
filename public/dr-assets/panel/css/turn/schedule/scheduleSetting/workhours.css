@@ -1693,14 +1693,15 @@ h6 {
         height: 42px !important;
     }
     .input-group {
-    .input-group-text {
-        min-width: 40px !important;
-    }
-    .manual-settings-content .form-control {
-        width: 85% !important;
-    }
+        .input-group-text {
+            min-width: 40px !important;
+        }
+        .manual-settings-content .form-control {
+            width: 85% !important;
+        }
 
-    .manual-settings-content .input-group-text {
-        width: auto !important;
+        .manual-settings-content .input-group-text {
+            width: auto !important;
+        }
     }
 }
