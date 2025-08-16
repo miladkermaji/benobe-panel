@@ -72,8 +72,12 @@ Route::prefix('/v2')->group(function () {
 
     Route::middleware(['custom-auth.jwt'])->group(function () {
         Route::prefix('appointments')->group(function () {
-            Route::get('book/{doctorId}', [AppointmentBookingController::class, 'getBookingDetails'])->name('api.v2.appointments.booking-details');
-            Route::post('book/{doctorId}', [AppointmentBookingController::class, 'bookAppointment'])->name('api.v2.appointments.book');
+            Route::get('book/{doctorId}', [AppointmentBookingController::class, 'getBookingDetails'])
+                ->middleware('check-profile-completion')
+                ->name('api.v2.appointments.booking-details');
+            Route::post('book/{doctorId}', [AppointmentBookingController::class, 'bookAppointment'])
+                ->middleware('check-profile-completion')
+                ->name('api.v2.appointments.book');
         });
 
         Route::prefix('subscriptions')->group(function () {

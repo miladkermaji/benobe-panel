@@ -87,6 +87,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'complete-profile' => \App\Http\Middleware\Dr\CheckCompleteProfile::class,
             'manager.permission' => \App\Http\Middleware\ManagerPermissionMiddleware::class,
             'check-database-connection' => \App\Http\Middleware\CheckDatabaseConnection::class,
+            'check-profile-completion' => \App\Http\Middleware\CheckProfileCompletion::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
