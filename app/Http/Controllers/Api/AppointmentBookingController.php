@@ -240,10 +240,10 @@ class AppointmentBookingController extends Controller
                     'national_code' => $authenticatedUser->national_code,
                     'mobile' => $authenticatedUser->mobile,
                     'email' => $authenticatedUser->email,
-                    'birth_date' => $authenticatedUser->birth_date,
-                    'gender' => $authenticatedUser->gender,
-                    'province_id' => $authenticatedUser->province_id,
-                    'city_id' => $authenticatedUser->city_id,
+                    'birth_date' => $authenticatedUser->date_of_birth,
+                    'gender' => $authenticatedUser->sex,
+                    'province_id' => $authenticatedUser->zone_province_id,
+                    'city_id' => $authenticatedUser->zone_city_id,
                     'address' => $authenticatedUser->address,
                 ] : null,
                 'appointment' => [
@@ -442,6 +442,16 @@ class AppointmentBookingController extends Controller
                 ], 404);
             }
 
+            // Log doctor and clinic information for debugging
+            Log::info('Doctor found, checking clinics', [
+                'doctor_id' => $doctor->id,
+                'doctor_slug' => $doctor->slug,
+                'clinic_slug' => $validated['clinic_slug'] ?? null,
+                'available_clinics' => $doctor->medicalCenters()
+                    ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.is_active', 'medical_centers.type')
+                    ->get()
+            ]);
+
             // پاک‌سازی رزروهای منقضی‌شده قبل از رزرو جدید
             $this->cleanupExpiredPendingAppointments($doctor->id);
 
@@ -469,12 +479,12 @@ class AppointmentBookingController extends Controller
                         'last_name' => $validated['last_name'],
                         'national_code' => $validated['national_code'],
                         'mobile' => $validated['mobile'],
-                        'email' => $validated['email'],
-                        'birth_date' => $validated['birth_date'],
-                        'gender' => $validated['gender'],
-                        'province_id' => $validated['province_id'],
-                        'city_id' => $validated['city_id'],
-                        'address' => $validated['address'],
+                        'email' => $validated['email'] ?? null,
+                        'date_of_birth' => $validated['birth_date'] ?? null,
+                        'sex' => $validated['gender'] ?? null,
+                        'zone_province_id' => $validated['province_id'] ?? null,
+                        'zone_city_id' => $validated['city_id'] ?? null,
+                        'address' => $validated['address'] ?? null,
                         'created_by' => $authenticatedUser->id,
                         'user_type' => 0,
                         'status' => 1,
@@ -508,12 +518,37 @@ class AppointmentBookingController extends Controller
                         ->where('type', 'policlinic')
                         ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug')
                         ->first();
+
                     if (!$mainClinic) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'کلینیک انتخاب‌شده یافت نشد یا غیرفعال است.',
-                            'data' => null,
-                        ], 404);
+                        // بررسی دقیق‌تر برای یافتن دلیل عدم یافتن کلینیک
+                        $clinicExists = $doctor->medicalCenters()->where('slug', $clinicSlug)->first();
+                        if (!$clinicExists) {
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'کلینیک با اسلاگ "' . $clinicSlug . '" برای این پزشک یافت نشد.',
+                                'data' => [
+                                    'clinic_slug' => $clinicSlug,
+                                    'doctor_slug' => $doctor->slug,
+                                    'available_clinics' => $doctor->medicalCenters()
+                                        ->select('medical_centers.id', 'medical_centers.name', 'medical_centers.slug', 'medical_centers.is_active', 'medical_centers.type')
+                                        ->get()
+                                ],
+                            ], 404);
+                        } else {
+                            // کلینیک وجود دارد اما شرایط لازم را ندارد
+                            return response()->json([
+                                'status' => 'error',
+                                'message' => 'کلینیک "' . $clinicExists->name . '" یافت شد اما شرایط لازم را ندارد.',
+                                'data' => [
+                                    'clinic_slug' => $clinicSlug,
+                                    'clinic_name' => $clinicExists->name,
+                                    'is_active' => $clinicExists->is_active,
+                                    'type' => $clinicExists->type,
+                                    'required_type' => 'policlinic',
+                                    'required_active' => true,
+                                ],
+                            ], 404);
+                        }
                     }
                 } else {
                     // اگر clinic_slug ارسال نشده، کلینیک اصلی یا اولین کلینیک فعال را انتخاب کن
@@ -653,10 +688,10 @@ class AppointmentBookingController extends Controller
                             'national_code' => $patient->national_code,
                             'mobile' => $patient->mobile,
                             'email' => $patient->email,
-                            'birth_date' => $patient->birth_date,
-                            'gender' => $patient->gender,
-                            'province_id' => $patient->province_id,
-                            'city_id' => $patient->city_id,
+                            'birth_date' => $patient->date_of_birth,
+                            'gender' => $patient->sex,
+                            'province_id' => $patient->zone_province_id,
+                            'city_id' => $patient->zone_city_id,
                             'address' => $patient->address,
                             'patient_type' => $patientType,
                         ],
