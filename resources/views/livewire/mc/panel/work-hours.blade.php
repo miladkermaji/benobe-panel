@@ -10,22 +10,33 @@
     <div class="workhours-content w-100 d-flex justify-content-center mb-3">
       <div class="workhours-wrapper-content p-3 pt-4">
         <!-- تنظیمات نوبت دستی (فقط وقتی autoScheduling غیرفعال باشد) -->
-        <div class="card border border-radius-11 p-3 mb-4 bg-white shadow-sm">
+        <div class="card border border-radius-11 mb-2 bg-white shadow-sm">
           <div class="p-2 d-flex align-items-center justify-content-between">
             <h6 class="mb-0">تنظیمات تایید دو مرحله ای نوبت‌های دستی</h6>
-            @component('components.custom-tooltip', [
-                'title' =>
-                    'در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت لغو خواهد شد. در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید.',
-                'placement' => 'top',
-                'trigger' => 'hover',
-            ])
-              <span class="toggle-appointment-help" tabindex="0">&#9432;</span>
-            @endcomponent
+            <div class="d-flex align-items-center gap-2">
+              @component('components.custom-tooltip', [
+                  'title' =>
+                      'در فیلد اول می‌توانید مشخص کنید که چند ساعت قبل از زمان نوبت پیامک تأیید نهایی نوبت ارسال شود و در فیلد دوم، می‌توانید مشخص کنید بیمار چند ساعت مهلت دارد نوبت خود را تأیید کند، در غیر این صورت نوبت لغو خواهد شد. در زیر با استفاده از گزینه بلی یا خیر می‌توانید این امکان را فعال یا غیرفعال نمایید.',
+                  'placement' => 'top',
+                  'trigger' => 'hover',
+              ])
+                <span class="toggle-appointment-help" tabindex="0">&#9432;</span>
+              @endcomponent
+              <!-- دکمه تاگل برای موبایل -->
+              <button class="btn btn-sm btn-outline-secondary d-md-none toggle-section-btn"
+                data-target="manual-settings-content" type="button">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                </svg>
+              </button>
+            </div>
           </div>
-          <div class="p-2">
+          <div class="py-2 px-2 manual-settings-content" id="manual-settings-content">
             <div class="row">
               @if (!$autoScheduling)
-                <div class="col-12 mb-3">
+                <div class="col-12 mb-1">
                   <div class="d-flex flex-row gap-3 flex-wrap align-items-center justify-content-center">
                     <div class="p-1 rounded bg-white"
                       style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
@@ -51,7 +62,7 @@
                 </div>
               @endif
               <!-- زمان ارسال لینک تأیید و مدت اعتبار لینک در یک ردیف (فقط وقتی toggle فعال باشد) -->
-              <div class="col-12 {{ $manualNobatActive ? '' : 'd-none' }} ">
+              <div class="col-12 {{ $manualNobatActive ? '' : 'd-none' }}">
                 <div class="d-flex flex-column flex-md-row gap-2">
                   <div class="flex-fill position-relative">
                     <label class="label-top-input-special-takhasos mb-2">زمان ارسال لینک تأیید:</label>
@@ -85,25 +96,44 @@
                 class="row border border-radius-11 p-3 align-items-center conditional-section" x-show="auto"
                 style="display: none;">
                 <!-- تعداد روزهای باز تقویم -->
-                <div class="col-8">
-                  <div class="input-group position-relative  rounded bg-white mt-2">
-                    <label class="floating-label bg-white px-2 fw-bold"
-                      style="position: absolute; top: -10px; right: -4px; font-size: 0.7rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
-                      تعداد روز‌های باز تقویم
-                    </label>
-                    <input type="text" inputmode="numeric" pattern="[0-9]*"
-                      class="form-control text-center calendar-days-input" name="calendar_days"
-                      placeholder="تعداد روز مورد نظر خود را وارد کنید" wire:model.live.debounce.500ms="calendarDays"
-                      wire:change="autoSaveCalendarDays" style="height: 50px; z-index: 1;">
-                    <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
+                <div class="col-12">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <h6 class="mb-0">تنظیمات تقویم و تعطیلات</h6>
+                    <!-- دکمه تاگل برای موبایل -->
+                    <button class="btn btn-sm btn-outline-secondary d-md-none toggle-section-btn"
+                      data-target="calendar-settings-content" type="button">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                          stroke-linejoin="round" />
+                      </svg>
+                    </button>
                   </div>
-                </div>
-                <!-- باز بودن مطب در تعطیلات رسمی -->
-                <div class="col-4">
-                  <div class="p-1 rounded bg-white"
-                    style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
-                    <x-my-toggle-yes-no :isChecked="$holidayAvailability" id="holiday-availability" model="holidayAvailability"
-                      day="باز بودن مطب در تعطیلات رسمی" />
+                  <div class="calendar-settings-content" id="calendar-settings-content">
+                    <div class="row">
+                      <div class="col-md-8">
+                        <div class="input-group position-relative rounded bg-white mt-2">
+                          <label class="floating-label bg-white px-2 fw-bold"
+                            style="position: absolute; top: -10px; right: -4px; font-size: 0.7rem; color: var(--text-secondary); z-index: 10; transition: all 0.2s ease;">
+                            تعداد روز‌های باز تقویم
+                          </label>
+                          <input type="text" inputmode="numeric" pattern="[0-9]*"
+                            class="form-control text-center calendar-days-input" name="calendar_days"
+                            placeholder="تعداد روز مورد نظر خود را وارد کنید"
+                            wire:model.live.debounce.500ms="calendarDays" wire:change="autoSaveCalendarDays"
+                            style="height: 50px; z-index: 1;">
+                          <span class="input-group-text" style="height: 50px; z-index: 1;">روز</span>
+                        </div>
+                      </div>
+                      <!-- باز بودن مطب در تعطیلات رسمی -->
+                      <div class="col-md-4">
+                        <div class="p-1 rounded bg-white"
+                          style="height: 50px; display: flex; align-items: center; justify-content: center; min-width: 200px;">
+                          <x-my-toggle-yes-no :isChecked="$holidayAvailability" id="holiday-availability" model="holidayAvailability"
+                            day="باز بودن مطب در تعطیلات رسمی" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -671,6 +701,62 @@
     </div>
     <script>
       document.addEventListener('livewire:initialized', () => {
+        // تابع تاگل کردن بخش‌ها در موبایل
+        function initializeMobileToggles() {
+          const toggleButtons = document.querySelectorAll('.toggle-section-btn');
+
+          toggleButtons.forEach(button => {
+            const targetId = button.getAttribute('data-target');
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+              // در موبایل، بخش‌ها را به صورت پیش‌فرض بسته کن
+              if (window.innerWidth <= 768) {
+                targetElement.classList.add('collapsed');
+                button.classList.add('collapsed');
+              }
+
+              button.addEventListener('click', function() {
+                const isCollapsed = targetElement.classList.contains('collapsed');
+
+                if (isCollapsed) {
+                  // باز کردن بخش
+                  targetElement.classList.remove('collapsed');
+                  button.classList.remove('collapsed');
+                } else {
+                  // بستن بخش
+                  targetElement.classList.add('collapsed');
+                  button.classList.add('collapsed');
+                }
+              });
+            }
+          });
+        }
+
+        // اجرای تابع در لود اولیه
+        initializeMobileToggles();
+
+        // اجرای مجدد در تغییر سایز صفحه
+        window.addEventListener('resize', function() {
+          if (window.innerWidth <= 768) {
+            // در موبایل، بخش‌ها را بسته کن
+            document.querySelectorAll('.manual-settings-content, .calendar-settings-content').forEach(element => {
+              element.classList.add('collapsed');
+            });
+            document.querySelectorAll('.toggle-section-btn').forEach(button => {
+              button.classList.add('collapsed');
+            });
+          } else {
+            // در دسکتاپ، بخش‌ها را باز کن
+            document.querySelectorAll('.manual-settings-content, .calendar-settings-content').forEach(element => {
+              element.classList.remove('collapsed');
+            });
+            document.querySelectorAll('.toggle-section-btn').forEach(button => {
+              button.classList.remove('collapsed');
+            });
+          }
+        });
+
         window.addEventListener('open-modal', event => {
           const modalName = event.detail.name;
           const day = event.detail.day;
