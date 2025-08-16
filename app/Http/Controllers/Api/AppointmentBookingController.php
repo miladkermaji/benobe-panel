@@ -475,6 +475,7 @@ class AppointmentBookingController extends Controller
                 if ($patientType === 'self') {
                     $patient = $authenticatedUser;
                     $patientMessage = 'نوبت برای خود شما رزرو می‌شود.';
+                    $isNewUser = false;
                 } else {
                     // بررسی وجود کاربر با کد ملی
                     $existingPatient = User::where('national_code', $validated['national_code'])->first();
@@ -482,7 +483,7 @@ class AppointmentBookingController extends Controller
                     if ($existingPatient) {
                         // کاربر موجود است - استفاده از کاربر موجود
                         $patient = $existingPatient;
-                        $patientMessage = 'کاربر قبلاً در سیستم ثبت شده است.';
+                        $patientMessage = 'کاربر با کد ملی ' . $validated['national_code'] . ' قبلاً در سیستم ثبت شده و اطلاعات آن بازیابی شد.';
                         $isNewUser = false;
 
                         // بررسی اینکه آیا این کاربر قبلاً در sub_users کاربر جاری ثبت شده
@@ -529,7 +530,7 @@ class AppointmentBookingController extends Controller
                             'status' => 'active',
                         ]);
 
-                        $patientMessage = 'کاربر جدید با موفقیت ثبت شد.';
+                        $patientMessage = 'کاربر جدید با نام ' . $validated['first_name'] . ' ' . $validated['last_name'] . ' و کد ملی ' . $validated['national_code'] . ' با موفقیت در سیستم ثبت شد.';
                         $isNewUser = true;
                     }
                 }
@@ -700,7 +701,7 @@ class AppointmentBookingController extends Controller
                 // پاسخ با اطلاعات اضافی
                 return response()->json([
                     'status' => 'success',
-                    'message' => 'نوبت با موفقیت رزرو شد. ' . $patientMessage . ' لطفاً به درگاه پرداخت هدایت شوید.',
+                    'message' => 'نوبت با موفقیت رزرو شد. لطفاً به درگاه پرداخت هدایت شوید.',
                     'payment_url' => $redirection->getTargetUrl(),
                     'tracking_code' => $trackingCode,
                     'expires_in_seconds' => 600,
@@ -730,6 +731,7 @@ class AppointmentBookingController extends Controller
                             'patient_type' => $patientType,
                             'is_new_user' => $isNewUser,
                             'message' => $patientMessage,
+                            'status' => $isNewUser ? 'new_user_created' : 'existing_user_found',
                         ],
                         'appointment' => [
                             'id' => $appointment->id,
