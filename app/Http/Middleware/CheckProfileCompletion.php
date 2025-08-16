@@ -65,8 +65,8 @@ class CheckProfileCompletion
             'last_name',
             'national_code',
             'mobile',
-            'birth_date',
-            'gender',
+            'date_of_birth',
+            'sex',
             'province_id',
             'city_id'
         ];
